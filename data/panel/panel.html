@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="panel.css">
+  </head>
+  <body>
+    <div id="messages" hidden>
+      <div data-l10n-id="password-too-short"></div>
+      <div data-l10n-id="passwords-differ"></div>
+      <div data-l10n-id="password-declined"></div>
+      <div data-l10n-id="password-name-required"></div>
+      <div data-l10n-id="password-name-exists"></div>
+      <div data-l10n-id="no-characters-selected"></div>
+      <div data-l10n-id="password-value-required"></div>
+      <div data-l10n-id="password-type-generated"></div>
+      <div data-l10n-id="password-type-legacy"></div>
+      <div data-l10n-id="remove-password-confirmation"></div>
+    </div>
+
+    <form id="change-master" class="slide" data-default-element="new-master">
+      <div id="new-master-message" class="description" data-l10n-id="new-master-message"></div>
+      <div id="reset-master-message" class="description warning" data-l10n-id="reset-master-message"></div>
+      <label class="block-start" for="new-master" data-l10n-id="new-master"></label>
+      <input id="new-master" type="password">
+      <div class="error" hidden></div>
+      <label class="block-start" for="new-master-repeat" data-l10n-id="new-master-repeat"></label>
+      <input id="new-master-repeat" type="password">
+      <div class="error" hidden></div>
+      <div class="button-container">
+        <button id="change-master-submit" type="submit" data-l10n-id="change-master-submit"></button>
+        <button id="reset-master-cancel" type="reset" data-l10n-id="cancel"></button>
+      </div>
+    </form>
+
+    <form id="enter-master" class="slide" data-default-element="master-password">
+      <label for="master-password" data-l10n-id="master-password"></label>
+      <input id="master-password" type="password">
+      <div class="error" hidden></div>
+      <div class="button-container">
+        <button data-l10n-id="enter-master-submit"></button>
+      </div>
+      <div class="link-container">
+        <a id="reset-master-link" href="#" data-l10n-id="reset-master-link"></a>
+      </div>
+    </form>
+
+    <form id="password-list" class="slide" data-default-element="site">
+      <!-- Cannot use <template> tag here, template contents are removed from document before l10n does its job -->
+      <div id="password-template" hidden>
+        <div class="password-container">
+          <a href="#" class="to-document-link" data-l10n-id="to-document"></a>
+          <a href="#" class="to-clipboard-link" data-l10n-id="to-clipboard"></a>
+          <span class="password-name"></span>
+          <a href="#" class="password-remove-link" data-l10n-id="remove-password"></a>
+        </div>
+      </div>
+
+      <label for="site" data-l10n-id="site"></label>
+      <div id="site-container">
+        <input id="site" type="text" readonly>
+        <a href="#" id="site-edit"></a>
+      </div>
+      <div id="password-copied-message" class="success" data-l10n-id="password-copied-message"></div>
+      <div id="no-such-password" class="warning" data-l10n-id="no-such-password"></div>
+      <div id="unknown-generation-method" class="warning" data-l10n-id="unknown-generation-method"></div>
+      <div id="wrong-site-message" class="warning" data-l10n-id="wrong-site-message"></div>
+      <div id="no-password-fields" class="warning" data-l10n-id="no-password-fields"></div>
+      <div data-l10n-id="passwords-label" class="block-start"></div>
+      <div id="no-passwords-message" data-l10n-id="no-passwords-message"></div>
+      <div id="password-list-container"></div>
+      <a href="#" id="generate-password-link" data-l10n-id="generate-password-link"></a>
+      <a href="#" id="legacy-password-link" data-l10n-id="legacy-password-link"></a>
+      <div class="link-container">
+        <a id="lock-passwords" href="#" data-l10n-id="lock-passwords"></a>
+      </div>
+    </form>
+
+    <form id="generate-password" class="slide" data-default-element="generate-password-name">
+      <label data-l10n-id="site"></label>
+      <div id="generate-password-site"></div>
+      <label class="block-start" for="generate-password-name" data-l10n-id="password-name"></label>
+      <input id="generate-password-name" type="text">
+      <div class="error" hidden></div>
+      <label class="block-start" for="password-length" data-l10n-id="password-length"></label>
+      <div id="length-container">
+        <input id="password-length" type="range" min="4" max="24" step="1" value="16">
+        <span id="password-length-value"></span>
+      </div>
+      <label class="block-start" for="charset-lower" data-l10n-id="allowed-characters"></label>
+      <div id="charsets-container">
+        <label><input id="charset-lower" type="checkbox" data-error="charsets-error" checked>abc</label>
+        <label><input id="charset-upper" type="checkbox" data-error="charsets-error" checked>XYZ</label>
+        <label><input id="charset-number" type="checkbox" data-error="charsets-error" checked>789</label>
+        <label><input id="charset-symbol" type="checkbox" data-error="charsets-error" checked>+^;</label>
+      </div>
+      <div id="charsets-error" class="error" hidden></div>
+      <div class="button-container">
+        <button id="generate-password-submit" type="submit" data-l10n-id="generate-password"></button>
+        <button id="generate-password-cancel" type="reset" data-l10n-id="cancel"></button>
+      </div>
+    </form>
+
+    <form id="legacy-password" class="slide" data-default-element="legacy-password-name">
+      <label data-l10n-id="site"></label>
+      <div id="legacy-password-site"></div>
+      <label class="block-start" for="legacy-password-name" data-l10n-id="password-name"></label>
+      <input id="legacy-password-name" type="text">
+      <div class="error" hidden></div>
+      <label class="block-start" for="legacy-password-value" data-l10n-id="password-value"></label>
+      <input id="legacy-password-value" type="password">
+      <div class="error" hidden></div>
+      <div class="button-container">
+        <button id="legacy-password-save" type="submit" data-l10n-id="save-password"></button>
+        <button id="legacy-password-cancel" type="reset" data-l10n-id="cancel"></button>
+      </div>
+    </form>
+
+    <form id="confirm" class="slide" data-default-element="confirm-yes">
+      <div id="confirm-message" class="warning"></div>
+      <div class="button-container">
+        <button id="confirm-yes" type="submit" data-l10n-id="yes"></button>
+        <button id="confirm-no" type="reset" data-l10n-id="no"></button>
+      </div>
+    </form>
+  </body>
+</html>
