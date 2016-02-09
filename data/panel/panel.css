@@ -123,18 +123,44 @@ input[type="checkbox"]
   flex-grow: 1;
 }
 
-#site-edit
+#site-edit,
+#site-edit-accept,
+#site-edit-cancel
 {
   min-width: var(--icon-size);
   min-height: var(--icon-size);
   -moz-margin-end: var(--inline-spacing);
   margin-inline-end: var(--inline-spacing);
-  background-image: url(../images/edit64.png);
   background-size: var(--icon-size);
   background-repeat: no-repeat;
 }
 
+#site-edit
+{
+  background-image: url(../images/edit64.png);
+}
+
 #site:not([readonly]) + #site-edit
+{
+  display: none;
+}
+
+#site-edit-cancel
+{
+  background-image: url(../images/cancel64.png);
+}
+
+#site[readonly] + * + #site-edit-cancel
+{
+  display: none;
+}
+
+#site-edit-accept
+{
+  background-image: url(../images/accept64.png);
+}
+
+#site[readonly] + * + * + #site-edit-accept
 {
   display: none;
 }

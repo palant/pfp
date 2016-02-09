@@ -14,12 +14,18 @@
 
   onInit(function()
   {
+    for (let element of ["original-site", "site-edit", "site-edit-accept", "site-edit-cancel"].map($))
+    {
+      element.setAttribute("title", element.textContent);
+      element.textContent = "";
+    }
+
     setSubmitHandler("password-list", finishEditingSite);
     setCommandHandler("site-edit", editSite);
     setCommandHandler("lock-passwords", () => self.port.emit("forgetMasterPassword"));
-
-    $("original-site").setAttribute("title", $("original-site").textContent);
     setCommandHandler("original-site", removeAlias);
+    setCommandHandler("site-edit-accept", finishEditingSite);
+    setCommandHandler("site-edit-cancel", abortEditingSite);
 
     self.port.on("setPasswords", initPasswordList);
     self.port.on("passwordAdded", showPasswords);
@@ -36,7 +42,6 @@
   function initPasswordList({origSite, site, passwords})
   {
     setSite(origSite, site);
-    $("site").setAttribute("readonly", "readonly");
     showPasswords(passwords);
   }
 
@@ -55,7 +60,10 @@
       origSiteField.hidden = true;
     $("site-edit").hidden = (origSite != site);
 
-    $("site").setAttribute("value", site || "???");
+    let field = $("site");
+    field.setAttribute("value", site || "???");
+    field.value = field.getAttribute("value");
+    field.setAttribute("readonly", "readonly");
     $("generate-password-link").hidden = $("legacy-password-link").hidden = !site;
   }
 
@@ -104,11 +112,22 @@
       return;
     }
 
+    if (alias == site)
+    {
+      abortEditingSite();
+      return;
+    }
+
     if (site)
       self.port.emit("addAlias", {site, alias});
     else
       self.port.emit("getPasswords", alias);
     field.setAttribute("readonly", "readonly");
+  }
+
+  function abortEditingSite()
+  {
+    setSite(origSite, site);
   }
 
   function removeAlias()
