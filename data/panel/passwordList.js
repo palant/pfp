@@ -90,6 +90,7 @@
 
     let field = $("site");
     field.removeAttribute("readonly");
+    field.value = site;
     field.focus();
   }
 
@@ -106,7 +107,7 @@
     if (site)
       self.port.emit("addAlias", {site, alias});
     else
-      self.port.emit("getPasswords", site);
+      self.port.emit("getPasswords", alias);
     field.setAttribute("readonly", "readonly");
   }
 
