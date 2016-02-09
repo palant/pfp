@@ -10,12 +10,16 @@
 
   let hidePasswordMessagesTimeout = null;
   let site = null;
+  let origSite = null;
 
   onInit(function()
   {
     setSubmitHandler("password-list", finishEditingSite);
     setCommandHandler("site-edit", editSite);
     setCommandHandler("lock-passwords", () => self.port.emit("forgetMasterPassword"));
+
+    $("original-site").setAttribute("title", $("original-site").textContent);
+    setCommandHandler("original-site", removeAlias);
 
     self.port.on("setPasswords", initPasswordList);
     self.port.on("passwordAdded", showPasswords);
@@ -36,8 +40,9 @@
     showPasswords(passwords);
   }
 
-  function setSite(origSite, newSite)
+  function setSite(newOrigSite, newSite)
   {
+    origSite = newOrigSite;
     site = newSite;
 
     let origSiteField = $("original-site");
@@ -103,6 +108,16 @@
     else
       self.port.emit("getPasswords", site);
     field.setAttribute("readonly", "readonly");
+  }
+
+  function removeAlias()
+  {
+    let message = messages["remove-alias-confirmation"].replace(/\{1\}/g, origSite).replace(/\{2\}/g, site);
+    confirm(message).then(response =>
+    {
+      if (response)
+        self.port.emit("removeAlias", origSite);
+    });
   }
 
   function showPasswords(passwords)
