@@ -104,6 +104,12 @@ input[type="checkbox"]
   color: var(--error-text);
 }
 
+#original-site
+{
+  white-space: pre-line;
+  text-align: center;
+}
+
 #site-container
 {
   display: flex;

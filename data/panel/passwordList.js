@@ -29,16 +29,26 @@
 
   onShow(initPasswordList);
 
-  function initPasswordList({site, passwords})
+  function initPasswordList({origSite, site, passwords})
   {
-    setSite(site);
+    setSite(origSite, site);
     $("site").setAttribute("readonly", "readonly");
     showPasswords(passwords);
   }
 
-  function setSite(newSite)
+  function setSite(origSite, newSite)
   {
     site = newSite;
+
+    let origSiteField = $("original-site");
+    if (origSite != site)
+    {
+      origSiteField.hidden = false;
+      origSiteField.textContent = origSite + "\n\u21E3";
+    }
+    else
+      origSiteField.hidden = true;
+    $("site-edit").hidden = (origSite != site);
 
     $("site").setAttribute("value", site || "???");
     $("generate-password-link").hidden = $("legacy-password-link").hidden = !site;
