@@ -109,6 +109,7 @@ input[type="checkbox"]
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
+  margin-bottom: var(--block-spacing);
 }
 
 #site

@@ -13,9 +13,11 @@
 
   onInit(function()
   {
+    setSubmitHandler("password-list", finishEditingSite);
     setCommandHandler("site-edit", editSite);
     setCommandHandler("lock-passwords", () => self.port.emit("forgetMasterPassword"));
 
+    self.port.on("setPasswords", initPasswordList);
     self.port.on("passwordAdded", showPasswords);
     self.port.on("passwordRemoved", showPasswords);
     self.port.on("fillInFailed", showPasswordMessage);
@@ -25,12 +27,14 @@
     hidePasswordMessages();
   });
 
-  onShow(function({site, passwords})
+  onShow(initPasswordList);
+
+  function initPasswordList({site, passwords})
   {
     setSite(site);
     $("site").setAttribute("readonly", "readonly");
     showPasswords(passwords);
-  });
+  }
 
   function setSite(newSite)
   {
@@ -46,13 +50,15 @@
       window.clearTimeout(hidePasswordMessagesTimeout);
     hidePasswordMessagesTimeout = null;
 
-    for (let id of ["password-copied-message", "no-such-password", "unknown-generation-method", "wrong-site-message", "no-password-fields"])
+    for (let id of ["cannot-edit-site", "empty-site-name", "password-copied-message", "no-such-password", "unknown-generation-method", "wrong-site-message", "no-password-fields"])
       $(id).hidden = true;
     resize();
   }
 
   function showPasswordMessage(id)
   {
+    hidePasswordMessages();
+
     $(id).hidden = false;
     resize();
 
@@ -61,9 +67,32 @@
 
   function editSite()
   {
+    if ($("password-list-container").firstElementChild)
+    {
+      showPasswordMessage("cannot-edit-site");
+      return;
+    }
+
     let field = $("site");
     field.removeAttribute("readonly");
     field.focus();
+  }
+
+  function finishEditingSite()
+  {
+    let field = $("site");
+    let alias = field.value.trim();
+    if (!alias)
+    {
+      showPasswordMessage("empty-site-name");
+      return;
+    }
+
+    if (site)
+      self.port.emit("addAlias", {site, alias});
+    else
+      self.port.emit("getPasswords", site);
+    field.setAttribute("readonly", "readonly");
   }
 
   function showPasswords(passwords)
