@@ -22,6 +22,7 @@
 
     setSubmitHandler("password-list", finishEditingSite);
     setCommandHandler("site-edit", editSite);
+    setCommandHandler("show-all", () => self.port.emit("showAllPasswords"));
     setCommandHandler("lock-passwords", () => self.port.emit("forgetMasterPassword"));
     setCommandHandler("original-site", removeAlias);
     setCommandHandler("site-edit-accept", finishEditingSite);
