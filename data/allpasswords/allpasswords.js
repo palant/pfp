@@ -11,53 +11,53 @@ function $(id)
   return document.getElementById(id);
 }
 
-function addCell(row, text, rowspan)
+function addDiv(parent, className, text)
 {
-  let cell = document.createElement("td");
-  cell.textContent = text;
-  if (rowspan)
-    cell.rowSpan = rowspan;
-  row.appendChild(cell);
+  let div = document.createElement("div");
+  div.className = className;
+  if (text)
+    div.textContent = text;
+  parent.appendChild(div);
+  return div;
 }
 
 self.port.on("init", function(sites)
 {
   let typeGenerated = $("type-generated").textContent;
   let typeLegacy = $("type-legacy").textContent;
-  let aliasesPrefix = $("aliases").textContent;
+  let aliasesPrefix = $("aliases-prefix").textContent;
+  let lengthPrefix = $("length-prefix").textContent;
+  let charsPrefix = $("chars-prefix").textContent;
 
   let siteNames = Object.keys(sites);
   siteNames.sort();
 
+  let container = $("list");
   for (let site of siteNames)
   {
     let {passwords, aliases} = sites[site];
+
+    let block = addDiv(container, "siteInfo");
+    addDiv(block, "siteName", site);
+
+    if (aliases.length)
+    {
+      aliases.sort();
+      addDiv(block, "siteAliases", aliasesPrefix + " " + aliases.join(", "));
+    }
+
     let passwordNames = Object.keys(passwords);
     passwordNames.sort();
-
-    let first = true;
-    let container = $("list").tBodies[0];
     for (let name of passwordNames)
     {
-      let row = document.createElement("tr");
-      if (first)
-      {
-        let text = site;
-        if (aliases.length)
-        {
-          aliases.sort();
-          text += "\n" + aliasesPrefix + " " + aliases.join(", ");
-        }
-        addCell(row, text, passwordNames.length);
-        first = false;
-      }
-
       let passwordData = passwords[name];
-      addCell(row, name);
+      let passwordDiv = addDiv(block, "password");
+      addDiv(passwordDiv, "passwordName", name);
+
       if (passwordData.type == "pbkdf2-sha1-generated")
       {
-        addCell(row, typeGenerated);
-        addCell(row, passwordData.length);
+        addDiv(passwordDiv, "passwordType", typeGenerated);
+        addDiv(passwordDiv, "passwordLength", lengthPrefix + " " + passwordData.length);
 
         let chars = [];
         if (passwordData.lower)
@@ -68,15 +68,12 @@ self.port.on("init", function(sites)
           chars.push("789");
         if (passwordData.symbol)
           chars.push("+^;");
-        addCell(row, chars.join(" "));
+        addDiv(passwordDiv, "passwordAllowedChars", charsPrefix + " " + chars.join(" "));
       }
       else
       {
-        addCell(row, typeLegacy);
-        addCell(row, "");
-        addCell(row, "");
+        addDiv(passwordDiv, "passwordType", typeLegacy);
       }
-      container.appendChild(row);
     }
   }
 });
