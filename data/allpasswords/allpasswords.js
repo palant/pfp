@@ -11,23 +11,18 @@ function $(id)
   return document.getElementById(id);
 }
 
-function addDiv(parent, className, text)
-{
-  let div = document.createElement("div");
-  div.className = className;
-  if (text)
-    div.textContent = text;
-  parent.appendChild(div);
-  return div;
-}
-
 self.port.on("init", function(sites)
 {
-  let typeGenerated = $("type-generated").textContent;
-  let typeLegacy = $("type-legacy").textContent;
-  let aliasesPrefix = $("aliases-prefix").textContent;
-  let lengthPrefix = $("length-prefix").textContent;
-  let charsPrefix = $("chars-prefix").textContent;
+  let siteTemplate = $("site-template").firstElementChild;
+  let passwordTemplate = $("password-template").firstElementChild;
+  for (let link of passwordTemplate.querySelectorAll("a"))
+  {
+    if (link.textContent)
+    {
+      link.setAttribute("title", link.textContent);
+      link.textContent = "";
+    }
+  }
 
   let siteNames = Object.keys(sites);
   siteNames.sort();
@@ -37,27 +32,26 @@ self.port.on("init", function(sites)
   {
     let {passwords, aliases} = sites[site];
 
-    let block = addDiv(container, "siteInfo");
-    addDiv(block, "siteName", site);
+    let siteInfo = siteTemplate.cloneNode(true);
+    siteInfo.querySelector(".site-name").textContent = site;
 
     if (aliases.length)
-    {
-      aliases.sort();
-      addDiv(block, "siteAliases", aliasesPrefix + " " + aliases.join(", "));
-    }
+      siteInfo.querySelector(".site-aliases-value").textContent = aliases.sort().join(", ");
+    else
+      siteInfo.querySelector(".site-aliases").hidden = true;
 
     let passwordNames = Object.keys(passwords);
     passwordNames.sort();
     for (let name of passwordNames)
     {
       let passwordData = passwords[name];
-      let passwordDiv = addDiv(block, "password");
-      addDiv(passwordDiv, "passwordName", name);
+      let passwordInfo = passwordTemplate.cloneNode(true);
+      passwordInfo.querySelector(".password-name").textContent = name;
 
       if (passwordData.type == "pbkdf2-sha1-generated")
       {
-        addDiv(passwordDiv, "passwordType", typeGenerated);
-        addDiv(passwordDiv, "passwordLength", lengthPrefix + " " + passwordData.length);
+        passwordInfo.querySelector(".password-info.legacy").hidden = true;
+        passwordInfo.querySelector(".password-length-value").textContent = passwordData.length;
 
         let chars = [];
         if (passwordData.lower)
@@ -68,12 +62,15 @@ self.port.on("init", function(sites)
           chars.push("789");
         if (passwordData.symbol)
           chars.push("+^;");
-        addDiv(passwordDiv, "passwordAllowedChars", charsPrefix + " " + chars.join(" "));
+        passwordInfo.querySelector(".password-allowed-chars-value").textContent = chars.join(" ");
       }
       else
       {
-        addDiv(passwordDiv, "passwordType", typeLegacy);
+        passwordInfo.querySelector(".password-info.generated").hidden = true;
       }
+      siteInfo.appendChild(passwordInfo);
     }
+
+    container.appendChild(siteInfo);
   }
 });
