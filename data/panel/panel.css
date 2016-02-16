@@ -74,7 +74,7 @@ input[type="checkbox"]
   padding: var(--block-padding);
   -moz-padding-start: calc(var(--icon-size) + var(--block-padding) + var(--inline-spacing));
   padding-inline-start: calc(var(--icon-size) + var(--block-padding) + var(--inline-spacing));
-  background-image: url(../images/warning64.png);
+  background-image: url(../images/android-warning.svg);
   background-size: var(--icon-size);
   background-position: var(--block-padding) var(--block-padding);
   background-repeat: no-repeat;
@@ -138,7 +138,7 @@ input[type="checkbox"]
 
 #site-edit
 {
-  background-image: url(../images/edit64.png);
+  background-image: url(../images/ios-compose-outline.svg);
 }
 
 #site:not([readonly]) + #site-edit
@@ -148,7 +148,7 @@ input[type="checkbox"]
 
 #site-edit-cancel
 {
-  background-image: url(../images/cancel64.png);
+  background-image: url(../images/close-round.svg);
 }
 
 #site[readonly] + * + #site-edit-cancel
@@ -158,7 +158,7 @@ input[type="checkbox"]
 
 #site-edit-accept
 {
-  background-image: url(../images/accept64.png);
+  background-image: url(../images/checkmark-round.svg);
 }
 
 #site[readonly] + * + * + #site-edit-accept
@@ -204,23 +204,17 @@ input[type="checkbox"]
 
 .to-document-link
 {
-/*  -moz-margin-end: var(--inline-spacing);
-  margin-inline-end: var(--inline-spacing);*/
-  background-image: url(../images/todocument64.png);
+  background-image: url(../images/ios-color-wand.svg);
 }
 
 .to-clipboard-link
 {
-/*  -moz-margin-end: var(--inline-spacing);
-  margin-inline-end: var(--inline-spacing);*/
-  background-image: url(../images/toclipboard64.png);
+  background-image: url(../images/archive.svg);
 }
 
 .password-remove-link
 {
-  -moz-margin-start: var(--inline-spacing);
-  margin-inline-start: var(--inline-spacing);
-  background-image: url(../images/remove64.png);
+  background-image: url(../images/ios-close-outline.svg);
 }
 
 #generate-password-link,
@@ -229,7 +223,7 @@ input[type="checkbox"]
   min-height: var(--icon-size);
   -moz-padding-start: calc(var(--icon-size) + var(--inline-spacing));
   padding-inline-start: calc(var(--icon-size) + var(--inline-spacing));
-  background-image: url(../images/add64.png);
+  background-image: url(../images/ios-plus-outline.svg);
   background-size: var(--icon-size);
   background-repeat: no-repeat;
 }
