@@ -6,6 +6,8 @@
 
 "use strict";
 
+let knownSites = null;
+
 function $(id)
 {
   return document.getElementById(id);
@@ -35,8 +37,86 @@ function removePassword(site, name, id)
     self.port.emit("removePassword", {site, name, id});
 }
 
+function exportData()
+{
+  if (!knownSites)
+    return;
+
+  let data = {
+    "application": "easypasswords",
+    "format": 1,
+    "sites": knownSites
+  };
+
+  let link = $("exportData");
+  link.href = "data:application/json," + encodeURIComponent(JSON.stringify(data));
+  link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
+  link.click();
+}
+
+function importData()
+{
+  $("importFile").click();
+}
+
+function importDataFromFile(file)
+{
+  let reader = new FileReader();
+  reader.onload = function()
+  {
+    let data = reader.result;
+    try
+    {
+      data = JSON.parse(data);
+    }
+    catch (e)
+    {
+      data = null;
+      console.error(e);
+    }
+
+    if (!data || typeof data != "object" || data.application != "easypasswords" || data.format != 1)
+    {
+      alert($("unknown-data-format").textContent);
+      return;
+    }
+
+    if (confirm($("allpasswords-import-confirm").textContent))
+      self.port.emit("importPasswordData", data.sites);
+  };
+  reader.readAsText(file);
+}
+
+function printPage()
+{
+  window.print();
+}
+
+window.addEventListener("DOMContentLoaded", function()
+{
+  let globalActions = {
+    export: exportData,
+    import: importData,
+    print: printPage
+  };
+
+  for (let id of Object.keys(globalActions))
+  {
+    let element = $(id);
+    element.setAttribute("title", element.textContent);
+    element.textContent = "";
+    setCommandHandler(element, globalActions[id]);
+  }
+
+  $("importFile").addEventListener("change", event =>
+  {
+    importDataFromFile(event.target.files[0]);
+  });
+});
+
 self.port.on("init", function(sites)
 {
+  knownSites = sites;
   let siteTemplate = $("site-template").firstElementChild;
   let passwordTemplate = $("password-template").firstElementChild;
   for (let link of passwordTemplate.querySelectorAll("a"))
@@ -134,4 +214,9 @@ self.port.on("passwordCopied", id => {
       message.hidden = true;
     }, 3000);
   }
+});
+
+self.port.on("dataImported", () => {
+  alert($("allpasswords-import-success").textContent);
+  window.location.reload();
 });
