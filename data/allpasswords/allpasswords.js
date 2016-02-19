@@ -133,6 +133,8 @@ self.port.on("init", function(sites)
 
   let counter = 0;
   let container = $("list");
+  let currentLetter = null;
+  let prevInfo = null;
   for (let site of siteNames)
   {
     let {passwords, aliases} = sites[site];
@@ -181,6 +183,27 @@ self.port.on("init", function(sites)
     }
 
     container.appendChild(siteInfo);
+
+    let letter = site[0].toUpperCase();
+    if (letter != currentLetter)
+    {
+      currentLetter = letter;
+      let link = document.createElement("a");
+      link.textContent = currentLetter;
+      link.href = "#";
+      setCommandHandler(link, () => {
+        let div = siteInfo;
+        while (div && !div.parentNode)
+          div = div._nextSiteInfo;
+        if (div)
+          div.scrollIntoView(true);
+      });
+      $("shortcuts").appendChild(link);
+    }
+
+    if (prevInfo)
+      prevInfo._nextSiteInfo = siteInfo;
+    prevInfo = siteInfo;
   }
 });
 
