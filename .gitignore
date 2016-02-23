@@ -1,4 +1,6 @@
+/node_modules/
 *.xpi
 *.zip
 *.pyc
 *.sh
+*.css

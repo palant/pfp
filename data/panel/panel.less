@@ -4,48 +4,48 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
+@font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@font-size: 24px;
+@font-size-small: 16px;
+
+@text-color: #000;
+@background-color: #fff;
+@hover-background: #E2F4FF;
+@warning-background: #faa;
+@success-background: #cfc;
+@error-text: #f44;
+
+@block-spacing: 15px;
+@block-padding: 5px;
+@inline-spacing: 5px;
+@icon-size: 32px;
+
 :root
 {
   margin: 0;
   min-width: 600px;
-
-  --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-size: 24px;
-  --font-size-small: 16px;
-
-  --text-color: #000;
-  --background-color: #fff;
-  --hover-background: #E2F4FF;
-  --warning-background: #faa;
-  --success-background: #cfc;
-  --error-text: #f44;
-
-  --block-spacing: 15px;
-  --block-padding: 5px;
-  --inline-spacing: 5px;
-  --icon-size: 32px;
 }
 
 body
 {
   margin: 0;
   padding: 10px;
-  background-color: var(--background-color);
-  color: var(--text-color);
+  background-color: @background-color;
+  color: @text-color;
 }
 
 body,
 input,
 button
 {
-  font-family: var(--font-family);
-  font-size: var(--font-size);
+  font-family: @font-family;
+  font-size: @font-size;
 }
 
 input[type="checkbox"]
 {
-  width: var(--font-size);
-  height: var(--font-size);
+  width: @font-size;
+  height: @font-size;
 }
 
 .slide
@@ -63,27 +63,27 @@ input[type="checkbox"]
 .button-container,
 .link-container
 {
-  margin-top: var(--block-spacing);
+  margin-top: @block-spacing;
 }
 
 .warning
 {
-  background-color: var(--warning-background);
-  border-radius: var(--block-padding);
+  background-color: @warning-background;
+  border-radius: @block-padding;
 
-  padding: var(--block-padding);
-  -moz-padding-start: calc(var(--icon-size) + var(--block-padding) + var(--inline-spacing));
-  padding-inline-start: calc(var(--icon-size) + var(--block-padding) + var(--inline-spacing));
+  padding: @block-padding;
+  -moz-padding-start: @icon-size + @block-padding + @inline-spacing;
+  padding-inline-start: @icon-size + @block-padding + @inline-spacing;
   background-image: url(../images/android-warning.svg);
-  background-size: var(--icon-size);
-  background-position: var(--block-padding) var(--block-padding);
+  background-size: @icon-size;
+  background-position: @block-padding @block-padding;
   background-repeat: no-repeat;
 }
 
 .success
 {
-  background-color: var(--success-background);
-  border-radius: var(--block-padding);
+  background-color: @success-background;
+  border-radius: @block-padding;
 }
 
 .button-container,
@@ -96,13 +96,13 @@ input[type="checkbox"]
 
 .link-container
 {
-  font-size: var(--font-size-small);
+  font-size: @font-size-small;
 }
 
 .error
 {
-  font-size: var(--font-size-small);
-  color: var(--error-text);
+  font-size: @font-size-small;
+  color: @error-text;
 }
 
 #original-site
@@ -116,7 +116,7 @@ input[type="checkbox"]
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  margin-bottom: var(--block-spacing);
+  margin-bottom: @block-spacing;
 }
 
 #site
@@ -128,11 +128,11 @@ input[type="checkbox"]
 #site-edit-accept,
 #site-edit-cancel
 {
-  min-width: var(--icon-size);
-  min-height: var(--icon-size);
-  -moz-margin-end: var(--inline-spacing);
-  margin-inline-end: var(--inline-spacing);
-  background-size: var(--icon-size);
+  min-width: @icon-size;
+  min-height: @icon-size;
+  -moz-margin-end: @inline-spacing;
+  margin-inline-end: @inline-spacing;
+  background-size: @icon-size;
   background-repeat: no-repeat;
 }
 
@@ -184,7 +184,7 @@ input[type="checkbox"]
 
 .password-container:hover
 {
-  background-color: var(--hover-background);
+  background-color: @hover-background;
 }
 
 .password-name
@@ -196,9 +196,9 @@ input[type="checkbox"]
 .to-clipboard-link,
 .password-remove-link
 {
-  min-width: var(--icon-size);
-  min-height: var(--icon-size);
-  background-size: var(--icon-size);
+  min-width: @icon-size;
+  min-height: @icon-size;
+  background-size: @icon-size;
   background-repeat: no-repeat;
 }
 
@@ -220,11 +220,11 @@ input[type="checkbox"]
 #generate-password-link,
 #legacy-password-link
 {
-  min-height: var(--icon-size);
-  -moz-padding-start: calc(var(--icon-size) + var(--inline-spacing));
-  padding-inline-start: calc(var(--icon-size) + var(--inline-spacing));
+  min-height: @icon-size;
+  -moz-padding-start: @icon-size + @inline-spacing;
+  padding-inline-start: @icon-size + @inline-spacing;
   background-image: url(../images/ios-plus-outline.svg);
-  background-size: var(--icon-size);
+  background-size: @icon-size;
   background-repeat: no-repeat;
 }
 

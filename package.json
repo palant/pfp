@@ -2,7 +2,7 @@
   "title": "Easy Passwords",
   "name": "easypasswords",
   "id": "easypasswords@palant.de",
-  "version": "0.3",
+  "version": "0.3.0",
   "description": "Use a single master password to generate secure unique passwords for all websites - without losing track of the passwords you cannot change.",
   "main": "lib/main.js",
   "author": "Wladimir Palant",
@@ -28,5 +28,11 @@
   "engines": {
     "firefox": "38.0a1 - 48.0"
   },
-  "license": "MPL-2.0"
+  "license": "MPL-2.0",
+  "devDependencies": {
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "gulp-less": "^3.0.5",
+    "jpm": "^1.0.6"
+  }
 }
