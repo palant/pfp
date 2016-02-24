@@ -40,6 +40,12 @@ If you want to test on another computer you can specify a host as well:
 
     gulp post --post-url=device.localdomain:8888
 
+You can also make Gulp watch the repository for changes and reinstall Easy Passwords whenever some file changes:
+
+    gulp watch
+
+Here you can use the same `--post-url` parameter as with `gulp post`.
+
 Cleaning up the repository
 --------------------------
 
