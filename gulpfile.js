@@ -19,12 +19,15 @@ function readArg(prefix, defaultValue)
   return defaultValue;
 }
 
-function jpm(args, callback)
+function jpm(args)
 {
-  let ps = spawn("./node_modules/.bin/jpm", args);
-  ps.stdout.pipe(process.stdout);
-  ps.stderr.pipe(process.stderr);
-  ps.on("close", callback);
+  return new Promise((resolve, reject) =>
+  {
+    let ps = spawn("./node_modules/.bin/jpm", args);
+    ps.stdout.pipe(process.stdout);
+    ps.stderr.pipe(process.stderr);
+    ps.on("close", resolve);
+  });
 }
 
 gulp.task("default", ["xpi"], function()
@@ -38,12 +41,12 @@ gulp.task("less", function()
              .pipe(gulp.dest('data'));
 });
 
-gulp.task("xpi", ["less"], function(callback)
+gulp.task("xpi", ["less"], function()
 {
-  jpm(["xpi"], callback);
+  return jpm(["xpi"]);
 });
 
-gulp.task("post", ["less"], function(callback)
+gulp.task("post", ["less"], function()
 {
   let postUrl = readArg("--post-url=", "http://localhost:8888/");
   if (/^\d+$/.test(postUrl))
@@ -51,7 +54,7 @@ gulp.task("post", ["less"], function(callback)
   if (postUrl.indexOf("://") < 0)
     postUrl = "http://" + postUrl;
 
-  jpm(["post", "--post-url", postUrl], callback);
+  return jpm(["post", "--post-url", postUrl]);
 });
 
 gulp.task("watch", ["post"], function()
