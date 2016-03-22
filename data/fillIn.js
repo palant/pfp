@@ -15,7 +15,10 @@ fields = Array.filter(fields, element => element.offsetHeight && element.offsetW
 if (fields.length > 0)
 {
   for (let field of fields)
+  {
     field.value = password;
+    field.dispatchEvent(new Event("change", {bubbles: true}));
+  }
   fields[0].focus();
   self.port.emit("success");
 }
