@@ -76,18 +76,36 @@ function setValidator(id, validator)
   else
     elements = id.map($);
 
-  let handler = () => validateElement(elements, validator);
+  let eagerValidation = false;
+  let handler = event =>
+  {
+    if (event.type == "reset")
+    {
+      eagerValidation = false;
+      for (let element of elements)
+        element.setCustomValidity("");
+    }
+    else if (event.type == "submit")
+    {
+      eagerValidation = !validateElement(elements, validator);
+      if (eagerValidation)
+      {
+        event.preventDefault();
+
+        if (!document.activeElement || !document.activeElement.validationMessage)
+          elements[0].focus();
+      }
+    }
+    else if ((event.type == "input" || event.type == "change") && eagerValidation)
+      validateElement(elements, validator);
+  };
+
   for (let element of elements)
   {
-    element.addEventListener("blur", handler);
+    element.form.addEventListener("submit", handler, true);
+    element.form.addEventListener("reset", handler);
+    element.addEventListener("input", handler);
     element.addEventListener("change", handler);
-    element.addEventListener("input", () => element.validity.customError && handler());
-
-    if (!element.form._validators)
-      element.form._validators = [];
-
-    if (element.form._validators.indexOf(handler) < 0)
-      element.form._validators.push(handler);
   }
 }
 
@@ -98,12 +116,39 @@ function validateElement(elements, validator)
   else if (!(elements instanceof Array))
     elements = [elements];
 
-  let result = typeof validator == "string" ? validator : validator.apply(null, elements);
+  let result = validator.apply(null, elements);
   for (let element of elements)
   {
     element.setCustomValidity(result || "");
     updateForm(element.form);
   }
+  return !result;
+}
+
+function markInvalid(element, message)
+{
+  if (typeof element == "string")
+    element = $(element);
+
+  element.setCustomValidity(message);
+  if (!document.activeElement || !document.activeElement.validationMessage)
+    element.focus();
+  updateForm(element.form);
+
+  // Clear message after a change
+  let handler = event =>
+  {
+    element.removeEventListener("input", handler);
+    element.removeEventListener("change", handler);
+
+    if (element.validationMessage == message)
+    {
+      element.setCustomValidity("");
+      updateForm(element.form);
+    }
+  };
+  element.addEventListener("input", handler);
+  element.addEventListener("change", handler);
 }
 
 function setCommandHandler(element, handler)
@@ -122,17 +167,12 @@ function setSubmitHandler(element, handler)
 {
   if (typeof element == "string")
     element = $(element);
-  let wrapper = (event) =>
+  let wrapper = event =>
   {
+    if (event.defaultPrevented)
+      return;
+
     event.preventDefault();
-
-    if (element._validators)
-    {
-      element._validators.forEach(v => v());
-      if (!element._isValid)
-        return;
-    }
-
     handler.call(element, event);
   };
   element.addEventListener("submit", wrapper);
@@ -169,8 +209,6 @@ function resetForm(form)
   try
   {
     form.reset();
-    for (let i = 0; i < form.length; i++)
-      form[i].setCustomValidity("");
     updateForm(form);
   }
   finally

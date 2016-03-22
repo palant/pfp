@@ -20,13 +20,13 @@
       element.textContent = "";
     }
 
-    setSubmitHandler("password-list", finishEditingSite);
     setCommandHandler("site-edit", editSite);
     setCommandHandler("show-all", () => self.port.emit("showAllPasswords"));
     setCommandHandler("lock-passwords", () => self.port.emit("forgetMasterPassword"));
     setCommandHandler("original-site", removeAlias);
     setCommandHandler("site-edit-accept", finishEditingSite);
     setCommandHandler("site-edit-cancel", abortEditingSite);
+    setSubmitHandler("password-list", finishEditingSite);
 
     self.port.on("setPasswords", initPasswordList);
     self.port.on("passwordAdded", showPasswords);

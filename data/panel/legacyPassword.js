@@ -9,13 +9,13 @@
 onInit(function()
 {
   self.port.on("passwordAdded", () => setActivePanel("password-list"));
-  self.port.on("passwordAlreadyExists", () => validateElement("legacy-password-name", messages["password-name-exists"]));
-
-  setSubmitHandler("legacy-password", addLegacyPassword);
-  setResetHandler("legacy-password", () => setActivePanel("password-list"));
+  self.port.on("passwordAlreadyExists", () => markInvalid("legacy-password-name", messages["password-name-exists"]));
 
   setValidator("legacy-password-name", enforceValue.bind(null, "password-name-required"));
   setValidator("legacy-password-value", enforceValue.bind(null, "password-value-required"));
+
+  setSubmitHandler("legacy-password", addLegacyPassword);
+  setResetHandler("legacy-password", () => setActivePanel("password-list"));
 });
 
 onShow(function({site})

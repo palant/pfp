@@ -8,11 +8,11 @@
 
 onInit(function()
 {
-  setSubmitHandler("change-master", () => self.port.emit("changeMasterPassword", $("new-master").value.trim()));
-  setResetHandler("change-master", () => setActivePanel("enter-master"));
-
   setValidator("new-master", validateMasterPassword);
   setValidator("new-master-repeat", validateMasterPasswordRepeat);
+
+  setSubmitHandler("change-master", () => self.port.emit("changeMasterPassword", $("new-master").value.trim()));
+  setResetHandler("change-master", () => setActivePanel("enter-master"));
 });
 
 onShow(function({masterPasswordState})

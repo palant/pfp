@@ -9,10 +9,7 @@
 onInit(function()
 {
   self.port.on("passwordAdded", () => setActivePanel("password-list"));
-  self.port.on("passwordAlreadyExists", () => validateElement("generate-password-name", messages["password-name-exists"]));
-
-  setSubmitHandler("generate-password", addGeneratedPassword);
-  setResetHandler("generate-password", () => setActivePanel("password-list"));
+  self.port.on("passwordAlreadyExists", () => markInvalid("generate-password-name", messages["password-name-exists"]));
 
   $("password-length").addEventListener("input", updatePasswordLengthDisplay);
   $("generate-password").addEventListener("reset", () => {
@@ -22,6 +19,9 @@ onInit(function()
 
   setValidator("generate-password-name", enforceValue.bind(null, "password-name-required"));
   setValidator(["charset-lower", "charset-upper", "charset-number", "charset-symbol"], validateCharsets);
+
+  setSubmitHandler("generate-password", addGeneratedPassword);
+  setResetHandler("generate-password", () => setActivePanel("password-list"));
 });
 
 onShow(function({site})
