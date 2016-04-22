@@ -6,8 +6,27 @@
 
 "use strict";
 
+function getActiveElement(doc)
+{
+  let result = doc.activeElement;
+  if (result && result.contentDocument)
+    return getActiveElement(result.contentDocument);
+  else
+    return result;
+}
+
 function fillIn(wnd)
 {
+  if (wnd == wnd.top)
+  {
+    let field = getActiveElement(wnd.document);
+    if (field instanceof HTMLInputElement && field.type == "password")
+    {
+      field.value = password;
+      return true;
+    }
+  }
+
   let fields = wnd.document.querySelectorAll("input[type=password]");
   let result = false;
   fields = Array.filter(fields, element => element.offsetHeight && element.offsetWidth);
