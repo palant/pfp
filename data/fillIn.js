@@ -15,7 +15,7 @@ function getActiveElement(doc)
     return result;
 }
 
-function fillIn(wnd)
+function fillIn(wnd, noFocus)
 {
   if (wnd == wnd.top)
   {
@@ -38,7 +38,8 @@ function fillIn(wnd)
       field.value = password;
       field.dispatchEvent(new Event("change", {bubbles: true}));
     }
-    fields[0].focus();
+    if (!noFocus)
+      fields[0].focus();
   }
 
   for (let i = 0; i < wnd.frames.length; i++)
@@ -53,7 +54,7 @@ function fillIn(wnd)
       continue;
     }
 
-    if (fillIn(wnd.frames[i]))
+    if (fillIn(wnd.frames[i], noFocus || fields.length > 0))
       result = true;
   }
 
