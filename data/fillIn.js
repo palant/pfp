@@ -52,7 +52,9 @@ function fillIn(wnd)
       // Forbidden by same-origin policy, ignore
       continue;
     }
-    result = result || fillIn(wnd.frames[i]);
+
+    if (fillIn(wnd.frames[i]))
+      result = true;
   }
 
   return result;
