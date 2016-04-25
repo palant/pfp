@@ -29,14 +29,15 @@
     "firefox": "41.0 - 49.0"
   },
   "license": "MPL-2.0",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/palant/easypasswords.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/palant/easypasswords.git"
   },
   "devDependencies": {
     "del": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-less": "^3.0.5",
+    "gulp-rename": "^1.2.2",
     "jpm": "^1.0.6"
   }
 }

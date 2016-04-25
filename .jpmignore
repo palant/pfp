@@ -1,8 +1,0 @@
-/node_modules/
-.*
-*.xpi
-*.zip
-*.py
-*.pyc
-*.less
-gulpfile.js
