@@ -6,6 +6,12 @@
 
 "use strict";
 
+/*
+  global $, onInit, onShow, setValidator, setActivePanel, getActivePanel,
+  setCommandHandler, setSubmitHandler, setResetHandler, markInvalid,
+  enforceValue, resize, messages
+*/
+
 onInit(function()
 {
   setValidator("new-master", validateMasterPassword);

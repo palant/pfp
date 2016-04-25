@@ -6,6 +6,8 @@
 
 "use strict";
 
+/* global unsafeWindow, cloneInto, exportFunction */
+
 // Let the script inside the page do the work. No, we cannot do it ourselves,
 // https://bugzilla.mozilla.org/show_bug.cgi?id=1198934 won't let us.
 

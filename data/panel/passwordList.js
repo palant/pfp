@@ -8,6 +8,12 @@
 {
   "use strict";
 
+  /*
+    global $, onInit, onShow, setValidator, setActivePanel, getActivePanel,
+    setCommandHandler, setSubmitHandler, setResetHandler, markInvalid,
+    enforceValue, resize, messages
+  */
+
   let hidePasswordMessagesTimeout = null;
   let site = null;
   let origSite = null;

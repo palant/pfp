@@ -6,6 +6,12 @@
 
 "use strict";
 
+/*
+  global $, onInit, onShow, setValidator, setActivePanel, getActivePanel,
+  setCommandHandler, setSubmitHandler, setResetHandler, markInvalid,
+  enforceValue, resize, messages
+*/
+
 onInit(function()
 {
   self.port.on("passwordAdded", () => setActivePanel("password-list"));

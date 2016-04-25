@@ -6,6 +6,8 @@
 
 "use strict";
 
+/* global Task */
+
 const NUM_ITERATIONS = 256*1024;
 
 // I, l, O, 0, 1 excluded because of potential confusion. ", ', \ excluded

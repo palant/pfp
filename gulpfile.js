@@ -6,12 +6,14 @@
 
 "use strict";
 
+let path = require("path");
+let spawn = require("child_process").spawn;
+
 let gulp = require("gulp");
 let less = require("gulp-less");
 let rename = require("gulp-rename");
 let del = require("del");
-let path = require("path");
-let spawn = require("child_process").spawn;
+let eslint = require("gulp-eslint");
 
 function readArg(prefix, defaultValue)
 {
@@ -92,12 +94,32 @@ gulp.task("builddir", ["package.json", "LICENSE.txt", "icon.png", "icon64.png", 
 {
 });
 
-gulp.task("xpi", ["builddir"], function()
+gulp.task("lint-data", ["package.json", "data"], function()
+{
+  return gulp.src("build/data/**/*.js")
+             .pipe(eslint({envs: ["browser", "es6"]}))
+             .pipe(eslint.format())
+             .pipe(eslint.failAfterError());
+});
+
+gulp.task("lint-lib", ["package.json", "lib"], function()
+{
+  return gulp.src("build/lib/**/*.js")
+             .pipe(eslint({envs: ["commonjs", "es6"]}))
+             .pipe(eslint.format())
+             .pipe(eslint.failAfterError());
+});
+
+gulp.task("lint", ["lint-data", "lint-lib"], function()
+{
+});
+
+gulp.task("xpi", ["lint"], function()
 {
   return jpm(["xpi"]);
 });
 
-gulp.task("post", ["builddir"], function()
+gulp.task("post", ["lint"], function()
 {
   let postUrl = readArg("--post-url=", "http://localhost:8888/");
   if (/^\d+$/.test(postUrl))

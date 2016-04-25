@@ -6,6 +6,12 @@
 
 "use strict";
 
+/*
+  global $, onInit, onShow, setValidator, setActivePanel, getActivePanel,
+  setCommandHandler, setSubmitHandler, setResetHandler, markInvalid,
+  enforceValue, resize, messages
+*/
+
 let promiseAccept = null;
 let originalSelection = null;
 

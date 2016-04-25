@@ -6,6 +6,14 @@
 
 "use strict";
 
+/*
+  global $, onInit, onShow, setValidator, setActivePanel, getActivePanel,
+  setCommandHandler, setSubmitHandler, setResetHandler, markInvalid,
+  enforceValue, resize, messages
+*/
+
+/* global validateMasterPassword */
+
 onInit(function()
 {
   setCommandHandler("reset-master-link", () => setActivePanel("change-master"));
