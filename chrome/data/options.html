@@ -11,14 +11,26 @@
     <meta charset="utf-8">
     <title data-l10n-id="options-title"></title>
     <link rel="stylesheet" href="options.css">
+    <script src="i18n.js"></script>
+    <script src="options.js"></script>
   </head>
   <body>
-    <label for="autolock" data-l10n-id="autolock_title"></label>
-    <div class="subtitle" data-l10n-id="autolock_description"></div>
-    <input type="checkbox" id="autolock" checked>
+    <h1 data-l10n-id="options-title"></h1>
 
-    <label for="autolock_delay" data-l10n-id="autolock_delay_title"></label>
-    <div class="subtitle" data-l10n-id="autolock_delay_description"></div>
-    <input type="number" id="autolock_delay" value="10" min="0">
+    <div class="setting">
+      <div class="setting-label">
+        <label for="autolock" data-l10n-id="autolock_title"></label>
+        <span class="description" data-l10n-id="autolock_description"></span>
+      </div>
+      <input type="checkbox" id="autolock">
+    </div>
+
+    <div class="setting">
+      <div class="setting-label">
+        <label for="autolock_delay" data-l10n-id="autolock_delay_title"></label>
+        <span class="description" data-l10n-id="autolock_delay_description"></span>
+      </div>
+      <input type="number" id="autolock_delay" min="0">
+    </div>
   </body>
 </html>
