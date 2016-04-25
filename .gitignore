@@ -1,6 +1,9 @@
-/build/
+/build-jpm/
+/build-chrome/
 /node_modules/
 *.xpi
+*.crx
 *.zip
 *.pyc
 *.sh
+*.pem

@@ -47,12 +47,18 @@
     "url": "https://github.com/palant/easypasswords.git"
   },
   "devDependencies": {
+    "browserify": "^13.0.0",
     "del": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-eslint": "^2.0.0",
     "gulp-htmlhint": "^0.3.1",
+    "gulp-json-modify": "^1.0.0",
     "gulp-less": "^3.0.5",
     "gulp-rename": "^1.2.2",
-    "jpm": "^1.0.6"
+    "gulp-zip": "^3.2.0",
+    "jpm": "^1.0.6",
+    "merge-stream": "^1.0.0",
+    "node-rsa": "^0.3.2",
+    "vinyl-source-stream": "^1.1.0"
   }
 }

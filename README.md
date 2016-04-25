@@ -23,7 +23,7 @@ If all the dependencies are installed building EasyPasswords is simply a matter 
 
     gulp xpi
 
-This will create a package inside the `build` directory with the file name like `easypasswords@palant.de-n.n.n.xpi` that you can install in Firefox.
+This will create a package inside the `build-jpm` directory with the file name like `easypasswords@palant.de-n.n.n.xpi` that you can install in Firefox.
 
 How to test
 -----------
