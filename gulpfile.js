@@ -14,6 +14,7 @@ let less = require("gulp-less");
 let rename = require("gulp-rename");
 let del = require("del");
 let eslint = require("gulp-eslint");
+let htmlhint = require("gulp-htmlhint");
 
 function readArg(prefix, defaultValue)
 {
@@ -94,7 +95,7 @@ gulp.task("builddir", ["package.json", "LICENSE.txt", "icon.png", "icon64.png", 
 {
 });
 
-gulp.task("lint-data", ["package.json", "data"], function()
+gulp.task("eslint-data", ["package.json", "data"], function()
 {
   return gulp.src("build/data/**/*.js")
              .pipe(eslint({envs: ["browser", "es6"]}))
@@ -102,7 +103,7 @@ gulp.task("lint-data", ["package.json", "data"], function()
              .pipe(eslint.failAfterError());
 });
 
-gulp.task("lint-lib", ["package.json", "lib"], function()
+gulp.task("eslint-lib", ["package.json", "lib"], function()
 {
   return gulp.src("build/lib/**/*.js")
              .pipe(eslint({envs: ["commonjs", "es6"]}))
@@ -110,16 +111,25 @@ gulp.task("lint-lib", ["package.json", "lib"], function()
              .pipe(eslint.failAfterError());
 });
 
-gulp.task("lint", ["lint-data", "lint-lib"], function()
+gulp.task("eslint", ["eslint-data", "eslint-lib"], function()
 {
 });
 
-gulp.task("xpi", ["lint"], function()
+gulp.task("htmlhint", ["data"], function()
+{
+  return gulp.src("build/**/*.html")
+             .pipe(htmlhint({
+               "title-require": false
+             }))
+             .pipe(htmlhint.failReporter());
+});
+
+gulp.task("xpi", ["eslint", "htmlhint"], function()
 {
   return jpm(["xpi"]);
 });
 
-gulp.task("post", ["lint"], function()
+gulp.task("post", ["eslint", "htmlhint"], function()
 {
   let postUrl = readArg("--post-url=", "http://localhost:8888/");
   if (/^\d+$/.test(postUrl))
