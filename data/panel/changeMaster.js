@@ -4,44 +4,48 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
-"use strict";
-
-/*
-  global $, onInit, onShow, setValidator, setActivePanel, getActivePanel,
-  setCommandHandler, setSubmitHandler, setResetHandler, markInvalid,
-  enforceValue, resize, messages
-*/
-
-onInit(function()
+(function(global)
 {
-  setValidator("new-master", validateMasterPassword);
-  setValidator("new-master-repeat", validateMasterPasswordRepeat);
+  "use strict";
 
-  setSubmitHandler("change-master", () => self.port.emit("changeMasterPassword", $("new-master").value.trim()));
-  setResetHandler("change-master", () => setActivePanel("enter-master"));
-});
+  /*
+    global $, onInit, onShow, setValidator, setActivePanel, getActivePanel,
+    setCommandHandler, setSubmitHandler, setResetHandler, markInvalid,
+    enforceValue, resize, messages
+  */
 
-onShow(function({masterPasswordState})
-{
-  $("new-master-message").hidden = masterPasswordState != "unset";
-  $("reset-master-message").hidden = masterPasswordState == "unset";
-  $("reset-master-cancel").hidden = masterPasswordState == "unset";
-});
+  onInit(function()
+  {
+    setValidator("new-master", validateMasterPassword);
+    setValidator("new-master-repeat", validateMasterPasswordRepeat);
 
-function validateMasterPassword(element)
-{
-  let value = element.value.trim();
-  if (value.length < 6)
-    return messages["password-too-short"];
+    setSubmitHandler("change-master", () => self.port.emit("changeMasterPassword", $("new-master").value.trim()));
+    setResetHandler("change-master", () => setActivePanel("enter-master"));
+  });
 
-  return null;
-}
+  onShow(function({masterPasswordState})
+  {
+    $("new-master-message").hidden = masterPasswordState != "unset";
+    $("reset-master-message").hidden = masterPasswordState == "unset";
+    $("reset-master-cancel").hidden = masterPasswordState == "unset";
+  });
 
-function validateMasterPasswordRepeat(element)
-{
-  let value = element.value.trim();
-  if (value != $("new-master").value.trim())
-    return messages["passwords-differ"];
+  function validateMasterPassword(element)
+  {
+    let value = element.value.trim();
+    if (value.length < 6)
+      return messages["password-too-short"];
 
-  return null;
-}
+    return null;
+  }
+  global.validateMasterPassword = validateMasterPassword;
+
+  function validateMasterPasswordRepeat(element)
+  {
+    let value = element.value.trim();
+    if (value != $("new-master").value.trim())
+      return messages["passwords-differ"];
+
+    return null;
+  }
+})(this);

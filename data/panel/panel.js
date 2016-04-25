@@ -4,292 +4,307 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
-"use strict";
-
-let disableResetHandlers = false;
-
-let messages = {};
-let initHandlers = [];
-let showHandlers = [];
-
-function $(id)
+(function(global)
 {
-  return document.getElementById(id);
-}
+  "use strict";
 
-function onInit(callback)
-{
-  initHandlers.push(callback);
-}
+  let disableResetHandlers = false;
 
-function onShow(callback)
-{
-  showHandlers.push(callback);
-}
+  let messages = global.messages = {};
+  let initHandlers = [];
+  let showHandlers = [];
 
-function init()
-{
-  window.removeEventListener("load", init, false);
-
-  for (let messageElement of $("messages").children)
-    messages[messageElement.getAttribute("data-l10n-id")] = messageElement.textContent;
-
-  self.port.on("masterPasswordAccepted", () => setActivePanel("password-list"));
-  self.port.on("masterPasswordForgotten", () => setActivePanel("enter-master"));
-
-  // Run panel initializers
-  for (let handler of initHandlers)
-    handler.call(null);
-}
-window.addEventListener("load", init);
-
-function show(message)
-{
-  let {masterPasswordState} = message;
-  let stateToPanel = {
-    "unset": "change-master",
-    "set": "enter-master",
-    "known": "password-list"
-  };
-  setActivePanel(stateToPanel[masterPasswordState]);
-
-  setFocus();
-
-  // Run panel initializers
-  for (let handler of showHandlers)
-    handler.call(null, message);
-}
-
-function hide()
-{
-  setActivePanel(null);
-
-  // Make sure we don't have any sensitive data stuck in the forms
-  resetForms();
-}
-
-function setValidator(id, validator)
-{
-  let elements;
-  if (typeof id == "string")
-    elements = [$(id)];
-  else
-    elements = id.map($);
-
-  let eagerValidation = false;
-  let handler = event =>
+  function $(id)
   {
-    if (event.type == "reset")
+    return document.getElementById(id);
+  }
+  global.$ = $;
+
+  function onInit(callback)
+  {
+    initHandlers.push(callback);
+  }
+  global.onInit = onInit;
+
+  function onShow(callback)
+  {
+    showHandlers.push(callback);
+  }
+  global.onShow = onShow;
+
+  function init()
+  {
+    window.removeEventListener("load", init, false);
+
+    for (let messageElement of $("messages").children)
+      messages[messageElement.getAttribute("data-l10n-id")] = messageElement.textContent;
+
+    self.port.on("masterPasswordAccepted", () => setActivePanel("password-list"));
+    self.port.on("masterPasswordForgotten", () => setActivePanel("enter-master"));
+
+    // Run panel initializers
+    for (let handler of initHandlers)
+      handler.call(null);
+  }
+  window.addEventListener("load", init);
+
+  function show(message)
+  {
+    let {masterPasswordState} = message;
+    let stateToPanel = {
+      "unset": "change-master",
+      "set": "enter-master",
+      "known": "password-list"
+    };
+    setActivePanel(stateToPanel[masterPasswordState]);
+
+    setFocus();
+
+    // Run panel initializers
+    for (let handler of showHandlers)
+      handler.call(null, message);
+  }
+
+  function hide()
+  {
+    setActivePanel(null);
+
+    // Make sure we don't have any sensitive data stuck in the forms
+    resetForms();
+  }
+
+  function setValidator(id, validator)
+  {
+    let elements;
+    if (typeof id == "string")
+      elements = [$(id)];
+    else
+      elements = id.map($);
+
+    let eagerValidation = false;
+    let handler = event =>
     {
-      eagerValidation = false;
-      for (let element of elements)
-        element.setCustomValidity("");
-    }
-    else if (event.type == "submit")
-    {
-      eagerValidation = !validateElement(elements, validator);
-      if (eagerValidation)
+      if (event.type == "reset")
       {
-        event.preventDefault();
-
-        if (!document.activeElement || !document.activeElement.validationMessage)
-          elements[0].focus();
+        eagerValidation = false;
+        for (let element of elements)
+          element.setCustomValidity("");
       }
-    }
-    else if ((event.type == "input" || event.type == "change") && eagerValidation)
-      validateElement(elements, validator);
-  };
+      else if (event.type == "submit")
+      {
+        eagerValidation = !validateElement(elements, validator);
+        if (eagerValidation)
+        {
+          event.preventDefault();
 
-  for (let element of elements)
+          if (!document.activeElement || !document.activeElement.validationMessage)
+            elements[0].focus();
+        }
+      }
+      else if ((event.type == "input" || event.type == "change") && eagerValidation)
+        validateElement(elements, validator);
+    };
+
+    for (let element of elements)
+    {
+      element.form.addEventListener("submit", handler, true);
+      element.form.addEventListener("reset", handler);
+      element.addEventListener("input", handler);
+      element.addEventListener("change", handler);
+    }
+  }
+  global.setValidator = setValidator;
+
+  function validateElement(elements, validator)
   {
-    element.form.addEventListener("submit", handler, true);
-    element.form.addEventListener("reset", handler);
+    if (typeof elements == "string")
+      elements = [$(elements)];
+    else if (!(elements instanceof Array))
+      elements = [elements];
+
+    let result = validator.apply(null, elements);
+    for (let element of elements)
+    {
+      element.setCustomValidity(result || "");
+      updateForm(element.form);
+    }
+    return !result;
+  }
+
+  function markInvalid(element, message)
+  {
+    if (typeof element == "string")
+      element = $(element);
+
+    element.setCustomValidity(message);
+    if (!document.activeElement || !document.activeElement.validationMessage)
+      element.focus();
+    updateForm(element.form);
+
+    // Clear message after a change
+    let handler = event =>
+    {
+      element.removeEventListener("input", handler);
+      element.removeEventListener("change", handler);
+
+      if (element.validationMessage == message)
+      {
+        element.setCustomValidity("");
+        updateForm(element.form);
+      }
+    };
     element.addEventListener("input", handler);
     element.addEventListener("change", handler);
   }
-}
+  global.markInvalid = markInvalid;
 
-function validateElement(elements, validator)
-{
-  if (typeof elements == "string")
-    elements = [$(elements)];
-  else if (!(elements instanceof Array))
-    elements = [elements];
-
-  let result = validator.apply(null, elements);
-  for (let element of elements)
+  function setCommandHandler(element, handler)
   {
-    element.setCustomValidity(result || "");
-    updateForm(element.form);
-  }
-  return !result;
-}
-
-function markInvalid(element, message)
-{
-  if (typeof element == "string")
-    element = $(element);
-
-  element.setCustomValidity(message);
-  if (!document.activeElement || !document.activeElement.validationMessage)
-    element.focus();
-  updateForm(element.form);
-
-  // Clear message after a change
-  let handler = event =>
-  {
-    element.removeEventListener("input", handler);
-    element.removeEventListener("change", handler);
-
-    if (element.validationMessage == message)
+    if (typeof element == "string")
+      element = $(element);
+    let wrapper = (event) =>
     {
-      element.setCustomValidity("");
-      updateForm(element.form);
+      event.preventDefault();
+      handler.call(element, event);
+    };
+    element.addEventListener("click", wrapper);
+  }
+  global.setCommandHandler = setCommandHandler;
+
+  function setSubmitHandler(element, handler)
+  {
+    if (typeof element == "string")
+      element = $(element);
+    let wrapper = event =>
+    {
+      if (event.defaultPrevented)
+        return;
+
+      event.preventDefault();
+      handler.call(element, event);
+    };
+    element.addEventListener("submit", wrapper);
+  }
+  global.setSubmitHandler = setSubmitHandler;
+
+  function setResetHandler(element, handler)
+  {
+    if (typeof element == "string")
+      element = $(element);
+    let wrapper = (event) =>
+    {
+      if (disableResetHandlers)
+        return;
+
+      handler.call(element, event);
+    };
+    element.addEventListener("reset", wrapper);
+  }
+  global.setResetHandler = setResetHandler;
+
+  function setFocus()
+  {
+    let activePanel = getActivePanel();
+    if (!activePanel)
+      return;
+
+    let defaultElement = $(activePanel).getAttribute("data-default-element");
+    if (defaultElement)
+      $(defaultElement).focus();
+  }
+
+  function resetForm(form)
+  {
+    disableResetHandlers = true;
+    try
+    {
+      form.reset();
+      updateForm(form);
     }
-  };
-  element.addEventListener("input", handler);
-  element.addEventListener("change", handler);
-}
+    finally
+    {
+      disableResetHandlers = false;
+    }
+  }
 
-function setCommandHandler(element, handler)
-{
-  if (typeof element == "string")
-    element = $(element);
-  let wrapper = (event) =>
+  function resetForms()
   {
-    event.preventDefault();
-    handler.call(element, event);
-  };
-  element.addEventListener("click", wrapper);
-}
+    for (let form of document.forms)
+      resetForm(form);
+  }
 
-function setSubmitHandler(element, handler)
-{
-  if (typeof element == "string")
-    element = $(element);
-  let wrapper = event =>
+  function resize()
   {
-    if (event.defaultPrevented)
+    // Force reflow
+    document.body.offsetHeight;
+
+    self.port.emit("resize", [
+      document.documentElement.scrollWidth + 2,
+      Math.min(document.documentElement.offsetHeight, document.documentElement.scrollHeight) + 2
+    ]);
+  }
+  global.resize = resize;
+
+  function getActivePanel()
+  {
+    let selection = document.querySelector("[data-active='true']");
+    return selection ? selection.id : null;
+  }
+  global.getActivePanel = getActivePanel;
+
+  function setActivePanel(id)
+  {
+    let oldSelection = getActivePanel();
+    if (oldSelection == id)
       return;
 
-    event.preventDefault();
-    handler.call(element, event);
-  };
-  element.addEventListener("submit", wrapper);
-}
+    if (oldSelection)
+      $(oldSelection).removeAttribute("data-active");
 
-function setResetHandler(element, handler)
-{
-  if (typeof element == "string")
-    element = $(element);
-  let wrapper = (event) =>
-  {
-    if (disableResetHandlers)
-      return;
+    if (id)
+    {
+      let form = $(id);
+      resetForm(form);
+      form.setAttribute("data-active", "true");
 
-    handler.call(element, event);
-  };
-  element.addEventListener("reset", wrapper);
-}
-
-function setFocus()
-{
-  let activePanel = getActivePanel();
-  if (!activePanel)
-    return;
-
-  let defaultElement = $(activePanel).getAttribute("data-default-element");
-  if (defaultElement)
-    $(defaultElement).focus();
-}
-
-function resetForm(form)
-{
-  disableResetHandlers = true;
-  try
-  {
-    form.reset();
-    updateForm(form);
+      resize();
+      setFocus();
+    }
   }
-  finally
+  global.setActivePanel = setActivePanel;
+
+  function updateForm(form)
   {
-    disableResetHandlers = false;
-  }
-}
-
-function resetForms()
-{
-  for (let form of document.forms)
-    resetForm(form);
-}
-
-function resize()
-{
-  // Force reflow
-  document.body.offsetHeight;
-
-  self.port.emit("resize", [
-    document.documentElement.scrollWidth + 2,
-    Math.min(document.documentElement.offsetHeight, document.documentElement.scrollHeight) + 2
-  ]);
-}
-
-function getActivePanel()
-{
-  let selection = document.querySelector("[data-active='true']");
-  return selection ? selection.id : null;
-}
-
-function setActivePanel(id)
-{
-  let oldSelection = getActivePanel();
-  if (oldSelection == id)
-    return;
-
-  if (oldSelection)
-    $(oldSelection).removeAttribute("data-active");
-
-  if (id)
-  {
-    let form = $(id);
-    resetForm(form);
-    form.setAttribute("data-active", "true");
-
+    let valid = true;
+    for (let i = 0; i < form.length; i++)
+    {
+      let messageElement;
+      if (form[i].dataset.error)
+        messageElement = $(form[i].dataset.error);
+      else
+        messageElement = form[i].nextElementSibling;
+      if (messageElement && messageElement.classList.contains("error"))
+      {
+        messageElement.textContent = form[i].validationMessage;
+        messageElement.hidden = form[i].validity.valid;
+      }
+      if (!form[i].validity.valid)
+        valid = false;
+    }
+    form._isValid = valid;
     resize();
-    setFocus();
   }
-}
 
-function updateForm(form)
-{
-  let valid = true;
-  for (let i = 0; i < form.length; i++)
+  function enforceValue(messageId, element)
   {
-    let messageElement;
-    if (form[i].dataset.error)
-      messageElement = $(form[i].dataset.error);
-    else
-      messageElement = form[i].nextElementSibling;
-    if (messageElement && messageElement.classList.contains("error"))
-    {
-      messageElement.textContent = form[i].validationMessage;
-      messageElement.hidden = form[i].validity.valid;
-    }
-    if (!form[i].validity.valid)
-      valid = false;
+    let value = element.value.trim();
+    if (value.length < 1)
+      return messages[messageId];
+
+    return null;
   }
-  form._isValid = valid;
-  resize();
-}
+  global.enforceValue = enforceValue;
 
-function enforceValue(messageId, element)
-{
-  let value = element.value.trim();
-  if (value.length < 1)
-    return messages[messageId];
-
-  return null;
-}
-
-self.port.on("show", show);
-self.port.on("hide", hide);
+  self.port.on("show", show);
+  self.port.on("hide", hide);
+})(this);
