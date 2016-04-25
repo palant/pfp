@@ -14,20 +14,15 @@ function $(id)
 window.addEventListener("DOMContentLoaded", function()
 {
   let autolock = $("autolock");
-  if ("autolock" in window.localStorage)
-    autolock.checked = (window.localStorage.autolock == "true");
-  else
-    autolock.checked = true;
+  autolock.checked = (window.localStorage.autolock !== "false");
   autolock.addEventListener("click", function()
   {
     window.localStorage.autolock = autolock.checked;
   });
 
   let autolock_delay = $("autolock_delay");
-  if ("autolock_delay" in window.localStorage)
-    autolock_delay.value = parseInt(window.localStorage.autolock_delay, 10);
-  else
-    autolock_delay.value = 10;
+  let value = parseInt(window.localStorage.autolock_delay, 10);
+  autolock_delay.value = isNaN(value) ? 10 : value;
   autolock_delay.addEventListener("input", function()
   {
     window.localStorage.autolock_delay = autolock_delay.value;
