@@ -5,7 +5,7 @@ Easy Passwords is a Firefox extension that allows generating secure site-specifi
 
 Legacy passwords that you cannot change can also be stored securely in this extension, these will be encrypted using your master password and cannot be decrypted without knowing the master password.
 
-If you need to generate one of your passwords and cannot use Easy Passwords, there is an [online version](https://palant.de/easypasswords-online.html) available. Please make sure to read the warnings when using this one!
+If you need to generate one of your passwords and cannot use Easy Passwords, there is an [online version](https://palant.github.io/easypasswords/online.html) available. Please make sure to read the warnings when using this one!
 
 Installing build prerequisites
 ------------------------------
