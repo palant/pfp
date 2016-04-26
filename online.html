@@ -1,0 +1,301 @@
+<!--
+ - This Source Code is subject to the terms of the Mozilla Public License
+ - version 2.0 (the "License"). You can obtain a copy of the License at
+ - http://mozilla.org/MPL/2.0/.
+ -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Easy Passwords online password generator</title>
+    <script>
+      "use strict";
+
+      var NUM_ITERATIONS = 256*1024;
+
+      // I, l, O, 0, 1 excluded because of potential confusion. ", ', \ excluded
+      // because of common bugs in web interfaces (magic quotes).
+      var LOWERCASE = "abcdefghjkmnpqrstuvwxyz";
+      var UPPERCASE = "ABCDEFGHJKMNPQRSTUVWXYZ";
+      var NUMBER = "23456789";
+      var SYMBOL = "!#$%&()*+,-./:;<=>?@[]^_{|}~";
+
+      function derivePassword(params, callback)
+      {
+        Promise.resolve(undefined).then(function()
+        {
+          return crypto.subtle.importKey(
+            "raw",
+            toUTF8Buffer(params.masterPassword),
+            {"name": "PBKDF2"},
+            false,
+            ["deriveBits"]
+          )
+        }).then(function(masterKey)
+        {
+          return crypto.subtle.deriveBits(
+            {
+              "name": "PBKDF2",
+              "salt": toUTF8Buffer(params.domain + "\0" + params.name),
+              "iterations": NUM_ITERATIONS,
+              // SHA-256 won't work, see https://bugzilla.mozilla.org/show_bug.cgi?id=554827
+              "hash": "SHA-1"
+            },
+            masterKey,
+            params.length * 8
+          );
+        }).then(function(buffer)
+        {
+          return toPassword(buffer, params.lower, params.upper, params.number, params.symbol);
+        }).then(callback).catch(function(e)
+        {
+          alert("Error generating password: " + e);
+          console.error(e);
+        });
+      }
+
+      function toPassword(buffer, lower, upper, number, symbol)
+      {
+        var array = new Uint8Array(buffer);
+
+        var charsets = [];
+        if (lower)
+          charsets.push(LOWERCASE);
+        if (upper)
+          charsets.push(UPPERCASE);
+        if (number)
+          charsets.push(NUMBER);
+        if (symbol)
+          charsets.push(SYMBOL);
+
+        function lengthSum(previous, current)
+        {
+          return previous + current.length;
+        }
+
+        var numChars = charsets.reduce(lengthSum, 0);
+        var seen = Object.create(null);
+        var result = [];
+        for (var i = 0; i < array.length; i++)
+        {
+          if (charsets.length - Object.keys(seen).length >= array.length - i)
+          {
+            for (var value in seen)
+            {
+              var index = charsets.indexOf(value);
+              if (index >= 0)
+                charsets.splice(index, 1);
+            }
+            seen = Object.create(null);
+            numChars = charsets.reduce(lengthSum, 0);
+          }
+
+          var index = array[i] % numChars;
+          for (var j = 0; j < charsets.length; j++)
+          {
+            var charset = charsets[j];
+            if (index < charset.length)
+            {
+              result.push(charset[index]);
+              seen[charset] = true;
+              break;
+            }
+            index -= charset.length;
+          }
+        }
+        return result.join("");
+      }
+
+      function toUTF8Buffer(str)
+      {
+        var matches = encodeURIComponent(str).match(/[^%]|%[0-9a-fA-F]{2}/g) || [];
+        var result = new Uint8Array(matches.length);
+        for (var i = 0; i < matches.length; i++)
+        {
+          if (matches[i].length == 1)
+            result[i] = matches[i].charCodeAt(0);
+          else
+            result[i] = parseInt(matches[i].substr(1), 16);
+        }
+        return result;
+      }
+
+      function $(id)
+      {
+        return document.getElementById(id);
+      }
+
+      function updatePasswordLengthDisplay()
+      {
+        $("password-length-value").textContent = $("password-length").value;
+      }
+
+      function generatePassword(event)
+      {
+        event.preventDefault();
+        derivePassword({
+          masterPassword: $("master-password").value,
+          domain: $("site").value,
+          name: $("generate-password-name").value,
+          length: $("password-length").value,
+          lower: $("charset-lower").checked,
+          upper: $("charset-upper").checked,
+          number: $("charset-number").checked,
+          symbol: $("charset-symbol").checked
+        }, function(password)
+        {
+          var resultField = $("result");
+          resultField.value = password;
+          $("result-container").hidden = false;
+          resultField.focus();
+          resultField.setSelectionRange(0, resultField.value.length);
+        });
+      }
+
+      window.addEventListener("load", function()
+      {
+        updatePasswordLengthDisplay();
+        $("password-length").addEventListener("input", updatePasswordLengthDisplay);
+
+        if (crypto.subtle)
+          $("generate-password").addEventListener("submit", generatePassword);
+        else
+        {
+          $("general-warning").hidden = true;
+          $("unsupported-warning").hidden = false;
+        }
+      });
+    </script>
+
+    <style>
+      body
+      {
+        margin: 0;
+        padding: 10px;
+        background-color: #fff;
+        color: #000;
+      }
+
+      body,
+      input,
+      button
+      {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 24px;
+      }
+
+      input[type="checkbox"]
+      {
+        width: 24px;
+        height: 24px;
+      }
+
+      form
+      {
+        display: flex;
+        flex-direction: column;
+      }
+
+      form,
+      #result-container
+      {
+        width: 600px;
+        margin: auto;
+      }
+
+      .warning
+      {
+        background-color: #faa;
+        border-radius: 5px;
+        padding: 5px;
+        padding-inline-start: 42px;
+        -webkit-padding-start: 42px;
+        background-image: url(data:image/svg+xml;charset=utf-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%0D%0A%3C%21--%20Generator%3A%20Adobe%20Illustrator%2016.2.1%2C%20SVG%20Export%20Plug-In%20.%20SVG%20Version%3A%206.00%20Build%200%29%20%20--%3E%0D%0A%3C%21DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%0D%0A%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%0D%0A%09%20width%3D%22512px%22%20height%3D%22512px%22%20viewBox%3D%220%200%20512%20512%22%20enable-background%3D%22new%200%200%20512%20512%22%20xml%3Aspace%3D%22preserve%22%3E%0D%0A%3Cg%20id%3D%22Icon_31_%22%3E%0D%0A%09%3Cg%3E%0D%0A%09%09%3Cpath%20d%3D%22M32%2C464h448L256%2C48L32%2C464z%20M280%2C400h-48v-48h48V400z%20M280%2C320h-48v-96h48V320z%22%2F%3E%0D%0A%09%3C%2Fg%3E%0D%0A%3C%2Fg%3E%0D%0A%3C%2Fsvg%3E);
+        background-size: 32px;
+        background-position: 5px 5px;
+        background-repeat: no-repeat;
+      }
+
+      form > label,
+      .button-container,
+      #result-container
+      {
+        margin-top: 15px;
+      }
+
+      #length-container,
+      #charsets-container
+      {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      #password-length
+      {
+        flex-grow: 1;
+      }
+
+      #password-length-value
+      {
+        min-width: 3ch;
+      }
+
+      .button-container
+      {
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="generate-password" action="#" autocomplete="off">
+      <div class="warning" id="unsupported-warning" hidden>
+        Your browser doesn't appear to support Web Crypto, so this password
+        generator won't work. Supported browsers are Mozilla Firefox, Google
+        Chrome and Microsoft Edge.
+      </div>
+
+      <div class="warning" id="general-warning">
+        This page will not transmit any data but you have to take my word on it.
+        Entering your master password on a webpage is a bad idea, so
+        you better use the <a href="https://addons.mozilla.org/addon/easy-passwords/">Easy Passwords extension</a>.
+        If you need to use this page regularly, you better
+        <a href="https://github.com/palant/easypasswords/raw/gh-pages/online.html">download it from GitHub</a>
+        rather than rely on the hosted version.
+      </div>
+
+      <label for="master-password">Master password:</label>
+      <input id="master-password" type="password" required>
+
+      <label for="site">Website name:</label>
+      <input id="site" type="text" required>
+
+      <label for="generate-password-name">Password name:</label>
+      <input id="generate-password-name" type="text" required>
+
+      <label for="password-length">Length:</label>
+      <div id="length-container">
+        <input id="password-length" type="range" min="4" max="24" step="1" value="16">
+        <span id="password-length-value"></span>
+      </div>
+
+      <label for="charset-lower">Allowed characters:</label>
+      <div id="charsets-container">
+        <label><input id="charset-lower" type="checkbox" checked>abc</label>
+        <label><input id="charset-upper" type="checkbox" checked>XYZ</label>
+        <label><input id="charset-number" type="checkbox" checked>789</label>
+        <label><input id="charset-symbol" type="checkbox" checked>+^;</label>
+      </div>
+
+      <div class="button-container">
+        <button id="generate-password-submit" type="submit">Generate password</button>
+      </div>
+    </form>
+
+    <div id="result-container" hidden>
+      Your generated password is:
+      <input id="result" type="text" readonly>
+    </div>
+  </body>
+</html>
