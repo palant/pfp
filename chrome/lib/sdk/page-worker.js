@@ -8,8 +8,10 @@
 
 exports.Page = function(options)
 {
-  this.frame = document.createElement("iframe");
-  document.body.appendChild(this.frame);
+  let result = Object.create(exports.Page.prototype);
+  result.frame = document.createElement("iframe");
+  document.body.appendChild(result.frame);
 
-  this.frame.src = options.contentURL;
+  result.frame.src = options.contentURL;
+  return result;
 };
