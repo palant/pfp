@@ -6,7 +6,8 @@
 
 "use strict";
 
-exports.emit = function(obj)
+exports.emit = function(obj, eventName, ...args)
 {
-  obj.emit.apply(obj, [].slice.call(arguments, 1));
+  for (let listener of obj._listeners[eventName] || [])
+    listener(...args);
 }

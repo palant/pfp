@@ -130,6 +130,31 @@ function toChromeLocale()
   return stream;
 }
 
+function convertHTML()
+{
+  let stream = new Transform({objectMode: true});
+  stream._transform = function(file, encoding, callback)
+  {
+    if (!file.isBuffer())
+      throw new Error("Unexpected file type");
+
+    if (/\.html$/.test(file.path))
+    {
+      let source = file.contents.toString("utf-8");
+
+      // Remove type attribute from scripts
+      source = source.replace(/<script\s+type="[^"]*"/g, "<script");
+
+      // Process conditional comments
+      source = source.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1");
+
+      file.contents = new Buffer(source, "utf-8");
+    }
+    callback(null, file);
+  };
+  return stream;
+}
+
 gulp.task("default", ["xpi"], function()
 {
 });
@@ -163,6 +188,7 @@ gulp.task("build-chrome", ["validate"], function()
         .pipe(jsonModify({key: "version", value: require("./package.json").version}))
         .pipe(gulp.dest("build-chrome")),
     gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/**/*.js", "chrome/data/**/*.html"])
+        .pipe(convertHTML())
         .pipe(gulp.dest("build-chrome/data")),
     gulp.src(["data/**/*.less", "chrome/data/**/*.less"])
         .pipe(less())

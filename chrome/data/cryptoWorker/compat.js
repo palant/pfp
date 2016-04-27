@@ -6,9 +6,19 @@
 
 "use strict";
 
-require("sdk/simple-storage").init.then(() =>
+let self =
 {
-  require("../../lib/masterPassword");
-  require("../../lib/passwords");
-  require("../../lib/crypto");
-});
+  port: window.frameElement.__port
+};
+
+let unsafeWindow = window;
+
+function cloneInto(obj, wnd)
+{
+  return obj;
+}
+
+function exportFunction(func, wnd)
+{
+  return func;
+}

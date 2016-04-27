@@ -23,19 +23,12 @@ let proto = {
 
   once: function(eventName, listener)
   {
-    let wrapper = () =>
+    let wrapper = (...args) =>
     {
       this.off(eventName, wrapper);
-      listener.apply(this, arguments);
+      listener(...args);
     };
     this.on(eventName, wrapper);
-  },
-
-  emit: function(eventName)
-  {
-    let args = [].slice.call(arguments, 1);
-    for (let listener of this._listeners[eventName] || [])
-      listener.apply(null, args);
   }
 };
 
