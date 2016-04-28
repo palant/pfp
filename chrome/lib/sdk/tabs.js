@@ -61,7 +61,7 @@ function runScript(tabId, {contentScriptFile, contentScriptOptions})
 
   let listener = message => {
     if (message.type == "contentScript")
-      emit(worker.port(message.eventName, ...message.args));
+      emit(worker.port, message.eventName, ...message.args);
   };
   chrome.runtime.onMessage.addListener(listener);
 

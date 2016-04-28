@@ -52,3 +52,5 @@ let self =
     };
   })()
 };
+
+self.port.on("_hide", () => window.close());

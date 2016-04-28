@@ -44,7 +44,7 @@ exports.Panel = function()
 
   panel.hide = function()
   {
-    // TODO
+    panel.port.emit("_hide");
   };
 
   return panel;
