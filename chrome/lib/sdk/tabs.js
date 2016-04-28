@@ -8,6 +8,9 @@
 
 /* global chrome */
 
+let {EventTarget} = require("sdk/event/target");
+let {emit} = require("sdk/event/core");
+
 // Chrome's tab API is async, so we have to keep track of current tab and its
 // URL, so that our code can access these values synchronously.
 let currentTab = -1;
@@ -46,8 +49,46 @@ chrome.tabs.onUpdated.addListener((tabId, {url}, tab) =>
 function getActiveTab()
 {
   return {
-    url: currentURL
+    url: currentURL,
+    attach: runScript.bind(null, currentTab)
   };
+}
+
+function runScript(tabId, {contentScriptFile, contentScriptOptions})
+{
+  let worker = EventTarget();
+  worker.port = EventTarget();
+
+  let listener = message => {
+    if (message.type == "contentScript")
+      emit(worker.port(message.eventName, ...message.args));
+  };
+  chrome.runtime.onMessage.addListener(listener);
+
+  worker.destroy = function()
+  {
+    chrome.runtime.onMessage.removeListener(listener);
+  };
+
+  chrome.tabs.executeScript(tabId, {file: "data/contentScript-compat.js"}, function()
+  {
+    if (chrome.runtime.lastError)
+    {
+      emit(worker, "error", chrome.runtime.lastError);
+      return;
+    }
+
+    chrome.tabs.sendMessage(tabId, contentScriptOptions);
+
+    contentScriptFile = contentScriptFile.replace(chrome.runtime.getURL(""), "");
+    chrome.tabs.executeScript(tabId, {file: contentScriptFile}, function()
+    {
+      if (chrome.runtime.lastError)
+        emit(worker, "error", chrome.runtime.lastError);
+    });
+  });
+
+  return worker;
 }
 
 Object.defineProperty(exports, "activeTab", {
