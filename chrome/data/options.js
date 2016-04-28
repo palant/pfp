@@ -6,6 +6,8 @@
 
 "use strict";
 
+/* global chrome */
+
 function $(id)
 {
   return document.getElementById(id);
@@ -13,18 +15,22 @@ function $(id)
 
 window.addEventListener("DOMContentLoaded", function()
 {
-  let autolock = $("autolock");
-  autolock.checked = (window.localStorage.autolock !== "false");
-  autolock.addEventListener("click", function()
+  chrome.runtime.getBackgroundPage(background =>
   {
-    window.localStorage.autolock = autolock.checked;
-  });
+    let prefs = background.getPrefs();
 
-  let autolock_delay = $("autolock_delay");
-  let value = parseInt(window.localStorage.autolock_delay, 10);
-  autolock_delay.value = isNaN(value) ? 10 : value;
-  autolock_delay.addEventListener("input", function()
-  {
-    window.localStorage.autolock_delay = autolock_delay.value;
+    let autolock = $("autolock");
+    autolock.checked = prefs.autolock;
+    autolock.addEventListener("click", function()
+    {
+      prefs.autolock = autolock.checked;
+    });
+
+    let autolock_delay = $("autolock_delay");
+    autolock_delay.value = prefs.autolock_delay;
+    autolock_delay.addEventListener("input", function()
+    {
+      prefs.autolock_delay = autolock_delay.value;
+    });
   });
 });
