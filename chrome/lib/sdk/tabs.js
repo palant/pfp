@@ -95,3 +95,11 @@ Object.defineProperty(exports, "activeTab", {
   enumerable: true,
   get: getActiveTab
 });
+
+exports.open = function(url)
+{
+  chrome.tabs.create({
+    url,
+    active: true
+  });
+};

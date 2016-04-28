@@ -27,4 +27,5 @@ Promise.all([
   require("../../lib/ui/masterPasswordBindings")(panel);
   require("../../lib/ui/passwordsBindings")(panel);
   require("../../lib/ui/passwordRetrieval")(panel);
+  require("../../lib/ui/allPasswordsBindings")(panel); 
 });

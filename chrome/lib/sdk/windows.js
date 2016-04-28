@@ -6,19 +6,9 @@
 
 "use strict";
 
-let self =
-{
-  port: window.frameElement.__port
+// TODO
+exports.browserWindows = {
+  activeWindow: {
+    tabs: []
+  }
 };
-
-let unsafeWindow = window;
-
-function cloneInto(obj, wnd)
-{
-  return obj;
-}
-
-function exportFunction(func, wnd)
-{
-  return func;
-}

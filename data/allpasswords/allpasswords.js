@@ -119,8 +119,10 @@ self.port.on("init", function(sites)
   knownSites = sites;
   let siteTemplate = $("site-template").firstElementChild;
   let passwordTemplate = $("password-template").firstElementChild;
-  for (let link of passwordTemplate.querySelectorAll("a"))
+  let links = passwordTemplate.querySelectorAll("a");
+  for (let i = 0; i < links.length; i++)
   {
+    let link = links[i];
     if (link.textContent)
     {
       link.setAttribute("title", link.textContent);

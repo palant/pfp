@@ -6,27 +6,39 @@
 
 "use strict";
 
+/* global chrome */
+
 let {EventTarget} = require("sdk/event/target");
 let {emit} = require("sdk/event/core");
 
 exports.Page = function(options)
 {
   let result = Object.create(exports.Page.prototype);
-  result.frame = document.createElement("iframe");
-  document.body.appendChild(result.frame);
-
   result.port = EventTarget();
-  result.frame.__port = EventTarget();
-  result.port.emit = function(...args)
+
+  let target = null;
+  chrome.runtime.onConnect.addListener(function(port)
   {
-    emit(result.frame.__port, ...args);
-  };
-  result.frame.__port.emit = function(...args)
+    if (port.name == "worker")
+    {
+      target = port;
+
+      port.onMessage.addListener(message =>
+      {
+        emit(result.port, message.eventName, ...message.args);
+      });
+    }
+  });
+
+  result.port.emit = function(eventName, ...args)
   {
-    emit(result.port, ...args);
+    if (target)
+      target.postMessage({eventName, args});
   };
 
-  result.frame.src = options.contentURL;
+  let frame = document.createElement("iframe");
+  document.body.appendChild(frame);
+  frame.src = options.contentURL;
 
   return result;
 };
