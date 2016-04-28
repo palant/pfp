@@ -6,7 +6,10 @@
 
 "use strict";
 
-require("sdk/simple-storage").init.then(() =>
+Promise.all([
+  require("sdk/simple-storage").init,
+  require("sdk/simple-prefs").init
+]).then(() =>
 {
   let {Panel} = require("sdk/panel");
 
