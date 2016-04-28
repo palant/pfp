@@ -8,7 +8,20 @@
 
 require("sdk/simple-storage").init.then(() =>
 {
-  require("../../lib/masterPassword");
-  require("../../lib/passwords");
-  require("../../lib/crypto");
+  let {Panel} = require("sdk/panel");
+
+  let panel = Panel();
+  panel.on("show", () => {
+    let {getCurrentHost} = require("../../lib/ui/utils");
+    let {getPasswords} = require("../../lib/passwords");
+    let {state: masterPasswordState} = require("../../lib/masterPassword");
+
+    let [origSite, site, passwords] = getPasswords(getCurrentHost());
+    panel.port.emit("show", {origSite, site, passwords, masterPasswordState});
+  });
+
+  // Connect panel to other modules
+  require("../../lib/ui/masterPasswordBindings")(panel);
+  require("../../lib/ui/passwordsBindings")(panel);
+  require("../../lib/ui/passwordRetrieval")(panel);
 });

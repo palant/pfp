@@ -6,8 +6,4 @@
 
 "use strict";
 
-exports.emit = function(obj, eventName, ...args)
-{
-  for (let listener of obj._listeners[eventName] || [])
-    listener(...args);
-};
+exports.URL = URL;

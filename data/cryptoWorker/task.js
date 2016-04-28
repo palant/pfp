@@ -20,13 +20,13 @@ const spawn = (task, ...args) => {
           resolve(value);
         else
           Promise.resolve(value).then(step, raise);
-      }
+      };
       step();
     } catch(error) {
       reject(error);
     }
   });
-}
+};
 exports.spawn = spawn;
 
 })(Task);

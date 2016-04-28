@@ -6,8 +6,12 @@
 
 "use strict";
 
-exports.emit = function(obj, eventName, ...args)
+exports.Sidebar = function()
 {
-  for (let listener of obj._listeners[eventName] || [])
-    listener(...args);
+  // Sidebars aren't actually used, return a dummy
+  return {
+    show: () => {},
+    hide: () => {},
+    dispose: () => {}
+  };
 };

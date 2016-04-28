@@ -157,8 +157,10 @@
     if (names.length)
     {
       let template = $("password-template").firstElementChild;
-      for (let link of template.querySelectorAll("a"))
+      let links = template.querySelectorAll("a");
+      for (let i = 0; i < links.length; i++)
       {
+        let link = links[i];
         if (link.textContent)
         {
           link.setAttribute("title", link.textContent);

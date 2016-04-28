@@ -36,8 +36,12 @@
   {
     window.removeEventListener("load", init, false);
 
-    for (let messageElement of $("messages").children)
+    let messageElements = $("messages").children;
+    for (let i = 0; i < messageElements.length; i++)
+    {
+      let messageElement = messageElements[i];
       messages[messageElement.getAttribute("data-l10n-id")] = messageElement.textContent;
+    }
 
     self.port.on("masterPasswordAccepted", () => setActivePanel("password-list"));
     self.port.on("masterPasswordForgotten", () => setActivePanel("enter-master"));
@@ -229,8 +233,9 @@
 
   function resetForms()
   {
-    for (let form of document.forms)
-      resetForm(form);
+    let forms = document.forms;
+    for (let i = 0; i < forms.length; i++)
+      resetForm(forms[i]);
   }
 
   function resize()

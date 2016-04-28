@@ -16,7 +16,7 @@ exports.init = new Promise((resolve, reject) =>
       reject(chrome.runtime.lastError);
     else
     {
-      exports.storage = items.passwords;
+      exports.storage = items.passwords || {};
       setTimeout(function()
       {
         chrome.storage.local.set({passwords: exports.storage});
