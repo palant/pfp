@@ -193,7 +193,8 @@ self.port.on("init", function(sites)
       let link = document.createElement("a");
       link.textContent = currentLetter;
       link.href = "#";
-      setCommandHandler(link, () => {
+      setCommandHandler(link, () =>
+      {
         let div = siteInfo;
         while (div && !div.parentNode)
           div = div._nextSiteInfo;
@@ -209,7 +210,8 @@ self.port.on("init", function(sites)
   }
 });
 
-self.port.on("passwordError", reason => {
+self.port.on("passwordError", reason =>
+{
   let message = $(reason);
   if (message && message.parentNode.id == "messages")
     message = message.textContent;
@@ -218,7 +220,8 @@ self.port.on("passwordError", reason => {
   alert(message);
 });
 
-self.port.on("passwordRemoved", id => {
+self.port.on("passwordRemoved", id =>
+{
   let passwordInfo = $(id);
   if (passwordInfo)
   {
@@ -229,19 +232,22 @@ self.port.on("passwordRemoved", id => {
   }
 });
 
-self.port.on("passwordCopied", id => {
+self.port.on("passwordCopied", id =>
+{
   let passwordInfo = $(id);
   if (passwordInfo)
   {
     let message = passwordInfo.querySelector(".password-copied-message");
     message.hidden = false;
-    setTimeout(() => {
+    setTimeout(() =>
+    {
       message.hidden = true;
     }, 3000);
   }
 });
 
-self.port.on("dataImported", () => {
+self.port.on("dataImported", () =>
+{
   alert($("allpasswords-import-success").textContent);
   window.location.reload();
 });

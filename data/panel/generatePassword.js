@@ -20,7 +20,8 @@
     self.port.on("passwordAlreadyExists", () => markInvalid("generate-password-name", messages["password-name-exists"]));
 
     $("password-length").addEventListener("input", updatePasswordLengthDisplay);
-    $("generate-password").addEventListener("reset", () => {
+    $("generate-password").addEventListener("reset", () =>
+    {
       setTimeout(updatePasswordLengthDisplay, 0);
     });
     updatePasswordLengthDisplay();

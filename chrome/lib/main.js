@@ -14,7 +14,8 @@ Promise.all([
   let {Panel} = require("sdk/panel");
 
   let panel = Panel();
-  panel.on("show", () => {
+  panel.on("show", () =>
+  {
     let {getCurrentHost} = require("../../lib/ui/utils");
     let {getPasswords} = require("../../lib/passwords");
     let {state: masterPasswordState} = require("../../lib/masterPassword");
@@ -27,5 +28,5 @@ Promise.all([
   require("../../lib/ui/masterPasswordBindings")(panel);
   require("../../lib/ui/passwordsBindings")(panel);
   require("../../lib/ui/passwordRetrieval")(panel);
-  require("../../lib/ui/allPasswordsBindings")(panel); 
+  require("../../lib/ui/allPasswordsBindings")(panel);
 });

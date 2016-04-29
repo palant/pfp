@@ -8,6 +8,8 @@
 
 /* global chrome */
 
+/* eslint no-var: "off" */
+
 var self = {
   port: {
     emit: function(eventName, ...args)

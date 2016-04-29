@@ -21,7 +21,7 @@ exports.PageMod = function({onAttach})
         port: EventTarget()
       };
 
-      worker.port.emit = function (eventName, ...args)
+      worker.port.emit = function(eventName, ...args)
       {
         port.postMessage({eventName, args});
       };

@@ -59,7 +59,8 @@ function runScript(tabId, {contentScriptFile, contentScriptOptions})
   let worker = EventTarget();
   worker.port = EventTarget();
 
-  let listener = message => {
+  let listener = message =>
+  {
     if (message.type == "contentScript")
       emit(worker.port, message.eventName, ...message.args);
   };

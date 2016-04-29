@@ -20,14 +20,14 @@ function exportFunction(func, wnd)
   return func;
 }
 
-let self =
-{
+let self = {
   port: (function()
   {
     let port = chrome.runtime.connect({name: document.documentElement.dataset.porttype});
     let listeners = {};
 
-    port.onMessage.addListener(message => {
+    port.onMessage.addListener(message =>
+    {
       for (let listener of listeners[message.eventName] || [])
         listener(...message.args);
     });

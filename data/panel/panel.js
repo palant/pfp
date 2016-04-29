@@ -126,7 +126,7 @@
     else if (!(elements instanceof Array))
       elements = [elements];
 
-    let result = validator.apply(null, elements);
+    let result = validator(...elements);
     for (let element of elements)
     {
       element.setCustomValidity(result || "");

@@ -8,7 +8,7 @@
 
 /* global Task */
 
-const NUM_ITERATIONS = 256*1024;
+const NUM_ITERATIONS = 256 * 1024;
 
 // I, l, O, 0, 1 excluded because of potential confusion. ", ', \ excluded
 // because of common bugs in web interfaces (magic quotes).

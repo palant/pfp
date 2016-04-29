@@ -10,8 +10,14 @@ exports.Sidebar = function()
 {
   // Sidebars aren't actually used, return a dummy
   return {
-    show: () => {},
-    hide: () => {},
-    dispose: () => {}
+    show: () =>
+    {
+    },
+    hide: () =>
+    {
+    },
+    dispose: () =>
+    {
+    }
   };
 };

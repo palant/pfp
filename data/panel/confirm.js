@@ -19,7 +19,8 @@
 
   onInit(function()
   {
-    setSubmitHandler("confirm", () => {
+    setSubmitHandler("confirm", () =>
+    {
       if (promiseAccept)
         promiseAccept(true);
       promiseAccept = null;
@@ -28,7 +29,8 @@
         setActivePanel(originalSelection);
     });
 
-    setResetHandler("confirm", () => {
+    setResetHandler("confirm", () =>
+    {
       if (promiseAccept)
         promiseAccept(false);
       promiseAccept = null;
@@ -45,7 +47,8 @@
     originalSelection = getActivePanel();
     setActivePanel("confirm");
 
-    return new Promise((accept, reject) => {
+    return new Promise((accept, reject) =>
+    {
       promiseAccept = accept;
     });
   }
