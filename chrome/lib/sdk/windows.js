@@ -6,7 +6,8 @@
 
 "use strict";
 
-// TODO
+// Not returning anything useful here - the caller should fall back to just
+// opening the tab, looking for existing instances will be done there.
 exports.browserWindows = {
   activeWindow: {
     tabs: []

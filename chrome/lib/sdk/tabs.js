@@ -98,8 +98,21 @@ Object.defineProperty(exports, "activeTab", {
 
 exports.open = function(url)
 {
-  chrome.tabs.create({
+  // Look for existing instances here because the fake sdk/windows
+  // implementation won't allow the caller to do so.
+  chrome.tabs.query({
     url,
-    active: true
+    lastFocusedWindow: true
+  }, function(tabs)
+  {
+    if (tabs.length)
+      chrome.tabs.update(tabs[0].id, {active: true});
+    else
+    {
+      chrome.tabs.create({
+        url,
+        active: true
+      });
+    }
   });
 };
