@@ -187,7 +187,7 @@ gulp.task("build-chrome", ["validate"], function()
     gulp.src("manifest.json")
         .pipe(jsonModify({key: "version", value: require("./package.json").version}))
         .pipe(gulp.dest("build-chrome")),
-    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/**/*.js", "chrome/data/**/*.html"])
+    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/**/*.js", "chrome/data/**/*.html", "chrome/data/**/*.png"])
         .pipe(convertHTML())
         .pipe(gulp.dest("build-chrome/data")),
     gulp.src(["data/**/*.less", "chrome/data/**/*.less"])

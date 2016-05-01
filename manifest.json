@@ -22,7 +22,8 @@
     "16": "data/images/icon16.png",
     "32": "data/images/icon32.png",
     "48": "data/images/icon48.png",
-    "64": "data/images/icon64.png"
+    "64": "data/images/icon64.png",
+    "128": "data/images/icon128.png"
   },
   "browser_action": {
     "default_icon": {
