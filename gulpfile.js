@@ -6,11 +6,6 @@
 
 "use strict";
 
-let fs = require("fs");
-let path = require("path");
-let spawn = require("child_process").spawn;
-let Transform = require("stream").Transform;
-
 let gulp = require("gulp");
 let source = require("vinyl-source-stream");
 let less = require("gulp-less");
@@ -20,141 +15,11 @@ let del = require("del");
 let eslint = require("gulp-eslint");
 let htmlhint = require("gulp-htmlhint");
 let stylelint = require("gulp-stylelint");
-let RSA = require("node-rsa");
 let zip = require("gulp-zip");
 let browserify = require("browserify");
 let jsonModify = require("gulp-json-modify");
 
-function readArg(prefix, defaultValue)
-{
-  for (let arg of process.argv)
-    if (arg.startsWith(prefix))
-      return arg.substr(prefix.length);
-  return defaultValue;
-}
-
-function jpm(args)
-{
-  return new Promise((resolve, reject) =>
-  {
-    let builddir = path.resolve(process.cwd(), "build-jpm");
-    let jpm = path.resolve(process.cwd(), "node_modules/.bin/jpm");
-    let ps = spawn(jpm, args, {cwd: builddir});
-    ps.stdout.pipe(process.stdout);
-    ps.stderr.pipe(process.stderr);
-    ps.on("close", resolve);
-  });
-}
-
-function signCRX(keyFile)
-{
-  let stream = new Transform({objectMode: true});
-  stream._transform = function(file, encoding, callback)
-  {
-    if (!file.isBuffer())
-      throw new Error("Unexpected file type");
-
-    new Promise((resolve, reject) =>
-    {
-      fs.readFile(keyFile, function(error, data)
-      {
-        if (error)
-          reject(error);
-        else
-          resolve(data);
-      });
-    }).then(keyData =>
-    {
-      let privateKey = RSA(keyData, {signingScheme: "pkcs1-sha1"});
-      let publicKey = privateKey.exportKey("pkcs8-public-der");
-      let signature = privateKey.sign(file.contents, "buffer");
-
-      let header = new Buffer(16);
-      header.write("Cr24", 0);
-      header.writeInt32LE(2, 4);
-      header.writeInt32LE(publicKey.length, 8);
-      header.writeInt32LE(signature.length, 12);
-      return Buffer.concat([header, publicKey, signature, file.contents]);
-    }).then(contents =>
-    {
-      file.path = file.path.replace(/\.zip$/, ".crx");
-      file.contents = contents;
-      callback(null, file);
-    }).catch(function(error)
-    {
-      console.error(error);
-      callback(error);
-    });
-  };
-  return stream;
-}
-
-function toChromeLocale()
-{
-  let stream = new Transform({objectMode: true});
-  stream._transform = function(file, encoding, callback)
-  {
-    if (!file.isBuffer())
-      throw new Error("Unexpected file type");
-
-    let locale = path.basename(file.path).replace(/\.properties$/, "");
-    let lines = file.contents.toString("utf-8").split(/[\r\n]+/);
-    let data = {};
-    for (let line of lines)
-    {
-      if (/^\s*#/.test(line))
-        continue;
-
-      let parts = line.split(/\s*=\s*/, 2);
-      if (parts.length < 2)
-        continue;
-
-      data[parts[0].replace(/-/g, "_")] = {"message": parts[1]};
-    }
-
-    let manifest = require("./package.json");
-    data.name = {"message": manifest.title};
-    data.description = {"message": manifest.description};
-    if ("locales" in manifest && locale in manifest.locales)
-    {
-      let localized = manifest.locales[locale];
-      if ("title" in localized)
-        data.name.message = localized.title;
-      if ("description" in localized)
-        data.description.message = localized.description;
-    }
-
-    file.path = path.join(path.dirname(file.path), locale.replace(/-/g, "_"), "messages.json");
-    file.contents = new Buffer(JSON.stringify(data), "utf-8");
-    callback(null, file);
-  };
-  return stream;
-}
-
-function convertHTML()
-{
-  let stream = new Transform({objectMode: true});
-  stream._transform = function(file, encoding, callback)
-  {
-    if (!file.isBuffer())
-      throw new Error("Unexpected file type");
-
-    if (/\.html$/.test(file.path))
-    {
-      let source = file.contents.toString("utf-8");
-
-      // Remove type attribute from scripts
-      source = source.replace(/<script\s+type="[^"]*"/g, "<script");
-
-      // Process conditional comments
-      source = source.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1");
-
-      file.contents = new Buffer(source, "utf-8");
-    }
-    callback(null, file);
-  };
-  return stream;
-}
+let utils = require("./gulp-utils");
 
 gulp.task("default", ["xpi"], function()
 {
@@ -189,7 +54,7 @@ gulp.task("build-chrome", ["validate"], function()
         .pipe(jsonModify({key: "version", value: require("./package.json").version}))
         .pipe(gulp.dest("build-chrome")),
     gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/**/*.js", "chrome/data/**/*.html", "chrome/data/**/*.png"])
-        .pipe(convertHTML())
+        .pipe(utils.convertHTML())
         .pipe(gulp.dest("build-chrome/data")),
     gulp.src(["data/**/*.less", "chrome/data/**/*.less"])
         .pipe(less())
@@ -199,7 +64,7 @@ gulp.task("build-chrome", ["validate"], function()
         .pipe(source("background.js"))
         .pipe(gulp.dest("build-chrome")),
     gulp.src("locale/**/*.properties")
-        .pipe(toChromeLocale())
+        .pipe(utils.toChromeLocale())
         .pipe(gulp.dest("build-chrome/_locales"))
   );
 });
@@ -221,6 +86,14 @@ gulp.task("build-webext", ["build-chrome"], function()
         }))
         .pipe(gulp.dest("build-webext"))
   );
+});
+
+gulp.task("eslint-node", function()
+{
+  return gulp.src(["*.js"])
+             .pipe(eslint({envs: ["node", "es6"]}))
+             .pipe(eslint.format())
+             .pipe(eslint.failAfterError());
 });
 
 gulp.task("eslint-data", function()
@@ -277,27 +150,27 @@ gulp.task("stylelint", function()
                    "console": true
                  }
                ]
-             }))
+             }));
 });
 
-gulp.task("validate", ["eslint-data", "eslint-lib", "eslint-chromelib", "htmlhint", "stylelint"], function()
+gulp.task("validate", ["eslint-node", "eslint-data", "eslint-lib", "eslint-chromelib", "htmlhint", "stylelint"], function()
 {
 });
 
 gulp.task("xpi", ["build-jpm"], function()
 {
-  return jpm(["xpi"]);
+  return utils.jpm(["xpi"]);
 });
 
 gulp.task("post", ["build-jpm"], function()
 {
-  let postUrl = readArg("--post-url=", "http://localhost:8888/");
+  let postUrl = utils.readArg("--post-url=", "http://localhost:8888/");
   if (/^\d+$/.test(postUrl))
     postUrl = "localhost:" + postUrl;
   if (postUrl.indexOf("://") < 0)
     postUrl = "http://" + postUrl;
 
-  return jpm(["post", "--post-url", postUrl]);
+  return utils.jpm(["post", "--post-url", postUrl]);
 });
 
 gulp.task("watch", ["post"], function()
@@ -310,9 +183,9 @@ gulp.task("crx", ["build-chrome"], function()
   let manifest = require("./package.json");
   let result = gulp.src(["build-chrome/**", "!build-chrome/**/.*", "!build-chrome/**/*.zip", "!build-chrome/**/*.crx"])
                    .pipe(zip("easypasswords-" + manifest.version + ".zip"));
-  let keyFile = readArg("--private-key=");
+  let keyFile = utils.readArg("--private-key=");
   if (keyFile)
-    result = result.pipe(signCRX(keyFile));
+    result = result.pipe(utils.signCRX(keyFile));
   return result.pipe(gulp.dest("build-chrome"));
 });
 
