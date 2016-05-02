@@ -17,7 +17,9 @@
       "background.js"
     ]
   },
-  "options_page": "data/options/options.html",
+  "options_ui": {
+    "page": "data/options/options.html"
+  },
   "icons": {
     "16": "data/images/icon16.png",
     "32": "data/images/icon32.png",

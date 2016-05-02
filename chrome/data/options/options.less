@@ -8,8 +8,6 @@
 @font-size: 24px;
 @font-size-small: 16px;
 
-@text-color: #000;
-@background-color: #fff;
 @greyed-color: #ccc;
 @block-spacing: 15px;
 
@@ -22,9 +20,7 @@
 body
 {
   margin: 0;
-  padding: 10px;
-  background-color: @background-color;
-  color: @text-color;
+  padding: 0 10px;
 }
 
 body,
@@ -51,7 +47,11 @@ input[type="checkbox"]
   flex-direction: row;
   align-items: flex-start;
   padding: @block-spacing 0;
-  border-top: 1px solid @greyed-color;
+}
+
+.setting:not(:last-child)
+{
+  border-bottom: 1px solid @greyed-color;
 }
 
 .setting-label
@@ -59,17 +59,19 @@ input[type="checkbox"]
   display: flex;
   flex-direction: column;
   flex-grow: 0;
-  width: 30%;
+  width: 70%;
+  margin-right: @block-spacing;
 }
 
 .description
 {
   font-size: 80%;
-  color: @greyed-color;
+  opacity: 0.5;
   padding-left: @block-spacing;
 }
 
 .setting input
 {
   flex-grow: 1;
+  width: @font-size;
 }
