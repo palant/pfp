@@ -19,6 +19,7 @@ let merge = require("merge-stream");
 let del = require("del");
 let eslint = require("gulp-eslint");
 let htmlhint = require("gulp-htmlhint");
+let stylelint = require("gulp-stylelint");
 let RSA = require("node-rsa");
 let zip = require("gulp-zip");
 let browserify = require("browserify");
@@ -255,7 +256,31 @@ gulp.task("htmlhint", function()
              .pipe(htmlhint.failReporter());
 });
 
-gulp.task("validate", ["eslint-data", "eslint-lib", "eslint-chromelib", "htmlhint"], function()
+gulp.task("stylelint", function()
+{
+  return gulp.src(["data/**/*.less", "chrome/data/**/*.less"])
+             .pipe(stylelint({
+               "failAfterError": true,
+               "syntax": "less",
+               "config": {
+                 "extends": "stylelint-config-standard",
+                 "rules": {
+                   "block-opening-brace-newline-before": "always",
+                   "block-opening-brace-newline-after": "always",
+                   "block-opening-brace-space-before": null,
+                   "block-opening-brace-space-after": null
+                 }
+               },
+               "reporters": [
+                 {
+                   "formatter": "string",
+                   "console": true
+                 }
+               ]
+             }))
+});
+
+gulp.task("validate", ["eslint-data", "eslint-lib", "eslint-chromelib", "htmlhint", "stylelint"], function()
 {
 });
 

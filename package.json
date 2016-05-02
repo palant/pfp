@@ -41,12 +41,18 @@
       "no-unused-vars": "off",
       "array-bracket-spacing": "error",
       "arrow-spacing": "error",
-      "brace-style": ["error", "allman"],
+      "brace-style": [
+        "error",
+        "allman"
+      ],
       "comma-spacing": "error",
       "comma-style": "error",
       "computed-property-spacing": "error",
       "eol-last": "error",
-      "indent": ["error", 2],
+      "indent": [
+        "error",
+        2
+      ],
       "key-spacing": "error",
       "keyword-spacing": "error",
       "linebreak-style": "error",
@@ -58,14 +64,26 @@
       "object-curly-spacing": "error",
       "operator-assignment": "error",
       "operator-linebreak": "error",
-      "padded-blocks": ["error", "never"],
+      "padded-blocks": [
+        "error",
+        "never"
+      ],
       "prefer-rest-params": "warn",
       "prefer-spread": "warn",
       "require-yield": "warn",
-      "quotes": ["error", "double", {"avoidEscape": true}],
+      "quotes": [
+        "error",
+        "double",
+        {
+          "avoidEscape": true
+        }
+      ],
       "semi": "error",
       "semi-spacing": "error",
-      "space-before-function-paren": ["error", "never"],
+      "space-before-function-paren": [
+        "error",
+        "never"
+      ],
       "space-in-parens": "error",
       "space-infix-ops": "error",
       "space-unary-ops": "error",
@@ -87,10 +105,12 @@
     "gulp-json-modify": "^1.0.0",
     "gulp-less": "^3.0.5",
     "gulp-rename": "^1.2.2",
+    "gulp-stylelint": "^2.0.2",
     "gulp-zip": "^3.2.0",
     "jpm": "^1.0.6",
     "merge-stream": "^1.0.0",
     "node-rsa": "^0.3.2",
+    "stylelint-config-standard": "^6.0.0",
     "vinyl-source-stream": "^1.1.0"
   }
 }
