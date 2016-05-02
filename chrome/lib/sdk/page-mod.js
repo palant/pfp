@@ -23,6 +23,8 @@ exports.PageMod = function({onAttach})
 
       worker.port.emit = function(eventName, ...args)
       {
+        // "Normalize" args, Firefox won't accept proxies via messaging (bug 1269327)
+        args = JSON.parse(JSON.stringify(args));
         port.postMessage({eventName, args});
       };
 

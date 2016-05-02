@@ -8,6 +8,13 @@
 
 /* global chrome */
 
+if (typeof chrome == "undefined")
+{
+  // Firefox doesn't expose the chrome namespace to frames inside the background
+  // page (like our page worker).
+  window.chrome = parent.chrome;
+}
+
 let unsafeWindow = window;
 
 function cloneInto(obj, wnd)
@@ -26,11 +33,17 @@ let self = {
     let port = chrome.runtime.connect({name: document.documentElement.dataset.porttype});
     let listeners = {};
 
-    port.onMessage.addListener(message =>
+    let handler = message =>
     {
-      for (let listener of listeners[message.eventName] || [])
-        listener(...message.args);
-    });
+      if (document.readyState == "complete")
+      {
+        for (let listener of listeners[message.eventName] || [])
+          listener(...message.args);
+      }
+      else
+        window.addEventListener("load", () => handler(message));
+    };
+    port.onMessage.addListener(handler);
 
     return {
       on: function(eventName, listener)

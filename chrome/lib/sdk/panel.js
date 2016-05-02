@@ -39,7 +39,11 @@ exports.Panel = function()
   panel.port.emit = function(eventName, ...args)
   {
     if (panel._target)
+    {
+      // "Normalize" args, Firefox won't accept proxies via messaging (bug 1269327)
+      args = JSON.parse(JSON.stringify(args));
       panel._target.postMessage({eventName, args});
+    }
   };
 
   panel.hide = function()

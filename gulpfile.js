@@ -203,6 +203,25 @@ gulp.task("build-chrome", ["validate"], function()
   );
 });
 
+gulp.task("build-webext", ["build-chrome"], function()
+{
+  let manifest = require("./package.json");
+  return merge(
+    gulp.src(["build-chrome/**", "!build-chrome/manifest.json"])
+        .pipe(gulp.dest("build-webext")),
+    gulp.src("build-chrome/manifest.json")
+        .pipe(jsonModify({
+          key: "applications",
+          value: {
+            gecko: {
+              id: manifest.id
+            }
+          }
+        }))
+        .pipe(gulp.dest("build-webext"))
+  );
+});
+
 gulp.task("eslint-data", function()
 {
   return gulp.src(["data/**/*.js", "chrome/data/**/*.js"])
@@ -272,7 +291,15 @@ gulp.task("crx", ["build-chrome"], function()
   return result.pipe(gulp.dest("build-chrome"));
 });
 
+gulp.task("webext", ["build-webext"], function()
+{
+  let manifest = require("./package.json");
+  return gulp.src(["build-webext/**", "!build-webext/**/.*", "!build-webext/**/*.xpi"])
+             .pipe(zip("easypasswords-" + manifest.version + ".xpi"))
+             .pipe(gulp.dest("build-webext"));
+});
+
 gulp.task("clean", function()
 {
-  return del(["build-jpm", "build-chrome"]);
+  return del(["build-jpm", "build-chrome", "build-webext"]);
 });
