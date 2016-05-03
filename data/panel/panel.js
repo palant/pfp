@@ -278,6 +278,7 @@
       let form = $(id);
       resetForm(form);
       form.setAttribute("data-active", "true");
+      $("crypto-error").hidden = true;
 
       resize();
       setFocus();
@@ -317,6 +318,26 @@
   }
   global.enforceValue = enforceValue;
 
+  function showCryptoError(e)
+  {
+    $("crypto-error-details").textContent = e;
+    $("crypto-error").hidden = false;
+    $("crypto-error-more").hidden = false;
+    $("crypto-error-details").hidden = true;
+    resize();
+  }
+
+  onInit(() =>
+  {
+    setCommandHandler("crypto-error-more", () =>
+    {
+      $("crypto-error-more").hidden = true;
+      $("crypto-error-details").hidden = false;
+      resize();
+    });
+  });
+
   self.port.on("show", show);
   self.port.on("hide", hide);
+  self.port.on("cryptoError", showCryptoError);
 })(this);
