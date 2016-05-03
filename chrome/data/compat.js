@@ -8,25 +8,6 @@
 
 /* global chrome */
 
-if (typeof chrome == "undefined")
-{
-  // Firefox doesn't expose the chrome namespace to frames inside the background
-  // page (like our page worker).
-  window.chrome = parent.chrome;
-}
-
-let unsafeWindow = window;
-
-function cloneInto(obj, wnd)
-{
-  return obj;
-}
-
-function exportFunction(func, wnd)
-{
-  return func;
-}
-
 let self = {
   port: (function()
   {
