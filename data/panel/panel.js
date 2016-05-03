@@ -223,6 +223,13 @@
     try
     {
       form.reset();
+      let custom = form.dataset.customReset;
+      if (custom)
+      {
+        let match = /^([^\.]+)\.([^=]+)=(.*)/.exec(custom);
+        if (match)
+          $(match[1]).setAttribute(match[2], match[3]);
+      }
       updateForm(form);
     }
     finally

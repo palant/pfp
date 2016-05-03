@@ -14,12 +14,15 @@
     enforceValue, resize, messages
   */
 
+  /* global zxcvbn */
+
   onInit(function()
   {
     setValidator("new-master", validateMasterPassword);
     setValidator("new-master-repeat", validateMasterPasswordRepeat);
+    $("new-master").addEventListener("input", checkPasswordScore);
 
-    setSubmitHandler("change-master", () => self.port.emit("changeMasterPassword", $("new-master").value.trim()));
+    setSubmitHandler("change-master", changeMasterPassword);
     setResetHandler("change-master", () => setActivePanel("enter-master"));
   });
 
@@ -47,5 +50,24 @@
       return messages["passwords-differ"];
 
     return null;
+  }
+
+  function checkPasswordScore()
+  {
+    let score = zxcvbn($("new-master").value.trim()).score;
+    $("password-score").setAttribute("data-score", score);
+    return score;
+  }
+
+  function changeMasterPassword()
+  {
+    let masterPassword = $("new-master").value.trim();
+    let score = checkPasswordScore();
+    let ask = score < 3 ? confirm(messages["weak-password"]) : Promise.resolve(true);
+    ask.then(accepted =>
+    {
+      if (accepted)
+        self.port.emit("changeMasterPassword", masterPassword);
+    });
   }
 })(this);

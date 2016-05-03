@@ -112,6 +112,71 @@ button
   color: @error-text;
 }
 
+#password-score
+{
+  display: flex;
+  flex-direction: row;
+  align-content: stretch;
+
+  *
+  {
+    flex-grow: 1;
+    background-color: #ccc;
+    height: 5px;
+    margin: 2px;
+  }
+}
+
+#password-score[data-score="0"]
+{
+  #password-score-0
+  {
+    background-color: #f00;
+  }
+}
+
+#password-score[data-score="1"]
+{
+  #password-score-0,
+  #password-score-1
+  {
+    background-color: #f80;
+  }
+}
+
+#password-score[data-score="2"]
+{
+  #password-score-0,
+  #password-score-1,
+  #password-score-2
+  {
+    background-color: #ee0;
+  }
+}
+
+#password-score[data-score="3"]
+{
+  #password-score-0,
+  #password-score-1,
+  #password-score-2,
+  #password-score-3
+  {
+    background-color: #cf0;
+  }
+}
+
+#password-score[data-score="4"]
+{
+  #password-score-0,
+  #password-score-1,
+  #password-score-2,
+  #password-score-3,
+  #password-score-4
+  {
+    background-color: #0f0;
+  }
+}
+
 #original-site
 {
   white-space: pre-line;

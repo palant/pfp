@@ -12,6 +12,7 @@
     <!--[ifchrome
     <script src="../compat.js"></script>
     <script src="../i18n.js"></script>
+    <script src="zxcvbn-4.3.0.js"></script>
     <script src="panel.js"></script>
     <script src="changeMaster.js"></script>
     <script src="enterMaster.js"></script>
@@ -26,6 +27,7 @@
     <div id="messages" hidden>
       <div data-l10n-id="password-too-short"></div>
       <div data-l10n-id="passwords-differ"></div>
+      <div data-l10n-id="weak-password"></div>
       <div data-l10n-id="password-declined"></div>
       <div data-l10n-id="password-name-required"></div>
       <div data-l10n-id="password-name-exists"></div>
@@ -37,12 +39,19 @@
       <div data-l10n-id="remove-alias-confirmation"></div>
     </div>
 
-    <form id="change-master" class="slide" data-default-element="new-master">
+    <form id="change-master" class="slide" data-default-element="new-master" data-custom-reset="password-score.data-score=0">
       <div id="new-master-message" class="description" data-l10n-id="new-master-message"></div>
       <div id="reset-master-message" class="description warning" data-l10n-id="reset-master-message"></div>
       <label class="block-start" for="new-master" data-l10n-id="new-master"></label>
       <input id="new-master" type="password">
       <div class="error" hidden></div>
+      <div id="password-score" data-score="0">
+        <div id="password-score-0"></div>
+        <div id="password-score-1"></div>
+        <div id="password-score-2"></div>
+        <div id="password-score-3"></div>
+        <div id="password-score-4"></div>
+      </div>
       <label class="block-start" for="new-master-repeat" data-l10n-id="new-master-repeat"></label>
       <input id="new-master-repeat" type="password">
       <div class="error" hidden></div>
