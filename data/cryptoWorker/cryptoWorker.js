@@ -6,8 +6,6 @@
 
 "use strict";
 
-/* global Task */
-
 const NUM_ITERATIONS = 256 * 1024;
 
 // I, l, O, 0, 1 excluded because of potential confusion. ", ', \ excluded
@@ -22,7 +20,7 @@ let decoder = new TextDecoder("utf-8");
 
 function derivePassword(params, callback)
 {
-  Task.spawn(function*()
+  Promise.resolve(true).then(() =>
   {
     if (params.domain == "" && params.name == "")
     {
@@ -32,15 +30,16 @@ function derivePassword(params, callback)
       params.name = toBase64(buffer);
     }
 
-    let masterKey = yield crypto.subtle.importKey(
+    return crypto.subtle.importKey(
       "raw",
       encoder.encode(params.masterPassword),
       {"name": "PBKDF2"},
       false,
       ["deriveBits"]
     );
-
-    let buffer = yield crypto.subtle.deriveBits(
+  }).then(masterKey =>
+  {
+    return crypto.subtle.deriveBits(
       {
         "name": "PBKDF2",
         "salt": encoder.encode(params.domain + "\0" + params.name),
@@ -51,24 +50,26 @@ function derivePassword(params, callback)
       masterKey,
       params.length * 8
     );
-
+  }).then(buffer =>
+  {
     return [toPassword(buffer, params.lower, params.upper, params.number, params.symbol), params.name];
   }).then(callback);
 }
 
 function encryptPassword(params, callback)
 {
-  Task.spawn(function*()
+  Promise.resolve(true).then(() =>
   {
-    let masterKey = yield crypto.subtle.importKey(
+    return crypto.subtle.importKey(
       "raw",
       encoder.encode(params.masterPassword),
       "PBKDF2",
       false,
       ["deriveKey"]
     );
-
-    let key = yield crypto.subtle.deriveKey(
+  }).then(masterKey =>
+  {
+    return crypto.subtle.deriveKey(
       {
         "name": "PBKDF2",
         "salt": encoder.encode(params.domain + "\0" + params.name),
@@ -81,16 +82,18 @@ function encryptPassword(params, callback)
       false,
       ["encrypt"]
     );
-
+  }).then(key =>
+  {
     let initializationVector = new Uint8Array(16);
     crypto.getRandomValues(initializationVector);
 
-    let buffer = yield crypto.subtle.encrypt(
+    return Promise.all([initializationVector, crypto.subtle.encrypt(
       {"name": "AES-CBC", iv: initializationVector},
       key,
       encoder.encode(params.password)
-    );
-
+    )]);
+  }).then(([initializationVector, buffer]) =>
+  {
     let array = new Uint8Array(buffer);
     let result = [];
     for (let i = 0; i < array.length; i++)
@@ -102,17 +105,18 @@ function encryptPassword(params, callback)
 
 function decryptPassword(params, callback)
 {
-  Task.spawn(function*()
+  Promise.resolve(true).then(() =>
   {
-    let masterKey = yield crypto.subtle.importKey(
+    return crypto.subtle.importKey(
       "raw",
       encoder.encode(params.masterPassword),
       "PBKDF2",
       false,
       ["deriveKey"]
     );
-
-    let key = yield crypto.subtle.deriveKey(
+  }).then(masterKey =>
+  {
+    return crypto.subtle.deriveKey(
       {
         "name": "PBKDF2",
         "salt": encoder.encode(params.domain + "\0" + params.name),
@@ -125,15 +129,17 @@ function decryptPassword(params, callback)
       false,
       ["decrypt"]
     );
-
+  }).then(key =>
+  {
     let [initializationVector, password] = params.encrypted.split("_", 2).map(fromBase64);
 
-    let buffer = yield crypto.subtle.decrypt(
+    return crypto.subtle.decrypt(
       {"name": "AES-CBC", iv: initializationVector},
       key,
       password
     );
-
+  }).then(buffer =>
+  {
     return decoder.decode(buffer);
   }).then(callback);
 }
