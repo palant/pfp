@@ -248,8 +248,8 @@
     document.body.offsetHeight;
 
     self.port.emit("resize", [
-      document.documentElement.scrollWidth + 2,
-      Math.min(document.documentElement.offsetHeight, document.documentElement.scrollHeight) + 2
+      document.documentElement.scrollWidth,
+      Math.min(document.documentElement.offsetHeight, document.documentElement.scrollHeight)
     ]);
   }
   global.resize = resize;
