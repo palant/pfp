@@ -16,12 +16,12 @@ Promise.all([
   let panel = Panel();
   panel.on("show", () =>
   {
-    let {getCurrentHost} = require("../../lib/ui/utils");
-    let {getPasswords} = require("../../lib/passwords");
+    let utils = require("../../lib/ui/utils");
+    let passwords = require("../../lib/passwords");
     let {state: masterPasswordState} = require("../../lib/masterPassword");
 
-    let [origSite, site, passwords] = getPasswords(getCurrentHost());
-    panel.port.emit("show", {origSite, site, passwords, masterPasswordState});
+    let [origSite, site, pwdList] = passwords.getPasswords(utils.getCurrentHost());
+    panel.port.emit("show", {origSite, site, pwdList, masterPasswordState});
   });
 
   // Connect panel to other modules

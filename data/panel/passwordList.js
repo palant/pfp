@@ -34,9 +34,9 @@
     setCommandHandler("site-edit-cancel", abortEditingSite);
     setSubmitHandler("password-list", finishEditingSite);
 
-    self.port.on("masterPasswordAccepted", passwords =>
+    self.port.on("masterPasswordAccepted", data =>
     {
-      showPasswords(passwords);
+      initPasswordList(data);
       setActivePanel("password-list");
     });
     self.port.on("masterPasswordForgotten", () => setActivePanel("enter-master"));
@@ -52,10 +52,10 @@
 
   onShow(initPasswordList);
 
-  function initPasswordList({origSite, site, passwords})
+  function initPasswordList({origSite, site, pwdList})
   {
     setSite(origSite, site);
-    showPasswords(passwords);
+    showPasswords(pwdList);
   }
 
   function setSite(newOrigSite, newSite)
@@ -153,13 +153,13 @@
     });
   }
 
-  function showPasswords(passwords)
+  function showPasswords(pwdList)
   {
     let list = $("password-list-container");
     while (list.lastChild && !list.lastChild.id)
       list.removeChild(list.lastChild);
 
-    let names = Object.keys(passwords);
+    let names = Object.keys(pwdList);
     if (names.length)
     {
       let template = $("password-template").firstElementChild;
@@ -177,7 +177,7 @@
       names.sort();
       for (let name of names)
       {
-        let password = passwords[name];
+        let password = pwdList[name];
         let tooltip;
         if (password.type == "pbkdf2-sha1-generated")
         {
