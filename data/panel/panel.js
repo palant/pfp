@@ -43,9 +43,6 @@
       messages[messageElement.getAttribute("data-l10n-id")] = messageElement.textContent;
     }
 
-    self.port.on("masterPasswordAccepted", () => setActivePanel("password-list"));
-    self.port.on("masterPasswordForgotten", () => setActivePanel("enter-master"));
-
     // Run panel initializers
     for (let handler of initHandlers)
       handler.call(null);

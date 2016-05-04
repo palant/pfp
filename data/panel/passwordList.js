@@ -34,6 +34,12 @@
     setCommandHandler("site-edit-cancel", abortEditingSite);
     setSubmitHandler("password-list", finishEditingSite);
 
+    self.port.on("masterPasswordAccepted", passwords =>
+    {
+      showPasswords(passwords);
+      setActivePanel("password-list");
+    });
+    self.port.on("masterPasswordForgotten", () => setActivePanel("enter-master"));
     self.port.on("setPasswords", initPasswordList);
     self.port.on("passwordAdded", showPasswords);
     self.port.on("passwordRemoved", showPasswords);
