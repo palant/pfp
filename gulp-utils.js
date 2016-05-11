@@ -34,15 +34,18 @@ exports.jpm = function(args)
   });
 };
 
-function transform(modifier, regexp)
+function transform(modifier, opts)
 {
+  if (!opts)
+    opts = {};
+
   let stream = new Transform({objectMode: true});
   stream._transform = function(file, encoding, callback)
   {
     if (!file.isBuffer())
       throw new Error("Unexpected file type");
 
-    if (regexp && !regexp.test(file.path))
+    if (opts.pathregexp && !opts.pathregexp.test(file.path))
     {
       callback(null, file);
       return;
@@ -50,9 +53,12 @@ function transform(modifier, regexp)
 
     Promise.resolve().then(() =>
     {
-      return modifier(file);
-    }).then(() =>
+      let contents = opts.raw ? file.contents : file.contents.toString("utf-8");
+      return modifier(file.path, contents);
+    }).then(([filepath, contents]) =>
     {
+      file.path = filepath;
+      file.contents = new Buffer(contents, "utf-8");
       callback(null, file);
     }).catch(e =>
     {
@@ -66,17 +72,17 @@ exports.transform = transform;
 
 exports.jsonModify = function(modifier)
 {
-  return transform(file =>
+  return transform((filepath, contents) =>
   {
-    let data = JSON.parse(file.contents.toString("utf-8"));
+    let data = JSON.parse(contents);
     data = modifier(data) || data;
-    file.contents = new Buffer(JSON.stringify(data, null, 2), "utf-8");
+    return [filepath, JSON.stringify(data, null, 2)];
   });
 };
 
 exports.signCRX = function(keyFile)
 {
-  return transform(file =>
+  return transform((filepath, contents) =>
   {
     return new Promise((resolve, reject) =>
     {
@@ -91,28 +97,27 @@ exports.signCRX = function(keyFile)
     {
       let privateKey = RSA(keyData, {signingScheme: "pkcs1-sha1"});
       let publicKey = privateKey.exportKey("pkcs8-public-der");
-      let signature = privateKey.sign(file.contents, "buffer");
+      let signature = privateKey.sign(contents, "buffer");
 
       let header = new Buffer(16);
       header.write("Cr24", 0);
       header.writeInt32LE(2, 4);
       header.writeInt32LE(publicKey.length, 8);
       header.writeInt32LE(signature.length, 12);
-      return Buffer.concat([header, publicKey, signature, file.contents]);
+      return Buffer.concat([header, publicKey, signature, contents]);
     }).then(contents =>
     {
-      file.path = file.path.replace(/\.zip$/, ".crx");
-      file.contents = contents;
+      return [filepath.replace(/\.zip$/, ".crx"), contents];
     });
-  });
+  }, {raw: true});
 };
 
 exports.toChromeLocale = function()
 {
-  return transform(file =>
+  return transform((filepath, contents) =>
   {
-    let locale = path.basename(file.path).replace(/\.properties$/, "");
-    let lines = file.contents.toString("utf-8").split(/[\r\n]+/);
+    let locale = path.basename(filepath).replace(/\.properties$/, "");
+    let lines = contents.split(/[\r\n]+/);
     let data = {};
     for (let line of lines)
     {
@@ -138,32 +143,28 @@ exports.toChromeLocale = function()
         data.description.message = localized.description;
     }
 
-    file.path = path.join(path.dirname(file.path), locale.replace(/-/g, "_"), "messages.json");
-    file.contents = new Buffer(JSON.stringify(data, null, 2), "utf-8");
+    return [
+      path.join(path.dirname(filepath), locale.replace(/-/g, "_"), "messages.json"),
+      JSON.stringify(data, null, 2)
+    ];
   });
 };
 
 exports.convertHTML = function()
 {
-  return transform(file =>
+  return transform((filepath, contents) =>
   {
-    let source = file.contents.toString("utf-8");
-
     // Process conditional comments
-    source = source.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1");
-
-    file.contents = new Buffer(source, "utf-8");
-  }, /\.html$/);
+    return [filepath, contents.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1")];
+  }, {pathregexp: /\.html$/});
 };
 
 exports.reduceZxcvbnSize = function()
 {
-  return transform(file =>
+  return transform((filepath, contents) =>
   {
-    let source = file.contents.toString("utf-8");
-
     // Shorten frequency lists
-    source = source.replace(/(frequency_lists\s*=\s*{)([\s\S]*?)(})/, (match, prefix, value, postfix) =>
+    contents = contents.replace(/(frequency_lists\s*=\s*{)([\s\S]*?)(})/, (match, prefix, value, postfix) =>
     {
       value = value.replace(/"(.*?)"/g, (match, list) =>
       {
@@ -173,7 +174,7 @@ exports.reduceZxcvbnSize = function()
     });
 
     // Insert copyright notice and explanation for AMO editors
-    source = `
+    contents = `
 // The below is the official zxcvbn release with this message and copyright
 // notice added, and with dictionaries shortened to 200 entries. For the
 // transformation applied to the original file see
@@ -203,8 +204,8 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-` + source;
+` + contents;
 
-    file.contents = new Buffer(source, "utf-8");
-  }, /\bzxcvbn-[\d\.]+\.js$/);
+    return [filepath, contents];
+  }, {pathregexp: /\bzxcvbn-[\d\.]+\.js$/});
 };
