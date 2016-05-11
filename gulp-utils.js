@@ -149,9 +149,6 @@ exports.convertHTML = function()
   {
     let source = file.contents.toString("utf-8");
 
-    // Remove type attribute from scripts
-    source = source.replace(/<script\s+type="[^"]*"/g, "<script");
-
     // Process conditional comments
     source = source.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1");
 
