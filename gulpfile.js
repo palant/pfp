@@ -86,6 +86,11 @@ gulp.task("build-webext", ["build-chrome"], function()
     gulp.src("build-chrome/manifest.json")
         .pipe(utils.jsonModify(data =>
         {
+          delete data.minimum_chrome_version;
+          let index = data.permissions.indexOf("unlimitedStorage");
+          if (index >= 0)
+            data.permissions.splice(index, 1);
+
           data.applications = {
             gecko: {
               id: manifest.id
