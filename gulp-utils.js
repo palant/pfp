@@ -34,13 +34,19 @@ exports.jpm = function(args)
   });
 };
 
-function transform(modifier)
+function transform(modifier, regexp)
 {
   let stream = new Transform({objectMode: true});
   stream._transform = function(file, encoding, callback)
   {
     if (!file.isBuffer())
       throw new Error("Unexpected file type");
+
+    if (regexp && !regexp.test(file.path))
+    {
+      callback(null, file);
+      return;
+    }
 
     Promise.resolve().then(() =>
     {
@@ -141,41 +147,36 @@ exports.convertHTML = function()
 {
   return transform(file =>
   {
-    if (/\.html$/.test(file.path))
-    {
-      let source = file.contents.toString("utf-8");
+    let source = file.contents.toString("utf-8");
 
-      // Remove type attribute from scripts
-      source = source.replace(/<script\s+type="[^"]*"/g, "<script");
+    // Remove type attribute from scripts
+    source = source.replace(/<script\s+type="[^"]*"/g, "<script");
 
-      // Process conditional comments
-      source = source.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1");
+    // Process conditional comments
+    source = source.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1");
 
-      file.contents = new Buffer(source, "utf-8");
-    }
-  });
+    file.contents = new Buffer(source, "utf-8");
+  }, /\.html$/);
 };
 
 exports.reduceZxcvbnSize = function()
 {
   return transform(file =>
   {
-    if (/\bzxcvbn-[\d\.]+\.js$/.test(file.path))
+    let source = file.contents.toString("utf-8");
+
+    // Shorten frequency lists
+    source = source.replace(/(frequency_lists\s*=\s*{)([\s\S]*?)(})/, (match, prefix, value, postfix) =>
     {
-      let source = file.contents.toString("utf-8");
-
-      // Shorten frequency lists
-      source = source.replace(/(frequency_lists\s*=\s*{)([\s\S]*?)(})/, (match, prefix, value, postfix) =>
+      value = value.replace(/"(.*?)"/g, (match, list) =>
       {
-        value = value.replace(/"(.*?)"/g, (match, list) =>
-        {
-          return '"' + list.split(/,/).slice(0, 200).join(",") + '"';
-        });
-        return prefix + value + postfix;
+        return '"' + list.split(/,/).slice(0, 200).join(",") + '"';
       });
+      return prefix + value + postfix;
+    });
 
-      // Insert copyright notice and explanation for AMO editors
-      source = `
+    // Insert copyright notice and explanation for AMO editors
+    source = `
 // The below is the official zxcvbn release with this message and copyright
 // notice added, and with dictionaries shortened to 200 entries. For the
 // transformation applied to the original file see
@@ -207,7 +208,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ` + source;
 
-      file.contents = new Buffer(source, "utf-8");
-    }
-  });
+    file.contents = new Buffer(source, "utf-8");
+  }, /\bzxcvbn-[\d\.]+\.js$/);
 };
