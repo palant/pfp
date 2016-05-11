@@ -34,7 +34,7 @@ exports.jpm = function(args)
   });
 };
 
-exports.jsonModify = function(modifier)
+function transform(modifier)
 {
   let stream = new Transform({objectMode: true});
   stream._transform = function(file, encoding, callback)
@@ -42,23 +42,37 @@ exports.jsonModify = function(modifier)
     if (!file.isBuffer())
       throw new Error("Unexpected file type");
 
+    Promise.resolve().then(() =>
+    {
+      return modifier(file);
+    }).then(() =>
+    {
+      callback(null, file);
+    }).catch(e =>
+    {
+      console.error(e);
+      callback(e);
+    });
+  };
+  return stream;
+}
+exports.transform = transform;
+
+exports.jsonModify = function(modifier)
+{
+  return transform(file =>
+  {
     let data = JSON.parse(file.contents.toString("utf-8"));
     data = modifier(data) || data;
     file.contents = new Buffer(JSON.stringify(data, null, 2), "utf-8");
-    callback(null, file);
-  };
-  return stream;
+  });
 };
 
 exports.signCRX = function(keyFile)
 {
-  let stream = new Transform({objectMode: true});
-  stream._transform = function(file, encoding, callback)
+  return transform(file =>
   {
-    if (!file.isBuffer())
-      throw new Error("Unexpected file type");
-
-    new Promise((resolve, reject) =>
+    return new Promise((resolve, reject) =>
     {
       fs.readFile(keyFile, function(error, data)
       {
@@ -83,24 +97,14 @@ exports.signCRX = function(keyFile)
     {
       file.path = file.path.replace(/\.zip$/, ".crx");
       file.contents = contents;
-      callback(null, file);
-    }).catch(function(error)
-    {
-      console.error(error);
-      callback(error);
     });
-  };
-  return stream;
+  });
 };
 
 exports.toChromeLocale = function()
 {
-  let stream = new Transform({objectMode: true});
-  stream._transform = function(file, encoding, callback)
+  return transform(file =>
   {
-    if (!file.isBuffer())
-      throw new Error("Unexpected file type");
-
     let locale = path.basename(file.path).replace(/\.properties$/, "");
     let lines = file.contents.toString("utf-8").split(/[\r\n]+/);
     let data = {};
@@ -130,19 +134,13 @@ exports.toChromeLocale = function()
 
     file.path = path.join(path.dirname(file.path), locale.replace(/-/g, "_"), "messages.json");
     file.contents = new Buffer(JSON.stringify(data, null, 2), "utf-8");
-    callback(null, file);
-  };
-  return stream;
+  });
 };
 
 exports.convertHTML = function()
 {
-  let stream = new Transform({objectMode: true});
-  stream._transform = function(file, encoding, callback)
+  return transform(file =>
   {
-    if (!file.isBuffer())
-      throw new Error("Unexpected file type");
-
     if (/\.html$/.test(file.path))
     {
       let source = file.contents.toString("utf-8");
@@ -155,19 +153,13 @@ exports.convertHTML = function()
 
       file.contents = new Buffer(source, "utf-8");
     }
-    callback(null, file);
-  };
-  return stream;
+  });
 };
 
 exports.reduceZxcvbnSize = function()
 {
-  let stream = new Transform({objectMode: true});
-  stream._transform = function(file, encoding, callback)
+  return transform(file =>
   {
-    if (!file.isBuffer())
-      throw new Error("Unexpected file type");
-
     if (/\bzxcvbn-[\d\.]+\.js$/.test(file.path))
     {
       let source = file.contents.toString("utf-8");
@@ -217,7 +209,5 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       file.contents = new Buffer(source, "utf-8");
     }
-    callback(null, file);
-  };
-  return stream;
+  });
 };
