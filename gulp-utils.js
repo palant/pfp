@@ -150,15 +150,6 @@ exports.toChromeLocale = function()
   });
 };
 
-exports.convertHTML = function()
-{
-  return transform((filepath, contents) =>
-  {
-    // Process conditional comments
-    return [filepath, contents.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1")];
-  }, {pathregexp: /\.html$/});
-};
-
 exports.reduceZxcvbnSize = function()
 {
   return transform((filepath, contents) =>

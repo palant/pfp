@@ -57,7 +57,11 @@ gulp.task("build-chrome", ["validate"], function()
         }))
         .pipe(gulp.dest("build-chrome")),
     gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/**/*.js", "chrome/data/**/*.html", "chrome/data/**/*.png"])
-        .pipe(utils.convertHTML())
+        .pipe(utils.transform((filepath, contents) =>
+        {
+          // Process conditional comments
+          return [filepath, contents.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1")];
+        }, {pathregexp: /\.html$/}))
         .pipe(utils.reduceZxcvbnSize())
         .pipe(gulp.dest("build-chrome/data")),
     gulp.src(["data/**/*.less", "chrome/data/**/*.less"])
