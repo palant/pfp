@@ -34,6 +34,22 @@ exports.jpm = function(args)
   });
 };
 
+exports.jsonModify = function(modifier)
+{
+  let stream = new Transform({objectMode: true});
+  stream._transform = function(file, encoding, callback)
+  {
+    if (!file.isBuffer())
+      throw new Error("Unexpected file type");
+
+    let data = JSON.parse(file.contents.toString("utf-8"));
+    data = modifier(data) || data;
+    file.contents = new Buffer(JSON.stringify(data, null, 2), "utf-8");
+    callback(null, file);
+  };
+  return stream;
+};
+
 exports.signCRX = function(keyFile)
 {
   let stream = new Transform({objectMode: true});

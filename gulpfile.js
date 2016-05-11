@@ -17,7 +17,6 @@ let htmlhint = require("gulp-htmlhint");
 let stylelint = require("gulp-stylelint");
 let zip = require("gulp-zip");
 let browserify = require("browserify");
-let jsonModify = require("gulp-json-modify");
 
 let utils = require("./gulp-utils");
 
@@ -52,7 +51,10 @@ gulp.task("build-chrome", ["validate"], function()
     gulp.src("LICENSE.TXT")
         .pipe(gulp.dest("build-chrome")),
     gulp.src("manifest.json")
-        .pipe(jsonModify({key: "version", value: require("./package.json").version}))
+        .pipe(utils.jsonModify(data =>
+        {
+          data.version = require("./package.json").version;
+        }))
         .pipe(gulp.dest("build-chrome")),
     gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/**/*.js", "chrome/data/**/*.html", "chrome/data/**/*.png"])
         .pipe(utils.convertHTML())
@@ -78,13 +80,14 @@ gulp.task("build-webext", ["build-chrome"], function()
     gulp.src(["build-chrome/**", "!build-chrome/manifest.json"])
         .pipe(gulp.dest("build-webext")),
     gulp.src("build-chrome/manifest.json")
-        .pipe(jsonModify({
-          key: "applications",
-          value: {
+        .pipe(utils.jsonModify(data =>
+        {
+          data.applications = {
             gecko: {
               id: manifest.id
             }
-          }
+          };
+          data.browser_action.browser_style = false;
         }))
         .pipe(gulp.dest("build-webext"))
   );
