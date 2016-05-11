@@ -129,7 +129,7 @@ exports.toChromeLocale = function()
     }
 
     file.path = path.join(path.dirname(file.path), locale.replace(/-/g, "_"), "messages.json");
-    file.contents = new Buffer(JSON.stringify(data), "utf-8");
+    file.contents = new Buffer(JSON.stringify(data, null, 2), "utf-8");
     callback(null, file);
   };
   return stream;
