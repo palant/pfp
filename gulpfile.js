@@ -77,7 +77,7 @@ gulp.task("build-webext", ["build-chrome"], function()
 {
   let manifest = require("./package.json");
   return merge(
-    gulp.src(["build-chrome/**", "!build-chrome/manifest.json"])
+    gulp.src(["build-chrome/**", "!build-chrome/manifest.json", "!build-chrome/**/*.crx", "!build-chrome/**/*.zip"])
         .pipe(gulp.dest("build-webext")),
     gulp.src("build-chrome/manifest.json")
         .pipe(utils.jsonModify(data =>
