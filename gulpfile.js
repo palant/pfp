@@ -35,7 +35,21 @@ gulp.task("build-jpm", ["validate"], function()
     }
   }));
   return merge(
-    gulp.src(["package.json", "LICENSE.TXT", "data/images/icon64.png"])
+    gulp.src("package.json")
+        .pipe(utils.jsonModify(data =>
+        {
+          let whitelist = new Set([
+            "name", "title", "id", "version", "description", "main", "author",
+            "homepage", "permissions", "preferences", "engines", "license"
+          ]);
+          for (let key of Object.keys(data))
+          {
+            if (!whitelist.has(key))
+              delete data[key];
+          }
+        }))
+        .pipe(gulp.dest("build-jpm")),
+    gulp.src(["LICENSE.TXT", "data/images/icon64.png"])
         .pipe(gulp.dest("build-jpm")),
     gulp.src("data/images/icon48.png")
         .pipe(rename("icon.png"))
