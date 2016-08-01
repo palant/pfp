@@ -7,7 +7,6 @@
 "use strict";
 
 let gulp = require("gulp");
-let source = require("vinyl-source-stream");
 let less = require("gulp-less");
 let rename = require("gulp-rename");
 let merge = require("merge-stream");
@@ -16,7 +15,7 @@ let eslint = require("gulp-eslint");
 let htmlhint = require("gulp-htmlhint");
 let stylelint = require("gulp-stylelint");
 let zip = require("gulp-zip");
-let browserify = require("browserify");
+let webpack = require("webpack-stream");
 
 let utils = require("./gulp-utils");
 
@@ -26,6 +25,15 @@ gulp.task("default", ["xpi"], function()
 
 gulp.task("build-jpm", ["validate"], function()
 {
+  let bundle = gulp.src("lib/main.js").pipe(webpack({
+    externals: function(context, request, callback)
+    {
+      if (/^sdk\//.test(request))
+        callback(null, "require(\"" + request + "\")");
+      else
+        callback();
+    }
+  }));
   return merge(
     gulp.src(["package.json", "LICENSE.TXT", "data/images/icon64.png"])
         .pipe(gulp.dest("build-jpm")),
@@ -38,8 +46,9 @@ gulp.task("build-jpm", ["validate"], function()
     gulp.src("data/**/*.less")
         .pipe(less())
         .pipe(gulp.dest("build-jpm/data")),
-    gulp.src("lib/**/*.js")
-        .pipe(gulp.dest("build-jpm/lib")),
+    gulp.src("jpm/header.js")
+        .pipe(utils.concat(bundle, "index.js"))
+        .pipe(gulp.dest("build-jpm")),
     gulp.src("locale/**/*.properties")
         .pipe(gulp.dest("build-jpm/locale"))
   );
@@ -47,6 +56,12 @@ gulp.task("build-jpm", ["validate"], function()
 
 gulp.task("build-chrome", ["validate"], function()
 {
+  let path = require("path");
+  let bundle = gulp.src("chrome/lib/main.js").pipe(webpack({
+    resolve: {
+      alias: {"sdk": path.resolve(process.cwd(), "chrome/lib/sdk")}
+    }
+  }));
   return merge(
     gulp.src("LICENSE.TXT")
         .pipe(gulp.dest("build-chrome")),
@@ -67,9 +82,8 @@ gulp.task("build-chrome", ["validate"], function()
     gulp.src(["data/**/*.less", "chrome/data/**/*.less"])
         .pipe(less())
         .pipe(gulp.dest("build-chrome/data")),
-    browserify("chrome/lib/main.js", {"paths": "chrome/lib"})
-        .bundle()
-        .pipe(source("background.js"))
+    gulp.src("chrome/header.js")
+        .pipe(utils.concat(bundle, "background.js"))
         .pipe(gulp.dest("build-chrome")),
     gulp.src("locale/**/*.properties")
         .pipe(utils.toChromeLocale())
@@ -120,16 +134,21 @@ gulp.task("eslint-data", function()
 
 gulp.task("eslint-lib", function()
 {
-  return gulp.src(["lib/**/*.js"])
-             .pipe(eslint({envs: ["commonjs", "es6"]}))
-             .pipe(eslint.format())
-             .pipe(eslint.failAfterError());
-});
-
-gulp.task("eslint-chromelib", function()
-{
-  return gulp.src(["chrome/lib/**/*.js"])
-             .pipe(eslint({envs: ["commonjs", "browser", "es6"]}))
+  return gulp.src(["lib/**/*.js", "sdk/header.js", "chrome/header.js", "chrome/lib/**/*.js"])
+             .pipe(eslint({
+               envs: ["commonjs", "es6"],
+               globals: {
+                 external: false,
+                 crypto: false,
+                 TextEncoder: false,
+                 TextDecoder: false,
+                 atob: false,
+                 btoa: false,
+                 setTimeout: false,
+                 clearTimeout: false,
+                 URL: false
+               }
+             }))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
 });
@@ -167,7 +186,7 @@ gulp.task("stylelint", function()
              }));
 });
 
-gulp.task("validate", ["eslint-node", "eslint-data", "eslint-lib", "eslint-chromelib", "htmlhint", "stylelint"], function()
+gulp.task("validate", ["eslint-node", "eslint-data", "eslint-lib", "htmlhint", "stylelint"], function()
 {
 });
 

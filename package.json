@@ -4,7 +4,7 @@
   "id": "easypasswords@palant.de",
   "version": "1.0.6",
   "description": "Use a single master password to generate secure passwords for all websites - without losing track of passwords you cannot change.",
-  "main": "lib/main.js",
+  "main": "index.js",
   "author": "Wladimir Palant",
   "homepage": "https://github.com/palant/easypasswords",
   "permissions": {
@@ -98,7 +98,6 @@
     "url": "https://github.com/palant/easypasswords.git"
   },
   "devDependencies": {
-    "browserify": "^13.0.0",
     "del": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-eslint": "^2.0.0",
@@ -111,6 +110,6 @@
     "merge-stream": "^1.0.0",
     "node-rsa": "^0.3.2",
     "stylelint-config-standard": "^6.0.0",
-    "vinyl-source-stream": "^1.1.0"
+    "webpack-stream": "^3.2.0"
   }
 }

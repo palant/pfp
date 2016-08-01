@@ -8,8 +8,7 @@
 
 /* global chrome */
 
-let {EventTarget} = require("sdk/event/target");
-let {emit} = require("sdk/event/core");
+let {EventTarget, emit} = require("../../../lib/eventTarget");
 
 exports.Panel = function()
 {

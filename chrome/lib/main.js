@@ -20,8 +20,11 @@ Promise.all([
     let passwords = require("../../lib/passwords");
     let {state: masterPasswordState} = require("../../lib/masterPassword");
 
-    let [origSite, site, pwdList] = passwords.getPasswords(utils.getCurrentHost());
-    panel.port.emit("show", {origSite, site, pwdList, masterPasswordState});
+    utils.getCurrentHost().then(currentHost =>
+    {
+      let [origSite, site, pwdList] = passwords.getPasswords(currentHost);
+      panel.port.emit("show", {origSite, site, pwdList, masterPasswordState});
+    });
   });
 
   // Connect panel to other modules

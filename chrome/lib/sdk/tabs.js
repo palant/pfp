@@ -8,53 +8,9 @@
 
 /* global chrome */
 
-let {EventTarget} = require("sdk/event/target");
-let {emit} = require("sdk/event/core");
+let {EventTarget, emit} = require("../../../lib/eventTarget");
 
-// Chrome's tab API is async, so we have to keep track of current tab and its
-// URL, so that our code can access these values synchronously.
-let currentTab = -1;
-let currentURL = null;
-
-chrome.tabs.query({
-  lastFocusedWindow: true,
-  active: true
-}, tabs =>
-{
-  if (tabs.length)
-  {
-    currentTab = tabs[0].id;
-    currentURL = tabs[0].url;
-  }
-});
-
-chrome.tabs.onActivated.addListener(({tabId, windowId}) =>
-{
-  currentTab = tabId;
-  chrome.tabs.get(tabId, tab =>
-  {
-    if (tab.id == currentTab)
-      currentURL = tab.url;
-  });
-});
-
-chrome.tabs.onUpdated.addListener((tabId, {url}, tab) =>
-{
-  if (tabId == currentTab && url)
-    currentURL = url;
-});
-
-// Now the actual tabs.activeTab implementation
-
-function getActiveTab()
-{
-  return {
-    url: currentURL,
-    attach: runScript.bind(null, currentTab)
-  };
-}
-
-function runScript(tabId, {contentScriptFile, contentScriptOptions})
+function runScript({contentScriptFile, contentScriptOptions})
 {
   let worker = EventTarget();
   worker.port = EventTarget();
@@ -71,49 +27,40 @@ function runScript(tabId, {contentScriptFile, contentScriptOptions})
     chrome.runtime.onMessage.removeListener(listener);
   };
 
-  chrome.tabs.executeScript(tabId, {file: "data/contentScript-compat.js"}, function()
+  chrome.tabs.query({
+    lastFocusedWindow: true,
+    active: true
+  }, tabs =>
   {
-    if (chrome.runtime.lastError)
+    if (tabs.length)
     {
-      emit(worker, "error", chrome.runtime.lastError);
-      return;
+      let tabId = tabs[0].id;
+
+      chrome.tabs.executeScript({file: "data/contentScript-compat.js"}, () =>
+      {
+        if (chrome.runtime.lastError)
+        {
+          emit(worker, "error", chrome.runtime.lastError);
+          return;
+        }
+
+        chrome.tabs.sendMessage(tabId, contentScriptOptions);
+
+        contentScriptFile = contentScriptFile.replace(chrome.runtime.getURL(""), "");
+        chrome.tabs.executeScript(tabId, {file: contentScriptFile}, () =>
+        {
+          if (chrome.runtime.lastError)
+            emit(worker, "error", chrome.runtime.lastError);
+        });
+      });
     }
-
-    chrome.tabs.sendMessage(tabId, contentScriptOptions);
-
-    contentScriptFile = contentScriptFile.replace(chrome.runtime.getURL(""), "");
-    chrome.tabs.executeScript(tabId, {file: contentScriptFile}, function()
-    {
-      if (chrome.runtime.lastError)
-        emit(worker, "error", chrome.runtime.lastError);
-    });
+    else
+      emit(worker, "error", new Error("No current tab?"));
   });
 
   return worker;
 }
 
-Object.defineProperty(exports, "activeTab", {
-  enumerable: true,
-  get: getActiveTab
-});
-
-exports.open = function(url)
-{
-  // Look for existing instances here because the fake sdk/windows
-  // implementation won't allow the caller to do so.
-  chrome.tabs.query({
-    url,
-    lastFocusedWindow: true
-  }, function(tabs)
-  {
-    if (tabs.length)
-      chrome.tabs.update(tabs[0].id, {active: true});
-    else
-    {
-      chrome.tabs.create({
-        url,
-        active: true
-      });
-    }
-  });
+exports.activeTab = {
+  attach: runScript
 };

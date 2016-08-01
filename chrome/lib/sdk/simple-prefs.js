@@ -6,10 +6,9 @@
 
 "use strict";
 
-/* global chrome */
+/* global chrome, window */
 
-let {EventTarget} = require("sdk/event/target");
-let {emit} = require("sdk/event/core");
+let {EventTarget, emit} = require("../../../lib/eventTarget");
 
 let values = {
   autolock: true,
