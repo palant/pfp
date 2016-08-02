@@ -6,7 +6,8 @@
 
 "use strict";
 
-let {gPalette, CustomizableUI} = external.importCustomizableUI();
+let {Cu} = require("chrome");
+let {gPalette, CustomizableUI} = Cu.import("resource:///modules/CustomizableUI.jsm", {});;
 
 let listener = {
   onWidgetCreated: function(id)

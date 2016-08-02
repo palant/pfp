@@ -6,6 +6,7 @@
 
 "use strict";
 
+let path = require("path");
 let gulp = require("gulp");
 let less = require("gulp-less");
 let rename = require("gulp-rename");
@@ -26,10 +27,13 @@ gulp.task("default", ["xpi"], function()
 gulp.task("build-jpm", ["validate"], function()
 {
   let bundle = gulp.src("lib/main.js").pipe(webpack({
+    resolve: {
+      root: path.resolve(process.cwd(), "jpm/lib")
+    },
     externals: function(context, request, callback)
     {
-      if (/^sdk\//.test(request))
-        callback(null, "require(\"" + request + "\")");
+      if (request == "./package.json" || request == "chrome" || request.indexOf("sdk/") == 0)
+        callback(null, "commonjs " + request);
       else
         callback();
     }
@@ -40,7 +44,8 @@ gulp.task("build-jpm", ["validate"], function()
         {
           let whitelist = new Set([
             "name", "title", "id", "version", "description", "main", "author",
-            "homepage", "permissions", "preferences", "engines", "license"
+            "homepage", "permissions", "preferences", "engines", "license",
+            "buttonPanel"
           ]);
           for (let key of Object.keys(data))
           {
@@ -70,10 +75,9 @@ gulp.task("build-jpm", ["validate"], function()
 
 gulp.task("build-chrome", ["validate"], function()
 {
-  let path = require("path");
   let bundle = gulp.src("chrome/lib/main.js").pipe(webpack({
     resolve: {
-      alias: {"sdk": path.resolve(process.cwd(), "chrome/lib/sdk")}
+      root: path.resolve(process.cwd(), "chrome/lib")
     }
   }));
   return merge(

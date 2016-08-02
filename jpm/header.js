@@ -46,12 +46,5 @@ this.external = {
   setClipboard: function(data)
   {
     return require("sdk/clipboard").set(data, "text");
-  },
-
-  // SDK-only
-  importCustomizableUI: function()
-  {
-    let {Cu} = require("chrome");
-    return Cu.import("resource:///modules/CustomizableUI.jsm", {});
   }
 };

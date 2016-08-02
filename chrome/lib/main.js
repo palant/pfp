@@ -11,9 +11,7 @@ Promise.all([
   require("sdk/simple-prefs").init
 ]).then(() =>
 {
-  let {Panel} = require("sdk/panel");
-
-  let panel = Panel();
+  let panel = require("buttonPanel");
   panel.on("show", () =>
   {
     let utils = require("../../lib/ui/utils");
