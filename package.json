@@ -46,6 +46,10 @@
       "panel/confirm.js"
     ]
   },
+  "contentPage": {
+    "contentURL": "allpasswords/allpasswords.html",
+    "contentScript": "allpasswords/allpasswords.js"
+  },
   "eslintConfig": {
     "extends": "eslint:recommended",
     "parserOptions": {

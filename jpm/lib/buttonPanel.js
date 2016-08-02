@@ -7,7 +7,7 @@
 "use strict";
 
 let {EventTarget, emit} = require("../../lib/eventTarget");
-let result = new EventTarget();
+let result = EventTarget();
 
 let manifest = require("./package.json");
 if (!manifest.buttonPanel)

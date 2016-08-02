@@ -45,7 +45,7 @@ gulp.task("build-jpm", ["validate"], function()
           let whitelist = new Set([
             "name", "title", "id", "version", "description", "main", "author",
             "homepage", "permissions", "preferences", "engines", "license",
-            "buttonPanel"
+            "buttonPanel", "contentPage"
           ]);
           for (let key of Object.keys(data))
           {
