@@ -27,6 +27,9 @@ gulp.task("default", ["xpi"], function()
 gulp.task("build-jpm", ["validate"], function()
 {
   let bundle = gulp.src("lib/main.js").pipe(webpack({
+    output: {
+      pathinfo: true
+    },
     resolve: {
       root: path.resolve(process.cwd(), "jpm/lib")
     },
@@ -76,6 +79,9 @@ gulp.task("build-jpm", ["validate"], function()
 gulp.task("build-chrome", ["validate"], function()
 {
   let bundle = gulp.src("chrome/lib/main.js").pipe(webpack({
+    output: {
+      pathinfo: true
+    },
     resolve: {
       root: path.resolve(process.cwd(), "chrome/lib")
     }
