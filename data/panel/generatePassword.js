@@ -19,6 +19,8 @@
     self.port.on("passwordAdded", () => setActivePanel("password-list"));
     self.port.on("passwordAlreadyExists", () => markInvalid("generate-password-name", messages["password-name-exists"]));
 
+    $("generate-password-name").setAttribute("placeholder", messages["password-name-hint"]);
+
     $("password-length").addEventListener("input", updatePasswordLengthDisplay);
     $("generate-password").addEventListener("reset", () =>
     {

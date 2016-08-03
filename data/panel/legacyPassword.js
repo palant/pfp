@@ -16,6 +16,8 @@
 
   onInit(function()
   {
+    $("legacy-password-name").setAttribute("placeholder", messages["password-name-hint"]);
+
     self.port.on("passwordAdded", () => setActivePanel("password-list"));
     self.port.on("passwordAlreadyExists", () => markInvalid("legacy-password-name", messages["password-name-exists"]));
 
