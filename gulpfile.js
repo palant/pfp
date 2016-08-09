@@ -47,7 +47,7 @@ gulp.task("build-jpm", ["validate"], function()
     gulp.src("data/images/icon48.png")
         .pipe(rename("icon.png"))
         .pipe(gulp.dest("build-jpm")),
-    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "!data/images/icon48.png"])
+    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "!data/images/icon48.png", "jpm/data/**/*.js"])
         .pipe(utils.reduceZxcvbnSize())
         .pipe(gulp.dest("build-jpm/data")),
     gulp.src("data/**/*.less")
@@ -160,7 +160,7 @@ gulp.task("eslint-node", function()
 
 gulp.task("eslint-data", function()
 {
-  return gulp.src(["data/**/*.js", "chrome/data/**/*.js", "!data/panel/zxcvbn-*.js"])
+  return gulp.src(["data/**/*.js", "jpm/data/**/*.js", "chrome/data/**/*.js", "!data/panel/zxcvbn-*.js"])
              .pipe(eslint({envs: ["browser", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());

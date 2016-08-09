@@ -28,3 +28,27 @@ exports.open = function(url)
 
   require("sdk/tabs").open(url);
 };
+
+exports.executeScript = function(contentScript, options)
+{
+  return new Promise((resolve, reject) =>
+  {
+    let {data} = require("sdk/self");
+    let worker = require("sdk/tabs").activeTab.attach({
+      contentScriptFile: [
+        data.url("contentScript-compat.js"),
+        data.url(contentScript)
+      ],
+      contentScriptOptions: options
+    });
+
+    worker.on("error", reject);
+    worker.port.on("_ready", () =>
+    {
+      worker.port.disconnect = function()
+      {
+      };
+      resolve(worker.port);
+    });
+  });
+};
