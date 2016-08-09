@@ -6,6 +6,8 @@
 
 "use strict";
 
+let {data} = require("sdk/self");
+
 let {EventTarget, emit} = require("../../lib/eventTarget");
 let page = EventTarget();
 
@@ -16,10 +18,10 @@ if (!manifest.contentPage)
 let contentScripts = manifest.contentPage.contentScript || [];
 if (typeof contentScripts.join != "function")
   contentScripts = [contentScripts];
-contentScripts = contentScripts.map(file => external.getURL(file));
+contentScripts = contentScripts.map(file => data.url(file));
 
 require("sdk/page-mod").PageMod({
-  include: external.getURL(manifest.contentPage.contentURL),
+  include: data.url(manifest.contentPage.contentURL),
   contentScriptFile: contentScripts,
   contentScriptWhen: "ready",
   onAttach: function(worker)

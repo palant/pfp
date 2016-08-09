@@ -26,21 +26,6 @@ gulp.task("default", ["xpi"], function()
 
 gulp.task("build-jpm", ["validate"], function()
 {
-  let bundle = gulp.src("lib/main.js").pipe(webpack({
-    output: {
-      pathinfo: true
-    },
-    resolve: {
-      root: path.resolve(process.cwd(), "jpm/lib")
-    },
-    externals: function(context, request, callback)
-    {
-      if (request == "./package.json" || request == "chrome" || request.indexOf("sdk/") == 0)
-        callback(null, "commonjs " + request);
-      else
-        callback();
-    }
-  }));
   return merge(
     gulp.src("package.json")
         .pipe(utils.jsonModify(data =>
@@ -68,8 +53,23 @@ gulp.task("build-jpm", ["validate"], function()
     gulp.src("data/**/*.less")
         .pipe(less())
         .pipe(gulp.dest("build-jpm/data")),
-    gulp.src("jpm/header.js")
-        .pipe(utils.concat(bundle, "index.js"))
+    gulp.src(["jpm/lib/init.js", "lib/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true
+          },
+          resolve: {
+            root: path.resolve(process.cwd(), "jpm/lib")
+          },
+          externals: function(context, request, callback)
+          {
+            if (request == "./package.json" || request == "chrome" || request.indexOf("sdk/") == 0)
+              callback(null, "commonjs " + request);
+            else
+              callback();
+          }
+        }))
         .pipe(gulp.dest("build-jpm")),
     gulp.src("locale/**/*.properties")
         .pipe(gulp.dest("build-jpm/locale"))
@@ -78,14 +78,6 @@ gulp.task("build-jpm", ["validate"], function()
 
 gulp.task("build-chrome", ["validate"], function()
 {
-  let bundle = gulp.src("chrome/lib/main.js").pipe(webpack({
-    output: {
-      pathinfo: true
-    },
-    resolve: {
-      root: path.resolve(process.cwd(), "chrome/lib")
-    }
-  }));
   return merge(
     gulp.src("LICENSE.TXT")
         .pipe(gulp.dest("build-chrome")),
@@ -106,8 +98,16 @@ gulp.task("build-chrome", ["validate"], function()
     gulp.src(["data/**/*.less", "chrome/data/**/*.less"])
         .pipe(less())
         .pipe(gulp.dest("build-chrome/data")),
-    gulp.src("chrome/header.js")
-        .pipe(utils.concat(bundle, "background.js"))
+    gulp.src("chrome/lib/main.js")
+        .pipe(webpack({
+          output: {
+            filename: "background.js",
+            pathinfo: true
+          },
+          resolve: {
+            root: path.resolve(process.cwd(), "chrome/lib")
+          }
+        }))
         .pipe(gulp.dest("build-chrome")),
     gulp.src("locale/**/*.properties")
         .pipe(utils.toChromeLocale())
@@ -158,7 +158,7 @@ gulp.task("eslint-data", function()
 
 gulp.task("eslint-lib", function()
 {
-  return gulp.src(["lib/**/*.js", "sdk/header.js", "chrome/header.js", "chrome/lib/**/*.js"])
+  return gulp.src(["lib/**/*.js", "jpm/lib/**/*.js", "chrome/lib/**/*.js"])
              .pipe(eslint({
                envs: ["commonjs", "es6"],
                globals: {

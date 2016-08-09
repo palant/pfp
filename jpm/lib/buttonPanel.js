@@ -6,6 +6,8 @@
 
 "use strict";
 
+let {data} = require("sdk/self");
+
 let {EventTarget, emit} = require("../../lib/eventTarget");
 let result = EventTarget();
 
@@ -15,7 +17,7 @@ if (!manifest.buttonPanel)
 
 let icon = Object.assign({}, manifest.buttonPanel.icon);
 for (let key in icon)
-  icon[key] = external.getURL(icon[key]);
+  icon[key] = data.url(icon[key]);
 
 let button;
 require("./bug1258706_hotfix").fixButton(() =>
@@ -30,10 +32,10 @@ require("./bug1258706_hotfix").fixButton(() =>
 let contentScripts = manifest.buttonPanel.contentScript || [];
 if (typeof contentScripts.join != "function")
   contentScripts = [contentScripts];
-contentScripts = contentScripts.map(file => external.getURL(file));
+contentScripts = contentScripts.map(file => data.url(file));
 
 let panel = require("sdk/panel").Panel({
-  contentURL: external.getURL(manifest.buttonPanel.contentURL),
+  contentURL: data.url(manifest.buttonPanel.contentURL),
   contentScriptFile: contentScripts,
   position: button
 });
@@ -74,7 +76,7 @@ result.hide = function()
   let sidebar = require("sdk/ui").Sidebar({
     id: "dummy",
     title: "dummy",
-    url: external.getURL("dummy")
+    url: data.url("dummy")
   });
 
   let tabs = require("sdk/tabs");

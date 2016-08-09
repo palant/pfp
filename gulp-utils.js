@@ -80,30 +80,6 @@ exports.jsonModify = function(modifier)
   });
 };
 
-exports.concat = function(stream, newname)
-{
-  let streamdata = new Promise((resolve, reject) =>
-  {
-    let result = [];
-    stream.on("data", chunk => result.push(chunk));
-    stream.on("end", () => resolve(result));
-  });
-
-  return transform((filepath, contents) =>
-  {
-    if (newname)
-      filepath = path.resolve(filepath, "..", newname);
-
-    return streamdata.then(data =>
-    {
-      let buffers = [Buffer.from(contents)];
-      for (let i = 0; i < data.length; i++)
-        buffers.push(data[i].contents);
-      return [filepath, Buffer.concat(buffers)];
-    });
-  });
-};
-
 exports.signCRX = function(keyFile)
 {
   return transform((filepath, contents) =>
