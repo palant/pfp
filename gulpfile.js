@@ -57,7 +57,8 @@ gulp.task("build-jpm", ["validate"], function()
         .pipe(webpack({
           output: {
             filename: "index.js",
-            pathinfo: true
+            pathinfo: true,
+            library: "require"
           },
           resolve: {
             root: path.resolve(process.cwd(), "jpm/lib")
@@ -112,7 +113,8 @@ gulp.task("build-chrome", ["validate"], function()
         .pipe(webpack({
           output: {
             filename: "background.js",
-            pathinfo: true
+            pathinfo: true,
+            library: "require"
           },
           resolve: {
             root: path.resolve(process.cwd(), "chrome/lib")
