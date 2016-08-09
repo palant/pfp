@@ -33,7 +33,7 @@ let wrapper = {
   }
 };
 
-exports.init = new Promise((resolve, reject) =>
+exports.ready = new Promise((resolve, reject) =>
 {
   chrome.storage.local.get("passwords", function(items)
   {

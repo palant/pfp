@@ -70,12 +70,14 @@ function transform(modifier, opts)
 }
 exports.transform = transform;
 
-exports.jsonModify = function(modifier)
+exports.jsonModify = function(modifier, newName)
 {
   return transform((filepath, contents) =>
   {
     let data = JSON.parse(contents);
     data = modifier(data) || data;
+    if (newName)
+      filepath = path.resolve(filepath, "..", newName);
     return [filepath, JSON.stringify(data, null, 2)];
   });
 };

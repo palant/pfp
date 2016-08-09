@@ -87,6 +87,16 @@ gulp.task("build-chrome", ["validate"], function()
           data.version = require("./package.json").version;
         }))
         .pipe(gulp.dest("build-chrome")),
+    gulp.src("package.json")
+        .pipe(utils.jsonModify(data =>
+        {
+          let prefs = {};
+          if (data.preferences)
+            for (let pref of data.preferences)
+              prefs[pref.name] = pref.value;
+          return prefs;
+        }, "prefs.json"))
+        .pipe(gulp.dest("build-chrome")),
     gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/**/*.js", "chrome/data/**/*.html", "chrome/data/**/*.png"])
         .pipe(utils.transform((filepath, contents) =>
         {
@@ -98,7 +108,7 @@ gulp.task("build-chrome", ["validate"], function()
     gulp.src(["data/**/*.less", "chrome/data/**/*.less"])
         .pipe(less())
         .pipe(gulp.dest("build-chrome/data")),
-    gulp.src("chrome/lib/main.js")
+    gulp.src("lib/main.js")
         .pipe(webpack({
           output: {
             filename: "background.js",
