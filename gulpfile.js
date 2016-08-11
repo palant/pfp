@@ -48,7 +48,6 @@ gulp.task("build-jpm", ["validate"], function()
         .pipe(rename("icon.png"))
         .pipe(gulp.dest("build-jpm")),
     gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "!data/images/icon48.png", "jpm/data/**/*.js"])
-        .pipe(utils.reduceZxcvbnSize())
         .pipe(gulp.dest("build-jpm/data")),
     gulp.src("data/**/*.less")
         .pipe(less())
@@ -104,7 +103,6 @@ gulp.task("build-chrome", ["validate"], function()
           // Process conditional comments
           return [filepath, contents.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1")];
         }, {pathregexp: /\.html$/}))
-        .pipe(utils.reduceZxcvbnSize())
         .pipe(gulp.dest("build-chrome/data")),
     gulp.src(["data/**/*.less", "chrome/data/**/*.less"])
         .pipe(less())
