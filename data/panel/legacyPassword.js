@@ -7,23 +7,20 @@
 "use strict";
 
 let {
-  $, onInit, onShow, setValidator, setActivePanel, setSubmitHandler,
+  $, onShow, setValidator, setActivePanel, setSubmitHandler,
   setResetHandler, markInvalid, enforceValue, messages
 } = require("./utils");
 
-onInit(function()
-{
-  $("legacy-password-name").setAttribute("placeholder", messages["password-name-hint"]);
+$("legacy-password-name").setAttribute("placeholder", messages["password-name-hint"]);
 
-  self.port.on("passwordAdded", () => setActivePanel("password-list"));
-  self.port.on("passwordAlreadyExists", () => markInvalid("legacy-password-name", messages["password-name-exists"]));
+self.port.on("passwordAdded", () => setActivePanel("password-list"));
+self.port.on("passwordAlreadyExists", () => markInvalid("legacy-password-name", messages["password-name-exists"]));
 
-  setValidator("legacy-password-name", enforceValue.bind(null, "password-name-required"));
-  setValidator("legacy-password-value", enforceValue.bind(null, "password-value-required"));
+setValidator("legacy-password-name", enforceValue.bind(null, "password-name-required"));
+setValidator("legacy-password-value", enforceValue.bind(null, "password-value-required"));
 
-  setSubmitHandler("legacy-password", addLegacyPassword);
-  setResetHandler("legacy-password", () => setActivePanel("password-list"));
-});
+setSubmitHandler("legacy-password", addLegacyPassword);
+setResetHandler("legacy-password", () => setActivePanel("password-list"));
 
 onShow(function({site})
 {

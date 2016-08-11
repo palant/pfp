@@ -7,33 +7,30 @@
 "use strict";
 
 let {
-  $, onInit, setActivePanel, getActivePanel, setSubmitHandler, setResetHandler
+  $, setActivePanel, getActivePanel, setSubmitHandler, setResetHandler
 } = require("./utils");
 
 let promiseAccept = null;
 let originalSelection = null;
 
-onInit(function()
+setSubmitHandler("confirm", () =>
 {
-  setSubmitHandler("confirm", () =>
-  {
-    if (promiseAccept)
-      promiseAccept(true);
-    promiseAccept = null;
+  if (promiseAccept)
+    promiseAccept(true);
+  promiseAccept = null;
 
-    if (originalSelection)
-      setActivePanel(originalSelection);
-  });
+  if (originalSelection)
+    setActivePanel(originalSelection);
+});
 
-  setResetHandler("confirm", () =>
-  {
-    if (promiseAccept)
-      promiseAccept(false);
-    promiseAccept = null;
+setResetHandler("confirm", () =>
+{
+  if (promiseAccept)
+    promiseAccept(false);
+  promiseAccept = null;
 
-    if (originalSelection)
-      setActivePanel(originalSelection);
-  });
+  if (originalSelection)
+    setActivePanel(originalSelection);
 });
 
 function confirm(message)

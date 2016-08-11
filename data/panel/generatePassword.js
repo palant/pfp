@@ -7,30 +7,27 @@
 "use strict";
 
 let {
-  $, onInit, onShow, setValidator, setActivePanel, setSubmitHandler,
+  $, onShow, setValidator, setActivePanel, setSubmitHandler,
   setResetHandler, markInvalid, enforceValue, messages
 } = require("./utils");
 
-onInit(function()
+self.port.on("passwordAdded", () => setActivePanel("password-list"));
+self.port.on("passwordAlreadyExists", () => markInvalid("generate-password-name", messages["password-name-exists"]));
+
+$("generate-password-name").setAttribute("placeholder", messages["password-name-hint"]);
+
+$("password-length").addEventListener("input", updatePasswordLengthDisplay);
+$("generate-password").addEventListener("reset", () =>
 {
-  self.port.on("passwordAdded", () => setActivePanel("password-list"));
-  self.port.on("passwordAlreadyExists", () => markInvalid("generate-password-name", messages["password-name-exists"]));
-
-  $("generate-password-name").setAttribute("placeholder", messages["password-name-hint"]);
-
-  $("password-length").addEventListener("input", updatePasswordLengthDisplay);
-  $("generate-password").addEventListener("reset", () =>
-  {
-    setTimeout(updatePasswordLengthDisplay, 0);
-  });
-  updatePasswordLengthDisplay();
-
-  setValidator("generate-password-name", enforceValue.bind(null, "password-name-required"));
-  setValidator(["charset-lower", "charset-upper", "charset-number", "charset-symbol"], validateCharsets);
-
-  setSubmitHandler("generate-password", addGeneratedPassword);
-  setResetHandler("generate-password", () => setActivePanel("password-list"));
+  setTimeout(updatePasswordLengthDisplay, 0);
 });
+updatePasswordLengthDisplay();
+
+setValidator("generate-password-name", enforceValue.bind(null, "password-name-required"));
+setValidator(["charset-lower", "charset-upper", "charset-number", "charset-symbol"], validateCharsets);
+
+setSubmitHandler("generate-password", addGeneratedPassword);
+setResetHandler("generate-password", () => setActivePanel("password-list"));
 
 onShow(function({site})
 {

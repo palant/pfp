@@ -7,7 +7,7 @@
 "use strict";
 
 let {
-  $, onInit, onShow, setValidator, setActivePanel, setSubmitHandler,
+  $, onShow, setValidator, setActivePanel, setSubmitHandler,
   setResetHandler, messages
 } = require("./utils");
 
@@ -15,15 +15,12 @@ let {confirm} = require("./confirm");
 
 let zxcvbn = require("zxcvbn");
 
-onInit(function()
-{
-  setValidator("new-master", validateMasterPassword);
-  setValidator("new-master-repeat", validateMasterPasswordRepeat);
-  $("new-master").addEventListener("input", checkPasswordScore);
+setValidator("new-master", validateMasterPassword);
+setValidator("new-master-repeat", validateMasterPasswordRepeat);
+$("new-master").addEventListener("input", checkPasswordScore);
 
-  setSubmitHandler("change-master", changeMasterPassword);
-  setResetHandler("change-master", () => setActivePanel("enter-master"));
-});
+setSubmitHandler("change-master", changeMasterPassword);
+setResetHandler("change-master", () => setActivePanel("enter-master"));
 
 onShow(function({masterPasswordState})
 {

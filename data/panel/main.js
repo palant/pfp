@@ -6,11 +6,18 @@
 
 "use strict";
 
-require("./enterMaster.js");
-require("./changeMaster.js");
-require("./passwordList.js");
-require("./generatePassword.js");
-require("./legacyPassword.js");
+function init()
+{
+  window.removeEventListener("load", init);
+
+  require("./enterMaster.js");
+  require("./changeMaster.js");
+  require("./passwordList.js");
+  require("./generatePassword.js");
+  require("./legacyPassword.js");
+}
+
+window.addEventListener("load", init);
 
 // Hack: expose __webpack_require__ for simpler debugging
 /* global __webpack_require__ */

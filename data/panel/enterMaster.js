@@ -7,20 +7,17 @@
 "use strict";
 
 let {
-  $, onInit, setValidator, setActivePanel, setCommandHandler, setSubmitHandler,
+  $, setValidator, setActivePanel, setCommandHandler, setSubmitHandler,
   markInvalid, messages
 } = require("./utils");
 
 let {validateMasterPassword} = require("./changeMaster");
 
-onInit(function()
-{
-  setCommandHandler("reset-master-link", () => setActivePanel("change-master"));
-  setCommandHandler("generate-password-link", () => setActivePanel("generate-password"));
-  setCommandHandler("legacy-password-link", () => setActivePanel("legacy-password"));
+setCommandHandler("reset-master-link", () => setActivePanel("change-master"));
+setCommandHandler("generate-password-link", () => setActivePanel("generate-password"));
+setCommandHandler("legacy-password-link", () => setActivePanel("legacy-password"));
 
-  setValidator("master-password", validateMasterPassword);
-  setSubmitHandler("enter-master", () => self.port.emit("checkMasterPassword", $("master-password").value.trim()));
+setValidator("master-password", validateMasterPassword);
+setSubmitHandler("enter-master", () => self.port.emit("checkMasterPassword", $("master-password").value.trim()));
 
-  self.port.on("masterPasswordDeclined", () => markInvalid("master-password", messages["password-declined"]));
-});
+self.port.on("masterPasswordDeclined", () => markInvalid("master-password", messages["password-declined"]));

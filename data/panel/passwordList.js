@@ -7,7 +7,7 @@
 "use strict";
 
 let {
-  $, onInit, onShow, setActivePanel, setCommandHandler, setSubmitHandler,
+  $, onShow, setActivePanel, setCommandHandler, setSubmitHandler,
   resize, messages
 } = require("./utils");
 
@@ -17,37 +17,34 @@ let hidePasswordMessagesTimeout = null;
 let site = null;
 let origSite = null;
 
-onInit(function()
+for (let element of ["original-site", "site-edit", "site-edit-accept", "site-edit-cancel"].map($))
 {
-  for (let element of ["original-site", "site-edit", "site-edit-accept", "site-edit-cancel"].map($))
-  {
-    element.setAttribute("title", element.textContent);
-    element.textContent = "";
-  }
+  element.setAttribute("title", element.textContent);
+  element.textContent = "";
+}
 
-  setCommandHandler("site-edit", editSite);
-  setCommandHandler("show-all", () => self.port.emit("showAllPasswords"));
-  setCommandHandler("lock-passwords", () => self.port.emit("forgetMasterPassword"));
-  setCommandHandler("original-site", removeAlias);
-  setCommandHandler("site-edit-accept", finishEditingSite);
-  setCommandHandler("site-edit-cancel", abortEditingSite);
-  setSubmitHandler("password-list", finishEditingSite);
+setCommandHandler("site-edit", editSite);
+setCommandHandler("show-all", () => self.port.emit("showAllPasswords"));
+setCommandHandler("lock-passwords", () => self.port.emit("forgetMasterPassword"));
+setCommandHandler("original-site", removeAlias);
+setCommandHandler("site-edit-accept", finishEditingSite);
+setCommandHandler("site-edit-cancel", abortEditingSite);
+setSubmitHandler("password-list", finishEditingSite);
 
-  self.port.on("masterPasswordAccepted", data =>
-  {
-    initPasswordList(data);
-    setActivePanel("password-list");
-  });
-  self.port.on("masterPasswordForgotten", () => setActivePanel("enter-master"));
-  self.port.on("setPasswords", initPasswordList);
-  self.port.on("passwordAdded", showPasswords);
-  self.port.on("passwordRemoved", showPasswords);
-  self.port.on("fillInFailed", showPasswordMessage);
-  self.port.on("passwordCopied", showPasswordMessage.bind(null, "password-copied-message"));
-  self.port.on("passwordCopyFailed", showPasswordMessage);
-
-  hidePasswordMessages();
+self.port.on("masterPasswordAccepted", data =>
+{
+  initPasswordList(data);
+  setActivePanel("password-list");
 });
+self.port.on("masterPasswordForgotten", () => setActivePanel("enter-master"));
+self.port.on("setPasswords", initPasswordList);
+self.port.on("passwordAdded", showPasswords);
+self.port.on("passwordRemoved", showPasswords);
+self.port.on("fillInFailed", showPasswordMessage);
+self.port.on("passwordCopied", showPasswordMessage.bind(null, "password-copied-message"));
+self.port.on("passwordCopyFailed", showPasswordMessage);
+
+hidePasswordMessages();
 
 onShow(initPasswordList);
 

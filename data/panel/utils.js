@@ -9,7 +9,13 @@
 let disableResetHandlers = false;
 
 let messages = exports.messages = {};
-let initHandlers = [];
+let messageElements = $("messages").children;
+for (let i = 0; i < messageElements.length; i++)
+{
+  let messageElement = messageElements[i];
+  messages[messageElement.getAttribute("data-l10n-id")] = messageElement.textContent;
+}
+
 let showHandlers = [];
 
 function $(id)
@@ -18,34 +24,11 @@ function $(id)
 }
 exports.$ = $;
 
-function onInit(callback)
-{
-  initHandlers.push(callback);
-}
-exports.onInit = onInit;
-
 function onShow(callback)
 {
   showHandlers.push(callback);
 }
 exports.onShow = onShow;
-
-function init()
-{
-  window.removeEventListener("load", init, false);
-
-  let messageElements = $("messages").children;
-  for (let i = 0; i < messageElements.length; i++)
-  {
-    let messageElement = messageElements[i];
-    messages[messageElement.getAttribute("data-l10n-id")] = messageElement.textContent;
-  }
-
-  // Run panel initializers
-  for (let handler of initHandlers)
-    handler.call(null);
-}
-window.addEventListener("load", init);
 
 function show(message)
 {
@@ -322,14 +305,11 @@ function showCryptoError(e)
   resize();
 }
 
-onInit(() =>
+setCommandHandler("crypto-error-more", () =>
 {
-  setCommandHandler("crypto-error-more", () =>
-  {
-    $("crypto-error-more").hidden = true;
-    $("crypto-error-details").hidden = false;
-    resize();
-  });
+  $("crypto-error-more").hidden = true;
+  $("crypto-error-details").hidden = false;
+  resize();
 });
 
 self.port.on("show", show);
