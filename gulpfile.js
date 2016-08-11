@@ -47,8 +47,22 @@ gulp.task("build-jpm", ["validate"], function()
     gulp.src("data/images/icon48.png")
         .pipe(rename("icon.png"))
         .pipe(gulp.dest("build-jpm")),
-    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "!data/images/icon48.png", "jpm/data/**/*.js"])
+    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "jpm/data/**/*.js", "!data/panel/*.js", "!data/images/icon48.png"])
         .pipe(gulp.dest("build-jpm/data")),
+    gulp.src("data/panel/zxcvbn-*.js")
+        .pipe(gulp.dest("build-jpm/data/panel")),
+    gulp.src(["data/panel/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          externals: {
+            "zxcvbn": "var zxcvbn"
+          }
+        }))
+        .pipe(gulp.dest("build-jpm/data/panel")),
     gulp.src("data/**/*.less")
         .pipe(less())
         .pipe(gulp.dest("build-jpm/data")),
@@ -57,7 +71,7 @@ gulp.task("build-jpm", ["validate"], function()
           output: {
             filename: "index.js",
             pathinfo: true,
-            library: "require"
+            library: "__webpack_require__"
           },
           resolve: {
             root: path.resolve(process.cwd(), "jpm/lib")
@@ -97,13 +111,27 @@ gulp.task("build-chrome", ["validate"], function()
           return prefs;
         }, "prefs.json"))
         .pipe(gulp.dest("build-chrome")),
-    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/**/*.js", "chrome/data/**/*.html", "chrome/data/**/*.png"])
+    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/**/*.js", "chrome/data/**/*.html", "chrome/data/**/*.png", "!data/panel/*.js"])
         .pipe(utils.transform((filepath, contents) =>
         {
           // Process conditional comments
           return [filepath, contents.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1")];
         }, {pathregexp: /\.html$/}))
         .pipe(gulp.dest("build-chrome/data")),
+    gulp.src("data/panel/zxcvbn-*.js")
+        .pipe(gulp.dest("build-chrome/data/panel")),
+    gulp.src(["data/panel/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          externals: {
+            "zxcvbn": "var zxcvbn"
+          }
+        }))
+        .pipe(gulp.dest("build-chrome/data/panel")),
     gulp.src(["data/**/*.less", "chrome/data/**/*.less"])
         .pipe(less())
         .pipe(gulp.dest("build-chrome/data")),
@@ -112,7 +140,7 @@ gulp.task("build-chrome", ["validate"], function()
           output: {
             filename: "background.js",
             pathinfo: true,
-            library: "require"
+            library: "__webpack_require__"
           },
           resolve: {
             root: path.resolve(process.cwd(), "chrome/lib")
@@ -160,8 +188,16 @@ gulp.task("eslint-node", function()
 
 gulp.task("eslint-data", function()
 {
-  return gulp.src(["data/**/*.js", "jpm/data/**/*.js", "chrome/data/**/*.js", "!data/panel/zxcvbn-*.js"])
+  return gulp.src(["data/**/*.js", "jpm/data/**/*.js", "chrome/data/**/*.js", "!data/panel/*.js"])
              .pipe(eslint({envs: ["browser", "es6"]}))
+             .pipe(eslint.format())
+             .pipe(eslint.failAfterError());
+});
+
+gulp.task("eslint-panel", function()
+{
+  return gulp.src(["data/panel/*.js", "!data/panel/zxcvbn-*.js"])
+             .pipe(eslint({envs: ["browser", "commonjs", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
 });
@@ -220,7 +256,7 @@ gulp.task("stylelint", function()
              }));
 });
 
-gulp.task("validate", ["eslint-node", "eslint-data", "eslint-lib", "htmlhint", "stylelint"], function()
+gulp.task("validate", ["eslint-node", "eslint-data", "eslint-panel", "eslint-lib", "htmlhint", "stylelint"], function()
 {
 });
 

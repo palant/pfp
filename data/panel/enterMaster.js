@@ -4,27 +4,23 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
-(function()
+"use strict";
+
+let {
+  $, onInit, setValidator, setActivePanel, setCommandHandler, setSubmitHandler,
+  markInvalid, messages
+} = require("./utils");
+
+let {validateMasterPassword} = require("./changeMaster");
+
+onInit(function()
 {
-  "use strict";
+  setCommandHandler("reset-master-link", () => setActivePanel("change-master"));
+  setCommandHandler("generate-password-link", () => setActivePanel("generate-password"));
+  setCommandHandler("legacy-password-link", () => setActivePanel("legacy-password"));
 
-  /*
-    global $, onInit, onShow, setValidator, setActivePanel, getActivePanel,
-    setCommandHandler, setSubmitHandler, setResetHandler, markInvalid,
-    enforceValue, resize, messages
-  */
+  setValidator("master-password", validateMasterPassword);
+  setSubmitHandler("enter-master", () => self.port.emit("checkMasterPassword", $("master-password").value.trim()));
 
-  /* global validateMasterPassword */
-
-  onInit(function()
-  {
-    setCommandHandler("reset-master-link", () => setActivePanel("change-master"));
-    setCommandHandler("generate-password-link", () => setActivePanel("generate-password"));
-    setCommandHandler("legacy-password-link", () => setActivePanel("legacy-password"));
-
-    setValidator("master-password", validateMasterPassword);
-    setSubmitHandler("enter-master", () => self.port.emit("checkMasterPassword", $("master-password").value.trim()));
-
-    self.port.on("masterPasswordDeclined", () => markInvalid("master-password", messages["password-declined"]));
-  });
-})();
+  self.port.on("masterPasswordDeclined", () => markInvalid("master-password", messages["password-declined"]));
+});

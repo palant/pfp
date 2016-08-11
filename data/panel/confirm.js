@@ -4,53 +4,48 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
-(function(global)
+"use strict";
+
+let {
+  $, onInit, setActivePanel, getActivePanel, setSubmitHandler, setResetHandler
+} = require("./utils");
+
+let promiseAccept = null;
+let originalSelection = null;
+
+onInit(function()
 {
-  "use strict";
-
-  /*
-    global $, onInit, onShow, setValidator, setActivePanel, getActivePanel,
-    setCommandHandler, setSubmitHandler, setResetHandler, markInvalid,
-    enforceValue, resize, messages
-  */
-
-  let promiseAccept = null;
-  let originalSelection = null;
-
-  onInit(function()
+  setSubmitHandler("confirm", () =>
   {
-    setSubmitHandler("confirm", () =>
-    {
-      if (promiseAccept)
-        promiseAccept(true);
-      promiseAccept = null;
+    if (promiseAccept)
+      promiseAccept(true);
+    promiseAccept = null;
 
-      if (originalSelection)
-        setActivePanel(originalSelection);
-    });
-
-    setResetHandler("confirm", () =>
-    {
-      if (promiseAccept)
-        promiseAccept(false);
-      promiseAccept = null;
-
-      if (originalSelection)
-        setActivePanel(originalSelection);
-    });
+    if (originalSelection)
+      setActivePanel(originalSelection);
   });
 
-  function confirm(message)
+  setResetHandler("confirm", () =>
   {
-    $("confirm-message").textContent = message;
+    if (promiseAccept)
+      promiseAccept(false);
+    promiseAccept = null;
 
-    originalSelection = getActivePanel();
-    setActivePanel("confirm");
+    if (originalSelection)
+      setActivePanel(originalSelection);
+  });
+});
 
-    return new Promise((accept, reject) =>
-    {
-      promiseAccept = accept;
-    });
-  }
-  global.confirm = confirm;
-})(this);
+function confirm(message)
+{
+  $("confirm-message").textContent = message;
+
+  originalSelection = getActivePanel();
+  setActivePanel("confirm");
+
+  return new Promise((accept, reject) =>
+  {
+    promiseAccept = accept;
+  });
+}
+exports.confirm = confirm;

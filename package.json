@@ -37,13 +37,7 @@
     "contentURL": "panel/panel.html",
     "contentScript": [
       "panel/zxcvbn-4.3.0.js",
-      "panel/panel.js",
-      "panel/changeMaster.js",
-      "panel/enterMaster.js",
-      "panel/passwordList.js",
-      "panel/generatePassword.js",
-      "panel/legacyPassword.js",
-      "panel/confirm.js"
+      "panel/index.js"
     ]
   },
   "contentPage": {

@@ -4,50 +4,46 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
-(function()
+"use strict";
+
+let {
+  $, onInit, onShow, setValidator, setActivePanel, setSubmitHandler,
+  setResetHandler, markInvalid, enforceValue, messages
+} = require("./utils");
+
+onInit(function()
 {
-  "use strict";
+  $("legacy-password-name").setAttribute("placeholder", messages["password-name-hint"]);
 
-  /*
-    global $, onInit, onShow, setValidator, setActivePanel, getActivePanel,
-    setCommandHandler, setSubmitHandler, setResetHandler, markInvalid,
-    enforceValue, resize, messages
-  */
+  self.port.on("passwordAdded", () => setActivePanel("password-list"));
+  self.port.on("passwordAlreadyExists", () => markInvalid("legacy-password-name", messages["password-name-exists"]));
 
-  onInit(function()
-  {
-    $("legacy-password-name").setAttribute("placeholder", messages["password-name-hint"]);
+  setValidator("legacy-password-name", enforceValue.bind(null, "password-name-required"));
+  setValidator("legacy-password-value", enforceValue.bind(null, "password-value-required"));
 
-    self.port.on("passwordAdded", () => setActivePanel("password-list"));
-    self.port.on("passwordAlreadyExists", () => markInvalid("legacy-password-name", messages["password-name-exists"]));
+  setSubmitHandler("legacy-password", addLegacyPassword);
+  setResetHandler("legacy-password", () => setActivePanel("password-list"));
+});
 
-    setValidator("legacy-password-name", enforceValue.bind(null, "password-name-required"));
-    setValidator("legacy-password-value", enforceValue.bind(null, "password-value-required"));
+onShow(function({site})
+{
+  $("legacy-password-site").textContent = site;
+});
 
-    setSubmitHandler("legacy-password", addLegacyPassword);
-    setResetHandler("legacy-password", () => setActivePanel("password-list"));
+function enforcePasswordValue(element)
+{
+  let value = element.value.trim();
+  if (value.length < 1)
+    return messages["password-value-required"];
+
+  return null;
+}
+
+function addLegacyPassword()
+{
+  self.port.emit("addLegacyPassword", {
+    site: $("site").value,
+    name: $("legacy-password-name").value,
+    password: $("legacy-password-value").value
   });
-
-  onShow(function({site})
-  {
-    $("legacy-password-site").textContent = site;
-  });
-
-  function enforcePasswordValue(element)
-  {
-    let value = element.value.trim();
-    if (value.length < 1)
-      return messages["password-value-required"];
-
-    return null;
-  }
-
-  function addLegacyPassword()
-  {
-    self.port.emit("addLegacyPassword", {
-      site: $("site").value,
-      name: $("legacy-password-name").value,
-      password: $("legacy-password-value").value
-    });
-  }
-})();
+}
