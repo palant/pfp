@@ -6,14 +6,15 @@
 
 "use strict";
 
+let {port} = require("platform");
 let {setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let {$, onShow, setActivePanel, messages} = require("./utils");
 
 $("legacy-password-name").setAttribute("placeholder", messages["password-name-hint"]);
 
-self.port.on("passwordAdded", () => setActivePanel("password-list"));
-self.port.on("passwordAlreadyExists", () => markInvalid("legacy-password-name", messages["password-name-exists"]));
+port.on("passwordAdded", () => setActivePanel("password-list"));
+port.on("passwordAlreadyExists", () => markInvalid("legacy-password-name", messages["password-name-exists"]));
 
 setValidator("legacy-password-name", enforceValue.bind(null, "password-name-required"));
 setValidator("legacy-password-value", enforceValue.bind(null, "password-value-required"));
@@ -37,7 +38,7 @@ function enforcePasswordValue(element)
 
 function addLegacyPassword()
 {
-  self.port.emit("addLegacyPassword", {
+  port.emit("addLegacyPassword", {
     site: $("site").value,
     name: $("legacy-password-name").value,
     password: $("legacy-password-value").value

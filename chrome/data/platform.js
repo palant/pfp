@@ -8,6 +8,8 @@
 
 /* global chrome */
 
+// i18n
+
 window.addEventListener("DOMContentLoaded", function()
 {
   let elements = document.querySelectorAll("[data-l10n-id]");
@@ -18,3 +20,25 @@ window.addEventListener("DOMContentLoaded", function()
     element.textContent = chrome.i18n.getMessage(id);
   }
 });
+
+// Messaging
+
+let {EventTarget, emit} = require("../../lib/eventTarget");
+
+let port = chrome.runtime.connect({name: document.documentElement.dataset.porttype});
+
+exports.port = new EventTarget();
+
+exports.port.emit = function(eventName, ...args)
+{
+  port.postMessage({eventName, args});
+};
+
+port.onMessage.addListener(message =>
+{
+  emit(exports.port, message.eventName, ...message.args);
+});
+
+// Panel hiding
+
+exports.port.on("_hide", () => window.close());

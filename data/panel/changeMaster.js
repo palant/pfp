@@ -6,6 +6,7 @@
 
 "use strict";
 
+let {port} = require("platform");
 let {setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator} = require("./formValidation");
 let {$, onShow, setActivePanel, messages} = require("./utils");
@@ -62,6 +63,6 @@ function changeMasterPassword()
   ask.then(accepted =>
   {
     if (accepted)
-      self.port.emit("changeMasterPassword", masterPassword);
+      port.emit("changeMasterPassword", masterPassword);
   });
 }

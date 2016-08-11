@@ -6,15 +6,7 @@
 
 "use strict";
 
-let showMessage = null;
-
-function show(message)
-{
-  // Store the message in case it arrives earlier than the panel is initialized
-  showMessage = message;
-}
-
-self.port.on("show", show);
+require("platform");
 
 function init()
 {
@@ -25,9 +17,6 @@ function init()
   require("./passwordList.js");
   require("./generatePassword.js");
   require("./legacyPassword.js");
-
-  if (showMessage)
-    require("./utils").show(showMessage);
 }
 
 window.addEventListener("load", init);

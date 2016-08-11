@@ -6,6 +6,7 @@
 
 "use strict";
 
+let {port} = require("platform");
 let {setCommandHandler, setSubmitHandler} = require("./events");
 let {$, onShow, setActivePanel, messages} = require("./utils");
 
@@ -22,25 +23,25 @@ for (let element of ["original-site", "site-edit", "site-edit-accept", "site-edi
 }
 
 setCommandHandler("site-edit", editSite);
-setCommandHandler("show-all", () => self.port.emit("showAllPasswords"));
-setCommandHandler("lock-passwords", () => self.port.emit("forgetMasterPassword"));
+setCommandHandler("show-all", () => port.emit("showAllPasswords"));
+setCommandHandler("lock-passwords", () => port.emit("forgetMasterPassword"));
 setCommandHandler("original-site", removeAlias);
 setCommandHandler("site-edit-accept", finishEditingSite);
 setCommandHandler("site-edit-cancel", abortEditingSite);
 setSubmitHandler("password-list", finishEditingSite);
 
-self.port.on("masterPasswordAccepted", data =>
+port.on("masterPasswordAccepted", data =>
 {
   initPasswordList(data);
   setActivePanel("password-list");
 });
-self.port.on("masterPasswordForgotten", () => setActivePanel("enter-master"));
-self.port.on("setPasswords", initPasswordList);
-self.port.on("passwordAdded", showPasswords);
-self.port.on("passwordRemoved", showPasswords);
-self.port.on("fillInFailed", showPasswordMessage);
-self.port.on("passwordCopied", showPasswordMessage.bind(null, "password-copied-message"));
-self.port.on("passwordCopyFailed", showPasswordMessage);
+port.on("masterPasswordForgotten", () => setActivePanel("enter-master"));
+port.on("setPasswords", initPasswordList);
+port.on("passwordAdded", showPasswords);
+port.on("passwordRemoved", showPasswords);
+port.on("fillInFailed", showPasswordMessage);
+port.on("passwordCopied", showPasswordMessage.bind(null, "password-copied-message"));
+port.on("passwordCopyFailed", showPasswordMessage);
 
 hidePasswordMessages();
 
@@ -124,9 +125,9 @@ function finishEditingSite()
   }
 
   if (site)
-    self.port.emit("addAlias", {site, alias});
+    port.emit("addAlias", {site, alias});
   else
-    self.port.emit("getPasswords", alias);
+    port.emit("getPasswords", alias);
   field.setAttribute("readonly", "readonly");
 }
 
@@ -141,7 +142,7 @@ function removeAlias()
   confirm(message).then(response =>
   {
     if (response)
-      self.port.emit("removeAlias", origSite);
+      port.emit("removeAlias", origSite);
   });
 }
 
@@ -209,12 +210,12 @@ function showPasswords(pwdList)
 
 function fillInPassword(name)
 {
-  self.port.emit("fillIn", {site, name});
+  port.emit("fillIn", {site, name});
 }
 
 function copyToClipboard(name)
 {
-  self.port.emit("copyToClipboard", {site, name});
+  port.emit("copyToClipboard", {site, name});
 }
 
 function removePassword(name)
@@ -223,6 +224,6 @@ function removePassword(name)
   confirm(message).then(response =>
   {
     if (response)
-      self.port.emit("removePassword", {site, name});
+      port.emit("removePassword", {site, name});
   });
 }

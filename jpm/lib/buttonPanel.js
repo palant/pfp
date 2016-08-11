@@ -44,7 +44,7 @@ require("./bug918600_hotfix").fixPanel(panel);
 button.on("change", state => state.checked && panel.show());
 panel.on("hide", () => button.state("window", {checked: false}));
 
-panel.port.on("resize", ([width, height]) =>
+panel.port.on("_resize", ([width, height]) =>
 {
   // See https://bugzilla.mozilla.org/show_bug.cgi?id=1270095 - on OS X we
   // need to request 2 extra pixels.

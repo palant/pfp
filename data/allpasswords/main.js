@@ -6,6 +6,8 @@
 
 "use strict";
 
+let {port} = require("platform");
+
 let knownSites = null;
 
 function $(id)
@@ -27,14 +29,14 @@ function setCommandHandler(element, handler)
 
 function copyToClipboard(site, name, id)
 {
-  self.port.emit("copyToClipboard", {site, name, id});
+  port.emit("copyToClipboard", {site, name, id});
 }
 
 function removePassword(site, name, id)
 {
   let message = $("remove-password-confirmation").textContent.replace(/\{1\}/g, name).replace(/\{2\}/g, site);
   if (confirm(message))
-    self.port.emit("removePassword", {site, name, id});
+    port.emit("removePassword", {site, name, id});
 }
 
 function exportData()
@@ -82,7 +84,7 @@ function importDataFromFile(file)
     }
 
     if (confirm($("allpasswords-import-confirm").textContent))
-      self.port.emit("importPasswordData", data.sites);
+      port.emit("importPasswordData", data.sites);
   };
   reader.readAsText(file);
 }
@@ -114,7 +116,7 @@ window.addEventListener("DOMContentLoaded", function()
   });
 });
 
-self.port.on("init", function(sites)
+port.on("init", function(sites)
 {
   knownSites = sites;
   let siteTemplate = $("site-template").firstElementChild;
@@ -210,7 +212,7 @@ self.port.on("init", function(sites)
   }
 });
 
-self.port.on("passwordError", reason =>
+port.on("passwordError", reason =>
 {
   let message = $(reason);
   if (message && message.parentNode.id == "messages")
@@ -220,7 +222,7 @@ self.port.on("passwordError", reason =>
   alert(message);
 });
 
-self.port.on("passwordRemoved", id =>
+port.on("passwordRemoved", id =>
 {
   let passwordInfo = $(id);
   if (passwordInfo)
@@ -232,7 +234,7 @@ self.port.on("passwordRemoved", id =>
   }
 });
 
-self.port.on("passwordCopied", id =>
+port.on("passwordCopied", id =>
 {
   let passwordInfo = $(id);
   if (passwordInfo)
@@ -246,8 +248,12 @@ self.port.on("passwordCopied", id =>
   }
 });
 
-self.port.on("dataImported", () =>
+port.on("dataImported", () =>
 {
   alert($("allpasswords-import-success").textContent);
   window.location.reload();
 });
+
+// Hack: expose __webpack_require__ for simpler debugging
+/* global __webpack_require__ */
+module.exports = __webpack_require__;

@@ -6,12 +6,13 @@
 
 "use strict";
 
+let {port} = require("platform");
 let {setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let {$, onShow, setActivePanel, messages} = require("./utils");
 
-self.port.on("passwordAdded", () => setActivePanel("password-list"));
-self.port.on("passwordAlreadyExists", () => markInvalid("generate-password-name", messages["password-name-exists"]));
+port.on("passwordAdded", () => setActivePanel("password-list"));
+port.on("passwordAlreadyExists", () => markInvalid("generate-password-name", messages["password-name-exists"]));
 
 $("generate-password-name").setAttribute("placeholder", messages["password-name-hint"]);
 
@@ -48,7 +49,7 @@ function validateCharsets(element1, element2, element3, element4)
 
 function addGeneratedPassword()
 {
-  self.port.emit("addGeneratedPassword", {
+  port.emit("addGeneratedPassword", {
     site: $("site").value,
     name: $("generate-password-name").value,
     length: $("password-length").value,

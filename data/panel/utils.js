@@ -6,6 +6,8 @@
 
 "use strict";
 
+let {port} = require("platform");
+
 let messages = exports.messages = {};
 let messageElements = $("messages").children;
 for (let i = 0; i < messageElements.length; i++)
@@ -44,7 +46,6 @@ function show(message)
   for (let handler of showHandlers)
     handler.call(null, message);
 }
-exports.show = show;
 
 function hide()
 {
@@ -93,23 +94,6 @@ function resetForms()
     resetForm(forms[i]);
 }
 
-function resize()
-{
-  // Force reflow
-  document.body.offsetHeight;
-
-  self.port.emit("resize", [
-    document.documentElement.scrollWidth,
-    Math.min(document.documentElement.offsetHeight, document.documentElement.scrollHeight)
-  ]);
-}
-new window.MutationObserver(resize).observe(document.documentElement, {
-  attributes: true,
-  characterData: true,
-  childList: true,
-  subtree: true
-});
-
 function getActivePanel()
 {
   let selection = document.querySelector("[data-active='true']");
@@ -156,6 +140,6 @@ Promise.resolve().then(() =>
   });
 });
 
-self.port.on("show", show);
-self.port.on("hide", hide);
-self.port.on("cryptoError", showCryptoError);
+port.on("show", show);
+port.on("hide", hide);
+port.on("cryptoError", showCryptoError);

@@ -6,6 +6,7 @@
 
 "use strict";
 
+let {port} = require("platform");
 let {setCommandHandler, setSubmitHandler} = require("./events");
 let {setValidator, markInvalid} = require("./formValidation");
 let {$, setActivePanel, messages} = require("./utils");
@@ -17,6 +18,6 @@ setCommandHandler("generate-password-link", () => setActivePanel("generate-passw
 setCommandHandler("legacy-password-link", () => setActivePanel("legacy-password"));
 
 setValidator("master-password", validateMasterPassword);
-setSubmitHandler("enter-master", () => self.port.emit("checkMasterPassword", $("master-password").value.trim()));
+setSubmitHandler("enter-master", () => port.emit("checkMasterPassword", $("master-password").value.trim()));
 
-self.port.on("masterPasswordDeclined", () => markInvalid("master-password", messages["password-declined"]));
+port.on("masterPasswordDeclined", () => markInvalid("master-password", messages["password-declined"]));

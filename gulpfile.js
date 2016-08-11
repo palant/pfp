@@ -47,7 +47,7 @@ gulp.task("build-jpm", ["validate"], function()
     gulp.src("data/images/icon48.png")
         .pipe(rename("icon.png"))
         .pipe(gulp.dest("build-jpm")),
-    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "jpm/data/**/*.js", "!data/panel/*.js", "!data/images/icon48.png"])
+    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "jpm/data/**/*.js", "!data/panel/*.js", "!data/allpasswords/*.js", "!data/images/icon48.png"])
         .pipe(gulp.dest("build-jpm/data")),
     gulp.src("data/panel/zxcvbn-*.js")
         .pipe(gulp.dest("build-jpm/data/panel")),
@@ -58,11 +58,26 @@ gulp.task("build-jpm", ["validate"], function()
             pathinfo: true,
             library: "__webpack_require__"
           },
+          resolve: {
+            root: path.resolve(process.cwd(), "jpm/data")
+          },
           externals: {
             "zxcvbn": "var zxcvbn"
           }
         }))
         .pipe(gulp.dest("build-jpm/data/panel")),
+    gulp.src(["data/allpasswords/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          resolve: {
+            root: path.resolve(process.cwd(), "jpm/data")
+          }
+        }))
+        .pipe(gulp.dest("build-jpm/data/allpasswords")),
     gulp.src("data/**/*.less")
         .pipe(less())
         .pipe(gulp.dest("build-jpm/data")),
@@ -111,7 +126,7 @@ gulp.task("build-chrome", ["validate"], function()
           return prefs;
         }, "prefs.json"))
         .pipe(gulp.dest("build-chrome")),
-    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/**/*.js", "chrome/data/**/*.html", "chrome/data/**/*.png", "!data/panel/*.js"])
+    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/**/*.js", "chrome/data/**/*.html", "chrome/data/**/*.png", "!data/panel/*.js", "!data/allpasswords/*.js"])
         .pipe(utils.transform((filepath, contents) =>
         {
           // Process conditional comments
@@ -127,11 +142,26 @@ gulp.task("build-chrome", ["validate"], function()
             pathinfo: true,
             library: "__webpack_require__"
           },
+          resolve: {
+            root: path.resolve(process.cwd(), "chrome/data")
+          },
           externals: {
             "zxcvbn": "var zxcvbn"
           }
         }))
         .pipe(gulp.dest("build-chrome/data/panel")),
+    gulp.src(["data/allpasswords/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          resolve: {
+            root: path.resolve(process.cwd(), "chrome/data")
+          }
+        }))
+        .pipe(gulp.dest("build-chrome/data/allpasswords")),
     gulp.src(["data/**/*.less", "chrome/data/**/*.less"])
         .pipe(less())
         .pipe(gulp.dest("build-chrome/data")),
@@ -188,15 +218,15 @@ gulp.task("eslint-node", function()
 
 gulp.task("eslint-data", function()
 {
-  return gulp.src(["data/**/*.js", "jpm/data/**/*.js", "chrome/data/**/*.js", "!data/panel/*.js"])
+  return gulp.src(["data/**/*.js", "jpm/data/**/*.js", "chrome/data/**/*.js", "!data/panel/*.js", "!data/allpasswords/*.js", "!**/platform.js"])
              .pipe(eslint({envs: ["browser", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
 });
 
-gulp.task("eslint-panel", function()
+gulp.task("eslint-datamodules", function()
 {
-  return gulp.src(["data/panel/*.js", "!data/panel/zxcvbn-*.js"])
+  return gulp.src(["data/panel/*.js", "!data/panel/zxcvbn-*.js", "data/allpasswords/*.js", "**/platform.js"])
              .pipe(eslint({envs: ["browser", "commonjs", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
@@ -256,7 +286,7 @@ gulp.task("stylelint", function()
              }));
 });
 
-gulp.task("validate", ["eslint-node", "eslint-data", "eslint-panel", "eslint-lib", "htmlhint", "stylelint"], function()
+gulp.task("validate", ["eslint-node", "eslint-data", "eslint-datamodules", "eslint-lib", "htmlhint", "stylelint"], function()
 {
 });
 
