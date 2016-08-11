@@ -46,6 +46,7 @@ function show(message)
   for (let handler of showHandlers)
     handler.call(null, message);
 }
+exports.show = show;
 
 function hide()
 {
@@ -233,7 +234,12 @@ function resize()
     Math.min(document.documentElement.offsetHeight, document.documentElement.scrollHeight)
   ]);
 }
-exports.resize = resize;
+new window.MutationObserver(resize).observe(document.documentElement, {
+  attributes: true,
+  characterData: true,
+  childList: true,
+  subtree: true
+});
 
 function getActivePanel()
 {
@@ -258,7 +264,6 @@ function setActivePanel(id)
     form.setAttribute("data-active", "true");
     $("crypto-error").hidden = true;
 
-    resize();
     setFocus();
   }
 }
@@ -283,7 +288,6 @@ function updateForm(form)
       valid = false;
   }
   form._isValid = valid;
-  resize();
 }
 
 function enforceValue(messageId, element)
@@ -302,14 +306,12 @@ function showCryptoError(e)
   $("crypto-error").hidden = false;
   $("crypto-error-more").hidden = false;
   $("crypto-error-details").hidden = true;
-  resize();
 }
 
 setCommandHandler("crypto-error-more", () =>
 {
   $("crypto-error-more").hidden = true;
   $("crypto-error-details").hidden = false;
-  resize();
 });
 
 self.port.on("show", show);

@@ -8,7 +8,7 @@
 
 let {
   $, onShow, setActivePanel, setCommandHandler, setSubmitHandler,
-  resize, messages
+  messages
 } = require("./utils");
 
 let {confirm} = require("./confirm");
@@ -84,7 +84,6 @@ function hidePasswordMessages()
 
   for (let id of ["cannot-edit-site", "empty-site-name", "password-copied-message", "no-such-password", "unknown-generation-method", "wrong-site-message", "no-password-fields"])
     $(id).hidden = true;
-  resize();
 }
 
 function showPasswordMessage(id)
@@ -92,7 +91,6 @@ function showPasswordMessage(id)
   hidePasswordMessages();
 
   $(id).hidden = false;
-  resize();
 
   hidePasswordMessagesTimeout = window.setTimeout(hidePasswordMessages, 3000);
 }
@@ -209,8 +207,6 @@ function showPasswords(pwdList)
   }
 
   $("no-passwords-message").hidden = names.length;
-
-  resize();
 }
 
 function fillInPassword(name)
