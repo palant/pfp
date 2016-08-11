@@ -6,8 +6,6 @@
 
 "use strict";
 
-let disableResetHandlers = false;
-
 let messages = exports.messages = {};
 let messageElements = $("messages").children;
 for (let i = 0; i < messageElements.length; i++)
@@ -56,135 +54,6 @@ function hide()
   resetForms();
 }
 
-function setValidator(id, validator)
-{
-  let elements;
-  if (typeof id == "string")
-    elements = [$(id)];
-  else
-    elements = id.map($);
-
-  let eagerValidation = false;
-  let handler = event =>
-  {
-    if (event.type == "reset")
-    {
-      eagerValidation = false;
-      for (let element of elements)
-        element.setCustomValidity("");
-    }
-    else if (event.type == "submit")
-    {
-      eagerValidation = !validateElement(elements, validator);
-      if (eagerValidation)
-      {
-        event.preventDefault();
-
-        if (!document.activeElement || !document.activeElement.validationMessage)
-          elements[0].focus();
-      }
-    }
-    else if ((event.type == "input" || event.type == "change") && eagerValidation)
-      validateElement(elements, validator);
-  };
-
-  for (let element of elements)
-  {
-    element.form.addEventListener("submit", handler, true);
-    element.form.addEventListener("reset", handler);
-    element.addEventListener("input", handler);
-    element.addEventListener("change", handler);
-  }
-}
-exports.setValidator = setValidator;
-
-function validateElement(elements, validator)
-{
-  if (typeof elements == "string")
-    elements = [$(elements)];
-  else if (!(elements instanceof Array))
-    elements = [elements];
-
-  let result = validator(...elements);
-  for (let element of elements)
-  {
-    element.setCustomValidity(result || "");
-    updateForm(element.form);
-  }
-  return !result;
-}
-
-function markInvalid(element, message)
-{
-  if (typeof element == "string")
-    element = $(element);
-
-  element.setCustomValidity(message);
-  if (!document.activeElement || !document.activeElement.validationMessage)
-    element.focus();
-  updateForm(element.form);
-
-  // Clear message after a change
-  let handler = event =>
-  {
-    element.removeEventListener("input", handler);
-    element.removeEventListener("change", handler);
-
-    if (element.validationMessage == message)
-    {
-      element.setCustomValidity("");
-      updateForm(element.form);
-    }
-  };
-  element.addEventListener("input", handler);
-  element.addEventListener("change", handler);
-}
-exports.markInvalid = markInvalid;
-
-function setCommandHandler(element, handler)
-{
-  if (typeof element == "string")
-    element = $(element);
-  let wrapper = (event) =>
-  {
-    event.preventDefault();
-    handler.call(element, event);
-  };
-  element.addEventListener("click", wrapper);
-}
-exports.setCommandHandler = setCommandHandler;
-
-function setSubmitHandler(element, handler)
-{
-  if (typeof element == "string")
-    element = $(element);
-  let wrapper = event =>
-  {
-    if (event.defaultPrevented)
-      return;
-
-    event.preventDefault();
-    handler.call(element, event);
-  };
-  element.addEventListener("submit", wrapper);
-}
-exports.setSubmitHandler = setSubmitHandler;
-
-function setResetHandler(element, handler)
-{
-  if (typeof element == "string")
-    element = $(element);
-  let wrapper = (event) =>
-  {
-    if (disableResetHandlers)
-      return;
-
-    handler.call(element, event);
-  };
-  element.addEventListener("reset", wrapper);
-}
-exports.setResetHandler = setResetHandler;
-
 function setFocus()
 {
   let activePanel = getActivePanel();
@@ -198,7 +67,7 @@ function setFocus()
 
 function resetForm(form)
 {
-  disableResetHandlers = true;
+  require("./events").disableResetHandlers = true;
   try
   {
     form.reset();
@@ -209,11 +78,11 @@ function resetForm(form)
       if (match)
         $(match[1]).setAttribute(match[2], match[3]);
     }
-    updateForm(form);
+    require("./formValidation").updateForm(form);
   }
   finally
   {
-    disableResetHandlers = false;
+    require("./events").disableResetHandlers = false;
   }
 }
 
@@ -269,37 +138,6 @@ function setActivePanel(id)
 }
 exports.setActivePanel = setActivePanel;
 
-function updateForm(form)
-{
-  let valid = true;
-  for (let i = 0; i < form.length; i++)
-  {
-    let messageElement;
-    if (form[i].dataset.error)
-      messageElement = $(form[i].dataset.error);
-    else
-      messageElement = form[i].nextElementSibling;
-    if (messageElement && messageElement.classList.contains("error"))
-    {
-      messageElement.textContent = form[i].validationMessage;
-      messageElement.hidden = form[i].validity.valid;
-    }
-    if (!form[i].validity.valid)
-      valid = false;
-  }
-  form._isValid = valid;
-}
-
-function enforceValue(messageId, element)
-{
-  let value = element.value.trim();
-  if (value.length < 1)
-    return messages[messageId];
-
-  return null;
-}
-exports.enforceValue = enforceValue;
-
 function showCryptoError(e)
 {
   $("crypto-error-details").textContent = e;
@@ -308,10 +146,14 @@ function showCryptoError(e)
   $("crypto-error-details").hidden = true;
 }
 
-setCommandHandler("crypto-error-more", () =>
+// Avoid circular references here
+Promise.resolve().then(() =>
 {
-  $("crypto-error-more").hidden = true;
-  $("crypto-error-details").hidden = false;
+  require("./events").setCommandHandler("crypto-error-more", () =>
+  {
+    $("crypto-error-more").hidden = true;
+    $("crypto-error-details").hidden = false;
+  });
 });
 
 self.port.on("show", show);

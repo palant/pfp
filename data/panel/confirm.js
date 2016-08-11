@@ -6,9 +6,8 @@
 
 "use strict";
 
-let {
-  $, setActivePanel, getActivePanel, setSubmitHandler, setResetHandler
-} = require("./utils");
+let {setSubmitHandler, setResetHandler} = require("./events");
+let {$, setActivePanel, getActivePanel} = require("./utils");
 
 let promiseAccept = null;
 let originalSelection = null;

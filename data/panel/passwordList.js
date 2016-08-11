@@ -6,10 +6,8 @@
 
 "use strict";
 
-let {
-  $, onShow, setActivePanel, setCommandHandler, setSubmitHandler,
-  messages
-} = require("./utils");
+let {setCommandHandler, setSubmitHandler} = require("./events");
+let {$, onShow, setActivePanel, messages} = require("./utils");
 
 let {confirm} = require("./confirm");
 

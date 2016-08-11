@@ -6,10 +6,9 @@
 
 "use strict";
 
-let {
-  $, onShow, setValidator, setActivePanel, setSubmitHandler,
-  setResetHandler, markInvalid, enforceValue, messages
-} = require("./utils");
+let {setSubmitHandler, setResetHandler} = require("./events");
+let {setValidator, markInvalid, enforceValue} = require("./formValidation");
+let {$, onShow, setActivePanel, messages} = require("./utils");
 
 self.port.on("passwordAdded", () => setActivePanel("password-list"));
 self.port.on("passwordAlreadyExists", () => markInvalid("generate-password-name", messages["password-name-exists"]));

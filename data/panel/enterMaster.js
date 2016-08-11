@@ -6,10 +6,9 @@
 
 "use strict";
 
-let {
-  $, setValidator, setActivePanel, setCommandHandler, setSubmitHandler,
-  markInvalid, messages
-} = require("./utils");
+let {setCommandHandler, setSubmitHandler} = require("./events");
+let {setValidator, markInvalid} = require("./formValidation");
+let {$, setActivePanel, messages} = require("./utils");
 
 let {validateMasterPassword} = require("./changeMaster");
 

@@ -6,10 +6,9 @@
 
 "use strict";
 
-let {
-  $, onShow, setValidator, setActivePanel, setSubmitHandler,
-  setResetHandler, markInvalid, enforceValue, messages
-} = require("./utils");
+let {setSubmitHandler, setResetHandler} = require("./events");
+let {setValidator, markInvalid, enforceValue} = require("./formValidation");
+let {$, onShow, setActivePanel, messages} = require("./utils");
 
 $("legacy-password-name").setAttribute("placeholder", messages["password-name-hint"]);
 
