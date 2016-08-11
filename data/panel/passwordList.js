@@ -8,13 +8,12 @@
 
 let {port} = require("platform");
 let {setCommandHandler, setSubmitHandler} = require("./events");
-let {$, onShow, setActivePanel, messages} = require("./utils");
+let state = require("./state");
+let {$, setActivePanel, messages} = require("./utils");
 
 let {confirm} = require("./confirm");
 
 let hidePasswordMessagesTimeout = null;
-let site = null;
-let origSite = null;
 
 for (let element of ["original-site", "site-edit", "site-edit-accept", "site-edit-cancel"].map($))
 {
@@ -32,31 +31,31 @@ setSubmitHandler("password-list", finishEditingSite);
 
 port.on("masterPasswordAccepted", data =>
 {
-  initPasswordList(data);
-  setActivePanel("password-list");
+  data.masterPasswordState = "known";
+  state.set(data);
 });
-port.on("masterPasswordForgotten", () => setActivePanel("enter-master"));
-port.on("setPasswords", initPasswordList);
-port.on("passwordAdded", showPasswords);
-port.on("passwordRemoved", showPasswords);
+port.on("masterPasswordForgotten", () => state.set({masterPasswordState: "set"}));
+port.on("setPasswords", data => state.set(data));
+port.on("passwordAdded", pwdList => state.set({pwdList}));
+port.on("passwordRemoved", pwdList => state.set({pwdList}));
 port.on("fillInFailed", showPasswordMessage);
 port.on("passwordCopied", showPasswordMessage.bind(null, "password-copied-message"));
 port.on("passwordCopyFailed", showPasswordMessage);
 
 hidePasswordMessages();
 
-onShow(initPasswordList);
+state.on("update", initPasswordList);
+initPasswordList();
 
-function initPasswordList({origSite, site, pwdList})
+function initPasswordList()
 {
-  setSite(origSite, site);
-  showPasswords(pwdList);
+  setSite();
+  showPasswords();
 }
 
-function setSite(newOrigSite, newSite)
+function setSite()
 {
-  origSite = newOrigSite;
-  site = newSite;
+  let {origSite, site} = state;
 
   let origSiteField = $("original-site");
   if (origSite != site)
@@ -104,7 +103,7 @@ function editSite()
 
   let field = $("site");
   field.removeAttribute("readonly");
-  field.value = site;
+  field.value = state.site;
   field.focus();
 }
 
@@ -118,6 +117,7 @@ function finishEditingSite()
     return;
   }
 
+  let {site} = state;
   if (alias == site)
   {
     abortEditingSite();
@@ -133,11 +133,12 @@ function finishEditingSite()
 
 function abortEditingSite()
 {
-  setSite(origSite, site);
+  setSite();
 }
 
 function removeAlias()
 {
+  let {origSite, site} = state;
   let message = messages["remove-alias-confirmation"].replace(/\{1\}/g, origSite).replace(/\{2\}/g, site);
   confirm(message).then(response =>
   {
@@ -146,8 +147,12 @@ function removeAlias()
   });
 }
 
-function showPasswords(pwdList)
+function showPasswords()
 {
+  let pwdList = state.pwdList;
+  if (!pwdList)
+    return;
+
   let list = $("password-list-container");
   while (list.lastChild && !list.lastChild.id)
     list.removeChild(list.lastChild);
@@ -210,16 +215,19 @@ function showPasswords(pwdList)
 
 function fillInPassword(name)
 {
+  let {site} = state;
   port.emit("fillIn", {site, name});
 }
 
 function copyToClipboard(name)
 {
+  let {site} = state;
   port.emit("copyToClipboard", {site, name});
 }
 
 function removePassword(name)
 {
+  let {site} = state;
   let message = messages["remove-password-confirmation"].replace(/\{1\}/g, name).replace(/\{2\}/g, site);
   confirm(message).then(response =>
   {

@@ -9,7 +9,8 @@
 let {port} = require("platform");
 let {setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
-let {$, onShow, setActivePanel, messages} = require("./utils");
+let state = require("./state");
+let {$, setActivePanel, messages} = require("./utils");
 
 $("legacy-password-name").setAttribute("placeholder", messages["password-name-hint"]);
 
@@ -22,10 +23,13 @@ setValidator("legacy-password-value", enforceValue.bind(null, "password-value-re
 setSubmitHandler("legacy-password", addLegacyPassword);
 setResetHandler("legacy-password", () => setActivePanel("password-list"));
 
-onShow(function({site})
+state.on("update", updateSite);
+updateSite();
+
+function updateSite()
 {
-  $("legacy-password-site").textContent = site;
-});
+  $("legacy-password-site").textContent = state.site;
+}
 
 function enforcePasswordValue(element)
 {
@@ -39,7 +43,7 @@ function enforcePasswordValue(element)
 function addLegacyPassword()
 {
   port.emit("addLegacyPassword", {
-    site: $("site").value,
+    site: state.site,
     name: $("legacy-password-name").value,
     password: $("legacy-password-value").value
   });

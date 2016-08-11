@@ -9,7 +9,8 @@
 let {port} = require("platform");
 let {setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator} = require("./formValidation");
-let {$, onShow, setActivePanel, messages} = require("./utils");
+let state = require("./state");
+let {$, setActivePanel, messages} = require("./utils");
 
 let {confirm} = require("./confirm");
 
@@ -22,12 +23,16 @@ $("new-master").addEventListener("input", checkPasswordScore);
 setSubmitHandler("change-master", changeMasterPassword);
 setResetHandler("change-master", () => setActivePanel("enter-master"));
 
-onShow(function({masterPasswordState})
+state.on("update", updateMasterPasswordState);
+updateMasterPasswordState();
+
+function updateMasterPasswordState()
 {
+  let {masterPasswordState} = state;
   $("new-master-message").hidden = masterPasswordState != "unset";
   $("reset-master-message").hidden = masterPasswordState == "unset";
   $("reset-master-cancel").hidden = masterPasswordState == "unset";
-});
+}
 
 function validateMasterPassword(element)
 {

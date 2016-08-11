@@ -6,7 +6,11 @@
 
 "use strict";
 
-require("platform");
+let {port} = require("platform");
+port.on("show", state =>
+{
+  require("./state").set(state);
+});
 
 function init()
 {

@@ -9,7 +9,8 @@
 let {port} = require("platform");
 let {setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
-let {$, onShow, setActivePanel, messages} = require("./utils");
+let state = require("./state");
+let {$, setActivePanel, messages} = require("./utils");
 
 port.on("passwordAdded", () => setActivePanel("password-list"));
 port.on("passwordAlreadyExists", () => markInvalid("generate-password-name", messages["password-name-exists"]));
@@ -29,10 +30,13 @@ setValidator(["charset-lower", "charset-upper", "charset-number", "charset-symbo
 setSubmitHandler("generate-password", addGeneratedPassword);
 setResetHandler("generate-password", () => setActivePanel("password-list"));
 
-onShow(function({site})
+state.on("update", updateSite);
+updateSite();
+
+function updateSite()
 {
-  $("generate-password-site").textContent = site;
-});
+  $("generate-password-site").textContent = state.site;
+}
 
 function updatePasswordLengthDisplay()
 {
@@ -50,7 +54,7 @@ function validateCharsets(element1, element2, element3, element4)
 function addGeneratedPassword()
 {
   port.emit("addGeneratedPassword", {
-    site: $("site").value,
+    site: state.site,
     name: $("generate-password-name").value,
     length: $("password-length").value,
     lower: $("charset-lower").checked,

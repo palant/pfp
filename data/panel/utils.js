@@ -16,36 +16,11 @@ for (let i = 0; i < messageElements.length; i++)
   messages[messageElement.getAttribute("data-l10n-id")] = messageElement.textContent;
 }
 
-let showHandlers = [];
-
 function $(id)
 {
   return document.getElementById(id);
 }
 exports.$ = $;
-
-function onShow(callback)
-{
-  showHandlers.push(callback);
-}
-exports.onShow = onShow;
-
-function show(message)
-{
-  let {masterPasswordState} = message;
-  let stateToPanel = {
-    "unset": "change-master",
-    "set": "enter-master",
-    "known": "password-list"
-  };
-  setActivePanel(stateToPanel[masterPasswordState]);
-
-  setFocus();
-
-  // Run panel initializers
-  for (let handler of showHandlers)
-    handler.call(null, message);
-}
 
 function hide()
 {
@@ -140,6 +115,5 @@ Promise.resolve().then(() =>
   });
 });
 
-port.on("show", show);
 port.on("hide", hide);
 port.on("cryptoError", showCryptoError);
