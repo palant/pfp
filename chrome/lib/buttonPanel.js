@@ -43,9 +43,4 @@ panel.port.emit = function(eventName, ...args)
   }
 };
 
-panel.hide = function()
-{
-  panel.port.emit("_hide");
-};
-
 module.exports = panel;

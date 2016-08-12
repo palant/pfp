@@ -7,13 +7,11 @@
 "use strict";
 
 let {port} = require("platform");
+let {passwords} = require("../proxy");
 let {setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
-let {$, setActivePanel, messages} = require("./utils");
-
-port.on("passwordAdded", () => setActivePanel("password-list"));
-port.on("passwordAlreadyExists", () => markInvalid("generate-password-name", messages["password-name-exists"]));
+let {$, setActivePanel, showUnknownError, messages} = require("./utils");
 
 $("generate-password-name").setAttribute("placeholder", messages["password-name-hint"]);
 
@@ -53,7 +51,7 @@ function validateCharsets(element1, element2, element3, element4)
 
 function addGeneratedPassword()
 {
-  port.emit("addGeneratedPassword", {
+  passwords.addGenerated({
     site: state.site,
     name: $("generate-password-name").value,
     length: $("password-length").value,
@@ -61,5 +59,15 @@ function addGeneratedPassword()
     upper: $("charset-upper").checked,
     number: $("charset-number").checked,
     symbol: $("charset-symbol").checked
+  }).then(pwdList =>
+  {
+    state.set({pwdList});
+    setActivePanel("password-list");
+  }).catch(error =>
+  {
+    if (error == "alreadyExists")
+      markInvalid("generate-password-name", messages["password-name-exists"]);
+    else
+      showUnknownError(error);
   });
 }

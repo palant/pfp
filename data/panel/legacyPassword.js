@@ -7,15 +7,13 @@
 "use strict";
 
 let {port} = require("platform");
+let {passwords} = require("../proxy");
 let {setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
-let {$, setActivePanel, messages} = require("./utils");
+let {$, setActivePanel, showUnknownError, messages} = require("./utils");
 
 $("legacy-password-name").setAttribute("placeholder", messages["password-name-hint"]);
-
-port.on("passwordAdded", () => setActivePanel("password-list"));
-port.on("passwordAlreadyExists", () => markInvalid("legacy-password-name", messages["password-name-exists"]));
 
 setValidator("legacy-password-name", enforceValue.bind(null, "password-name-required"));
 setValidator("legacy-password-value", enforceValue.bind(null, "password-value-required"));
@@ -42,9 +40,19 @@ function enforcePasswordValue(element)
 
 function addLegacyPassword()
 {
-  port.emit("addLegacyPassword", {
+  passwords.addLegacy({
     site: state.site,
     name: $("legacy-password-name").value,
     password: $("legacy-password-value").value
+  }).then(pwdList =>
+  {
+    state.set({pwdList});
+    setActivePanel("password-list");
+  }).catch(error =>
+  {
+    if (error == "alreadyExists")
+      markInvalid("legacy-password-name", messages["password-name-exists"]);
+    else
+      showUnknownError(error);
   });
 }

@@ -90,30 +90,30 @@ function setActivePanel(id)
     let form = $(id);
     resetForm(form);
     form.setAttribute("data-active", "true");
-    $("crypto-error").hidden = true;
+    $("unknown-error").hidden = true;
 
     setFocus();
   }
 }
 exports.setActivePanel = setActivePanel;
 
-function showCryptoError(e)
+function showUnknownError(e)
 {
-  $("crypto-error-details").textContent = e;
-  $("crypto-error").hidden = false;
-  $("crypto-error-more").hidden = false;
-  $("crypto-error-details").hidden = true;
+  $("unknown-error-details").textContent = e;
+  $("unknown-error").hidden = false;
+  $("unknown-error-more").hidden = false;
+  $("unknown-error-details").hidden = true;
 }
+exports.showUnknownError = showUnknownError;
 
 // Avoid circular references here
 Promise.resolve().then(() =>
 {
-  require("./events").setCommandHandler("crypto-error-more", () =>
+  require("./events").setCommandHandler("unknown-error-more", () =>
   {
-    $("crypto-error-more").hidden = true;
-    $("crypto-error-details").hidden = false;
+    $("unknown-error-more").hidden = true;
+    $("unknown-error-details").hidden = false;
   });
 });
 
 port.on("hide", hide);
-port.on("cryptoError", showCryptoError);

@@ -30,3 +30,7 @@ new window.MutationObserver(resize).observe(document.documentElement, {
 // Messaging
 
 exports.port = self.port;
+
+// Panel hiding
+
+exports.close = () => self.port.emit("_hide");

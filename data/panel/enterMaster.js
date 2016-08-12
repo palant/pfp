@@ -7,9 +7,11 @@
 "use strict";
 
 let {port} = require("platform");
+let {masterPassword} = require("../proxy");
 let {setCommandHandler, setSubmitHandler} = require("./events");
 let {setValidator, markInvalid} = require("./formValidation");
-let {$, setActivePanel, messages} = require("./utils");
+let state = require("./state");
+let {$, setActivePanel, showUnknownError, messages} = require("./utils");
 
 let {validateMasterPassword} = require("./changeMaster");
 
@@ -18,6 +20,15 @@ setCommandHandler("generate-password-link", () => setActivePanel("generate-passw
 setCommandHandler("legacy-password-link", () => setActivePanel("legacy-password"));
 
 setValidator("master-password", validateMasterPassword);
-setSubmitHandler("enter-master", () => port.emit("checkMasterPassword", $("master-password").value.trim()));
-
-port.on("masterPasswordDeclined", () => markInvalid("master-password", messages["password-declined"]));
+setSubmitHandler("enter-master", () =>
+{
+  masterPassword.checkPassword($("master-password").value.trim())
+    .then(() => state.set({masterPasswordState: "known"}))
+    .catch(error =>
+    {
+      if (error == "declined")
+        markInvalid("master-password", messages["password-declined"]);
+      else
+        showUnknownError(error);
+    });
+});

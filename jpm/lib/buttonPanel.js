@@ -57,17 +57,7 @@ panel.port.on("_resize", ([width, height]) =>
   panel.resize(width, height);
 });
 
-panel.on("show", () => emit(result, "show"));
-
-panel.on("hide", () =>
-{
-  // Hiding will not unload the page, so we need to notify the page
-  panel.port.emit("hide");
-
-  emit(result, "hide");
-});
-
-result.hide = function()
+panel.port.on("_hide", function()
 {
   panel.hide();
 
@@ -83,7 +73,17 @@ result.hide = function()
   sidebar.show(tabs.activeTab.window);
   sidebar.hide(tabs.activeTab.window);
   sidebar.dispose();
-};
+});
+
+panel.on("show", () => emit(result, "show"));
+
+panel.on("hide", () =>
+{
+  // Hiding will not unload the page, so we need to notify the page
+  panel.port.emit("hide");
+
+  emit(result, "hide");
+});
 
 result.port = panel.port;
 

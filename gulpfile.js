@@ -218,7 +218,7 @@ gulp.task("eslint-node", function()
 
 gulp.task("eslint-data", function()
 {
-  return gulp.src(["data/**/*.js", "jpm/data/**/*.js", "chrome/data/**/*.js", "!data/panel/*.js", "!data/allpasswords/*.js", "!**/platform.js"])
+  return gulp.src(["data/fillIn.js", "jpm/data/**/*.js", "chrome/data/**/*.js", "!**/platform.js"])
              .pipe(eslint({envs: ["browser", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
@@ -226,7 +226,7 @@ gulp.task("eslint-data", function()
 
 gulp.task("eslint-datamodules", function()
 {
-  return gulp.src(["data/panel/*.js", "!data/panel/zxcvbn-*.js", "data/allpasswords/*.js", "**/platform.js"])
+  return gulp.src(["data/**/*.js", "!data/fillIn.js", "!data/panel/zxcvbn-*.js", "**/platform.js"])
              .pipe(eslint({envs: ["browser", "commonjs", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());

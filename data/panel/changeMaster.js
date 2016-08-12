@@ -7,10 +7,11 @@
 "use strict";
 
 let {port} = require("platform");
+let {passwords, masterPassword} = require("../proxy");
 let {setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator} = require("./formValidation");
 let state = require("./state");
-let {$, setActivePanel, messages} = require("./utils");
+let {$, setActivePanel, showUnknownError, messages} = require("./utils");
 
 let {confirm} = require("./confirm");
 
@@ -62,12 +63,20 @@ function checkPasswordScore()
 
 function changeMasterPassword()
 {
-  let masterPassword = $("new-master").value.trim();
+  let newPassword = $("new-master").value.trim();
   let score = checkPasswordScore();
   let ask = score < 3 ? confirm(messages["weak-password"]) : Promise.resolve(true);
   ask.then(accepted =>
   {
     if (accepted)
-      port.emit("changeMasterPassword", masterPassword);
+    {
+      masterPassword.changePassword(newPassword)
+        .then(() => passwords.getPasswords(state.origSite))
+        .then(([origSite, site, pwdList]) =>
+        {
+          state.set({origSite, site, pwdList, masterPasswordState: "known"});
+        })
+        .catch(showUnknownError);
+    }
   });
 }

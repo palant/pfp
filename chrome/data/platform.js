@@ -41,4 +41,4 @@ port.onMessage.addListener(message =>
 
 // Panel hiding
 
-exports.port.on("_hide", () => window.close());
+exports.close = () => window.close();

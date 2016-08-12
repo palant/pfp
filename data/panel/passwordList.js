@@ -7,9 +7,10 @@
 "use strict";
 
 let {port} = require("platform");
+let {passwords, masterPassword, passwordRetrieval} = require("../proxy");
 let {setCommandHandler, setSubmitHandler} = require("./events");
 let state = require("./state");
-let {$, setActivePanel, messages} = require("./utils");
+let {$, setActivePanel, messages, showUnknownError} = require("./utils");
 
 let {confirm} = require("./confirm");
 
@@ -23,24 +24,16 @@ for (let element of ["original-site", "site-edit", "site-edit-accept", "site-edi
 
 setCommandHandler("site-edit", editSite);
 setCommandHandler("show-all", () => port.emit("showAllPasswords"));
-setCommandHandler("lock-passwords", () => port.emit("forgetMasterPassword"));
+setCommandHandler("lock-passwords", () =>
+{
+  masterPassword.forgetPassword()
+    .then(() => state.set({masterPasswordState: "set"}))
+    .catch(showUnknownError);
+});
 setCommandHandler("original-site", removeAlias);
 setCommandHandler("site-edit-accept", finishEditingSite);
 setCommandHandler("site-edit-cancel", abortEditingSite);
 setSubmitHandler("password-list", finishEditingSite);
-
-port.on("masterPasswordAccepted", data =>
-{
-  data.masterPasswordState = "known";
-  state.set(data);
-});
-port.on("masterPasswordForgotten", () => state.set({masterPasswordState: "set"}));
-port.on("setPasswords", data => state.set(data));
-port.on("passwordAdded", pwdList => state.set({pwdList}));
-port.on("passwordRemoved", pwdList => state.set({pwdList}));
-port.on("fillInFailed", showPasswordMessage);
-port.on("passwordCopied", showPasswordMessage.bind(null, "password-copied-message"));
-port.on("passwordCopyFailed", showPasswordMessage);
 
 hidePasswordMessages();
 
@@ -84,11 +77,18 @@ function hidePasswordMessages()
     $(id).hidden = true;
 }
 
-function showPasswordMessage(id)
+function showPasswordMessage(error)
 {
   hidePasswordMessages();
 
-  $(id).hidden = false;
+  let element = $(error);
+  if (!element)
+  {
+    showUnknownError(error);
+    return;
+  }
+
+  element.hidden = false;
 
   hidePasswordMessagesTimeout = window.setTimeout(hidePasswordMessages, 3000);
 }
@@ -124,10 +124,17 @@ function finishEditingSite()
     return;
   }
 
-  if (site)
-    port.emit("addAlias", {site, alias});
-  else
-    port.emit("getPasswords", alias);
+  Promise.resolve()
+    .then(() =>
+    {
+      if (site)
+        return passwords.addAlias(site, alias);
+      else
+        return undefined;
+    })
+    .then(() => passwords.getPasswords(state.origSite || alias))
+    .then(([origSite, site, pwdList]) => state.set({origSite, site, pwdList}))
+    .catch(showUnknownError);
   field.setAttribute("readonly", "readonly");
 }
 
@@ -143,7 +150,12 @@ function removeAlias()
   confirm(message).then(response =>
   {
     if (response)
-      port.emit("removeAlias", origSite);
+    {
+      passwords.removeAlias(origSite)
+        .then(() => passwords.getPasswords(origSite))
+        .then(([origSite, site, pwdList]) => state.set({origSite, site, pwdList}))
+        .catch(showUnknownError);
+    }
   });
 }
 
@@ -216,13 +228,17 @@ function showPasswords()
 function fillInPassword(name)
 {
   let {site} = state;
-  port.emit("fillIn", {site, name});
+  passwordRetrieval.fillIn(site, name)
+    .then(() => require("platform").close())
+    .catch(showPasswordMessage);
 }
 
 function copyToClipboard(name)
 {
   let {site} = state;
-  port.emit("copyToClipboard", {site, name});
+  passwordRetrieval.copyToClipboard(site, name)
+    .then(() => showPasswordMessage("password-copied-message"))
+    .catch(showPasswordMessage);
 }
 
 function removePassword(name)
@@ -232,6 +248,10 @@ function removePassword(name)
   confirm(message).then(response =>
   {
     if (response)
-      port.emit("removePassword", {site, name});
+    {
+      passwords.removePassword({site, name})
+        .then(pwdList => state.set({pwdList}))
+        .catch(showPasswordMessage);
+    }
   });
 }
