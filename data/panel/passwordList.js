@@ -7,7 +7,7 @@
 "use strict";
 
 let {port} = require("platform");
-let {passwords, masterPassword, passwordRetrieval} = require("../proxy");
+let {passwords, masterPassword, passwordRetrieval, ui} = require("../proxy");
 let {setCommandHandler, setSubmitHandler} = require("./events");
 let state = require("./state");
 let {$, setActivePanel, messages, showUnknownError} = require("./utils");
@@ -23,7 +23,12 @@ for (let element of ["original-site", "site-edit", "site-edit-accept", "site-edi
 }
 
 setCommandHandler("site-edit", editSite);
-setCommandHandler("show-all", () => port.emit("showAllPasswords"));
+setCommandHandler("show-all", () =>
+{
+  ui.showAllPasswords()
+    .then(() => require("platform").close())
+    .catch(showUnknownError);
+});
 setCommandHandler("lock-passwords", () =>
 {
   masterPassword.forgetPassword()
@@ -249,7 +254,7 @@ function removePassword(name)
   {
     if (response)
     {
-      passwords.removePassword({site, name})
+      passwords.removePassword(site, name)
         .then(pwdList => state.set({pwdList}))
         .catch(showPasswordMessage);
     }

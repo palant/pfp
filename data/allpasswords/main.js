@@ -6,6 +6,7 @@
 
 "use strict";
 
+let {passwords, passwordRetrieval} = require("../proxy");
 let {port} = require("platform");
 
 let knownSites = null;
@@ -27,16 +28,32 @@ function setCommandHandler(element, handler)
   element.addEventListener("click", wrapper);
 }
 
-function copyToClipboard(site, name, id)
+function copyToClipboard(site, name, passwordInfo)
 {
-  port.emit("copyToClipboard", {site, name, id});
+  passwordRetrieval.copyToClipboard(site, name).then(() =>
+  {
+    let message = passwordInfo.querySelector(".password-copied-message");
+    message.hidden = false;
+    setTimeout(() =>
+    {
+      message.hidden = true;
+    }, 3000);
+  }).catch(showError);
 }
 
-function removePassword(site, name, id)
+function removePassword(site, name, passwordInfo)
 {
   let message = $("remove-password-confirmation").textContent.replace(/\{1\}/g, name).replace(/\{2\}/g, site);
   if (confirm(message))
-    port.emit("removePassword", {site, name, id});
+  {
+    passwords.removePassword(site, name).then(() =>
+    {
+      let siteInfo = passwordInfo.parentNode;
+      siteInfo.removeChild(passwordInfo);
+      if (!siteInfo.querySelector(".password-container"))
+        siteInfo.parentNode.removeChild(siteInfo);
+    }).catch(showError);
+  }
 }
 
 function exportData()
@@ -84,7 +101,13 @@ function importDataFromFile(file)
     }
 
     if (confirm($("allpasswords-import-confirm").textContent))
-      port.emit("importPasswordData", data.sites);
+    {
+      passwords.importPasswordData(data.sites).then(() =>
+      {
+        alert($("allpasswords-import-success").textContent);
+        window.location.reload();
+      }).catch(showError);
+    }
   };
   reader.readAsText(file);
 }
@@ -160,8 +183,8 @@ port.on("init", function(sites)
       passwordInfo.id = "password" + ++counter;
       passwordInfo.querySelector(".password-name").textContent = name;
 
-      setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, name, passwordInfo.id));
-      setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, site, name, passwordInfo.id));
+      setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, name, passwordInfo));
+      setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, site, name, passwordInfo));
 
       if (passwordData.type == "pbkdf2-sha1-generated")
       {
@@ -212,47 +235,15 @@ port.on("init", function(sites)
   }
 });
 
-port.on("passwordError", reason =>
+function showError(error)
 {
-  let message = $(reason);
+  let message = $(error);
   if (message && message.parentNode.id == "messages")
     message = message.textContent;
   else
-    message = reason;
+    message = error;
   alert(message);
-});
-
-port.on("passwordRemoved", id =>
-{
-  let passwordInfo = $(id);
-  if (passwordInfo)
-  {
-    let siteInfo = passwordInfo.parentNode;
-    siteInfo.removeChild(passwordInfo);
-    if (!siteInfo.querySelector(".password-container"))
-      siteInfo.parentNode.removeChild(siteInfo);
-  }
-});
-
-port.on("passwordCopied", id =>
-{
-  let passwordInfo = $(id);
-  if (passwordInfo)
-  {
-    let message = passwordInfo.querySelector(".password-copied-message");
-    message.hidden = false;
-    setTimeout(() =>
-    {
-      message.hidden = true;
-    }, 3000);
-  }
-});
-
-port.on("dataImported", () =>
-{
-  alert($("allpasswords-import-success").textContent);
-  window.location.reload();
-});
+}
 
 // Hack: expose __webpack_require__ for simpler debugging
 /* global __webpack_require__ */

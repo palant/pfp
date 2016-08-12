@@ -39,8 +39,8 @@ function Proxy(moduleName, methods)
 }
 
 exports.passwords = Proxy("passwords", [
-  "getPasswords", "addAlias", "removeAlias", "addGenerated", "addLegacy",
-  "removePassword"
+  "importPasswordData", "getPasswords", "addAlias", "removeAlias",
+  "addGenerated", "addLegacy", "removePassword"
 ]);
 
 exports.masterPassword = Proxy("masterPassword", [
@@ -50,3 +50,5 @@ exports.masterPassword = Proxy("masterPassword", [
 exports.passwordRetrieval = Proxy("passwordRetrieval", [
   "fillIn", "copyToClipboard"
 ]);
+
+exports.ui = Proxy("ui", ["showAllPasswords"]);
