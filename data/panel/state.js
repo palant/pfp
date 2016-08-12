@@ -23,10 +23,10 @@ let stateToPanel = {
 function set(state)
 {
   for (let key of ["site", "origSite", "pwdList", "masterPasswordState"])
-    if (state[key])
+    if (key in state)
       exports[key] = state[key];
 
-  if (state.masterPasswordState)
+  if ("masterPasswordState" in state)
   {
     let {getActivePanel, setActivePanel} = require("./utils");
     let panels = stateToPanel[state.masterPasswordState];
