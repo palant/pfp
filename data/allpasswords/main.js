@@ -158,7 +158,6 @@ port.on("init", function(sites)
   let siteNames = Object.keys(sites);
   siteNames.sort();
 
-  let counter = 0;
   let container = $("list");
   let currentLetter = null;
   let prevInfo = null;
@@ -180,7 +179,6 @@ port.on("init", function(sites)
     {
       let passwordData = passwords[name];
       let passwordInfo = passwordTemplate.cloneNode(true);
-      passwordInfo.id = "password" + ++counter;
       passwordInfo.querySelector(".password-name").textContent = name;
 
       setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, name, passwordInfo));
