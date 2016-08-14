@@ -125,7 +125,10 @@
     "jpm": "^1.0.6",
     "merge-stream": "^1.0.0",
     "node-rsa": "^0.3.2",
+    "nodeunit": "^0.9.1",
+    "sandboxed-module": "^2.0.3",
     "stylelint-config-standard": "^6.0.0",
+    "text-encoding": "^0.6.0",
     "webpack-stream": "^3.2.0"
   }
 }

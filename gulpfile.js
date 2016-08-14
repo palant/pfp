@@ -210,7 +210,7 @@ gulp.task("build-webext", ["build-chrome"], function()
 
 gulp.task("eslint-node", function()
 {
-  return gulp.src(["*.js"])
+  return gulp.src(["*.js", "test/**/*.js"])
              .pipe(eslint({envs: ["node", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
@@ -328,6 +328,12 @@ gulp.task("webext", ["build-webext"], function()
   return gulp.src(["build-webext/**", "!build-webext/**/.*", "!build-webext/**/*.xpi"])
              .pipe(zip("easypasswords-" + manifest.version + ".xpi"))
              .pipe(gulp.dest("build-webext"));
+});
+
+gulp.task("test", ["validate"], function()
+{
+  return gulp.src(["test/**/*.js"])
+             .pipe(utils.runTests());
 });
 
 gulp.task("clean", function()

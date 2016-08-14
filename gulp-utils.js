@@ -151,3 +151,46 @@ exports.toChromeLocale = function()
     ];
   });
 };
+
+exports.runTests = function()
+{
+  let sourceTransformers = {};
+  let modules = fs.readdirSync("test-lib")
+    .filter(f => path.extname(f) == ".js")
+    .map(f => path.basename(f, ".js"));
+  for (let i = 0; i < modules.length; i++)
+  {
+    let module = modules[i];
+    sourceTransformers[module] = source =>
+    {
+      return source.replace(/(\brequire\((["']))(.*?)\2/g, (match, prefix, quote, name) =>
+      {
+        if (name == module)
+          return prefix + "../test-lib/" + name + quote;
+        else
+          return match;
+      });
+    };
+  }
+
+  let {TextEncoder, TextDecoder} = require("text-encoding");
+  let nodeunit = require("sandboxed-module").require("nodeunit", {
+    sourceTransformers,
+    globals: {TextEncoder, TextDecoder}
+  });
+  let reporter = nodeunit.reporters.default;
+
+  return transform((filepath, contents) =>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      reporter.run([filepath], null, error =>
+      {
+        if (error)
+          reject(error);
+        else
+          resolve([filepath, contents]);
+      });
+    });
+  });
+};
