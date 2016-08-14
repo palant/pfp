@@ -154,12 +154,11 @@ exports.toChromeLocale = function()
 
 exports.runTests = function()
 {
-  let sourceTransformers = {};
-  let modules = new Set(fs.readdirSync("test-lib")
-    .filter(f => path.extname(f) == ".js")
-    .map(f => path.basename(f, ".js")));
-  sourceTransformers.rewriteRequires = source =>
+  function rewriteRequires(source)
   {
+    let modules = new Set(fs.readdirSync("test-lib")
+      .filter(f => path.extname(f) == ".js")
+      .map(f => path.basename(f, ".js")));
     return source.replace(/(\brequire\(["'])([^"']+)/g, (match, prefix, request) =>
     {
       if (modules.has(request))
@@ -167,11 +166,11 @@ exports.runTests = function()
       else
         return match;
     });
-  };
+  }
 
   let {TextEncoder, TextDecoder} = require("text-encoding");
   let nodeunit = require("sandboxed-module").require("nodeunit", {
-    sourceTransformers,
+    sourceTransformers: {rewriteRequires},
     globals: {TextEncoder, TextDecoder}
   });
   let reporter = nodeunit.reporters.default;
