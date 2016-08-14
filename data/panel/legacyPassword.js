@@ -13,9 +13,7 @@ let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
 let {$, setActivePanel, showUnknownError, messages} = require("./utils");
 
-$("legacy-password-name").setAttribute("placeholder", messages["password-name-hint"]);
-
-setValidator("legacy-password-name", enforceValue.bind(null, "password-name-required"));
+setValidator("legacy-password-user-name", enforceValue.bind(null, "user-name-required"));
 setValidator("legacy-password-value", enforceValue.bind(null, "password-value-required"));
 
 setSubmitHandler("legacy-password", addLegacyPassword);
@@ -42,7 +40,7 @@ function addLegacyPassword()
 {
   passwords.addLegacy({
     site: state.site,
-    name: $("legacy-password-name").value,
+    name: $("legacy-password-user-name").value,
     password: $("legacy-password-value").value
   }).then(pwdList =>
   {
@@ -51,7 +49,7 @@ function addLegacyPassword()
   }).catch(error =>
   {
     if (error == "alreadyExists")
-      markInvalid("legacy-password-name", messages["password-name-exists"]);
+      markInvalid("legacy-password-user-name", messages["user-name-exists"]);
     else
       showUnknownError(error);
   });

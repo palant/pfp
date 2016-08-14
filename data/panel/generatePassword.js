@@ -13,8 +13,6 @@ let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
 let {$, setActivePanel, showUnknownError, messages} = require("./utils");
 
-$("generate-password-name").setAttribute("placeholder", messages["password-name-hint"]);
-
 $("password-length").addEventListener("input", updatePasswordLengthDisplay);
 $("generate-password").addEventListener("reset", () =>
 {
@@ -22,7 +20,7 @@ $("generate-password").addEventListener("reset", () =>
 });
 updatePasswordLengthDisplay();
 
-setValidator("generate-password-name", enforceValue.bind(null, "password-name-required"));
+setValidator("generate-password-user-name", enforceValue.bind(null, "user-name-required"));
 setValidator(["charset-lower", "charset-upper", "charset-number", "charset-symbol"], validateCharsets);
 
 setSubmitHandler("generate-password", addGeneratedPassword);
@@ -53,7 +51,7 @@ function addGeneratedPassword()
 {
   passwords.addGenerated({
     site: state.site,
-    name: $("generate-password-name").value,
+    name: $("generate-password-user-name").value,
     length: $("password-length").value,
     lower: $("charset-lower").checked,
     upper: $("charset-upper").checked,
@@ -66,7 +64,7 @@ function addGeneratedPassword()
   }).catch(error =>
   {
     if (error == "alreadyExists")
-      markInvalid("generate-password-name", messages["password-name-exists"]);
+      markInvalid("generate-password-user-name", messages["user-name-exists"]);
     else
       showUnknownError(error);
   });

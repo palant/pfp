@@ -223,7 +223,7 @@ function showPasswords()
       setCommandHandler(entry.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, name));
       setCommandHandler(entry.querySelector(".password-remove-link"), removePassword.bind(null, name));
 
-      let nameNode = entry.querySelector(".password-name");
+      let nameNode = entry.querySelector(".user-name");
       nameNode.textContent = name;
       nameNode.setAttribute("title", tooltip);
 
