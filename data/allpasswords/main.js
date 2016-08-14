@@ -179,7 +179,7 @@ port.on("init", function(sites)
     {
       let passwordData = passwords[name];
       let passwordInfo = passwordTemplate.cloneNode(true);
-      passwordInfo.querySelector(".password-name").textContent = name;
+      passwordInfo.querySelector(".user-name").textContent = name;
 
       setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, name, passwordInfo));
       setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, site, name, passwordInfo));
