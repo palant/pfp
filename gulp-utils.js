@@ -155,23 +155,19 @@ exports.toChromeLocale = function()
 exports.runTests = function()
 {
   let sourceTransformers = {};
-  let modules = fs.readdirSync("test-lib")
+  let modules = new Set(fs.readdirSync("test-lib")
     .filter(f => path.extname(f) == ".js")
-    .map(f => path.basename(f, ".js"));
-  for (let i = 0; i < modules.length; i++)
+    .map(f => path.basename(f, ".js")));
+  sourceTransformers.rewriteRequires = source =>
   {
-    let module = modules[i];
-    sourceTransformers[module] = source =>
+    return source.replace(/(\brequire\(["'])([^"']+)/g, (match, prefix, request) =>
     {
-      return source.replace(/(\brequire\((["']))(.*?)\2/g, (match, prefix, quote, name) =>
-      {
-        if (name == module)
-          return prefix + "../test-lib/" + name + quote;
-        else
-          return match;
-      });
-    };
-  }
+      if (modules.has(request))
+        return prefix + path.resolve(process.cwd(), "test-lib/" + request + ".js");
+      else
+        return match;
+    });
+  };
 
   let {TextEncoder, TextDecoder} = require("text-encoding");
   let nodeunit = require("sandboxed-module").require("nodeunit", {
