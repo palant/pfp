@@ -116,23 +116,15 @@ exports.signCRX = function(keyFile)
 
 exports.toChromeLocale = function()
 {
+  let parser = require("properties-parser");
   return transform((filepath, contents) =>
   {
-    let locale = path.basename(filepath).replace(/\.properties$/, "");
-    let lines = contents.split(/[\r\n]+/);
+    let properties = parser.parse(contents);
     let data = {};
-    for (let line of lines)
-    {
-      if (/^\s*#/.test(line))
-        continue;
+    for (let key of Object.keys(properties))
+      data[key.replace(/-/g, "_")] = {message: properties[key]};
 
-      let parts = line.split(/\s*=\s*/, 2);
-      if (parts.length < 2)
-        continue;
-
-      data[parts[0].replace(/-/g, "_")] = {"message": parts[1]};
-    }
-
+    let locale = path.basename(filepath, ".properties");
     let manifest = require("./package.json");
     data.name = {"message": manifest.title};
     data.description = {"message": manifest.description};
