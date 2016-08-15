@@ -48,6 +48,16 @@ input[type="checkbox"]
   height: @font-size;
 }
 
+a
+{
+  text-decoration: none;
+}
+
+a:hover
+{
+  text-decoration: underline;
+}
+
 .slide
 {
   display: none;
@@ -175,18 +185,16 @@ input[type="checkbox"]
   }
 }
 
-#original-site
+#site-container
 {
-  white-space: pre-line;
-  text-align: center;
+  margin-bottom: @block-spacing;
 }
 
-#site-container
+#site-name-container
 {
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  margin-bottom: @block-spacing;
 }
 
 #site
@@ -194,7 +202,6 @@ input[type="checkbox"]
   flex-grow: 1;
 }
 
-#site-edit,
 #site-edit-accept,
 #site-edit-cancel
 {
@@ -206,22 +213,12 @@ input[type="checkbox"]
   background-repeat: no-repeat;
 }
 
-#site-edit
-{
-  background-image: url(../images/ios-compose-outline.svg);
-}
-
-#site:not([readonly]) + #site-edit
-{
-  display: none;
-}
-
 #site-edit-cancel
 {
   background-image: url(../images/close-round.svg);
 }
 
-#site[readonly] + * + #site-edit-cancel
+#site[readonly] + #site-edit-cancel
 {
   display: none;
 }
@@ -231,9 +228,14 @@ input[type="checkbox"]
   background-image: url(../images/checkmark-round.svg);
 }
 
-#site[readonly] + * + * + #site-edit-accept
+#site[readonly] + * + #site-edit-accept
 {
   display: none;
+}
+
+#site-edit-container
+{
+  font-size: @font-size-small;
 }
 
 #password-list-container

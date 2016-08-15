@@ -16,13 +16,15 @@ let {confirm} = require("./confirm");
 
 let hidePasswordMessagesTimeout = null;
 
-for (let element of ["original-site", "site-edit", "site-edit-accept", "site-edit-cancel"].map($))
+for (let element of ["site-edit-accept", "site-edit-cancel"].map($))
 {
   element.setAttribute("title", element.textContent);
   element.textContent = "";
 }
 
-setCommandHandler("site-edit", editSite);
+setCommandHandler("set-site", editSite);
+setCommandHandler("add-alias", editSite);
+setCommandHandler("remove-alias", removeAlias);
 setCommandHandler("show-all", () =>
 {
   ui.showAllPasswords()
@@ -35,7 +37,6 @@ setCommandHandler("lock-passwords", () =>
     .then(() => state.set({masterPasswordState: "set"}))
     .catch(showUnknownError);
 });
-setCommandHandler("original-site", removeAlias);
 setCommandHandler("site-edit-accept", finishEditingSite);
 setCommandHandler("site-edit-cancel", abortEditingSite);
 setSubmitHandler("password-list", finishEditingSite);
@@ -55,15 +56,21 @@ function setSite()
 {
   let {origSite, site} = state;
 
-  let origSiteField = $("original-site");
   if (origSite != site)
   {
-    origSiteField.hidden = false;
-    origSiteField.textContent = origSite + "\n\u21E3";
+    let aliasText = $("alias-text");
+    if (!aliasText.hasAttribute("data-template"))
+      aliasText.setAttribute("data-template", aliasText.textContent);
+    aliasText.textContent = aliasText.getAttribute("data-template").replace(/\{1\}/g, origSite);
+
+    $("alias-container").hidden = false;
   }
   else
-    origSiteField.hidden = true;
-  $("site-edit").hidden = (origSite != site);
+    $("alias-container").hidden = true;
+
+  $("site-edit-container").hidden = false;
+  $("set-site").hidden = site;
+  $("add-alias").hidden = (!site || origSite != site || Object.keys(state.pwdList).length);
 
   let field = $("site");
   field.setAttribute("value", site || "???");
@@ -78,7 +85,7 @@ function hidePasswordMessages()
     window.clearTimeout(hidePasswordMessagesTimeout);
   hidePasswordMessagesTimeout = null;
 
-  for (let id of ["cannot-edit-site", "empty-site-name", "password-copied-message", "no-such-password", "unknown-generation-method", "wrong-site-message", "no-password-fields"])
+  for (let id of ["empty-site-name", "password-copied-message", "no-such-password", "unknown-generation-method", "wrong-site-message", "no-password-fields"])
     $(id).hidden = true;
 }
 
@@ -100,11 +107,7 @@ function showPasswordMessage(error)
 
 function editSite()
 {
-  if ($("password-list-container").firstElementChild)
-  {
-    showPasswordMessage("cannot-edit-site");
-    return;
-  }
+  $("site-edit-container").hidden = true;
 
   let field = $("site");
   field.removeAttribute("readonly");
