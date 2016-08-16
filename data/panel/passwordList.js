@@ -112,6 +112,7 @@ function editSite()
   let field = $("site");
   field.removeAttribute("readonly");
   field.value = state.site;
+  field.select();
   field.focus();
 }
 
