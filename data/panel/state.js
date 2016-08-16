@@ -15,7 +15,7 @@ exports.pwdList = null;
 exports.masterPasswordState = null;
 
 let stateToPanel = {
-  "unset": "change-master",
+  "unset": ["change-master"],
   "set": ["enter-master", "change-master"],
   "known": ["password-list", "generate-password", "legacy-password", "confirm"]
 };
