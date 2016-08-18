@@ -161,9 +161,13 @@ exports.runTests = function()
   }
 
   let {TextEncoder, TextDecoder} = require("text-encoding");
+  let crypto = require("./test-lib/fake-crypto");
+  let atob = str => new Buffer(str, "base64").toString("binary");
+  let btoa = str => new Buffer(str, "binary").toString("base64");
+
   let nodeunit = require("sandboxed-module").require("nodeunit", {
     sourceTransformers: {rewriteRequires},
-    globals: {TextEncoder, TextDecoder}
+    globals: {TextEncoder, TextDecoder, crypto, atob, btoa}
   });
   let reporter = nodeunit.reporters.default;
 
