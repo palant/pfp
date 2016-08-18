@@ -10,7 +10,7 @@ let crypto = require("crypto");
 
 function Key(keyData, algo, usages)
 {
-  this._data = new Buffer(keyData).toString("binary");
+  this._data = new Buffer(keyData);
   this._algo = algo;
   this._deriveKey = false;
   this._deriveBits = false;
@@ -84,7 +84,7 @@ exports.subtle = {
         throw new Error("Extractable keys not supported");
 
       let data = crypto.pbkdf2Sync(masterKey._data, algo.salt, algo.iterations,
-                                   derivedKeyAlgo.length, "sha1");
+                                   Math.ceil(derivedKeyAlgo.length / 8), "sha1");
       return new Key(data, derivedKeyAlgo.name, keyUsages);
     });
   },
@@ -97,10 +97,10 @@ exports.subtle = {
         throw new Error("Unexpected algorithm");
       if (key._algo != "AES-CBC" || !key._encrypt)
         throw new Error("Key not suitable for encryption");
-      let cipher = crypto.createCipher("aes" + key._data.length, key._data);
-      let encrypted = cipher.update(cleartext);
-      encrypted += cipher.final();
-      return encrypted;
+
+      let algoName = "aes-" + (key._data.length * 8) + "-cbc";
+      let cipher = crypto.createCipheriv(algoName, key._data, algo.iv);
+      return Buffer.concat([cipher.update(cleartext), cipher.final()]);
     });
   },
 
@@ -112,10 +112,10 @@ exports.subtle = {
         throw new Error("Unexpected algorithm");
       if (key._algo != "AES-CBC" || !key._decrypt)
         throw new Error("Key not suitable for decryption");
-      let decipher = crypto.createDecipher("aes" + key._data.length, key._data);
-      let cleartext = decipher.update(ciphertext);
-      cleartext += decipher.final();
-      return cleartext;
+
+      let algoName = "aes-" + (key._data.length * 8) + "-cbc";
+      let decipher = crypto.createDecipheriv(algoName, key._data, algo.iv);
+      return Buffer.concat([decipher.update(ciphertext), decipher.final()]);
     });
   }
 };

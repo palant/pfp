@@ -9,6 +9,8 @@
 let passwords = require("../lib/passwords");
 let masterPassword = require("../lib/masterPassword");
 
+let dummyMaster = "foobar";
+
 let generated1 = {
   site: "example.com",
   name: "foo",
@@ -16,7 +18,8 @@ let generated1 = {
   lower: true,
   upper: false,
   number: true,
-  symbol: false
+  symbol: false,
+  password: "r8hx8be6"
 };
 
 let generated2 = {
@@ -26,7 +29,8 @@ let generated2 = {
   lower: false,
   upper: true,
   number: false,
-  symbol: true
+  symbol: true,
+  password: "WSSH(Z?HM{H[V^}U"
 };
 
 let legacy1 = {
@@ -162,7 +166,7 @@ exports.testAddRemoveLegacy = function(test)
     test.ok(false, "Added legacy password before knowing master password");
   }).catch(expectedValue.bind(test, "master-password-required")).then(() =>
   {
-    return masterPassword.changePassword("foobar");
+    return masterPassword.changePassword(dummyMaster);
   }).then(() =>
   {
     return passwords.addLegacy(legacy1);
@@ -215,7 +219,7 @@ exports.testAddGeneratedExisting = function(test)
 {
   Promise.resolve().then(() =>
   {
-    return masterPassword.changePassword("foobar");
+    return masterPassword.changePassword(dummyMaster);
   }).then(() =>
   {
     return passwords.addGenerated(generated1);
@@ -234,5 +238,29 @@ exports.testAddGeneratedExisting = function(test)
   }).then(() =>
   {
     return passwords.addLegacy(legacy1);
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
+
+exports.testRetrieval = function(test)
+{
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return passwords.addGenerated(generated1);
+  }).then(pwdList =>
+  {
+    return passwords.getPassword(generated1.site, generated1.name);
+  }).then(pwd =>
+  {
+    test.equal(pwd, generated1.password);
+    return passwords.addLegacy(legacy2);
+  }).then(pwdList =>
+  {
+    return passwords.getPassword(legacy2.site, legacy2.name);
+  }).then(pwd =>
+  {
+    test.equal(pwd, legacy2.password);
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
