@@ -173,9 +173,9 @@ port.on("init", function(sites)
     else
       siteInfo.querySelector(".site-aliases").hidden = true;
 
-    let passwordNames = Object.keys(passwords);
-    passwordNames.sort();
-    for (let name of passwordNames)
+    let userNames = Object.keys(passwords);
+    userNames.sort();
+    for (let name of userNames)
     {
       let passwordData = passwords[name];
       let passwordInfo = passwordTemplate.cloneNode(true);
