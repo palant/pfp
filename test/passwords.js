@@ -264,3 +264,118 @@ exports.testRetrieval = function(test)
     test.equal(pwd, legacy2.password);
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
+
+exports.testAllPasswords = function(test)
+{
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(pwdList =>
+  {
+    test.deepEqual(passwords.getAllPasswords(), {});
+
+    return passwords.addGenerated(generated1);
+  }).then(pwdList =>
+  {
+    test.deepEqual(passwords.getAllPasswords(), {
+      [generated1.site]: {
+        passwords: {
+          [generated1.name]: {
+            type: "pbkdf2-sha1-generated",
+            length: generated1.length,
+            lower: generated1.lower,
+            upper: generated1.upper,
+            number: generated1.number,
+            symbol: generated1.symbol
+          }
+        },
+        aliases: []
+      }
+    });
+
+    return passwords.addLegacy(legacy2);
+  }).then(pwdList =>
+  {
+    let list = JSON.parse(JSON.stringify(passwords.getAllPasswords()));
+    delete list[generated2.site].passwords[generated2.name].password;
+    test.deepEqual(list, {
+      [generated1.site]: {
+        passwords: {
+          [generated1.name]: {
+            type: "pbkdf2-sha1-generated",
+            length: generated1.length,
+            lower: generated1.lower,
+            upper: generated1.upper,
+            number: generated1.number,
+            symbol: generated1.symbol
+          },
+          [legacy2.name]: {
+            type: "pbkdf2-sha1-aes256-encrypted"
+          }
+        },
+        aliases: []
+      }
+    });
+
+    return passwords.addGenerated(Object.assign({}, generated2, {site: "sub." + generated2.site}));
+  }).then(pwdList =>
+  {
+    let list = JSON.parse(JSON.stringify(passwords.getAllPasswords()));
+    delete list[generated2.site].passwords[generated2.name].password;
+    test.deepEqual(list, {
+      [generated1.site]: {
+        passwords: {
+          [generated1.name]: {
+            type: "pbkdf2-sha1-generated",
+            length: generated1.length,
+            lower: generated1.lower,
+            upper: generated1.upper,
+            number: generated1.number,
+            symbol: generated1.symbol
+          },
+          [legacy2.name]: {
+            type: "pbkdf2-sha1-aes256-encrypted"
+          }
+        },
+        aliases: []
+      },
+      ["sub." + generated2.site]: {
+        passwords: {
+          [generated2.name]: {
+            type: "pbkdf2-sha1-generated",
+            length: generated2.length,
+            lower: generated2.lower,
+            upper: generated2.upper,
+            number: generated2.number,
+            symbol: generated2.symbol
+          }
+        },
+        aliases: []
+      }
+    });
+
+    return passwords.removePassword("sub." + generated2.site, generated2.name);
+  }).then(pwdList =>
+  {
+    let list = JSON.parse(JSON.stringify(passwords.getAllPasswords()));
+    delete list[generated2.site].passwords[generated2.name].password;
+    test.deepEqual(list, {
+      [generated1.site]: {
+        passwords: {
+          [generated1.name]: {
+            type: "pbkdf2-sha1-generated",
+            length: generated1.length,
+            lower: generated1.lower,
+            upper: generated1.upper,
+            number: generated1.number,
+            symbol: generated1.symbol
+          },
+          [legacy2.name]: {
+            type: "pbkdf2-sha1-aes256-encrypted"
+          }
+        },
+        aliases: []
+      }
+    });
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
