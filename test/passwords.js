@@ -265,6 +265,63 @@ exports.testRetrieval = function(test)
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
+exports.testAliases = function(test)
+{
+  Promise.resolve().then(() =>
+  {
+    return passwords.addGenerated(generated1);
+  }).then(() =>
+  {
+    test.deepEqual(passwords.getAlias("example.info"), ["example.info", "example.info"]);
+    test.deepEqual(passwords.getAlias("www.example.info"), ["example.info", "example.info"]);
+
+    test.deepEqual(passwords.getPasswords("example.info"), ["example.info", "example.info", {}]);
+    test.deepEqual(passwords.getPasswords("www.example.info"), ["example.info", "example.info", {}]);
+
+    passwords.addAlias("example.info", generated1.site);
+
+    test.deepEqual(passwords.getAlias("example.info"), ["example.info", generated1.site]);
+    test.deepEqual(passwords.getAlias("www.example.info"), ["example.info", generated1.site]);
+
+    test.deepEqual(passwords.getPasswords("example.info"), ["example.info", generated1.site, {
+      [generated1.name]: {
+        type: "pbkdf2-sha1-generated",
+        length: generated1.length,
+        lower: generated1.lower,
+        upper: generated1.upper,
+        number: generated1.number,
+        symbol: generated1.symbol
+      }
+    }]);
+    test.deepEqual(passwords.getPasswords("www.example.info"), ["example.info", generated1.site, {
+      [generated1.name]: {
+        type: "pbkdf2-sha1-generated",
+        length: generated1.length,
+        lower: generated1.lower,
+        upper: generated1.upper,
+        number: generated1.number,
+        symbol: generated1.symbol
+      }
+    }]);
+
+    passwords.removeAlias("example.info");
+
+    test.deepEqual(passwords.getAlias("example.info"), ["example.info", "example.info"]);
+    test.deepEqual(passwords.getAlias("www.example.info"), ["example.info", "example.info"]);
+
+    test.deepEqual(passwords.getPasswords("example.info"), ["example.info", "example.info", {}]);
+    test.deepEqual(passwords.getPasswords("www.example.info"), ["example.info", "example.info", {}]);
+
+    passwords.removeAlias("example.info");
+
+    test.deepEqual(passwords.getAlias("example.info"), ["example.info", "example.info"]);
+    test.deepEqual(passwords.getAlias("www.example.info"), ["example.info", "example.info"]);
+
+    test.deepEqual(passwords.getPasswords("example.info"), ["example.info", "example.info", {}]);
+    test.deepEqual(passwords.getPasswords("www.example.info"), ["example.info", "example.info", {}]);
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
+
 exports.testAllPasswords = function(test)
 {
   Promise.resolve().then(() =>
@@ -317,6 +374,9 @@ exports.testAllPasswords = function(test)
       }
     });
 
+    passwords.addAlias("example.info", generated1.site);
+    passwords.addAlias("sub1.example.info", generated1.site);
+    passwords.addAlias("sub2.example.info", "sub." + generated2.site);
     return passwords.addGenerated(Object.assign({}, generated2, {site: "sub." + generated2.site}));
   }).then(pwdList =>
   {
@@ -337,7 +397,7 @@ exports.testAllPasswords = function(test)
             type: "pbkdf2-sha1-aes256-encrypted"
           }
         },
-        aliases: []
+        aliases: ["example.info", "sub1.example.info"]
       },
       ["sub." + generated2.site]: {
         passwords: {
@@ -350,7 +410,7 @@ exports.testAllPasswords = function(test)
             symbol: generated2.symbol
           }
         },
-        aliases: []
+        aliases: ["sub2.example.info"]
       }
     });
 
@@ -374,7 +434,7 @@ exports.testAllPasswords = function(test)
             type: "pbkdf2-sha1-aes256-encrypted"
           }
         },
-        aliases: []
+        aliases: ["example.info", "sub1.example.info"]
       }
     });
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
