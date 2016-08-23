@@ -25,12 +25,13 @@ let generated1 = {
 let generated2 = {
   site: "example.com",
   name: "bar",
+  revision: "2",
   length: 16,
   lower: false,
   upper: true,
   number: false,
   symbol: true,
-  password: "WSSH(Z?HM{H[V^}U"
+  password: "VX~RBJ^NCBH(#;N["
 };
 
 let legacy1 = {
@@ -81,38 +82,40 @@ exports.testAddRemoveGenerated = function(test)
     return passwords.addGenerated(generated1);
   }).then(pwdList =>
   {
-    test.deepEqual(pwdList, {
-      [generated1.name]: {
-        type: "pbkdf2-sha1-generated",
-        length: generated1.length,
-        lower: generated1.lower,
-        upper: generated1.upper,
-        number: generated1.number,
-        symbol: generated1.symbol
-      }
-    });
+    test.deepEqual(pwdList, [{
+      type: "generated",
+      name: generated1.name,
+      revision: "",
+      length: generated1.length,
+      lower: generated1.lower,
+      upper: generated1.upper,
+      number: generated1.number,
+      symbol: generated1.symbol
+    }]);
 
     return passwords.addGenerated(generated2);
   }).then(pwdList =>
   {
-    test.deepEqual(pwdList, {
-      [generated1.name]: {
-        type: "pbkdf2-sha1-generated",
-        length: generated1.length,
-        lower: generated1.lower,
-        upper: generated1.upper,
-        number: generated1.number,
-        symbol: generated1.symbol
-      },
-      [generated2.name]: {
-        type: "pbkdf2-sha1-generated",
-        length: generated2.length,
-        lower: generated2.lower,
-        upper: generated2.upper,
-        number: generated2.number,
-        symbol: generated2.symbol
-      }
-    });
+    test.deepEqual(pwdList, [{
+      type: "generated",
+      name: generated1.name,
+      revision: "",
+      length: generated1.length,
+      lower: generated1.lower,
+      upper: generated1.upper,
+      number: generated1.number,
+      symbol: generated1.symbol
+    },
+    {
+      type: "generated",
+      name: generated2.name,
+      revision: generated2.revision,
+      length: generated2.length,
+      lower: generated2.lower,
+      upper: generated2.upper,
+      number: generated2.number,
+      symbol: generated2.symbol
+    }]);
 
     let [origSite, site, pwdList2] = passwords.getPasswords(generated1.site);
     test.equal(origSite, generated1.site);
@@ -127,29 +130,35 @@ exports.testAddRemoveGenerated = function(test)
     [origSite, site, pwdList2] = passwords.getPasswords("sub." + generated1.site);
     test.equal(origSite, "sub." + generated1.site);
     test.equal(site, "sub." + generated1.site);
-    test.deepEqual(pwdList2, {});
+    test.deepEqual(pwdList2, []);
 
-    return passwords.removePassword(generated1.site, generated1.name);
+    return passwords.removePassword(generated1.site, generated1.name, generated1.revision);
   }).catch(unexpectedError.bind(test)).then(pwdList =>
   {
-    test.deepEqual(pwdList, {
-      [generated2.name]: {
-        type: "pbkdf2-sha1-generated",
-        length: generated2.length,
-        lower: generated2.lower,
-        upper: generated2.upper,
-        number: generated2.number,
-        symbol: generated2.symbol
-      }
-    });
+    test.deepEqual(pwdList, [{
+      type: "generated",
+      name: generated2.name,
+      revision: generated2.revision,
+      length: generated2.length,
+      lower: generated2.lower,
+      upper: generated2.upper,
+      number: generated2.number,
+      symbol: generated2.symbol
+    }]);
 
-    return passwords.removePassword(generated1.site, generated1.name);
+    return passwords.removePassword(generated1.site, generated1.name, generated1.revision);
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
   }).catch(expectedValue.bind(test, "no-such-password")).then(() =>
   {
-    return passwords.removePassword("sub." + generated2.site, generated2.name);
+    return passwords.removePassword("sub." + generated2.site, generated2.name, "");
+  }).then(() =>
+  {
+    test.ok(false, "Succeeded removing password with wrong revision number");
+  }).catch(expectedValue.bind(test, "no-such-password")).then(() =>
+  {
+    return passwords.removePassword("sub." + generated2.site, generated2.name, generated2.revision);
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
@@ -172,14 +181,20 @@ exports.testAddRemoveLegacy = function(test)
     return passwords.addLegacy(legacy1);
   }).then(pwdList =>
   {
-    test.deepEqual(Object.keys(pwdList), [legacy1.name]);
-    test.equal(pwdList[legacy1.name].type, "pbkdf2-sha1-aes256-encrypted");
+    test.deepEqual(pwdList, [{
+      type: "stored",
+      name: legacy1.name
+    }]);
     return passwords.addLegacy(legacy2);
   }).then(pwdList =>
   {
-    test.deepEqual(Object.keys(pwdList), [legacy1.name, legacy2.name]);
-    test.equal(pwdList[legacy1.name].type, "pbkdf2-sha1-aes256-encrypted");
-    test.equal(pwdList[legacy2.name].type, "pbkdf2-sha1-aes256-encrypted");
+    test.deepEqual(pwdList, [{
+      type: "stored",
+      name: legacy1.name
+    }, {
+      type: "stored",
+      name: legacy2.name
+    }]);
 
     let [origSite, site, pwdList2] = passwords.getPasswords(legacy1.site);
     test.equal(origSite, legacy1.site);
@@ -194,13 +209,15 @@ exports.testAddRemoveLegacy = function(test)
     [origSite, site, pwdList2] = passwords.getPasswords("sub." + legacy1.site);
     test.equal(origSite, "sub." + legacy1.site);
     test.equal(site, "sub." + legacy1.site);
-    test.deepEqual(pwdList2, {});
+    test.deepEqual(pwdList2, []);
 
     return passwords.removePassword(legacy1.site, legacy1.name);
   }).catch(unexpectedError.bind(test)).then(pwdList =>
   {
-    test.deepEqual(Object.keys(pwdList), [legacy2.name]);
-    test.equal(pwdList[legacy2.name].type, "pbkdf2-sha1-aes256-encrypted");
+    test.deepEqual(pwdList, [{
+      type: "stored",
+      name: legacy2.name
+    }]);
 
     return passwords.removePassword(legacy1.site, legacy1.name);
   }).then(() =>
@@ -234,7 +251,7 @@ exports.testAddGeneratedExisting = function(test)
     return passwords.addLegacy(legacy1);
   }).catch(expectedValue.bind(test, "alreadyExists")).then(() =>
   {
-    return passwords.removePassword(generated1.site, generated1.name);
+    return passwords.removePassword(generated1.site, generated1.name, generated1.revision);
   }).then(() =>
   {
     return passwords.addLegacy(legacy1);
@@ -251,10 +268,17 @@ exports.testRetrieval = function(test)
     return passwords.addGenerated(generated1);
   }).then(pwdList =>
   {
-    return passwords.getPassword(generated1.site, generated1.name);
+    return passwords.getPassword(generated1.site, generated1.name, generated1.revision);
   }).then(pwd =>
   {
     test.equal(pwd, generated1.password);
+    return passwords.addGenerated(generated2);
+  }).then(pwdList =>
+  {
+    return passwords.getPassword(generated2.site, generated2.name, generated2.revision);
+  }).then(pwd =>
+  {
+    test.equal(pwd, generated2.password);
     return passwords.addLegacy(legacy2);
   }).then(pwdList =>
   {
@@ -275,50 +299,50 @@ exports.testAliases = function(test)
     test.deepEqual(passwords.getAlias("example.info"), ["example.info", "example.info"]);
     test.deepEqual(passwords.getAlias("www.example.info"), ["example.info", "example.info"]);
 
-    test.deepEqual(passwords.getPasswords("example.info"), ["example.info", "example.info", {}]);
-    test.deepEqual(passwords.getPasswords("www.example.info"), ["example.info", "example.info", {}]);
+    test.deepEqual(passwords.getPasswords("example.info"), ["example.info", "example.info", []]);
+    test.deepEqual(passwords.getPasswords("www.example.info"), ["example.info", "example.info", []]);
 
     passwords.addAlias("example.info", generated1.site);
 
     test.deepEqual(passwords.getAlias("example.info"), ["example.info", generated1.site]);
     test.deepEqual(passwords.getAlias("www.example.info"), ["example.info", generated1.site]);
 
-    test.deepEqual(passwords.getPasswords("example.info"), ["example.info", generated1.site, {
-      [generated1.name]: {
-        type: "pbkdf2-sha1-generated",
-        length: generated1.length,
-        lower: generated1.lower,
-        upper: generated1.upper,
-        number: generated1.number,
-        symbol: generated1.symbol
-      }
-    }]);
-    test.deepEqual(passwords.getPasswords("www.example.info"), ["example.info", generated1.site, {
-      [generated1.name]: {
-        type: "pbkdf2-sha1-generated",
-        length: generated1.length,
-        lower: generated1.lower,
-        upper: generated1.upper,
-        number: generated1.number,
-        symbol: generated1.symbol
-      }
-    }]);
+    test.deepEqual(passwords.getPasswords("example.info"), ["example.info", generated1.site, [{
+      type: "generated",
+      name: generated1.name,
+      revision: "",
+      length: generated1.length,
+      lower: generated1.lower,
+      upper: generated1.upper,
+      number: generated1.number,
+      symbol: generated1.symbol
+    }]]);
+    test.deepEqual(passwords.getPasswords("www.example.info"), ["example.info", generated1.site, [{
+      type: "generated",
+      name: generated1.name,
+      revision: "",
+      length: generated1.length,
+      lower: generated1.lower,
+      upper: generated1.upper,
+      number: generated1.number,
+      symbol: generated1.symbol
+    }]]);
 
     passwords.removeAlias("example.info");
 
     test.deepEqual(passwords.getAlias("example.info"), ["example.info", "example.info"]);
     test.deepEqual(passwords.getAlias("www.example.info"), ["example.info", "example.info"]);
 
-    test.deepEqual(passwords.getPasswords("example.info"), ["example.info", "example.info", {}]);
-    test.deepEqual(passwords.getPasswords("www.example.info"), ["example.info", "example.info", {}]);
+    test.deepEqual(passwords.getPasswords("example.info"), ["example.info", "example.info", []]);
+    test.deepEqual(passwords.getPasswords("www.example.info"), ["example.info", "example.info", []]);
 
     passwords.removeAlias("example.info");
 
     test.deepEqual(passwords.getAlias("example.info"), ["example.info", "example.info"]);
     test.deepEqual(passwords.getAlias("www.example.info"), ["example.info", "example.info"]);
 
-    test.deepEqual(passwords.getPasswords("example.info"), ["example.info", "example.info", {}]);
-    test.deepEqual(passwords.getPasswords("www.example.info"), ["example.info", "example.info", {}]);
+    test.deepEqual(passwords.getPasswords("example.info"), ["example.info", "example.info", []]);
+    test.deepEqual(passwords.getPasswords("www.example.info"), ["example.info", "example.info", []]);
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
@@ -336,16 +360,16 @@ exports.testAllPasswords = function(test)
   {
     test.deepEqual(passwords.getAllPasswords(), {
       [generated1.site]: {
-        passwords: {
-          [generated1.name]: {
-            type: "pbkdf2-sha1-generated",
-            length: generated1.length,
-            lower: generated1.lower,
-            upper: generated1.upper,
-            number: generated1.number,
-            symbol: generated1.symbol
-          }
-        },
+        passwords: [{
+          type: "generated",
+          name: generated1.name,
+          revision: "",
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }],
         aliases: []
       }
     });
@@ -353,23 +377,21 @@ exports.testAllPasswords = function(test)
     return passwords.addLegacy(legacy2);
   }).then(pwdList =>
   {
-    let list = JSON.parse(JSON.stringify(passwords.getAllPasswords()));
-    delete list[generated2.site].passwords[generated2.name].password;
-    test.deepEqual(list, {
+    test.deepEqual(passwords.getAllPasswords(), {
       [generated1.site]: {
-        passwords: {
-          [generated1.name]: {
-            type: "pbkdf2-sha1-generated",
-            length: generated1.length,
-            lower: generated1.lower,
-            upper: generated1.upper,
-            number: generated1.number,
-            symbol: generated1.symbol
-          },
-          [legacy2.name]: {
-            type: "pbkdf2-sha1-aes256-encrypted"
-          }
-        },
+        passwords: [{
+          type: "generated",
+          name: generated1.name,
+          revision: "",
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }, {
+          type: "stored",
+          name: legacy2.name
+        }],
         aliases: []
       }
     });
@@ -380,60 +402,56 @@ exports.testAllPasswords = function(test)
     return passwords.addGenerated(Object.assign({}, generated2, {site: "sub." + generated2.site}));
   }).then(pwdList =>
   {
-    let list = JSON.parse(JSON.stringify(passwords.getAllPasswords()));
-    delete list[generated2.site].passwords[generated2.name].password;
-    test.deepEqual(list, {
+    test.deepEqual(passwords.getAllPasswords(), {
       [generated1.site]: {
-        passwords: {
-          [generated1.name]: {
-            type: "pbkdf2-sha1-generated",
-            length: generated1.length,
-            lower: generated1.lower,
-            upper: generated1.upper,
-            number: generated1.number,
-            symbol: generated1.symbol
-          },
-          [legacy2.name]: {
-            type: "pbkdf2-sha1-aes256-encrypted"
-          }
-        },
+        passwords: [{
+          type: "generated",
+          name: generated1.name,
+          revision: "",
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }, {
+          type: "stored",
+          name: legacy2.name
+        }],
         aliases: ["example.info", "sub1.example.info"]
       },
       ["sub." + generated2.site]: {
-        passwords: {
-          [generated2.name]: {
-            type: "pbkdf2-sha1-generated",
-            length: generated2.length,
-            lower: generated2.lower,
-            upper: generated2.upper,
-            number: generated2.number,
-            symbol: generated2.symbol
-          }
-        },
+        passwords: [{
+          type: "generated",
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol
+        }],
         aliases: ["sub2.example.info"]
       }
     });
 
-    return passwords.removePassword("sub." + generated2.site, generated2.name);
+    return passwords.removePassword("sub." + generated2.site, generated2.name, generated2.revision);
   }).then(pwdList =>
   {
-    let list = JSON.parse(JSON.stringify(passwords.getAllPasswords()));
-    delete list[generated2.site].passwords[generated2.name].password;
-    test.deepEqual(list, {
+    test.deepEqual(passwords.getAllPasswords(), {
       [generated1.site]: {
-        passwords: {
-          [generated1.name]: {
-            type: "pbkdf2-sha1-generated",
-            length: generated1.length,
-            lower: generated1.lower,
-            upper: generated1.upper,
-            number: generated1.number,
-            symbol: generated1.symbol
-          },
-          [legacy2.name]: {
-            type: "pbkdf2-sha1-aes256-encrypted"
-          }
-        },
+        passwords: [{
+          type: "generated",
+          name: generated1.name,
+          revision: "",
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }, {
+          type: "stored",
+          name: legacy2.name
+        }],
         aliases: ["example.info", "sub1.example.info"]
       }
     });

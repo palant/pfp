@@ -70,7 +70,7 @@ function setSite()
 
   $("site-edit-container").hidden = false;
   $("set-site").hidden = site;
-  $("add-alias").hidden = (!site || origSite != site || Object.keys(state.pwdList).length);
+  $("add-alias").hidden = (!site || origSite != site || state.pwdList.length);
 
   let field = $("site");
   field.setAttribute("value", site || "???");
@@ -178,8 +178,7 @@ function showPasswords()
   while (list.lastChild && !list.lastChild.id)
     list.removeChild(list.lastChild);
 
-  let names = Object.keys(pwdList);
-  if (names.length)
+  if (pwdList.length)
   {
     let template = $("password-template").firstElementChild;
     let links = template.querySelectorAll("a");
@@ -193,10 +192,8 @@ function showPasswords()
       }
     }
 
-    names.sort();
-    for (let name of names)
+    for (let password of pwdList)
     {
-      let password = pwdList[name];
       let tooltip;
       if (password.type == "pbkdf2-sha1-generated")
       {
@@ -219,46 +216,46 @@ function showPasswords()
         tooltip = messages["password-type-legacy"];
 
       let entry = template.cloneNode(true);
-      setCommandHandler(entry.querySelector(".to-document-link"), fillInPassword.bind(null, name));
-      setCommandHandler(entry.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, name));
-      setCommandHandler(entry.querySelector(".password-remove-link"), removePassword.bind(null, name));
+      setCommandHandler(entry.querySelector(".to-document-link"), fillInPassword.bind(null, password));
+      setCommandHandler(entry.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, password));
+      setCommandHandler(entry.querySelector(".password-remove-link"), removePassword.bind(null, password));
 
       let nameNode = entry.querySelector(".user-name");
-      nameNode.textContent = name;
+      nameNode.textContent = password.name;
       nameNode.setAttribute("title", tooltip);
 
       list.appendChild(entry);
     }
   }
 
-  $("no-passwords-message").hidden = names.length;
+  $("no-passwords-message").hidden = pwdList.length;
 }
 
-function fillInPassword(name)
+function fillInPassword(password)
 {
   let {site} = state;
-  passwordRetrieval.fillIn(site, name)
+  passwordRetrieval.fillIn(site, password.name, password.revision)
     .then(() => require("platform").close())
     .catch(showPasswordMessage);
 }
 
-function copyToClipboard(name)
+function copyToClipboard(password)
 {
   let {site} = state;
-  passwordRetrieval.copyToClipboard(site, name)
+  passwordRetrieval.copyToClipboard(site, password.name, password.revision)
     .then(() => showPasswordMessage("password-copied-message"))
     .catch(showPasswordMessage);
 }
 
-function removePassword(name)
+function removePassword(password)
 {
   let {site} = state;
-  let message = messages["remove-password-confirmation"].replace(/\{1\}/g, name).replace(/\{2\}/g, site);
+  let message = messages["remove-password-confirmation"].replace(/\{1\}/g, password.name).replace(/\{2\}/g, site);
   confirm(message).then(response =>
   {
     if (response)
     {
-      passwords.removePassword(site, name)
+      passwords.removePassword(site, password.name, password.revision)
         .then(pwdList => state.set({pwdList}))
         .catch(showPasswordMessage);
     }

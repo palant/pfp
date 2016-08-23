@@ -9,8 +9,6 @@
 let {passwords, passwordRetrieval} = require("../proxy");
 let {port} = require("platform");
 
-let knownSites = null;
-
 function $(id)
 {
   return document.getElementById(id);
@@ -28,9 +26,9 @@ function setCommandHandler(element, handler)
   element.addEventListener("click", wrapper);
 }
 
-function copyToClipboard(site, name, passwordInfo)
+function copyToClipboard(site, password, passwordInfo)
 {
-  passwordRetrieval.copyToClipboard(site, name).then(() =>
+  passwordRetrieval.copyToClipboard(site, password.name, password.revision).then(() =>
   {
     let message = passwordInfo.querySelector(".password-copied-message");
     message.hidden = false;
@@ -41,12 +39,12 @@ function copyToClipboard(site, name, passwordInfo)
   }).catch(showError);
 }
 
-function removePassword(site, name, passwordInfo)
+function removePassword(site, password, passwordInfo)
 {
-  let message = $("remove-password-confirmation").textContent.replace(/\{1\}/g, name).replace(/\{2\}/g, site);
+  let message = $("remove-password-confirmation").textContent.replace(/\{1\}/g, password.name).replace(/\{2\}/g, site);
   if (confirm(message))
   {
-    passwords.removePassword(site, name).then(() =>
+    passwords.removePassword(site, password.name, password.revision).then(() =>
     {
       let siteInfo = passwordInfo.parentNode;
       siteInfo.removeChild(passwordInfo);
@@ -58,19 +56,19 @@ function removePassword(site, name, passwordInfo)
 
 function exportData()
 {
-  if (!knownSites)
-    return;
+  passwords.exportPasswordData().then(sites =>
+  {
+    let data = {
+      application: "easypasswords",
+      format: 1,
+      sites
+    };
 
-  let data = {
-    "application": "easypasswords",
-    "format": 1,
-    "sites": knownSites
-  };
-
-  let link = $("exportData");
-  link.href = "data:application/json," + encodeURIComponent(JSON.stringify(data));
-  link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
-  link.click();
+    let link = $("exportData");
+    link.href = "data:application/json," + encodeURIComponent(JSON.stringify(data));
+    link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
+    link.click();
+  }).catch(showError);
 }
 
 function importData()
@@ -141,7 +139,6 @@ window.addEventListener("DOMContentLoaded", function()
 
 port.on("init", function(sites)
 {
-  knownSites = sites;
   let siteTemplate = $("site-template").firstElementChild;
   let passwordTemplate = $("password-template").firstElementChild;
   let links = passwordTemplate.querySelectorAll("a");
@@ -173,16 +170,13 @@ port.on("init", function(sites)
     else
       siteInfo.querySelector(".site-aliases").hidden = true;
 
-    let userNames = Object.keys(passwords);
-    userNames.sort();
-    for (let name of userNames)
+    for (let passwordData of passwords)
     {
-      let passwordData = passwords[name];
       let passwordInfo = passwordTemplate.cloneNode(true);
-      passwordInfo.querySelector(".user-name").textContent = name;
+      passwordInfo.querySelector(".user-name").textContent = passwordData.name;
 
-      setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, name, passwordInfo));
-      setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, site, name, passwordInfo));
+      setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, passwordData, passwordInfo));
+      setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, site, passwordData, passwordInfo));
 
       if (passwordData.type == "pbkdf2-sha1-generated")
       {
