@@ -19,9 +19,13 @@ window.addEventListener("DOMContentLoaded", function()
     let id = element.getAttribute("data-l10n-id").replace(/-/g, "_");
     element.textContent = chrome.i18n.getMessage(id);
   }
+
+  initDone();
 });
 
 // Messaging
+
+let messageQueue = [];
 
 let {EventTarget, emit} = require("../../lib/eventTarget");
 
@@ -36,8 +40,20 @@ exports.port.emit = function(eventName, ...args)
 
 port.onMessage.addListener(message =>
 {
-  emit(exports.port, message.eventName, ...message.args);
+  if (messageQueue)
+    messageQueue.push(message);
+  else
+    emit(exports.port, message.eventName, ...message.args);
 });
+
+function initDone()
+{
+  let queue = messageQueue;
+  messageQueue = null;
+
+  for (let message of queue)
+    emit(exports.port, message.eventName, ...message.args);
+}
 
 // Panel hiding
 
