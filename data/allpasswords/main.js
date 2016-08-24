@@ -178,7 +178,7 @@ port.on("init", function(sites)
       setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, passwordData, passwordInfo));
       setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, site, passwordData, passwordInfo));
 
-      if (passwordData.type == "pbkdf2-sha1-generated")
+      if (passwordData.type == "generated")
       {
         passwordInfo.querySelector(".password-info.legacy").hidden = true;
         passwordInfo.querySelector(".password-length-value").textContent = passwordData.length;

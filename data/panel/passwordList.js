@@ -195,7 +195,7 @@ function showPasswords()
     for (let password of pwdList)
     {
       let tooltip;
-      if (password.type == "pbkdf2-sha1-generated")
+      if (password.type == "generated")
       {
         tooltip = messages["password-type-generated"];
 
@@ -212,7 +212,7 @@ function showPasswords()
         if (password.symbol)
           tooltip += " " + "+^;";
       }
-      else if (password.type == "pbkdf2-sha1-aes256-encrypted")
+      else if (password.type == "stored")
         tooltip = messages["password-type-legacy"];
 
       let entry = template.cloneNode(true);
