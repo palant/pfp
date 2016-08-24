@@ -17,6 +17,37 @@
       return result;
   }
 
+  function fakeInput(field, value)
+  {
+    field.value = value;
+    field.dispatchEvent(new Event("change", {bubbles: true}));
+  }
+
+  const userNameFieldTypes = new Set(["", "text", "email", "url"]);
+
+  function findNameField(passwordField)
+  {
+    if (!passwordField.form)
+      return null;
+
+    let nameField = null;
+    for (let element of passwordField.form.elements)
+    {
+      if (element == passwordField)
+        break;
+      if (element instanceof HTMLInputElement && userNameFieldTypes.has(element.type))
+        nameField = element;
+    }
+    return nameField;
+  }
+
+  function fillInName(passwordField)
+  {
+    let nameField = findNameField(passwordField);
+    if (nameField && nameField.value.trim() == "")
+      fakeInput(nameField, name);
+  }
+
   function fillIn(wnd, noFocus)
   {
     if (wnd == wnd.top)
@@ -24,7 +55,8 @@
       let field = getActiveElement(wnd.document);
       if (field instanceof HTMLInputElement && field.type == "password")
       {
-        field.value = password;
+        fakeInput(field, password);
+        fillInName(field);
         return true;
       }
     }
@@ -36,12 +68,10 @@
     {
       result = true;
       for (let field of fields)
-      {
-        field.value = password;
-        field.dispatchEvent(new Event("change", {bubbles: true}));
-      }
+        fakeInput(field, password);
       if (!noFocus)
         fields[0].focus();
+      fillInName(fields[0]);
     }
 
     for (let i = 0; i < wnd.frames.length; i++)
@@ -63,7 +93,7 @@
     return result;
   }
 
-  let {host, password} = self.options;
+  let {host, name, password} = self.options;
   if (window.location.hostname != host)
     throw new Error("Password is meant for a different website, not filling in.");
 
