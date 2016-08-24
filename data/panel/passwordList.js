@@ -220,9 +220,12 @@ function showPasswords()
       setCommandHandler(entry.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, password));
       setCommandHandler(entry.querySelector(".password-remove-link"), removePassword.bind(null, password));
 
-      let nameNode = entry.querySelector(".user-name");
-      nameNode.textContent = password.name;
-      nameNode.setAttribute("title", tooltip);
+      entry.querySelector(".user-name-container").setAttribute("title", tooltip);
+      entry.querySelector(".user-name").textContent = password.name;
+
+      let revisionNode = entry.querySelector(".password-revision");
+      revisionNode.hidden = !password.revision;
+      revisionNode.textContent = password.revision;
 
       list.appendChild(entry);
     }

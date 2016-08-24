@@ -23,6 +23,7 @@
       <div data-l10n-id="password-declined"></div>
       <div data-l10n-id="user-name-required"></div>
       <div data-l10n-id="user-name-exists"></div>
+      <div data-l10n-id="user-name-exists-generated"></div>
       <div data-l10n-id="no-characters-selected"></div>
       <div data-l10n-id="password-value-required"></div>
       <div data-l10n-id="password-type-generated"></div>
@@ -77,7 +78,10 @@
         <div class="password-container">
           <a href="#" class="to-document-link" data-l10n-id="to-document"></a>
           <a href="#" class="to-clipboard-link" data-l10n-id="to-clipboard"></a>
-          <span class="user-name"></span>
+          <span class="user-name-container">
+            <span class="user-name"></span>
+            <span class="password-revision"></span>
+          </span>
           <a href="#" class="password-remove-link" data-l10n-id="remove-password"></a>
         </div>
       </div>
@@ -115,12 +119,17 @@
       </div>
     </form>
 
-    <form id="generate-password" class="slide" data-default-element="generate-password-user-name">
+    <form id="generate-password" class="slide" data-default-element="generate-password-user-name" data-custom-reset="change-password-revision.hidden,password-revision-container.hidden=true">
       <label data-l10n-id="site"></label>
       <div id="generate-password-site"></div>
       <label class="block-start" for="generate-password-user-name" data-l10n-id="user-name"></label>
       <input id="generate-password-user-name" type="text">
       <div class="error" hidden></div>
+      <a href="#" id="change-password-revision" data-l10n-id="change-password-revision"></a>
+      <div id="password-revision-container" hidden>
+        <label class="block-start" for="password-revision" data-l10n-id="password-revision"></label>
+        <input id="password-revision" type="text" value="1">
+      </div>
       <label class="block-start" for="password-length" data-l10n-id="password-length"></label>
       <div id="length-container">
         <input id="password-length" type="range" min="4" max="24" step="1" value="16">

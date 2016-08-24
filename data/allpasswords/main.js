@@ -175,6 +175,10 @@ port.on("init", function(sites)
       let passwordInfo = passwordTemplate.cloneNode(true);
       passwordInfo.querySelector(".user-name").textContent = passwordData.name;
 
+      let revisionNode = passwordInfo.querySelector(".password-revision");
+      revisionNode.hidden = !passwordData.revision;
+      revisionNode.textContent = passwordData.revision;
+
       setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, passwordData, passwordInfo));
       setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, site, passwordData, passwordInfo));
 

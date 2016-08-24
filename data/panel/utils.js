@@ -50,9 +50,14 @@ function resetForm(form)
     let custom = form.dataset.customReset;
     if (custom)
     {
-      let match = /^([^\.]+)\.([^=]+)=(.*)/.exec(custom);
-      if (match)
-        $(match[1]).setAttribute(match[2], match[3]);
+      for (let statement of custom.split(/\s*,\s*/))
+      {
+        let match = /^([^\.]+)\.([^=]+)(?:=(.*))?/.exec(statement);
+        if (match && match[3])
+          $(match[1]).setAttribute(match[2], match[3]);
+        else if (match)
+          $(match[1]).removeAttribute(match[2]);
+      }
     }
     require("./formValidation").updateForm(form);
   }

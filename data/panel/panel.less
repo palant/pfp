@@ -259,9 +259,20 @@ a:hover
   background-color: @hover-background;
 }
 
-.user-name
+.user-name-container
 {
   flex-grow: 1;
+}
+
+.password-revision::before
+{
+  content: "#";
+}
+
+.password-revision
+{
+  font-size: @font-size-small;
+  vertical-align: text-top;
 }
 
 .to-document-link,
@@ -307,6 +318,17 @@ a:hover
 {
   display: flex;
   justify-content: space-between;
+}
+
+#change-password-revision
+{
+  font-size: @font-size-small;
+}
+
+#password-revision-container:not([hidden])
+{
+  display: flex;
+  flex-direction: column;
 }
 
 #password-length

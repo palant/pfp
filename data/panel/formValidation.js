@@ -66,30 +66,40 @@ function validateElement(elements, validator)
   return !result;
 }
 
-function markInvalid(element, message)
+function markInvalid(elements, message)
 {
-  if (typeof element == "string")
-    element = $(element);
-
-  element.setCustomValidity(message);
-  if (!document.activeElement || !document.activeElement.validationMessage)
-    element.focus();
-  updateForm(element.form);
+  if (typeof elements == "string")
+    elements = [$(elements)];
+  else if (!(elements instanceof Array))
+    elements = [elements];
 
   // Clear message after a change
   let handler = event =>
   {
-    element.removeEventListener("input", handler);
-    element.removeEventListener("change", handler);
-
-    if (element.validationMessage == message)
+    for (let element of elements)
     {
-      element.setCustomValidity("");
-      updateForm(element.form);
+      element.removeEventListener("input", handler);
+      element.removeEventListener("change", handler);
+
+      if (element.validationMessage == message)
+      {
+        element.setCustomValidity("");
+        updateForm(element.form);
+      }
     }
   };
-  element.addEventListener("input", handler);
-  element.addEventListener("change", handler);
+
+  for (let element of elements)
+  {
+    element.setCustomValidity(message);
+    updateForm(element.form);
+
+    element.addEventListener("input", handler);
+    element.addEventListener("change", handler);
+  }
+
+  if (!document.activeElement || !document.activeElement.validationMessage)
+    elements[0].focus();
 }
 exports.markInvalid = markInvalid;
 

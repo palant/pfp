@@ -8,7 +8,7 @@
 
 let {port} = require("platform");
 let {passwords} = require("../proxy");
-let {setSubmitHandler, setResetHandler} = require("./events");
+let {setCommandHandler, setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
 let {$, setActivePanel, showUnknownError, messages} = require("./utils");
@@ -22,6 +22,11 @@ updatePasswordLengthDisplay();
 
 setValidator("generate-password-user-name", enforceValue.bind(null, "user-name-required"));
 setValidator(["charset-lower", "charset-upper", "charset-number", "charset-symbol"], validateCharsets);
+
+// Dummy validator makes sure validation state is reset when necessary.
+setValidator("password-revision", () => null);
+
+setCommandHandler("change-password-revision", showRevision);
 
 setSubmitHandler("generate-password", addGeneratedPassword);
 setResetHandler("generate-password", () => setActivePanel("password-list"));
@@ -47,11 +52,23 @@ function validateCharsets(element1, element2, element3, element4)
   return null;
 }
 
+function showRevision()
+{
+  $("change-password-revision").hidden = true;
+  $("password-revision-container").hidden = false;
+  $("password-revision").focus();
+}
+
 function addGeneratedPassword()
 {
+  let revision = $("password-revision").value.trim();
+  if (revision == "1")
+    revision = "";
+
   passwords.addGenerated({
     site: state.site,
     name: $("generate-password-user-name").value,
+    revision,
     length: $("password-length").value,
     lower: $("charset-lower").checked,
     upper: $("charset-upper").checked,
@@ -64,7 +81,10 @@ function addGeneratedPassword()
   }).catch(error =>
   {
     if (error == "alreadyExists")
-      markInvalid("generate-password-user-name", messages["user-name-exists"]);
+    {
+      markInvalid([$("generate-password-user-name"), $("password-revision")], messages["user-name-exists-generated"]);
+      showRevision();
+    }
     else
       showUnknownError(error);
   });
