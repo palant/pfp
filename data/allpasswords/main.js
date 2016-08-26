@@ -56,14 +56,8 @@ function removePassword(site, password, passwordInfo)
 
 function exportData()
 {
-  passwords.exportPasswordData().then(sites =>
+  passwords.exportPasswordData().then(data =>
   {
-    let data = {
-      application: "easypasswords",
-      format: 1,
-      sites
-    };
-
     let link = $("exportData");
     link.href = "data:application/json," + encodeURIComponent(JSON.stringify(data));
     link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
@@ -81,26 +75,9 @@ function importDataFromFile(file)
   let reader = new FileReader();
   reader.onload = function()
   {
-    let data = reader.result;
-    try
-    {
-      data = JSON.parse(data);
-    }
-    catch (e)
-    {
-      data = null;
-      console.error(e);
-    }
-
-    if (!data || typeof data != "object" || data.application != "easypasswords" || data.format != 1)
-    {
-      alert($("unknown-data-format").textContent);
-      return;
-    }
-
     if (confirm($("allpasswords-import-confirm").textContent))
     {
-      passwords.importPasswordData(data.sites).then(() =>
+      passwords.importPasswordData(reader.result).then(() =>
       {
         alert($("allpasswords-import-success").textContent);
         window.location.reload();
