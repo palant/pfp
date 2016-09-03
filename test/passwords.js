@@ -457,3 +457,289 @@ exports.testAllPasswords = function(test)
     });
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
+
+exports.testExport = function(test)
+{
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    test.deepEqual(passwords.exportPasswordData(), {
+      application: "easypasswords",
+      format: 1,
+      sites: {}
+    });
+
+    return passwords.addGenerated(generated1);
+  }).then(pwdList =>
+  {
+    test.deepEqual(passwords.exportPasswordData(), {
+      application: "easypasswords",
+      format: 1,
+      sites: {
+        [generated1.site]: {
+          passwords: {
+            [generated1.name]: {
+              type: "pbkdf2-sha1-generated",
+              length: generated1.length,
+              lower: generated1.lower,
+              upper: generated1.upper,
+              number: generated1.number,
+              symbol: generated1.symbol
+            }
+          },
+          aliases: []
+        }
+      }
+    });
+
+    return passwords.addGenerated(generated2);
+  }).then(pwdList =>
+  {
+    test.deepEqual(passwords.exportPasswordData(), {
+      application: "easypasswords",
+      format: 1,
+      sites: {
+        [generated1.site]: {
+          passwords: {
+            [generated1.name]: {
+              type: "pbkdf2-sha1-generated",
+              length: generated1.length,
+              lower: generated1.lower,
+              upper: generated1.upper,
+              number: generated1.number,
+              symbol: generated1.symbol
+            },
+            [generated2.name + "\n" + generated2.revision]: {
+              type: "pbkdf2-sha1-generated",
+              length: generated2.length,
+              lower: generated2.lower,
+              upper: generated2.upper,
+              number: generated2.number,
+              symbol: generated2.symbol
+            }
+          },
+          aliases: []
+        }
+      }
+    });
+
+    passwords.addAlias("example.info", generated1.site);
+    return passwords.addLegacy(legacy2);
+  }).then(() =>
+  {
+    let data = passwords.exportPasswordData();
+    delete data.sites[legacy2.site].passwords[legacy2.name].password;
+    test.deepEqual(data, {
+      application: "easypasswords",
+      format: 1,
+      sites: {
+        [generated1.site]: {
+          passwords: {
+            [generated1.name]: {
+              type: "pbkdf2-sha1-generated",
+              length: generated1.length,
+              lower: generated1.lower,
+              upper: generated1.upper,
+              number: generated1.number,
+              symbol: generated1.symbol
+            },
+            [generated2.name + "\n" + generated2.revision]: {
+              type: "pbkdf2-sha1-generated",
+              length: generated2.length,
+              lower: generated2.lower,
+              upper: generated2.upper,
+              number: generated2.number,
+              symbol: generated2.symbol
+            },
+            [legacy2.name]: {
+              type: "pbkdf2-sha1-aes256-encrypted"
+            }
+          },
+          aliases: ["example.info"]
+        }
+      }
+    });
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
+
+exports.testImportErrors = function(test)
+{
+  Promise.resolve().then(() =>
+  {
+    passwords.importPasswordData("foobar");
+  }).then(() =>
+  {
+    test.ok(false, "Imported malformed JSON");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    passwords.importPasswordData(JSON.stringify(42));
+  }).then(() =>
+  {
+    test.ok(false, "Imported non-object");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    passwords.importPasswordData(JSON.stringify({
+      application: "foobar",
+      format: 1,
+      sites: {}
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported unknown application data");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 33,
+      sites: {}
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported unknown format version");
+  }).catch(expectedValue.bind(test, "unknown-data-format"))
+    .then(done.bind(test));
+};
+
+exports.testImport = function(test)
+{
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 1,
+      sites: {
+        [generated1.site]: {
+          passwords: {
+            [generated1.name]: {
+              type: "pbkdf2-sha1-generated",
+              length: generated1.length,
+              lower: generated1.lower,
+              upper: generated1.upper,
+              number: generated1.number,
+              symbol: generated1.symbol
+            }
+          },
+          aliases: []
+        }
+      }
+    }));
+
+    test.deepEqual(passwords.getAllPasswords(), {
+      [generated1.site]: {
+        passwords: [{
+          type: "generated",
+          name: generated1.name,
+          revision: "",
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }],
+        aliases: []
+      }
+    });
+  }).then(() =>
+  {
+    passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 1,
+      sites: {
+        [generated1.site]: {
+          passwords: {
+            [generated1.name]: {
+              type: "pbkdf2-sha1-generated",
+              length: generated1.length,
+              lower: generated1.lower,
+              upper: generated1.upper,
+              number: generated1.number,
+              symbol: generated1.symbol
+            },
+            [generated2.name + "\n" + generated2.revision]: {
+              type: "pbkdf2-sha1-generated",
+              length: generated2.length,
+              lower: generated2.lower,
+              upper: generated2.upper,
+              number: generated2.number,
+              symbol: generated2.symbol
+            },
+            [legacy2.name]: {
+              type: "pbkdf2-sha1-aes256-encrypted"
+            }
+          },
+          aliases: ["example.info"]
+        }
+      }
+    }));
+
+    test.deepEqual(passwords.getAllPasswords(), {
+      [generated1.site]: {
+        passwords: [{
+          type: "generated",
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol
+        }, {
+          type: "generated",
+          name: generated1.name,
+          revision: "",
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }],
+        aliases: ["example.info"]
+      }
+    });
+  }).then(() =>
+  {
+    passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 1,
+      sites: {
+        [legacy1.site]: {
+          passwords: {
+            [legacy1.name]: {
+              type: "pbkdf2-sha1-aes256-encrypted",
+              password: "BaxABw0KMZmYxGTB8vdwIQ==_smbTbzvo8hdAIjnM45A97Q=="
+            }
+          }
+        }
+      }
+    }));
+
+    test.deepEqual(passwords.getAllPasswords(), {
+      [generated1.site]: {
+        passwords: [{
+          type: "generated",
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol
+        }, {
+          type: "stored",
+          name: legacy1.name
+        }],
+        aliases: ["example.info"]
+      }
+    });
+
+    return passwords.getPassword(legacy1.site, legacy1.name);
+  }).then(pwd =>
+  {
+    test.equal(pwd, legacy1.password);
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
