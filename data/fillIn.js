@@ -63,7 +63,13 @@
 
     let fields = wnd.document.querySelectorAll("input[type=password]");
     let result = false;
-    fields = [].filter.call(fields, element => element.offsetHeight && element.offsetWidth);
+
+    if (wnd.location.host != "accounts.google.com")
+    {
+      // accounts.google.com has the password field hidden while email is being
+      // entered, fill in here despite being hidden.
+      fields = [].filter.call(fields, element => element.offsetHeight && element.offsetWidth);
+    }
     if (fields.length > 0)
     {
       result = true;
