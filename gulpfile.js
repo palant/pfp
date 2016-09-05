@@ -49,7 +49,7 @@ gulp.task("build-jpm", ["validate"], function()
         .pipe(gulp.dest("build-jpm")),
     gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "jpm/data/**/*.js", "!data/panel/*.js", "!data/allpasswords/*.js", "!data/images/icon48.png"])
         .pipe(gulp.dest("build-jpm/data")),
-    gulp.src("data/panel/zxcvbn-*.js")
+    gulp.src(["data/panel/zxcvbn-*.js", "data/panel/jsqr-*.js"])
         .pipe(gulp.dest("build-jpm/data/panel")),
     gulp.src(["data/panel/main.js"])
         .pipe(webpack({
@@ -62,7 +62,8 @@ gulp.task("build-jpm", ["validate"], function()
             root: path.resolve(process.cwd(), "jpm/data")
           },
           externals: {
-            "zxcvbn": "var zxcvbn"
+            "zxcvbn": "var zxcvbn",
+            "jsqr": "var JSQR"
           }
         }))
         .pipe(gulp.dest("build-jpm/data/panel")),
@@ -133,7 +134,7 @@ gulp.task("build-chrome", ["validate"], function()
           return [filepath, contents.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1")];
         }, {pathregexp: /\.html$/}))
         .pipe(gulp.dest("build-chrome/data")),
-    gulp.src("data/panel/zxcvbn-*.js")
+    gulp.src(["data/panel/zxcvbn-*.js", "data/panel/jsqr-*.js"])
         .pipe(gulp.dest("build-chrome/data/panel")),
     gulp.src(["data/panel/main.js"])
         .pipe(webpack({
@@ -146,7 +147,8 @@ gulp.task("build-chrome", ["validate"], function()
             root: path.resolve(process.cwd(), "chrome/data")
           },
           externals: {
-            "zxcvbn": "var zxcvbn"
+            "zxcvbn": "var zxcvbn",
+            "jsqr": "var JSQR"
           }
         }))
         .pipe(gulp.dest("build-chrome/data/panel")),
@@ -226,7 +228,7 @@ gulp.task("eslint-data", function()
 
 gulp.task("eslint-datamodules", function()
 {
-  return gulp.src(["data/**/*.js", "!data/fillIn.js", "!data/panel/zxcvbn-*.js", "**/platform.js"])
+  return gulp.src(["data/**/*.js", "!data/fillIn.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js", "**/platform.js"])
              .pipe(eslint({envs: ["browser", "commonjs", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());

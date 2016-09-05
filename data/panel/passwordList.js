@@ -45,6 +45,7 @@ let menuPassword = null;
 setCommandHandler("menu-to-document", () => fillInPassword(menuPassword));
 setCommandHandler("menu-to-clipboard", () => copyToClipboard(menuPassword));
 setCommandHandler("menu-bump-revision", () => bumpRevision(menuPassword));
+setCommandHandler("menu-show-qrcode", () => showQRCode(menuPassword));
 setCommandHandler("menu-password-remove", () => removePassword(menuPassword));
 
 let menu = $("password-menu");
@@ -315,6 +316,13 @@ function bumpRevision(password)
   }
 
   require("./generatePassword").showRevision();
+}
+
+function showQRCode(password)
+{
+  passwords.getPassword(state.site, password.name, password.revision)
+    .then(value => require("./qrcode").show(value))
+    .catch(showPasswordMessage);
 }
 
 function removePassword(password)

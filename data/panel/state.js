@@ -17,7 +17,7 @@ exports.masterPasswordState = null;
 let stateToPanel = {
   "unset": ["change-master"],
   "set": ["enter-master", "change-master"],
-  "known": ["password-list", "generate-password", "legacy-password", "confirm"]
+  "known": ["password-list", "generate-password", "legacy-password", "qrcode", "confirm"]
 };
 
 function set(state)

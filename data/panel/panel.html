@@ -11,6 +11,7 @@
     <meta charset="utf-8">
     <!--[ifchrome
     <script src="zxcvbn-4.3.0.js"></script>
+    <script src="jsqr-1.0.2.js"></script>
     <script src="index.js"></script>
     ]-->
     <link rel="stylesheet" href="panel.css">
@@ -100,6 +101,10 @@
           <span class="bump-revision-link iconic-link"></span>
           <span data-l10n-id="bump-revision"></span>
         </a>
+        <a href="#" id="menu-show-qrcode" class="password-menu-entry">
+          <span class="show-qrcode-link iconic-link"></span>
+          <span data-l10n-id="show-qrcode"></span>
+        </a>
         <a href="#" id="menu-password-remove" class="password-menu-entry">
           <span class="password-remove-link iconic-link"></span>
           <span data-l10n-id="remove-password"></span>
@@ -181,6 +186,13 @@
       <div class="button-container">
         <button id="legacy-password-save" type="submit" data-l10n-id="save-password"></button>
         <button id="legacy-password-cancel" type="reset" data-l10n-id="cancel"></button>
+      </div>
+    </form>
+
+    <form id="qrcode" class="slide" data-default-element="qrcode-ok">
+      <canvas id="qrcode-canvas"></canvas>
+      <div class="button-container">
+        <button id="qrcode-ok" type="submit" data-l10n-id="cancel"></button>
       </div>
     </form>
 
