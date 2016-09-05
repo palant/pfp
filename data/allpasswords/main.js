@@ -104,7 +104,9 @@ function showPasswords()
         actions.push(passwords.getPassword(site, passwordData.name, passwordData.revision)
           .then(value =>
           {
-            passwordInfo.querySelector(".password-value").textContent = value;
+            let element = passwordInfo.querySelector(".password-value");
+            element.textContent = value;
+            element.hidden = false;
           }));
       }
       return Promise.all(actions);
