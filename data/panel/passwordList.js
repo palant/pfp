@@ -41,6 +41,15 @@ setCommandHandler("site-edit-accept", finishEditingSite);
 setCommandHandler("site-edit-cancel", abortEditingSite);
 setSubmitHandler("password-list", finishEditingSite);
 
+let menuPassword = null;
+setCommandHandler("menu-to-document", () => fillInPassword(menuPassword));
+setCommandHandler("menu-to-clipboard", () => copyToClipboard(menuPassword));
+setCommandHandler("menu-password-remove", () => removePassword(menuPassword));
+
+let menu = $("password-menu");
+menu.parentNode.removeChild(menu);
+menu.removeAttribute("hidden");
+
 hidePasswordMessages();
 
 state.on("update", initPasswordList);
@@ -170,6 +179,8 @@ function removeAlias()
 
 function showPasswords()
 {
+  hideMenu();
+
   let pwdList = state.pwdList;
   if (!pwdList)
     return;
@@ -216,9 +227,9 @@ function showPasswords()
         tooltip = messages["password-type-legacy"];
 
       let entry = template.cloneNode(true);
+      setCommandHandler(entry.querySelector(".password-menu-link"), toggleMenu.bind(null, password, entry));
       setCommandHandler(entry.querySelector(".to-document-link"), fillInPassword.bind(null, password));
       setCommandHandler(entry.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, password));
-      setCommandHandler(entry.querySelector(".password-remove-link"), removePassword.bind(null, password));
 
       entry.querySelector(".user-name-container").setAttribute("title", tooltip);
       entry.querySelector(".user-name").textContent = password.name;
@@ -232,6 +243,35 @@ function showPasswords()
   }
 
   $("no-passwords-message").hidden = pwdList.length;
+}
+
+function showMenu(password, element)
+{
+  hideMenu();
+
+  menuPassword = password;
+  element.parentNode.insertBefore(menu, element.nextSibling);
+  element.querySelector(".password-menu-link").setAttribute("data-menuactive", "true");
+}
+
+function hideMenu()
+{
+  menuPassword = null;
+
+  let element = $("password-list-container").querySelector(".password-menu-link[data-menuactive]");
+  if (element)
+    element.removeAttribute("data-menuactive");
+
+  if (menu.parentNode)
+    menu.parentNode.removeChild(menu);
+}
+
+function toggleMenu(password, element)
+{
+  if (!menuPassword || menuPassword != password)
+    showMenu(password, element);
+  else
+    hideMenu();
 }
 
 function fillInPassword(password)

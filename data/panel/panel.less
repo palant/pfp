@@ -19,6 +19,8 @@
 @block-padding: 5px;
 @inline-spacing: 5px;
 @icon-size: 32px;
+@menu-arrow-height: 7px;
+@menu-border-width: 1px;
 
 :root
 {
@@ -275,14 +277,22 @@ a:hover
   vertical-align: text-top;
 }
 
-.to-document-link,
-.to-clipboard-link,
-.password-remove-link
+.iconic-link
 {
   min-width: @icon-size;
   min-height: @icon-size;
   background-size: @icon-size;
   background-repeat: no-repeat;
+}
+
+.password-menu-link
+{
+  background-image: url("../images/android-menu.svg");
+}
+
+.password-menu-link[data-menuactive]
+{
+  background-color: 0.7 * @background-color + 0.3 * @text-color;
 }
 
 .to-document-link
@@ -298,6 +308,64 @@ a:hover
 .password-remove-link
 {
   background-image: url(../images/ios-close-outline.svg);
+}
+
+#password-menu
+{
+  display: flex;
+  flex-direction: column;
+  margin-top: @menu-arrow-height;
+  border: @menu-border-width solid @text-color;
+  border-radius: @block-padding;
+  padding: @block-padding;
+}
+
+.menu-arrow
+{
+  position: relative;
+  left: @icon-size / 2 - @menu-border-width - @block-padding - @menu-arrow-height;
+  top: -(@menu-arrow-height + @block-padding);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 @menu-arrow-height @menu-arrow-height @menu-arrow-height;
+  border-color: transparent transparent @text-color transparent;
+}
+
+.menu-arrow::after
+{
+  @menu-arrow-inner-height: @menu-arrow-height - 1;
+  content: "";
+  position: relative;
+  display: block;
+  left: -@menu-arrow-inner-height;
+  top: @menu-border-width;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 @menu-arrow-inner-height @menu-arrow-inner-height @menu-arrow-inner-height;
+  border-color: transparent transparent @background-color transparent;
+}
+
+.password-menu-entry
+{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: @font-size-small;
+  color: @text-color;
+  text-decoration: none;
+}
+
+.password-menu-entry:hover
+{
+  background-color: @hover-background;
+}
+
+.password-menu-entry > .iconic-link
+{
+  margin-inline-end: @inline-spacing;
+  -webkit-margin-end: @inline-spacing;
 }
 
 #generate-password-link,

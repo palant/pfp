@@ -76,14 +76,30 @@
       <!-- Cannot use <template> tag here, template contents are removed from document before l10n does its job -->
       <div id="password-template" hidden>
         <div class="password-container">
-          <a href="#" class="to-document-link" data-l10n-id="to-document"></a>
-          <a href="#" class="to-clipboard-link" data-l10n-id="to-clipboard"></a>
+          <a href="#" class="password-menu-link iconic-link" data-l10n-id="password-menu"></a>
+          <a href="#" class="to-document-link iconic-link" data-l10n-id="to-document"></a>
+          <a href="#" class="to-clipboard-link iconic-link" data-l10n-id="to-clipboard"></a>
           <span class="user-name-container">
             <span class="user-name"></span>
             <span class="password-revision"></span>
           </span>
-          <a href="#" class="password-remove-link" data-l10n-id="remove-password"></a>
         </div>
+      </div>
+
+      <div id="password-menu" hidden>
+        <div class="menu-arrow"></div>
+        <a href="#" id="menu-to-document" class="password-menu-entry">
+          <span class="to-document-link iconic-link"></span>
+          <span data-l10n-id="to-document"></span>
+        </a>
+        <a href="#" id="menu-to-clipboard" class="password-menu-entry">
+          <span class="to-clipboard-link iconic-link"></span>
+          <span data-l10n-id="to-clipboard"></span>
+        </a>
+        <a href="#" id="menu-password-remove" class="password-menu-entry">
+          <span class="password-remove-link iconic-link"></span>
+          <span data-l10n-id="remove-password"></span>
+        </a>
       </div>
 
       <label for="site" data-l10n-id="site"></label>
