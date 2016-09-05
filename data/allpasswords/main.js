@@ -87,6 +87,35 @@ function importDataFromFile(file)
   reader.readAsText(file);
 }
 
+function showPasswords()
+{
+  if (confirm($("allpasswords-show-confirm").textContent))
+  {
+    $("show").hidden = true;
+
+    Promise.resolve().then(() =>
+    {
+      let actions = [];
+      let elements = $("list").querySelectorAll(".password-info-container");
+      for (let i = 0; i < elements.length; i++)
+      {
+        let passwordInfo = elements[i];
+        let [site, passwordData] = passwordInfo._data;
+        actions.push(passwords.getPassword(site, passwordData.name, passwordData.revision)
+          .then(value =>
+          {
+            passwordInfo.querySelector(".password-value").textContent = value;
+          }));
+      }
+      return Promise.all(actions);
+    }).catch(e =>
+    {
+      $("show").hidden = false;
+      showError(e);
+    });
+  }
+}
+
 function printPage()
 {
   window.print();
@@ -97,6 +126,7 @@ window.addEventListener("DOMContentLoaded", function()
   let globalActions = {
     export: exportData,
     import: importData,
+    show: showPasswords,
     print: printPage
   };
 
@@ -150,6 +180,7 @@ port.on("init", function(sites)
     for (let passwordData of passwords)
     {
       let passwordInfo = passwordTemplate.cloneNode(true);
+      passwordInfo._data = [site, passwordData];
       passwordInfo.querySelector(".user-name").textContent = passwordData.name;
 
       let revisionNode = passwordInfo.querySelector(".password-revision");
