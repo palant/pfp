@@ -47,6 +47,7 @@ setCommandHandler("menu-to-clipboard", () => copyToClipboard(menuPassword));
 setCommandHandler("menu-bump-revision", () => bumpRevision(menuPassword));
 setCommandHandler("menu-show-qrcode", () => showQRCode(menuPassword));
 setCommandHandler("menu-password-remove", () => removePassword(menuPassword));
+$("password-menu").addEventListener("click", hideMenu);
 
 let menu = $("password-menu");
 menu.parentNode.removeChild(menu);
