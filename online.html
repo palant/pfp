@@ -35,10 +35,13 @@
           )
         }).then(function(masterKey)
         {
+          var salt = params.domain + "\0" + params.name;
+          if (params.revision)
+            salt += "\0" + params.revision;
           return crypto.subtle.deriveBits(
             {
               "name": "PBKDF2",
-              "salt": toUTF8Buffer(params.domain + "\0" + params.name),
+              "salt": toUTF8Buffer(salt),
               "iterations": NUM_ITERATIONS,
               // SHA-256 won't work, see https://bugzilla.mozilla.org/show_bug.cgi?id=554827
               "hash": "SHA-1"
@@ -135,10 +138,16 @@
       function generatePassword(event)
       {
         event.preventDefault();
+
+        var revision = $("password-revision").value.trim();
+        if (revision == "1")
+          revision = "";
+
         derivePassword({
           masterPassword: $("master-password").value,
           domain: $("site").value,
-          name: $("generate-password-name").value,
+          name: $("user-name").value,
+          revision: revision,
           length: $("password-length").value,
           lower: $("charset-lower").checked,
           upper: $("charset-upper").checked,
@@ -274,8 +283,11 @@
       <label for="site">Website name:</label>
       <input id="site" type="text" required>
 
-      <label for="generate-password-name">Password name:</label>
-      <input id="generate-password-name" type="text" required>
+      <label for="user-name">User name:</label>
+      <input id="user-name" type="text" required>
+
+      <label for="password-revision">Revision:</label>
+      <input id="password-revision" type="text" value="1">
 
       <label for="password-length">Length:</label>
       <div id="length-container">
