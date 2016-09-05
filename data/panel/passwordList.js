@@ -44,6 +44,7 @@ setSubmitHandler("password-list", finishEditingSite);
 let menuPassword = null;
 setCommandHandler("menu-to-document", () => fillInPassword(menuPassword));
 setCommandHandler("menu-to-clipboard", () => copyToClipboard(menuPassword));
+setCommandHandler("menu-bump-revision", () => bumpRevision(menuPassword));
 setCommandHandler("menu-password-remove", () => removePassword(menuPassword));
 
 let menu = $("password-menu");
@@ -288,6 +289,32 @@ function copyToClipboard(password)
   passwordRetrieval.copyToClipboard(site, password.name, password.revision)
     .then(() => showPasswordMessage("password-copied-message"))
     .catch(showPasswordMessage);
+}
+
+function bumpRevision(password)
+{
+  setActivePanel("generate-password");
+
+  $("generate-password-user-name").value = password.name;
+
+  let {pwdList} = state;
+  let revision = (parseInt(password.revision, 10) || 1) + 1;
+  if (revision < 2)
+    revision = 2;
+  while (pwdList.some(pwd => pwd.name == password.name && pwd.revision == revision))
+    revision++;
+  $("password-revision").value = revision;
+
+  if (password.type == "generated")
+  {
+    $("password-length").value = password.length;
+    $("charset-lower").checked = password.lower;
+    $("charset-upper").checked = password.upper;
+    $("charset-number").checked = password.number;
+    $("charset-symbol").checked = password.symbol;
+  }
+
+  require("./generatePassword").showRevision();
 }
 
 function removePassword(password)

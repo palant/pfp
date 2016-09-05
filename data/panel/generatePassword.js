@@ -58,6 +58,7 @@ function showRevision()
   $("password-revision-container").hidden = false;
   $("password-revision").focus();
 }
+exports.showRevision = showRevision;
 
 function addGeneratedPassword()
 {
