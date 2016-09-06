@@ -34,10 +34,17 @@ function show(text)
 
   let matrix = new qr.Matrix(input, code);
   matrix.margin = 0;
+  matrix.scale = 8;
 
   let canvas = $("qrcode-canvas");
-  canvas.setAttribute("width", matrix.pixelWidth);
-  canvas.setAttribute("height", matrix.pixelWidth);
+  canvas.width = matrix.pixelWidth;
+  canvas.height = matrix.pixelWidth;
+
+  let context = canvas.getContext("2d");
+  context.fillStyle = "white";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = "black";
+
   matrix.draw(canvas, 0, 0);
 
   setActivePanel("qrcode");
