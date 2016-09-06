@@ -13,3 +13,5 @@ let global = Cu.getGlobalForObject(this);
 let timers = require("sdk/timers");
 global.setTimeout = timers.setTimeout;
 global.clearTimeout = timers.clearTimeout;
+
+require("./bug1300735_hotfix.js");
