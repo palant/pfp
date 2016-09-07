@@ -8,6 +8,8 @@
 
 /* global chrome */
 
+require("platform");
+
 function $(id)
 {
   return document.getElementById(id);

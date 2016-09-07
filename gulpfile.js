@@ -127,7 +127,7 @@ gulp.task("build-chrome", ["validate"], function()
           return prefs;
         }, "prefs.json"))
         .pipe(gulp.dest("build-chrome")),
-    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/**/*.js", "chrome/data/**/*.html", "chrome/data/**/*.png", "!data/panel/*.js", "!data/allpasswords/*.js"])
+    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/contentScript-compat.js", "chrome/data/**/*.html", "chrome/data/**/*.png", "!data/panel/*.js", "!data/allpasswords/*.js"])
         .pipe(utils.transform((filepath, contents) =>
         {
           // Process conditional comments
@@ -164,6 +164,18 @@ gulp.task("build-chrome", ["validate"], function()
           }
         }))
         .pipe(gulp.dest("build-chrome/data/allpasswords")),
+    gulp.src(["chrome/data/options/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          resolve: {
+            root: path.resolve(process.cwd(), "chrome/data")
+          }
+        }))
+        .pipe(gulp.dest("build-chrome/data/options")),
     gulp.src(["data/**/*.scss", "chrome/data/**/*.scss"])
         .pipe(sass())
         .pipe(gulp.dest("build-chrome/data")),
@@ -220,7 +232,7 @@ gulp.task("eslint-node", function()
 
 gulp.task("eslint-data", function()
 {
-  return gulp.src(["data/fillIn.js", "jpm/data/**/*.js", "chrome/data/**/*.js", "!**/platform.js"])
+  return gulp.src(["data/fillIn.js", "**/contentScript-compat.js"])
              .pipe(eslint({envs: ["browser", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
@@ -228,7 +240,7 @@ gulp.task("eslint-data", function()
 
 gulp.task("eslint-datamodules", function()
 {
-  return gulp.src(["data/**/*.js", "!data/fillIn.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js", "**/platform.js"])
+  return gulp.src(["data/**/*.js", "!data/fillIn.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js", "chrome/data/**/*.js", "jpm/data/**/*.js",  "!**/contentScript-compat.js"])
              .pipe(eslint({envs: ["browser", "commonjs", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
