@@ -8,7 +8,7 @@
 
 let path = require("path");
 let gulp = require("gulp");
-let less = require("gulp-less");
+let sass = require("gulp-sass");
 let rename = require("gulp-rename");
 let merge = require("merge-stream");
 let del = require("del");
@@ -79,8 +79,8 @@ gulp.task("build-jpm", ["validate"], function()
           }
         }))
         .pipe(gulp.dest("build-jpm/data/allpasswords")),
-    gulp.src("data/**/*.less")
-        .pipe(less())
+    gulp.src("data/**/*.scss")
+        .pipe(sass())
         .pipe(gulp.dest("build-jpm/data")),
     gulp.src(["jpm/lib/init.js", "lib/main.js"])
         .pipe(webpack({
@@ -164,8 +164,8 @@ gulp.task("build-chrome", ["validate"], function()
           }
         }))
         .pipe(gulp.dest("build-chrome/data/allpasswords")),
-    gulp.src(["data/**/*.less", "chrome/data/**/*.less"])
-        .pipe(less())
+    gulp.src(["data/**/*.scss", "chrome/data/**/*.scss"])
+        .pipe(sass())
         .pipe(gulp.dest("build-chrome/data")),
     gulp.src("lib/main.js")
         .pipe(webpack({
@@ -266,10 +266,10 @@ gulp.task("htmlhint", function()
 
 gulp.task("stylelint", function()
 {
-  return gulp.src(["data/**/*.less", "chrome/data/**/*.less"])
+  return gulp.src(["data/**/*.scss", "chrome/data/**/*.scss"])
              .pipe(stylelint({
                "failAfterError": true,
-               "syntax": "less",
+               "syntax": "scss",
                "config": {
                  "extends": "stylelint-config-standard",
                  "rules": {

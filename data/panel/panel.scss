@@ -4,23 +4,23 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
-@font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-@font-size: 24px;
-@font-size-small: 16px;
+$font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$font-size: 24px;
+$font-size-small: 16px;
 
-@text-color: #000;
-@background-color: #fff;
-@hover-background: #e2f4ff;
-@warning-background: #faa;
-@success-background: #cfc;
-@error-text: #f44;
+$text-color: #000;
+$background-color: #fff;
+$hover-background: #e2f4ff;
+$warning-background: #faa;
+$success-background: #cfc;
+$error-text: #f44;
 
-@block-spacing: 15px;
-@block-padding: 5px;
-@inline-spacing: 5px;
-@icon-size: 32px;
-@menu-arrow-height: 7px;
-@menu-border-width: 1px;
+$block-spacing: 15px;
+$block-padding: 5px;
+$inline-spacing: 5px;
+$icon-size: 32px;
+$menu-arrow-height: 7px;
+$menu-border-width: 1px;
 
 :root
 {
@@ -32,22 +32,22 @@ body
   margin: 0;
   width: 600px;
   padding: 10px;
-  background-color: @background-color;
-  color: @text-color;
+  background-color: $background-color;
+  color: $text-color;
 }
 
 body,
 input,
 button
 {
-  font-family: @font-family;
-  font-size: @font-size;
+  font-family: $font-family;
+  font-size: $font-size;
 }
 
 input[type="checkbox"]
 {
-  width: @font-size;
-  height: @font-size;
+  width: $font-size;
+  height: $font-size;
 }
 
 a
@@ -75,27 +75,27 @@ a:hover
 .button-container,
 .link-container
 {
-  margin-top: @block-spacing;
+  margin-top: $block-spacing;
 }
 
 .warning
 {
-  background-color: @warning-background;
-  border-radius: @block-padding;
+  background-color: $warning-background;
+  border-radius: $block-padding;
 
-  padding: @block-padding;
-  padding-inline-start: @icon-size + @block-padding + @inline-spacing;
-  -webkit-padding-start: @icon-size + @block-padding + @inline-spacing;
+  padding: $block-padding;
+  padding-inline-start: $icon-size + $block-padding + $inline-spacing;
+  -webkit-padding-start: $icon-size + $block-padding + $inline-spacing;
   background-image: url(../images/android-warning.svg);
-  background-size: @icon-size;
-  background-position: @block-padding @block-padding;
+  background-size: $icon-size;
+  background-position: $block-padding $block-padding;
   background-repeat: no-repeat;
 }
 
 .success
 {
-  background-color: @success-background;
-  border-radius: @block-padding;
+  background-color: $success-background;
+  border-radius: $block-padding;
 }
 
 .button-container,
@@ -108,13 +108,13 @@ a:hover
 
 .link-container
 {
-  font-size: @font-size-small;
+  font-size: $font-size-small;
 }
 
 .error
 {
-  font-size: @font-size-small;
-  color: @error-text;
+  font-size: $font-size-small;
+  color: $error-text;
 }
 
 #crypto-error
@@ -189,7 +189,7 @@ a:hover
 
 #site-container
 {
-  margin-bottom: @block-spacing;
+  margin-bottom: $block-spacing;
 }
 
 #site-name-container
@@ -207,11 +207,11 @@ a:hover
 #site-edit-accept,
 #site-edit-cancel
 {
-  min-width: @icon-size;
-  min-height: @icon-size;
-  margin-inline-end: @inline-spacing;
-  -webkit-margin-end: @inline-spacing;
-  background-size: @icon-size;
+  min-width: $icon-size;
+  min-height: $icon-size;
+  margin-inline-end: $inline-spacing;
+  -webkit-margin-end: $inline-spacing;
+  background-size: $icon-size;
   background-repeat: no-repeat;
 }
 
@@ -237,7 +237,7 @@ a:hover
 
 #site-edit-container
 {
-  font-size: @font-size-small;
+  font-size: $font-size-small;
 }
 
 #password-list-container
@@ -258,7 +258,7 @@ a:hover
 
 .password-container:hover
 {
-  background-color: @hover-background;
+  background-color: $hover-background;
 }
 
 .user-name-container
@@ -273,15 +273,15 @@ a:hover
 
 .password-revision
 {
-  font-size: @font-size-small;
+  font-size: $font-size-small;
   vertical-align: text-top;
 }
 
 .iconic-link
 {
-  min-width: @icon-size;
-  min-height: @icon-size;
-  background-size: @icon-size;
+  min-width: $icon-size;
+  min-height: $icon-size;
+  background-size: $icon-size;
   background-repeat: no-repeat;
 }
 
@@ -292,7 +292,7 @@ a:hover
 
 .password-menu-link[data-menuactive]
 {
-  background-color: 0.7 * @background-color + 0.3 * @text-color;
+  background-color: 0.7 * $background-color + 0.3 * $text-color;
 }
 
 .to-document-link
@@ -324,37 +324,37 @@ a:hover
 {
   display: flex;
   flex-direction: column;
-  margin-top: @menu-arrow-height;
-  border: @menu-border-width solid @text-color;
-  border-radius: @block-padding;
-  padding: @block-padding;
+  margin-top: $menu-arrow-height;
+  border: $menu-border-width solid $text-color;
+  border-radius: $block-padding;
+  padding: $block-padding;
 }
 
 .menu-arrow
 {
   position: relative;
-  left: @icon-size / 2 - @menu-border-width - @block-padding - @menu-arrow-height;
-  top: -(@menu-arrow-height + @block-padding);
+  left: $icon-size / 2 - $menu-border-width - $block-padding - $menu-arrow-height;
+  top: -($menu-arrow-height + $block-padding);
   width: 0;
   height: 0;
   border-style: solid;
-  border-width: 0 @menu-arrow-height @menu-arrow-height @menu-arrow-height;
-  border-color: transparent transparent @text-color transparent;
+  border-width: 0 $menu-arrow-height $menu-arrow-height $menu-arrow-height;
+  border-color: transparent transparent $text-color transparent;
 }
 
 .menu-arrow::after
 {
-  @menu-arrow-inner-height: @menu-arrow-height - 1;
+  $menu-arrow-inner-height: $menu-arrow-height - 1;
   content: "";
   position: relative;
   display: block;
-  left: -@menu-arrow-inner-height;
-  top: @menu-border-width;
+  left: -$menu-arrow-inner-height;
+  top: $menu-border-width;
   width: 0;
   height: 0;
   border-style: solid;
-  border-width: 0 @menu-arrow-inner-height @menu-arrow-inner-height @menu-arrow-inner-height;
-  border-color: transparent transparent @background-color transparent;
+  border-width: 0 $menu-arrow-inner-height $menu-arrow-inner-height $menu-arrow-inner-height;
+  border-color: transparent transparent $background-color transparent;
 }
 
 .password-menu-entry
@@ -362,30 +362,30 @@ a:hover
   display: flex;
   flex-direction: row;
   align-items: center;
-  font-size: @font-size-small;
-  color: @text-color;
+  font-size: $font-size-small;
+  color: $text-color;
   text-decoration: none;
 }
 
 .password-menu-entry:hover
 {
-  background-color: @hover-background;
+  background-color: $hover-background;
 }
 
 .password-menu-entry > .iconic-link
 {
-  margin-inline-end: @inline-spacing;
-  -webkit-margin-end: @inline-spacing;
+  margin-inline-end: $inline-spacing;
+  -webkit-margin-end: $inline-spacing;
 }
 
 #generate-password-link,
 #legacy-password-link
 {
-  min-height: @icon-size;
-  padding-inline-start: @icon-size + @inline-spacing;
-  -webkit-padding-start: @icon-size + @inline-spacing;
+  min-height: $icon-size;
+  padding-inline-start: $icon-size + $inline-spacing;
+  -webkit-padding-start: $icon-size + $inline-spacing;
   background-image: url(../images/ios-plus-outline.svg);
-  background-size: @icon-size;
+  background-size: $icon-size;
   background-repeat: no-repeat;
 }
 
@@ -400,7 +400,7 @@ a:hover
 
 #change-password-revision
 {
-  font-size: @font-size-small;
+  font-size: $font-size-small;
 }
 
 #password-revision-container:not([hidden])
