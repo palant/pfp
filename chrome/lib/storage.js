@@ -8,60 +8,111 @@
 
 /* global chrome */
 
-let storage = {};
-
-let wrapper = {
-  get: function(target, property, receiver)
-  {
-    let result = target[property];
-    if (typeof result == "object")
-      return new Proxy(result, wrapper);
-    else
-      return result;
-  },
-
-  set: function(target, property, value, receiver)
-  {
-    scheduleWrite();
-    return target[property] = value;
-  },
-
-  deleteProperty: function(target, property)
-  {
-    scheduleWrite();
-    return delete target[property];
-  }
-};
-
-exports.ready = new Promise((resolve, reject) =>
+function promisify(handler)
 {
-  chrome.storage.local.get("passwords", function(items)
+  return new Promise((resolve, reject) =>
   {
-    if (chrome.runtime.lastError)
-      reject(chrome.runtime.lastError);
-    else
+    handler(result =>
     {
-      if (items.passwords)
-        storage = items.passwords;
-      resolve();
-    }
+      if (chrome.runtime.lastError)
+        reject(chrome.runtime.lastError);
+      else
+        resolve(result);
+    });
   });
-});
-
-let writeTimeout = null;
-
-function scheduleWrite()
-{
-  if (writeTimeout)
-    clearTimeout(writeTimeout);
-  writeTimeout = setTimeout(function()
-  {
-    writeTimeout = null;
-    chrome.storage.local.set({passwords: storage});
-  }, 0);
 }
 
-Object.defineProperty(exports, "storage", {
-  enumerable: true,
-  get: () => new Proxy(storage, wrapper)
+function get(name)
+{
+  return promisify(callback =>
+  {
+    chrome.storage.local.get(name, callback);
+  }).then(items =>
+  {
+    return items[name];
+  });
+}
+exports.get = get;
+
+function getAllByPrefix(prefix)
+{
+  return promisify(callback =>
+  {
+    chrome.storage.local.get(null, callback);
+  }).then(items =>
+  {
+    let result = {};
+    for (let name in items)
+      if (name.substr(0, prefix.length) == prefix)
+        result[name.substr(prefix.length)] = items[name];
+    return result;
+  });
+}
+exports.getAllByPrefix = getAllByPrefix;
+
+function set(name, value)
+{
+  return promisify(callback =>
+  {
+    chrome.storage.local.set({[name]: value}, callback);
+  });
+}
+exports.set = set;
+
+function delete_(name)
+{
+  return promisify(callback =>
+  {
+    chrome.storage.local.remove(name, callback);
+  });
+}
+exports.delete = delete_;
+
+function deleteByPrefix(prefix)
+{
+  return promisify(callback =>
+  {
+    chrome.storage.local.get(null, callback);
+  }).then(items =>
+  {
+    let keys = Object.keys(items).filter(name => name.substr(0, prefix.length) == prefix);
+    return delete_(keys);
+  });
+}
+exports.deleteByPrefix = deleteByPrefix;
+
+// Old data migration
+get("passwords").then(oldData =>
+{
+  if (!oldData)
+    return;
+
+  delete_("passwords");
+
+  if (oldData.masterPasswordHash && oldData.masterPasswordSalt)
+  {
+    set("masterPassword", {
+      hash: oldData.masterPasswordHash,
+      salt: oldData.masterPasswordSalt
+    });
+  }
+
+  if (oldData.sites)
+  {
+    for (let site in oldData.sites)
+    {
+      let siteData = oldData.sites[site];
+      if (siteData.passwords)
+      {
+        for (let key in siteData.passwords)
+        {
+          if (siteData.passwords[key].type == "pbkdf2-sha1-generated")
+            siteData.passwords[key].type = "generated";
+          else if (siteData.passwords[key].type == "pbkdf2-sha1-aes256-encrypted")
+            siteData.passwords[key].type = "stored";
+        }
+      }
+      set("site:" + site, siteData);
+    }
+  }
 });
