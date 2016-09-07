@@ -129,7 +129,7 @@
     "nodeunit": "^0.9.1",
     "properties-parser": "^0.3.1",
     "sandboxed-module": "^2.0.3",
-    "stylelint-config-standard": "^6.0.0",
+    "stylelint-config-standard": "^10.0.0",
     "subtle": "^0.1.8",
     "text-encoding": "^0.6.0",
     "webpack-stream": "^3.2.0"
