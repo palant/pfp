@@ -39,9 +39,6 @@ function promisify(request)
 
 let connection = Promise.resolve().then(() =>
 {
-  return promisify(indexedDB.deleteDatabase(DB_NAME));
-}).then(() =>
-{
   let request = indexedDB.open(DB_NAME, DB_VERSION);
   request.onupgradeneeded = event =>
   {
