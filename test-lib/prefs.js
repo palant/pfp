@@ -9,11 +9,19 @@
 let {EventTarget, emit} = require("../lib/eventTarget");
 
 module.exports = exports = EventTarget();
-exports.values = {};
-exports.ready = Promise.resolve();
 
-exports._setValue = function(name, value)
+let data = {};
+exports.data = data;
+
+exports.get = function(name)
 {
-  exports.values[name] = value;
-  emit(exports, name);
+  return Promise.resolve(data[name]);
+};
+
+exports.set = function(name, value)
+{
+  return Promise.resolve().then(() =>
+  {
+    data[name] = value;
+  }).then(() => emit(exports, name, value));
 };

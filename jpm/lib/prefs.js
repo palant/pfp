@@ -8,9 +8,26 @@
 
 let sp = require("sdk/simple-prefs");
 
-exports.on = (name, listener) =>
+function get(name)
 {
-  sp.on(name, listener);
-};
-exports.values = sp.prefs;
-exports.ready = Promise.resolve();
+  return Promise.resolve(sp.prefs[name]);
+}
+exports.get = get;
+
+function set(name, value)
+{
+  return Promise.resolve().then(() =>
+  {
+    sp.prefs[name] = value;
+  });
+}
+exports.set = set;
+
+function on(name, listener)
+{
+  sp.on(name, () =>
+  {
+    listener(name, sp.prefs[name]);
+  });
+}
+exports.on = on;

@@ -51,4 +51,6 @@ exports.passwordRetrieval = Proxy("passwordRetrieval", [
   "fillIn", "copyToClipboard"
 ]);
 
+exports.prefs = Proxy("prefs", ["get", "set"]);
+
 exports.ui = Proxy("ui", ["showAllPasswords"]);

@@ -27,10 +27,7 @@ function get(name)
   return promisify(callback =>
   {
     chrome.storage.local.get(name, callback);
-  }).then(items =>
-  {
-    return items[name];
-  });
+  }).then(items => items[name]);
 }
 exports.get = get;
 

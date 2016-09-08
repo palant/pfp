@@ -6,50 +6,55 @@
 
 "use strict";
 
-/* global chrome, window */
+/* global chrome */
 
 let {EventTarget, emit} = require("../../lib/eventTarget");
 
 exports = module.exports = EventTarget();
 
-exports.values = {};
-
-exports.ready = window.fetch(chrome.runtime.getURL("prefs.json"))
-  .then(response => response.json())
-  .then(values =>
+function promisify(handler)
+{
+  return new Promise((resolve, reject) =>
   {
-    for (let key in values)
+    handler(result =>
     {
-      Object.defineProperty(exports.values, key, {
-        enumerable: true,
-        get: () => values[key],
-        set: value =>
-        {
-          if (value == values[key])
-            return;
-
-          values[key] = value;
-          chrome.storage.local.set(values);
-          emit(exports, key);
-        }
-      });
-    }
-
-    return new Promise((resolve, reject) =>
-    {
-      chrome.storage.local.get(Object.keys(values), function(items)
-      {
-        if (chrome.runtime.lastError)
-          reject(chrome.runtime.lastError);
-        else
-        {
-          for (let key in items)
-            values[key] = items[key];
-          resolve();
-        }
-      });
+      if (chrome.runtime.lastError)
+        reject(chrome.runtime.lastError);
+      else
+        resolve(result);
     });
   });
+}
 
-// For the options page
-window.getPrefs = () => exports.values;
+function get(name)
+{
+  let key = "pref:" + name;
+  return promisify(callback =>
+  {
+    chrome.storage.local.get(key, callback);
+  }).then(items => items[key]);
+}
+exports.get = get;
+
+function set(name, value)
+{
+  let key = "pref:" + name;
+  return promisify(callback =>
+  {
+    chrome.storage.local.set({[key]: value}, callback);
+  }).then(() => emit(exports, name, value));
+}
+exports.set = set;
+
+// Old data migration
+let oldPrefs = ["autolock", "autolock_delay"];
+chrome.storage.local.get(oldPrefs, items =>
+{
+  if (chrome.runtime.lastError || Object.keys(items).length == 0)
+    return;
+
+  for (let name of oldPrefs)
+    if (name in items)
+      set(name, items[name]);
+  chrome.storage.local.remove(oldPrefs);
+});

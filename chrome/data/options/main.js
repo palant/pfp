@@ -10,6 +10,8 @@
 
 require("platform");
 
+let {prefs} = require("../../../data/proxy");
+
 function $(id)
 {
   return document.getElementById(id);
@@ -17,22 +19,23 @@ function $(id)
 
 window.addEventListener("DOMContentLoaded", function()
 {
-  chrome.runtime.getBackgroundPage(background =>
+  Promise.all([
+    prefs.get("autolock"),
+    prefs.get("autolock_delay")
+  ]).then(([autolock, autolock_delay]) =>
   {
-    let prefs = background.getPrefs();
-
-    let autolock = $("autolock");
-    autolock.checked = prefs.autolock;
-    autolock.addEventListener("click", function()
+    let autolockElement = $("autolock");
+    autolockElement.checked = autolock;
+    autolockElement.addEventListener("click", function()
     {
-      prefs.autolock = autolock.checked;
+      prefs.set("autolock", autolockElement.checked);
     });
 
-    let autolock_delay = $("autolock_delay");
-    autolock_delay.value = prefs.autolock_delay;
-    autolock_delay.addEventListener("input", function()
+    let autolockDelayElement = $("autolock_delay");
+    autolockDelayElement.value = autolock_delay;
+    autolockDelayElement.addEventListener("input", function()
     {
-      prefs.autolock_delay = autolock_delay.value;
+      prefs.set("autolock_delay", autolockDelayElement.value);
     });
   });
 });

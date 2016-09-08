@@ -33,7 +33,7 @@ exports.setUp = function(callback)
   for (let key of Object.keys(storage))
     delete storage[key];
 
-  let {values: prefs} = require("prefs");
+  let {data: prefs} = require("prefs");
   for (let key of Object.keys(prefs))
     delete prefs[key];
 
