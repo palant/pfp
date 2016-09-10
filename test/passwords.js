@@ -123,9 +123,10 @@ exports.testAddRemoveGenerated = function(test)
       pwdList,
       passwords.getPasswords(generated1.site),
       passwords.getPasswords("www." + generated1.site),
-      passwords.getPasswords("sub." + generated1.site)
+      passwords.getPasswords("www." + generated1.site + "."),
+      passwords.getPasswords("sub." + generated1.site + ".")
     ]);
-  }).then(([pwdList, siteData, wwwSiteData, subSiteData]) =>
+  }).then(([pwdList, siteData, wwwSiteData, wwwSiteData2, subSiteData]) =>
   {
     let [origSite, site, pwdList2] = siteData;
     test.equal(origSite, generated1.site);
@@ -136,6 +137,7 @@ exports.testAddRemoveGenerated = function(test)
     test.equal(origSite, generated1.site);
     test.equal(site, generated1.site);
     test.deepEqual(pwdList2, pwdList);
+    test.deepEqual(wwwSiteData, wwwSiteData2);
 
     [origSite, site, pwdList2] = subSiteData;
     test.equal(origSite, "sub." + generated1.site);
@@ -210,9 +212,10 @@ exports.testAddRemoveLegacy = function(test)
       pwdList,
       passwords.getPasswords(legacy1.site),
       passwords.getPasswords("www." + legacy1.site),
-      passwords.getPasswords("sub." + legacy1.site)
+      passwords.getPasswords("www." + legacy1.site + "."),
+      passwords.getPasswords("sub." + legacy1.site + ".")
     ]);
-  }).then(([pwdList, siteData, wwwSiteData, subSiteData]) =>
+  }).then(([pwdList, siteData, wwwSiteData, wwwSiteData2, subSiteData]) =>
   {
     let [origSite, site, pwdList2] = siteData;
     test.equal(origSite, legacy1.site);
@@ -223,6 +226,7 @@ exports.testAddRemoveLegacy = function(test)
     test.equal(origSite, legacy1.site);
     test.equal(site, legacy1.site);
     test.deepEqual(pwdList2, pwdList);
+    test.deepEqual(wwwSiteData, wwwSiteData2);
 
     [origSite, site, pwdList2] = subSiteData;
     test.equal(origSite, "sub." + legacy1.site);
@@ -323,6 +327,12 @@ exports.testAliases = function(test)
       test.equal(site, expectedSite);
       test.equal(alias, expectedAlias);
 
+      return passwords.getAlias(expectedSite + ".");
+    }).then(([site, alias]) =>
+    {
+      test.equal(site, expectedSite);
+      test.equal(alias, expectedAlias);
+
       return passwords.getPasswords(expectedSite);
     }).then(([site, alias, pwdList]) =>
     {
@@ -331,6 +341,13 @@ exports.testAliases = function(test)
       test.deepEqual(pwdList, expectedPwdList);
 
       return passwords.getPasswords("www." + expectedSite);
+    }).then(([site, alias, pwdList]) =>
+    {
+      test.equal(site, expectedSite);
+      test.equal(alias, expectedAlias);
+      test.deepEqual(pwdList, expectedPwdList);
+
+      return passwords.getPasswords(expectedSite + ".");
     }).then(([site, alias, pwdList]) =>
     {
       test.equal(site, expectedSite);
