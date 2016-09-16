@@ -31,7 +31,7 @@ Creating a Chrome and Opera build is similar:
 
     gulp crx --private-key=key.pem
 
-This will create a package inside the `build-chrome` directory with the file name like `easypasswords.de-n.n.n.crx` that you can install in Chrome and Opera. If you don't specify a signing key it will create a ZIP file as required by Chrome Web Store.
+This will create a package inside the `build-chrome` directory with the file name like `easypasswords.de-n.n.n.crx` that you can install in Chrome and Opera. If you don't specify a signing key it will create a ZIP file that can be uploaded to Chrome Web Store or Opera Add-ons.
 
 How to test in Firefox
 ----------------------
