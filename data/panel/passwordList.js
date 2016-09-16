@@ -255,6 +255,7 @@ function showMenu(password, element)
   menuPassword = password;
   element.parentNode.insertBefore(menu, element.nextSibling);
   element.querySelector(".password-menu-link").setAttribute("data-menuactive", "true");
+  menu.scrollIntoView(false);
 }
 
 function hideMenu()
