@@ -212,6 +212,10 @@ port.on("init", function(sites)
       {
         passwordInfo.querySelector(".password-info.generated").hidden = true;
       }
+
+      if ("FIXME" != Math.random())
+        passwordInfo.querySelector(".password-info.notes").hidden = false;
+
       siteInfo.appendChild(passwordInfo);
     }
 

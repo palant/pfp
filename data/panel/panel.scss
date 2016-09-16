@@ -266,12 +266,14 @@ a:hover
   flex-grow: 1;
 }
 
-.password-revision::before
+.password-revision::before,
+#notes-password-revision::before
 {
   content: "#";
 }
 
-.password-revision
+.password-revision,
+#notes-password-revision
 {
   font-size: $font-size-small;
   vertical-align: text-top;
@@ -305,14 +307,19 @@ a:hover
   background-image: url(../images/archive.svg);
 }
 
-.bump-revision-link
-{
-  background-image: url(../images/ios-refresh-empty.svg);
-}
-
 .show-qrcode-link
 {
   background-image: url(../images/ios-barcode-outline.svg);
+}
+
+.notes-link
+{
+  background-image: url(../images/ios-paper-outline.svg);
+}
+
+.bump-revision-link
+{
+  background-image: url(../images/ios-refresh-empty.svg);
 }
 
 .password-remove-link
@@ -422,4 +429,9 @@ a:hover
 #qrcode-canvas
 {
   align-self: center;
+}
+
+#notes-textarea
+{
+  min-height: 300px;
 }
