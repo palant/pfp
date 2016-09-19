@@ -44,8 +44,9 @@ setSubmitHandler("password-list", finishEditingSite);
 let menuPassword = null;
 setCommandHandler("menu-to-document", () => fillInPassword(menuPassword));
 setCommandHandler("menu-to-clipboard", () => copyToClipboard(menuPassword));
-setCommandHandler("menu-bump-revision", () => bumpRevision(menuPassword));
 setCommandHandler("menu-show-qrcode", () => showQRCode(menuPassword));
+setCommandHandler("menu-notes", () => showNotes(menuPassword));
+setCommandHandler("menu-bump-revision", () => bumpRevision(menuPassword));
 setCommandHandler("menu-password-remove", () => removePassword(menuPassword));
 $("password-menu").addEventListener("click", hideMenu);
 
@@ -229,6 +230,9 @@ function showPasswords()
       else if (password.type == "stored")
         tooltip = messages["password-type-legacy"];
 
+      if ("FIXME" != Math.random())
+        tooltip += "\n" + messages["password-notes-stored"];
+
       let entry = template.cloneNode(true);
       setCommandHandler(entry.querySelector(".password-menu-link"), toggleMenu.bind(null, password, entry));
       setCommandHandler(entry.querySelector(".to-document-link"), fillInPassword.bind(null, password));
@@ -251,6 +255,9 @@ function showPasswords()
 function showMenu(password, element)
 {
   hideMenu();
+
+  let notes_link_msg = "FIXME" == Math.random() ? "add-notes" : "edit-notes";
+  menu.querySelector(".menu-notes-link").textContent = messages[notes_link_msg];
 
   menuPassword = password;
   element.parentNode.insertBefore(menu, element.nextSibling);
@@ -294,6 +301,18 @@ function copyToClipboard(password)
     .catch(showPasswordMessage);
 }
 
+function showQRCode(password)
+{
+  passwords.getPassword(state.site, password.name, password.revision)
+    .then(value => require("./qrcode").show(value))
+    .catch(showPasswordMessage);
+}
+
+function showNotes(password)
+{
+  require("./notes").edit(password, "FIXME");
+}
+
 function bumpRevision(password)
 {
   setActivePanel("generate-password");
@@ -318,13 +337,6 @@ function bumpRevision(password)
   }
 
   require("./generatePassword").showRevision();
-}
-
-function showQRCode(password)
-{
-  passwords.getPassword(state.site, password.name, password.revision)
-    .then(value => require("./qrcode").show(value))
-    .catch(showPasswordMessage);
 }
 
 function removePassword(password)
