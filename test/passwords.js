@@ -417,8 +417,8 @@ exports.testAliasErrors = function(test)
 
 exports.testNotes = function(test)
 {
-  let notes1 = "foobar";
-  let notes2 = "barbas";
+  let notes1 = "foobarnotes";
+  let notes2 = "barbasnotes";
 
   Promise.resolve().then(() =>
   {
@@ -639,7 +639,7 @@ exports.testAllPasswords = function(test)
       }
     });
 
-    return passwords.setNotes(legacy2.site, legacy2.name, "", "foobar");
+    return passwords.setNotes(legacy2.site, legacy2.name, "", "foobarnotes");
   }).then(pwdList =>
   {
     return passwords.getAllPasswords();
@@ -825,6 +825,14 @@ exports.testExport = function(test)
         }
       }
     });
+
+    return passwords.setNotes(generated2.site, generated2.name, generated2.revision, "foobarnotes");
+  }).then(() =>
+  {
+    return passwords.exportPasswordData();
+  }).then(exportData =>
+  {
+    test.ok(exportData.sites[generated2.site].passwords[generated2.name + "\n" + generated2.revision].notes);
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
@@ -935,7 +943,8 @@ exports.testImport = function(test)
               lower: generated2.lower,
               upper: generated2.upper,
               number: generated2.number,
-              symbol: generated2.symbol
+              symbol: generated2.symbol,
+              notes: "JUcNu0W/U+zrGe1qxOSi1Q==_dOxyFz2Gbx0TxauU+dQkeA=="
             },
             [legacy2.name]: {
               type: "pbkdf2-sha1-aes256-encrypted"
@@ -961,7 +970,7 @@ exports.testImport = function(test)
           upper: generated2.upper,
           number: generated2.number,
           symbol: generated2.symbol,
-          hasNotes: false
+          hasNotes: true
         }, {
           type: "generated",
           name: generated1.name,
@@ -976,8 +985,12 @@ exports.testImport = function(test)
         aliases: ["example.info"]
       }
     });
-  }).then(() =>
+
+    return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
+  }).then(notes =>
   {
+    test.equal(notes, "foobarnotes");
+
     return passwords.importPasswordData(JSON.stringify({
       application: "easypasswords",
       format: 1,
@@ -1008,7 +1021,7 @@ exports.testImport = function(test)
           upper: generated2.upper,
           number: generated2.number,
           symbol: generated2.symbol,
-          hasNotes: false
+          hasNotes: true
         }, {
           type: "stored",
           name: legacy1.name,
@@ -1050,7 +1063,7 @@ exports.testImport = function(test)
           upper: generated2.upper,
           number: generated2.number,
           symbol: generated2.symbol,
-          hasNotes: false
+          hasNotes: true
         }, {
           type: "stored",
           name: legacy1.name,
