@@ -6,7 +6,6 @@
 
 "use strict";
 
-let {port} = require("platform");
 let {passwords, masterPassword, passwordRetrieval, ui} = require("../proxy");
 let {setCommandHandler, setSubmitHandler} = require("./events");
 let state = require("./state");

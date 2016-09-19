@@ -6,7 +6,6 @@
 
 "use strict";
 
-let {port} = require("platform");
 let {passwords, masterPassword} = require("../proxy");
 let {setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator} = require("./formValidation");
