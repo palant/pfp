@@ -40,7 +40,8 @@ function Proxy(moduleName, methods)
 
 exports.passwords = Proxy("passwords", [
   "exportPasswordData", "importPasswordData", "getPasswords", "addAlias",
-  "removeAlias", "addGenerated", "addLegacy", "removePassword", "getPassword"
+  "removeAlias", "addGenerated", "addLegacy", "removePassword", "getPassword",
+  "setNotes", "removeNotes", "getNotes"
 ]);
 
 exports.masterPassword = Proxy("masterPassword", [

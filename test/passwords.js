@@ -92,7 +92,8 @@ exports.testAddRemoveGenerated = function(test)
       lower: generated1.lower,
       upper: generated1.upper,
       number: generated1.number,
-      symbol: generated1.symbol
+      symbol: generated1.symbol,
+      hasNotes: false
     }]);
 
     return passwords.addGenerated(generated2);
@@ -106,7 +107,8 @@ exports.testAddRemoveGenerated = function(test)
       lower: generated2.lower,
       upper: generated2.upper,
       number: generated2.number,
-      symbol: generated2.symbol
+      symbol: generated2.symbol,
+      hasNotes: false
     },
     {
       type: "generated",
@@ -116,7 +118,8 @@ exports.testAddRemoveGenerated = function(test)
       lower: generated1.lower,
       upper: generated1.upper,
       number: generated1.number,
-      symbol: generated1.symbol
+      symbol: generated1.symbol,
+      hasNotes: false
     }]);
 
     return Promise.all([
@@ -155,7 +158,8 @@ exports.testAddRemoveGenerated = function(test)
       lower: generated2.lower,
       upper: generated2.upper,
       number: generated2.number,
-      symbol: generated2.symbol
+      symbol: generated2.symbol,
+      hasNotes: false
     }]);
 
     return passwords.removePassword(generated1.site, generated1.name, generated1.revision);
@@ -195,17 +199,20 @@ exports.testAddRemoveLegacy = function(test)
   {
     test.deepEqual(pwdList, [{
       type: "stored",
-      name: legacy1.name
+      name: legacy1.name,
+      hasNotes: false
     }]);
     return passwords.addLegacy(legacy2);
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
       type: "stored",
-      name: legacy2.name
+      name: legacy2.name,
+      hasNotes: false
     }, {
       type: "stored",
-      name: legacy1.name
+      name: legacy1.name,
+      hasNotes: false
     }]);
 
     return Promise.all([
@@ -238,7 +245,8 @@ exports.testAddRemoveLegacy = function(test)
   {
     test.deepEqual(pwdList, [{
       type: "stored",
-      name: legacy2.name
+      name: legacy2.name,
+      hasNotes: false
     }]);
 
     return passwords.removePassword(legacy1.site, legacy1.name);
@@ -372,7 +380,8 @@ exports.testAliases = function(test)
       lower: generated1.lower,
       upper: generated1.upper,
       number: generated1.number,
-      symbol: generated1.symbol
+      symbol: generated1.symbol,
+      hasNotes: false
     }]);
   }).then(() =>
   {
@@ -388,13 +397,138 @@ exports.testAliasErrors = function(test)
   Promise.resolve().then(() => passwords.addGenerated(generated1)).then(() =>
   {
     return passwords.addAlias(generated1.site, "example.info");
+  }).then(() =>
+  {
+    test.ok(false, "Successfully added an alias for a site with passwords");
   }).catch(expectedValue.bind(test, "site-has-passwords")).then(() =>
   {
     return passwords.removeAlias(generated1.site);
+  }).then(() =>
+  {
+    test.ok(false, "Successfully removed a non-existant alias");
   }).catch(expectedValue.bind(test, "no-such-alias")).then(() =>
   {
     return passwords.removeAlias("example.info");
+  }).then(() =>
+  {
+    test.ok(false, "Successfully removed a non-existant alias");
   }).catch(expectedValue.bind(test, "no-such-alias")).then(done.bind(test));
+};
+
+exports.testNotes = function(test)
+{
+  let notes1 = "foobar";
+  let notes2 = "barbas";
+
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return passwords.addGenerated(generated2);
+  }).then(() =>
+  {
+    return passwords.setNotes(generated1.site, generated1.name, "", notes1);
+  }).then(() =>
+  {
+    test.ok(false, "Successfully set notes on a non-existant password");
+  }).catch(expectedValue.bind(test, "no-such-password")).then(() =>
+  {
+    return passwords.setNotes("sub." + generated2.site, generated2.name, generated2.revision, notes1);
+  }).then(() =>
+  {
+    test.ok(false, "Successfully set notes on a non-existant password");
+  }).catch(expectedValue.bind(test, "no-such-password")).then(() =>
+  {
+    return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
+  }).then(notes =>
+  {
+    test.equal(notes, null);
+
+    return passwords.setNotes(generated2.site, generated2.name, generated2.revision, notes1);
+  }).then(pwdList =>
+  {
+    test.deepEqual(pwdList, [{
+      type: "generated",
+      name: generated2.name,
+      revision: generated2.revision,
+      length: generated2.length,
+      lower: generated2.lower,
+      upper: generated2.upper,
+      number: generated2.number,
+      symbol: generated2.symbol,
+      hasNotes: true
+    }]);
+
+    return Promise.all([pwdList, passwords.getPasswords(generated2.site)]);
+  }).then(([pwdList, [origSite, site, pwdList2]]) =>
+  {
+    test.deepEqual(pwdList2, pwdList);
+
+    return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
+  }).then(notes =>
+  {
+    test.equal(notes, notes1);
+
+    return passwords.setNotes(generated2.site, generated2.name, generated2.revision, notes2);
+  }).then(pwdList =>
+  {
+    test.deepEqual(pwdList, [{
+      type: "generated",
+      name: generated2.name,
+      revision: generated2.revision,
+      length: generated2.length,
+      lower: generated2.lower,
+      upper: generated2.upper,
+      number: generated2.number,
+      symbol: generated2.symbol,
+      hasNotes: true
+    }]);
+
+    return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
+  }).then(notes =>
+  {
+    test.equal(notes, notes2);
+
+    return passwords.removeNotes(generated2.site, generated2.name, generated2.revision);
+  }).then(pwdList =>
+  {
+    test.deepEqual(pwdList, [{
+      type: "generated",
+      name: generated2.name,
+      revision: generated2.revision,
+      length: generated2.length,
+      lower: generated2.lower,
+      upper: generated2.upper,
+      number: generated2.number,
+      symbol: generated2.symbol,
+      hasNotes: false
+    }]);
+
+    return Promise.all([pwdList, passwords.getPasswords(generated2.site)]);
+  }).then(([pwdList, [origSite, site, pwdList2]]) =>
+  {
+    test.deepEqual(pwdList2, pwdList);
+
+    return passwords.removeNotes(generated2.site, generated2.name, generated2.revision);
+  }).then(pwdList =>
+  {
+    test.deepEqual(pwdList, [{
+      type: "generated",
+      name: generated2.name,
+      revision: generated2.revision,
+      length: generated2.length,
+      lower: generated2.lower,
+      upper: generated2.upper,
+      number: generated2.number,
+      symbol: generated2.symbol,
+      hasNotes: false
+    }]);
+    return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
+  }).then(notes =>
+  {
+    test.equal(notes, null);
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
 exports.testAllPasswords = function(test)
@@ -425,7 +559,8 @@ exports.testAllPasswords = function(test)
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol
+          symbol: generated1.symbol,
+          hasNotes: false
         }],
         aliases: []
       }
@@ -441,7 +576,8 @@ exports.testAllPasswords = function(test)
       [generated1.site]: {
         passwords: [{
           type: "stored",
-          name: legacy2.name
+          name: legacy2.name,
+          hasNotes: false
         }, {
           type: "generated",
           name: generated1.name,
@@ -450,7 +586,8 @@ exports.testAllPasswords = function(test)
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol
+          symbol: generated1.symbol,
+          hasNotes: false
         }],
         aliases: []
       }
@@ -471,7 +608,8 @@ exports.testAllPasswords = function(test)
       [generated1.site]: {
         passwords: [{
           type: "stored",
-          name: legacy2.name
+          name: legacy2.name,
+          hasNotes: false
         }, {
           type: "generated",
           name: generated1.name,
@@ -480,7 +618,8 @@ exports.testAllPasswords = function(test)
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol
+          symbol: generated1.symbol,
+          hasNotes: false
         }],
         aliases: ["example.info", "sub1.example.info"]
       },
@@ -493,7 +632,49 @@ exports.testAllPasswords = function(test)
           lower: generated2.lower,
           upper: generated2.upper,
           number: generated2.number,
-          symbol: generated2.symbol
+          symbol: generated2.symbol,
+          hasNotes: false
+        }],
+        aliases: ["sub2.example.info"]
+      }
+    });
+
+    return passwords.setNotes(legacy2.site, legacy2.name, "", "foobar");
+  }).then(pwdList =>
+  {
+    return passwords.getAllPasswords();
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {
+      [generated1.site]: {
+        passwords: [{
+          type: "stored",
+          name: legacy2.name,
+          hasNotes: true
+        }, {
+          type: "generated",
+          name: generated1.name,
+          revision: "",
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol,
+          hasNotes: false
+        }],
+        aliases: ["example.info", "sub1.example.info"]
+      },
+      ["sub." + generated2.site]: {
+        passwords: [{
+          type: "generated",
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol,
+          hasNotes: false
         }],
         aliases: ["sub2.example.info"]
       }
@@ -509,7 +690,8 @@ exports.testAllPasswords = function(test)
       [generated1.site]: {
         passwords: [{
           type: "stored",
-          name: legacy2.name
+          name: legacy2.name,
+          hasNotes: true
         }, {
           type: "generated",
           name: generated1.name,
@@ -518,7 +700,8 @@ exports.testAllPasswords = function(test)
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol
+          symbol: generated1.symbol,
+          hasNotes: false
         }],
         aliases: ["example.info", "sub1.example.info"]
       }
@@ -724,7 +907,8 @@ exports.testImport = function(test)
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol
+          symbol: generated1.symbol,
+          hasNotes: false
         }],
         aliases: []
       }
@@ -776,7 +960,8 @@ exports.testImport = function(test)
           lower: generated2.lower,
           upper: generated2.upper,
           number: generated2.number,
-          symbol: generated2.symbol
+          symbol: generated2.symbol,
+          hasNotes: false
         }, {
           type: "generated",
           name: generated1.name,
@@ -785,7 +970,8 @@ exports.testImport = function(test)
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol
+          symbol: generated1.symbol,
+          hasNotes: false
         }],
         aliases: ["example.info"]
       }
@@ -821,10 +1007,12 @@ exports.testImport = function(test)
           lower: generated2.lower,
           upper: generated2.upper,
           number: generated2.number,
-          symbol: generated2.symbol
+          symbol: generated2.symbol,
+          hasNotes: false
         }, {
           type: "stored",
-          name: legacy1.name
+          name: legacy1.name,
+          hasNotes: false
         }],
         aliases: ["example.info"]
       }
@@ -861,10 +1049,12 @@ exports.testImport = function(test)
           lower: generated2.lower,
           upper: generated2.upper,
           number: generated2.number,
-          symbol: generated2.symbol
+          symbol: generated2.symbol,
+          hasNotes: false
         }, {
           type: "stored",
-          name: legacy1.name
+          name: legacy1.name,
+          hasNotes: false
         }],
         aliases: []
       }
