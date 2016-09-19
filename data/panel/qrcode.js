@@ -7,9 +7,18 @@
 "use strict";
 
 let {setSubmitHandler} = require("./events");
+let state = require("./state");
 let {$, getActivePanel, setActivePanel} = require("./utils");
 
 let originalSelection = null;
+
+state.on("update", updateSiteName);
+updateSiteName();
+
+function updateSiteName()
+{
+  $("qrcode-website-name").textContent = state.site;
+}
 
 setSubmitHandler("qrcode", () =>
 {
@@ -17,8 +26,14 @@ setSubmitHandler("qrcode", () =>
     setActivePanel(originalSelection);
 });
 
-function show(text)
+function show(password, text)
 {
+  $("qrcode-user-name").textContent = password.name;
+
+  let revisionField = $("qrcode-password-revision");
+  revisionField.hidden = !password.revision;
+  revisionField.textContent = password.revision;
+
   originalSelection = getActivePanel();
 
   let qr = new (require("jsqr"))();

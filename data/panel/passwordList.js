@@ -304,7 +304,7 @@ function copyToClipboard(password)
 function showQRCode(password)
 {
   passwords.getPassword(state.site, password.name, password.revision)
-    .then(value => require("./qrcode").show(value))
+    .then(value => require("./qrcode").show(password, value))
     .catch(showPasswordMessage);
 }
 

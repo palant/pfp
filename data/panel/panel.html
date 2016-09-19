@@ -213,7 +213,14 @@
     </form>
 
     <form id="qrcode" class="slide" data-default-element="qrcode-ok">
-      <canvas id="qrcode-canvas"></canvas>
+      <label data-l10n-id="site"></label>
+      <div id="qrcode-website-name"></div>
+      <label class="block-start" data-l10n-id="user-name"></label>
+      <div id="qrcode-user-name-container">
+        <span id="qrcode-user-name"></span>
+        <span id="qrcode-password-revision" class="password-revision"></span>
+      </div>
+      <canvas class="block-start" id="qrcode-canvas"></canvas>
       <div class="button-container">
         <button id="qrcode-ok" type="submit" data-l10n-id="cancel"></button>
       </div>
