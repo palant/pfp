@@ -23,13 +23,14 @@ function updateSiteName()
 
 function edit(password, notes)
 {
+  setActivePanel("notes");
+
   $("notes-user-name").textContent = password.name;
 
   let revisionField = $("notes-password-revision");
   revisionField.hidden = !password.revision;
   revisionField.textContent = password.revision;
 
-  setActivePanel("notes");
   $("notes-textarea").value = notes;
 }
 exports.edit = edit;
