@@ -266,14 +266,12 @@ a:hover
   flex-grow: 1;
 }
 
-.password-revision::before,
-#notes-password-revision::before
+.password-revision::before
 {
   content: "#";
 }
 
-.password-revision,
-#notes-password-revision
+.password-revision
 {
   font-size: $font-size-small;
   vertical-align: text-top;
