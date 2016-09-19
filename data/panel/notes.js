@@ -13,9 +13,16 @@ let {$, setActivePanel} = require("./utils");
 setSubmitHandler("notes", alert.bind(null, "FIXME"));
 setResetHandler("notes", setActivePanel.bind(null, "password-list"));
 
-function edit(password, notes)
+state.on("update", updateSiteName);
+updateSiteName();
+
+function updateSiteName()
 {
   $("notes-website-name").textContent = state.site;
+}
+
+function edit(password, notes)
+{
   $("notes-user-name").textContent = password.name;
 
   let revisionField = $("notes-password-revision");
