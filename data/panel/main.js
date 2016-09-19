@@ -16,11 +16,11 @@ function init()
 {
   window.removeEventListener("load", init);
 
-  require("./enterMaster.js");
-  require("./changeMaster.js");
-  require("./passwordList.js");
-  require("./generatePassword.js");
-  require("./legacyPassword.js");
+  require("./enterMaster");
+  require("./changeMaster");
+  require("./passwordList");
+  require("./generatePassword");
+  require("./legacyPassword");
 }
 
 window.addEventListener("load", init);
