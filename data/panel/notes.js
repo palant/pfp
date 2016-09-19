@@ -6,15 +6,18 @@
 
 "use strict";
 
+let {passwords} = require("../proxy");
 let {setSubmitHandler, setResetHandler} = require("./events");
 let state = require("./state");
-let {$, setActivePanel} = require("./utils");
+let {$, setActivePanel, showUnknownError} = require("./utils");
 
-setSubmitHandler("notes", alert.bind(null, "FIXME"));
+setSubmitHandler("notes", saveNotes);
 setResetHandler("notes", setActivePanel.bind(null, "password-list"));
 
 state.on("update", updateSiteName);
 updateSiteName();
+
+let currentPassword = null;
 
 function updateSiteName()
 {
@@ -23,6 +26,8 @@ function updateSiteName()
 
 function edit(password, notes)
 {
+  currentPassword = password;
+
   setActivePanel("notes");
 
   $("notes-user-name").textContent = password.name;
@@ -34,3 +39,19 @@ function edit(password, notes)
   $("notes-textarea").value = notes;
 }
 exports.edit = edit;
+
+function saveNotes()
+{
+  let notes = $("notes-textarea").value.trim();
+  let action;
+  if (notes)
+    action = passwords.setNotes(state.site, currentPassword.name, currentPassword.revision, notes);
+  else
+    action = passwords.removeNotes(state.site, currentPassword.name, currentPassword.revision);
+
+  action.then(pwdList =>
+  {
+    state.set({pwdList});
+    setActivePanel("password-list");
+  }).catch(showUnknownError);
+}

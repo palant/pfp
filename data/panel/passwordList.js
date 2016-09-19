@@ -230,7 +230,7 @@ function showPasswords()
       else if (password.type == "stored")
         tooltip = messages["password-type-legacy"];
 
-      if ("FIXME" != Math.random())
+      if (password.hasNotes)
         tooltip += "\n" + messages["password-notes-stored"];
 
       let entry = template.cloneNode(true);
@@ -256,7 +256,7 @@ function showMenu(password, element)
 {
   hideMenu();
 
-  let notes_link_msg = "FIXME" == Math.random() ? "add-notes" : "edit-notes";
+  let notes_link_msg = password.hasNotes ? "edit-notes" : "add-notes";
   menu.querySelector(".menu-notes-link").textContent = messages[notes_link_msg];
 
   menuPassword = password;
@@ -310,7 +310,9 @@ function showQRCode(password)
 
 function showNotes(password)
 {
-  require("./notes").edit(password, "FIXME");
+  passwords.getNotes(state.site, password.name, password.revision)
+    .then(value => require("./notes").edit(password, value))
+    .catch(showPasswordMessage);
 }
 
 function bumpRevision(password)
