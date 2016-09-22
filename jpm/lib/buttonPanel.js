@@ -46,6 +46,9 @@ panel.on("hide", () => button.state("window", {checked: false}));
 
 panel.port.on("_resize", ([width, height]) =>
 {
+  if (!panel.isShowing)
+    return;
+
   // See https://bugzilla.mozilla.org/show_bug.cgi?id=1270095 - on OS X we
   // need to request 2 extra pixels.
   if (require("sdk/system").platform == "darwin")
