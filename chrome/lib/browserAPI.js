@@ -23,7 +23,7 @@ function promisify(method, numArgs, ...args)
     this[method](...args, result =>
     {
       if (chrome.runtime.lastError)
-        reject(chrome.runtime.lastError);
+        reject(chrome.runtime.lastError.message);
       else
         resolve(result);
     });
