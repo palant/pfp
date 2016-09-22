@@ -117,9 +117,10 @@ a:hover
   color: $error-text;
 }
 
-#crypto-error
+#unknown-error-details
 {
-  font-size: 80%;
+  font-size: $font-size-small;
+  white-space: pre-wrap;
 }
 
 #password-score
