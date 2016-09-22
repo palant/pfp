@@ -6,8 +6,6 @@
 
 "use strict";
 
-/* global chrome */
-
 require("platform");
 
 let {prefs} = require("../../../data/proxy");

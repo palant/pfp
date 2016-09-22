@@ -6,24 +6,20 @@
 
 "use strict";
 
-/* global chrome */
-
+let browser = require("./browserAPI");
 let {EventTarget, emit} = require("../../lib/eventTarget");
 
 exports.currentTabURL = function()
 {
-  return new Promise((resolve, reject) =>
+  return browser.tabs.query({
+    lastFocusedWindow: true,
+    active: true
+  }).then(tabs =>
   {
-    chrome.tabs.query({
-      lastFocusedWindow: true,
-      active: true
-    }, tabs =>
-    {
-      if (tabs.length)
-        resolve(tabs[0].url);
-      else
-        resolve(null);
-    });
+    if (tabs.length)
+      return tabs[0].url;
+    else
+      return null;
   });
 };
 
@@ -31,16 +27,16 @@ exports.open = function(url)
 {
   // Only look for existing tab in the active window, don't activate
   // background windows to avoid unexpected effects.
-  chrome.tabs.query({
+  return browser.tabs.query({
     url,
     lastFocusedWindow: true
-  }, function(tabs)
+  }).then(tabs =>
   {
     if (tabs.length)
-      chrome.tabs.update(tabs[0].id, {active: true});
+      return browser.tabs.update(tabs[0].id, {active: true});
     else
     {
-      chrome.tabs.create({
+      return browser.tabs.create({
         url,
         active: true
       });
@@ -52,37 +48,26 @@ exports.executeScript = function(contentScript, options)
 {
   function executeScript(tabId, path)
   {
-    return new Promise((resolve, reject) =>
-    {
-      chrome.tabs.executeScript(tabId, {file: path}, () =>
-      {
-        if (chrome.runtime.lastError)
-          reject(chrome.runtime.lastError);
-        else
-          resolve(tabId);
-      });
-    });
+    return browser.tabs.executeScript(tabId, {file: path}).then(() => tabId);
   }
 
-  return new Promise((resolve, reject) =>
+  return browser.tabs.query({
+    lastFocusedWindow: true,
+    active: true
+  }).then(tabs =>
   {
-    chrome.tabs.query({
-      lastFocusedWindow: true,
-      active: true
-    }, tabs =>
-    {
-      if (tabs.length)
-        resolve(tabs[0].id);
-      else
-        reject(new Error("No current tab?"));
-    });
+    if (tabs.length)
+      return tabs[0].id;
+    else
+      throw new Error("No current tab?");
   }).then(tabId =>
   {
     return executeScript(tabId, "data/contentScript-compat.js");
   }).then(tabId =>
   {
-    chrome.tabs.sendMessage(tabId, options);
-
+    return browser.tabs.sendMessage(tabId, options).then(() => tabId);
+  }).then(tabId =>
+  {
     return executeScript(tabId, "data/" + contentScript);
   }).then(tabId =>
   {
@@ -93,11 +78,11 @@ exports.executeScript = function(contentScript, options)
       if (message.type == "contentScript")
         emit(port, message.eventName, ...message.args);
     };
-    chrome.runtime.onMessage.addListener(listener);
+    browser.runtime.onMessage.addListener(listener);
 
     port.disconnect = function()
     {
-      chrome.runtime.onMessage.removeListener(listener);
+      browser.runtime.onMessage.removeListener(listener);
     };
 
     return port;

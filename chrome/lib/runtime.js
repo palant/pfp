@@ -6,9 +6,9 @@
 
 "use strict";
 
-/* global chrome */
+let browser = require("./browserAPI");
 
 exports.getDataURL = function(path)
 {
-  return chrome.runtime.getURL("data/" + path);
+  return browser.runtime.getURL("data/" + path);
 };

@@ -6,37 +6,17 @@
 
 "use strict";
 
-/* global chrome */
-
-function promisify(handler)
-{
-  return new Promise((resolve, reject) =>
-  {
-    handler(result =>
-    {
-      if (chrome.runtime.lastError)
-        reject(chrome.runtime.lastError);
-      else
-        resolve(result);
-    });
-  });
-}
+let browser = require("./browserAPI");
 
 function get(name)
 {
-  return promisify(callback =>
-  {
-    chrome.storage.local.get(name, callback);
-  }).then(items => items[name]);
+  return browser.storage.local.get(name).then(items => items[name]);
 }
 exports.get = get;
 
 function getAllByPrefix(prefix)
 {
-  return promisify(callback =>
-  {
-    chrome.storage.local.get(null, callback);
-  }).then(items =>
+  return browser.storage.local.get(null).then(items =>
   {
     let result = {};
     for (let name in items)
@@ -49,28 +29,19 @@ exports.getAllByPrefix = getAllByPrefix;
 
 function set(name, value)
 {
-  return promisify(callback =>
-  {
-    chrome.storage.local.set({[name]: value}, callback);
-  });
+  return browser.storage.local.set({[name]: value});
 }
 exports.set = set;
 
 function delete_(name)
 {
-  return promisify(callback =>
-  {
-    chrome.storage.local.remove(name, callback);
-  });
+  return browser.storage.local.remove(name);
 }
 exports.delete = delete_;
 
 function deleteByPrefix(prefix)
 {
-  return promisify(callback =>
-  {
-    chrome.storage.local.get(null, callback);
-  }).then(items =>
+  return browser.storage.local.get(null).then(items =>
   {
     let keys = Object.keys(items).filter(name => name.substr(0, prefix.length) == prefix);
     return delete_(keys);

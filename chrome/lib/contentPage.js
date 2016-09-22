@@ -6,12 +6,11 @@
 
 "use strict";
 
-/* global chrome */
-
+let browser = require("./browserAPI");
 let {EventTarget, emit} = require("../../lib/eventTarget");
 let page = EventTarget();
 
-chrome.runtime.onConnect.addListener(function(port)
+browser.runtime.onConnect.addListener(function(port)
 {
   if (port.name == "pagemod")
   {
