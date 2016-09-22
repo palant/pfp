@@ -21,7 +21,7 @@ exports.get = get;
 function set(name, value)
 {
   let key = "pref:" + name;
-  return browser.storage.local.set({[key]: value}).then(() => emit(exports, name, value));
+  return browser.storage.local.set({[key]: value}).then(() => emit(exports, name, name, value));
 }
 exports.set = set;
 
