@@ -146,15 +146,21 @@ exports.toChromeLocale = function()
 
 exports.runTests = function()
 {
+  function escape_string(str)
+  {
+    return str.replace(/(["'\\])/g, "\\$1");
+  }
+
   function rewriteRequires(source)
   {
-    let modules = new Set(fs.readdirSync("test-lib")
-      .filter(f => path.extname(f) == ".js")
-      .map(f => path.basename(f, ".js")));
+    let modules = new Map();
+    for (let file of fs.readdirSync("test-lib"))
+      if (path.extname(file) == ".js")
+        modules.set(path.basename(file, ".js"), path.resolve("test-lib", file));
     return source.replace(/(\brequire\(["'])([^"']+)/g, (match, prefix, request) =>
     {
       if (modules.has(request))
-        return prefix + path.resolve(process.cwd(), "test-lib/" + request + ".js");
+        return prefix + escape_string(modules.get(request));
       else
         return match;
     });
