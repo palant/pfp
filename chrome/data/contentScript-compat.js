@@ -20,7 +20,8 @@ var self = {
   options: null
 };
 
-chrome.runtime.onMessage.addListener(options =>
+chrome.runtime.onMessage.addListener((options, sender, sendResponse) =>
 {
   self.options = options;
+  sendResponse();
 });
