@@ -2,7 +2,7 @@
   "title": "Easy Passwords",
   "name": "easypasswords",
   "id": "easypasswords@palant.de",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Use a single master password to generate secure passwords for all websites - without losing track of passwords you cannot change.",
   "main": "index.js",
   "author": "Wladimir Palant",
