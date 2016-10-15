@@ -54,4 +54,6 @@ exports.passwordRetrieval = Proxy("passwordRetrieval", [
 
 exports.prefs = Proxy("prefs", ["get", "set"]);
 
+exports.sync = Proxy("sync", ["authorize", "disable"]);
+
 exports.ui = Proxy("ui", ["showAllPasswords"]);

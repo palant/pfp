@@ -34,6 +34,8 @@
       <div data-l10n-id="remove-alias-confirmation"></div>
       <div data-l10n-id="add-notes"></div>
       <div data-l10n-id="edit-notes"></div>
+      <div data-l10n-id="sync-lastTime-never"></div>
+      <div data-l10n-id="sync-disable-confirmation"></div>
     </div>
 
     <div id="unknown-error" class="warning" hidden>
@@ -147,6 +149,8 @@
       <a href="#" id="legacy-password-link" data-l10n-id="legacy-password-link"></a>
       <div class="link-container">
         <a id="show-all" href="#" data-l10n-id="show-all-passwords"></a>
+        <a id="sync-setup-link" href="#" data-l10n-id="sync-setup" hidden></a>
+        <a id="sync-state-link" href="#" data-l10n-id="sync-state" hidden></a>
         <a id="lock-passwords" href="#" data-l10n-id="lock-passwords"></a>
       </div>
     </form>
@@ -223,6 +227,30 @@
       <canvas class="block-start" id="qrcode-canvas"></canvas>
       <div class="button-container">
         <button id="qrcode-ok" type="submit" data-l10n-id="cancel"></button>
+      </div>
+    </form>
+
+    <form id="sync-setup" class="slide" data-default-element="sync-authorize">
+      <label data-l10n-id="sync-how-label"></label>
+      <div data-l10n-id="sync-how-explanation"></div>
+      <label class="block-start" data-l10n-id="sync-safe-label"></label>
+      <div data-l10n-id="sync-safe-explanation"></div>
+      <label class="block-start" data-l10n-id="sync-no-account-label"></label>
+      <div data-l10n-id="sync-no-account-explanation"></div>
+      <div class="button-container">
+        <button id="sync-authorize" type="submit" data-l10n-id="sync-authorize"></button>
+        <button id="sync-setup-cancel" type="reset" data-l10n-id="cancel"></button>
+      </div>
+    </form>
+
+    <form id="sync-state" class="slide" data-default-element="sync-provider">
+      <label for="sync-provider" data-l10n-id="sync-provider"></label>
+      <div id="sync-provider"></div>
+      <label class="block-start" for="sync-lastTime" data-l10n-id="sync-lastTime"></label>
+      <div id="sync-lastTime"></div>
+      <div class="button-container">
+        <button id="sync-disable" type="submit" data-l10n-id="sync-disable"></button>
+        <button id="sync-state-cancel" type="reset" data-l10n-id="cancel"></button>
       </div>
     </form>
 

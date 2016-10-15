@@ -29,6 +29,27 @@ exports.open = function(url)
   require("sdk/tabs").open(url);
 };
 
+exports.openAndWait = function(url, expectedUrl)
+{
+  return new Promise((resolve, reject) =>
+  {
+    let tabs = require("sdk/tabs");
+    tabs.once("open", tab =>
+    {
+      tab.on("close", () => reject("tab-closed"));
+      tab.on("ready", () =>
+      {
+        if (tab.url.startsWith(expectedUrl))
+        {
+          resolve(tab.url);
+          tab.close();
+        }
+      });
+    });
+    tabs.open(url);
+  });
+};
+
 exports.executeScript = function(contentScript, options)
 {
   return new Promise((resolve, reject) =>

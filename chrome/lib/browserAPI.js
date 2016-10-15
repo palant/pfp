@@ -48,9 +48,12 @@ if (typeof browser_.tabs == "undefined")
   browser_.tabs = {
     query: promisify.bind(chrome.tabs, "query", 1),
     create: promisify.bind(chrome.tabs, "create", 1),
+    remove: promisify.bind(chrome.tabs, "remove", 1),
     update: promisify.bind(chrome.tabs, "update", 2),
     executeScript: promisify.bind(chrome.tabs, "executeScript", 2),
-    sendMessage: promisify.bind(chrome.tabs, "sendMessage", 2)
+    sendMessage: promisify.bind(chrome.tabs, "sendMessage", 2),
+    onUpdated: chrome.tabs.onUpdated,
+    onRemoved: chrome.tabs.onRemoved
   };
 }
 

@@ -434,3 +434,13 @@ a:hover
 {
   min-height: 300px;
 }
+
+#sync-setup > label
+{
+  font-weight: bold;
+}
+
+#sync-setup > div
+{
+  font-size: $font-size-small;
+}

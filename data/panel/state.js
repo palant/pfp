@@ -17,14 +17,13 @@ exports.masterPasswordState = null;
 let stateToPanel = {
   "unset": ["change-master"],
   "set": ["enter-master", "change-master"],
-  "known": ["password-list", "generate-password", "legacy-password", "qrcode", "confirm"]
+  "known": ["password-list", "generate-password", "legacy-password", "qrcode", "sync-setup", "sync-state", "confirm"]
 };
 
 function set(state)
 {
-  for (let key of ["site", "origSite", "pwdList", "masterPasswordState"])
-    if (key in state)
-      exports[key] = state[key];
+  for (let key of Object.keys(state))
+    exports[key] = state[key];
 
   if ("masterPasswordState" in state)
   {

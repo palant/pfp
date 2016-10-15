@@ -21,6 +21,8 @@ function init()
   require("./passwordList");
   require("./generatePassword");
   require("./legacyPassword");
+  require("./syncSetup");
+  require("./syncState");
 }
 
 window.addEventListener("load", init);
