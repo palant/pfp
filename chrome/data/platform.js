@@ -6,7 +6,15 @@
 
 "use strict";
 
-/* global chrome */
+/* global window, chrome, browser */
+
+if (typeof browser == "undefined")
+{
+  window.browser = {
+    runtime: chrome.runtime,
+    i18n: chrome.i18n
+  };
+}
 
 // i18n
 
@@ -17,7 +25,7 @@ window.addEventListener("DOMContentLoaded", function()
   {
     let element = elements[i];
     let id = element.getAttribute("data-l10n-id").replace(/-/g, "_");
-    element.textContent = chrome.i18n.getMessage(id);
+    element.textContent = browser.i18n.getMessage(id);
   }
 
   initDone();
@@ -29,7 +37,7 @@ let messageQueue = [];
 
 let {EventTarget, emit} = require("../../lib/eventTarget");
 
-let port = chrome.runtime.connect({name: document.documentElement.dataset.porttype});
+let port = browser.runtime.connect({name: document.documentElement.dataset.porttype});
 
 exports.port = new EventTarget();
 

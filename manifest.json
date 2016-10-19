@@ -5,6 +5,7 @@
   "name": "__MSG_name__",
   "short_name": "__MSG_name__",
   "description": "__MSG_description__",
+  "author": "Wladimir Palant",
   "permissions": [
     "tabs",
     "http://*/*",
@@ -14,6 +15,7 @@
     "unlimitedStorage"
   ],
   "background": {
+    "persistent": true,
     "scripts": [
       "background.js"
     ]
