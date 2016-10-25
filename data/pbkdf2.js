@@ -246,7 +246,7 @@ function pbkdf2(password, salt, iterations, length)
         result[offset + k] ^= hasher.state[k];
     }
 
-    offset += DIGEST_LENGTH;
+    offset += DIGEST_LENGTH >> 2;
   }
 
   // Convert result to big-endian
