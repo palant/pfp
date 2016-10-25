@@ -420,6 +420,12 @@
           var resultField = $("result");
           resultField.value = password;
           $("result-container").hidden = false;
+
+          // Working around https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/9513336/,
+          // in Edge we need to make sure the text field is also visible.
+          resultField.hidden = true;
+          resultField.hidden = false;
+
           resultField.focus();
           resultField.setSelectionRange(0, resultField.value.length);
         }
