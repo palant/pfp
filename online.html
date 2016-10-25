@@ -31,7 +31,7 @@
         var maxPaddedChunkLength = BLOCK_SIZE * 2;
         var input = new Int32Array(heap, 0, maxPaddedChunkLength >> 2);
         var state = new Int32Array(heap, maxPaddedChunkLength + 320, 5);
-        var {hash} = RushaCore({Int32Array}, {}, heap);
+        var hash = RushaCore({Int32Array}, {}, heap).hash;
 
         /**
          * Initializes the current state, this should be called when the processing
