@@ -212,7 +212,7 @@
         else
           ikey.set(password);
 
-        var okey = Uint8Array.from(ikey);
+        var okey = new Uint8Array(ikey);
         for (var i = 0; i < BLOCK_SIZE; i++)
         {
           ikey[i] ^= 0x36;
