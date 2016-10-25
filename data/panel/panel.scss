@@ -30,7 +30,7 @@ $menu-border-width: 1px;
 body
 {
   margin: 0;
-  width: 600px;
+  min-width: 600px;
   padding: 10px;
   background-color: $background-color;
   color: $text-color;
