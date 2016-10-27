@@ -83,11 +83,9 @@ if (window.navigator.userAgent.indexOf(" Edge/"))
       request.responseType = "text";
       request.addEventListener("load", () =>
       {
-        let element = document.createElement("link");
-        element.setAttribute("rel", "stylesheet");
+        let element = document.createElement("style");
         element.setAttribute("media", "print");
-        element.setAttribute("href",
-            "data:text/css," + window.encodeURIComponent(request.response));
+        element.textContent = request.response;
         stylesheet.parentNode.insertBefore(element, stylesheet.nextSibling);
       });
       request.send(null);
