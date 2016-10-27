@@ -278,7 +278,9 @@ gulp.task("stylelint", function()
                    "block-opening-brace-newline-before": "always",
                    "block-opening-brace-newline-after": "always",
                    "block-opening-brace-space-before": null,
-                   "block-opening-brace-space-after": null
+                   "block-opening-brace-space-after": null,
+                   "at-rule-no-unknown": [true, {"ignoreAtRules": ["mixin", "include"]}],
+                   "at-rule-empty-line-before": ["always", {"ignore": ["all-nested"]}]
                  }
                },
                "reporters": [

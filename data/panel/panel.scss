@@ -22,6 +22,32 @@ $icon-size: 32px;
 $menu-arrow-height: 7px;
 $menu-border-width: 1px;
 
+@mixin padding-inline-start($length)
+{
+  :root:not([dir="rtl"]) &
+  {
+    padding-left: $length;
+  }
+
+  :root[dir="rtl"] &
+  {
+    padding-right: $length;
+  }
+}
+
+@mixin margin-inline-end($length)
+{
+  :root:not([dir="rtl"]) &
+  {
+    margin-right: $length;
+  }
+
+  :root[dir="rtl"] &
+  {
+    margin-left: $length;
+  }
+}
+
 :root
 {
   margin: 0;
@@ -84,8 +110,7 @@ a:hover
   border-radius: $block-padding;
 
   padding: $block-padding;
-  padding-inline-start: $icon-size + $block-padding + $inline-spacing;
-  -webkit-padding-start: $icon-size + $block-padding + $inline-spacing;
+  @include padding-inline-start($icon-size + $block-padding + $inline-spacing);
   background-image: url(../images/android-warning.svg);
   background-size: $icon-size;
   background-position: $block-padding $block-padding;
@@ -210,10 +235,9 @@ a:hover
 {
   min-width: $icon-size;
   min-height: $icon-size;
-  margin-inline-end: $inline-spacing;
-  -webkit-margin-end: $inline-spacing;
   background-size: $icon-size;
   background-repeat: no-repeat;
+  @include margin-inline-end($inline-spacing);
 }
 
 #site-edit-cancel
@@ -380,16 +404,14 @@ a:hover
 
 .password-menu-entry > .iconic-link
 {
-  margin-inline-end: $inline-spacing;
-  -webkit-margin-end: $inline-spacing;
+  @include margin-inline-end($inline-spacing);
 }
 
 #generate-password-link,
 #legacy-password-link
 {
   min-height: $icon-size;
-  padding-inline-start: $icon-size + $inline-spacing;
-  -webkit-padding-start: $icon-size + $inline-spacing;
+  @include padding-inline-start($icon-size + $inline-spacing);
   background-image: url(../images/ios-plus-outline.svg);
   background-size: $icon-size;
   background-repeat: no-repeat;
