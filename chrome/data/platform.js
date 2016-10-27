@@ -66,3 +66,31 @@ function initDone()
 // Panel hiding
 
 exports.close = () => window.close();
+
+// Work-around for https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/9550897/,
+// inline all stylesheets.
+
+if (window.navigator.userAgent.indexOf(" Edge/"))
+{
+  window.addEventListener("DOMContentLoaded", () =>
+  {
+    let stylesheets = document.querySelectorAll("link[rel='stylesheet']");
+    for (let i = 0; i < stylesheets.length; i++)
+    {
+      let stylesheet = stylesheets[i];
+      let request = new XMLHttpRequest();
+      request.open("GET", stylesheet.href);
+      request.responseType = "text";
+      request.addEventListener("load", () =>
+      {
+        let element = document.createElement("link");
+        element.setAttribute("rel", "stylesheet");
+        element.setAttribute("media", "print");
+        element.setAttribute("href",
+            "data:text/css," + window.encodeURIComponent(request.response));
+        stylesheet.parentNode.insertBefore(element, stylesheet.nextSibling);
+      });
+      request.send(null);
+    }
+  });
+}
