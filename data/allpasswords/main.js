@@ -59,7 +59,8 @@ function exportData()
   passwords.exportPasswordData().then(data =>
   {
     let link = $("exportData");
-    link.href = "data:application/json," + encodeURIComponent(JSON.stringify(data));
+    let blob = new Blob([JSON.stringify(data)], {type: "application/json"});
+    link.href = URL.createObjectURL(blob);
     link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
     link.click();
   }).catch(showError);
