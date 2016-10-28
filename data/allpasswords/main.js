@@ -58,11 +58,23 @@ function exportData()
 {
   passwords.exportPasswordData().then(data =>
   {
-    let link = $("exportData");
-    let blob = new Blob([JSON.stringify(data)], {type: "application/json"});
-    link.href = URL.createObjectURL(blob);
-    link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
-    link.click();
+    if (window.navigator.userAgent.indexOf(" Edge/") >= 0)
+    {
+      // Edge won't let extensions download blobs (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/9551771/)
+      // and it would ignore the file name anyway (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/6594876/).
+      // data: URIs don't work either (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/4282810/).
+      // Let the user copy the text manually, that's the only way.
+      if (confirm($("allpasswords-export-edge").textContent))
+        document.body.textContent = JSON.stringify(data);
+    }
+    else
+    {
+      let link = $("exportData");
+      let blob = new Blob([JSON.stringify(data)], {type: "application/json"});
+      link.href = URL.createObjectURL(blob);
+      link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
+      link.click();
+    }
   }).catch(showError);
 }
 

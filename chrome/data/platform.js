@@ -70,7 +70,7 @@ exports.close = () => window.close();
 // Work-around for https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/9550897/,
 // inline all stylesheets.
 
-if (window.navigator.userAgent.indexOf(" Edge/"))
+if (window.navigator.userAgent.indexOf(" Edge/") >= 0)
 {
   window.addEventListener("DOMContentLoaded", () =>
   {
