@@ -55,9 +55,10 @@ if (typeof window.TextDecoder == "undefined")
   window.TextDecoder.prototype = {
     decode: function(buffer)
     {
+      let array = new Uint8Array(buffer);
       let bytes = [];
-      for (let i = 0; i < buffer.length; i++)
-        bytes.push((buffer[i] < 16 ? "%0" : "%") + buffer[i].toString(16));
+      for (let i = 0; i < array.length; i++)
+        bytes.push((array[i] < 16 ? "%0" : "%") + array[i].toString(16));
       return window.decodeURIComponent(bytes.join(""));
     }
   };
