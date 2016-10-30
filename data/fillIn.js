@@ -31,8 +31,10 @@
       return null;
 
     let nameField = null;
-    for (let element of passwordField.form.elements)
+    let elements = passwordField.form.elements;
+    for (let i = 0; i < elements.length; i++)
     {
+      let element = elements[i];
       if (element == passwordField)
         break;
       if (element instanceof HTMLInputElement && userNameFieldTypes.has(element.type))
