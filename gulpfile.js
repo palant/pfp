@@ -24,9 +24,100 @@ gulp.task("default", ["xpi"], function()
 {
 });
 
+function buildCommon(targetdir, platform)
+{
+  return merge(
+    gulp.src("LICENSE.TXT")
+        .pipe(gulp.dest(`${targetdir}`)),
+    gulp.src(["data/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", `${platform}/data/contentScript-compat.js`, `${platform}/data/**/*.html`, `${platform}/data/**/*.png`])
+        .pipe(utils.transform((filepath, contents) =>
+        {
+          // Process conditional comments
+          let regexp = new RegExp(`<!--\\[if${platform}\\b([\\s\\S]*?)\\]-->`, "g");
+          return [filepath, contents.replace(regexp, "$1")];
+        }, {pathregexp: /\.html$/}))
+        .pipe(gulp.dest(`${targetdir}/data`)),
+    gulp.src(["data/panel/zxcvbn-*.js", "data/panel/jsqr-*.js"])
+        .pipe(gulp.dest(`${targetdir}/data/panel`)),
+    gulp.src(["data/panel/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          resolve: {
+            root: path.resolve(process.cwd(), `${platform}/data`)
+          },
+          externals: {
+            "zxcvbn": "var zxcvbn",
+            "jsqr": "var JSQR"
+          }
+        }))
+        .pipe(gulp.dest(`${targetdir}/data/panel`)),
+    gulp.src(["data/allpasswords/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          resolve: {
+            root: path.resolve(process.cwd(), `${platform}/data`)
+          }
+        }))
+        .pipe(gulp.dest(`${targetdir}/data/allpasswords`)),
+    gulp.src(["data/**/*.scss", `${platform}/data/**/*.scss`])
+        .pipe(sass())
+        .pipe(gulp.dest(`${targetdir}/data`)),
+    gulp.src([`${platform}/lib/init.js`, "lib/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          resolve: {
+            root: path.resolve(process.cwd(), `${platform}/lib`)
+          },
+          externals: function(context, request, callback)
+          {
+            if (platform == "jpm" && (request == "./package.json" || request == "chrome" || request.indexOf("sdk/") == 0))
+              callback(null, "commonjs " + request);
+            else
+              callback();
+          }
+        }))
+        .pipe(gulp.dest(`${targetdir}`))
+  );
+}
+
+function buildWebExtCommon(targetdir)
+{
+  return merge(
+    buildCommon(targetdir, "chrome"),
+    gulp.src(["chrome/data/options/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          resolve: {
+            root: path.resolve(process.cwd(), "chrome/data")
+          }
+        }))
+        .pipe(gulp.dest(`${targetdir}/data/options`)),
+    gulp.src("locale/**/*.properties")
+        .pipe(utils.toChromeLocale())
+        .pipe(gulp.dest(`${targetdir}/_locales`))
+  );
+}
+
 gulp.task("build-jpm", ["validate"], function()
 {
   return merge(
+    buildCommon("build-jpm", "jpm"),
     gulp.src("package.json")
         .pipe(utils.jsonModify(data =>
         {
@@ -42,64 +133,10 @@ gulp.task("build-jpm", ["validate"], function()
           }
         }))
         .pipe(gulp.dest("build-jpm")),
-    gulp.src(["LICENSE.TXT", "data/images/icon64.png"])
+    gulp.src(["data/images/icon64.png"])
         .pipe(gulp.dest("build-jpm")),
     gulp.src("data/images/icon48.png")
         .pipe(rename("icon.png"))
-        .pipe(gulp.dest("build-jpm")),
-    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "jpm/data/**/*.js", "!data/panel/*.js", "!data/allpasswords/*.js", "!data/images/icon48.png"])
-        .pipe(gulp.dest("build-jpm/data")),
-    gulp.src(["data/panel/zxcvbn-*.js", "data/panel/jsqr-*.js"])
-        .pipe(gulp.dest("build-jpm/data/panel")),
-    gulp.src(["data/panel/main.js"])
-        .pipe(webpack({
-          output: {
-            filename: "index.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          },
-          resolve: {
-            root: path.resolve(process.cwd(), "jpm/data")
-          },
-          externals: {
-            "zxcvbn": "var zxcvbn",
-            "jsqr": "var JSQR"
-          }
-        }))
-        .pipe(gulp.dest("build-jpm/data/panel")),
-    gulp.src(["data/allpasswords/main.js"])
-        .pipe(webpack({
-          output: {
-            filename: "index.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          },
-          resolve: {
-            root: path.resolve(process.cwd(), "jpm/data")
-          }
-        }))
-        .pipe(gulp.dest("build-jpm/data/allpasswords")),
-    gulp.src("data/**/*.scss")
-        .pipe(sass())
-        .pipe(gulp.dest("build-jpm/data")),
-    gulp.src(["jpm/lib/init.js", "lib/main.js"])
-        .pipe(webpack({
-          output: {
-            filename: "index.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          },
-          resolve: {
-            root: path.resolve(process.cwd(), "jpm/lib")
-          },
-          externals: function(context, request, callback)
-          {
-            if (request == "./package.json" || request == "chrome" || request.indexOf("sdk/") == 0)
-              callback(null, "commonjs " + request);
-            else
-              callback();
-          }
-        }))
         .pipe(gulp.dest("build-jpm")),
     gulp.src("locale/**/*.properties")
         .pipe(gulp.dest("build-jpm/locale"))
@@ -109,93 +146,26 @@ gulp.task("build-jpm", ["validate"], function()
 gulp.task("build-chrome", ["validate"], function()
 {
   return merge(
-    gulp.src("LICENSE.TXT")
-        .pipe(gulp.dest("build-chrome")),
+    buildWebExtCommon("build-chrome"),
     gulp.src("manifest.json")
         .pipe(utils.jsonModify(data =>
         {
           data.version = require("./package.json").version;
         }))
-        .pipe(gulp.dest("build-chrome")),
-    gulp.src(["data/**/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", "chrome/data/contentScript-compat.js", "chrome/data/**/*.html", "chrome/data/**/*.png", "!data/panel/*.js", "!data/allpasswords/*.js"])
-        .pipe(utils.transform((filepath, contents) =>
-        {
-          // Process conditional comments
-          return [filepath, contents.replace(/<!--\[ifchrome\b([\s\S]*?)\]-->/g, "$1")];
-        }, {pathregexp: /\.html$/}))
-        .pipe(gulp.dest("build-chrome/data")),
-    gulp.src(["data/panel/zxcvbn-*.js", "data/panel/jsqr-*.js"])
-        .pipe(gulp.dest("build-chrome/data/panel")),
-    gulp.src(["data/panel/main.js"])
-        .pipe(webpack({
-          output: {
-            filename: "index.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          },
-          resolve: {
-            root: path.resolve(process.cwd(), "chrome/data")
-          },
-          externals: {
-            "zxcvbn": "var zxcvbn",
-            "jsqr": "var JSQR"
-          }
-        }))
-        .pipe(gulp.dest("build-chrome/data/panel")),
-    gulp.src(["data/allpasswords/main.js"])
-        .pipe(webpack({
-          output: {
-            filename: "index.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          },
-          resolve: {
-            root: path.resolve(process.cwd(), "chrome/data")
-          }
-        }))
-        .pipe(gulp.dest("build-chrome/data/allpasswords")),
-    gulp.src(["chrome/data/options/main.js"])
-        .pipe(webpack({
-          output: {
-            filename: "index.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          },
-          resolve: {
-            root: path.resolve(process.cwd(), "chrome/data")
-          }
-        }))
-        .pipe(gulp.dest("build-chrome/data/options")),
-    gulp.src(["data/**/*.scss", "chrome/data/**/*.scss"])
-        .pipe(sass())
-        .pipe(gulp.dest("build-chrome/data")),
-    gulp.src("lib/main.js")
-        .pipe(webpack({
-          output: {
-            filename: "background.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          },
-          resolve: {
-            root: path.resolve(process.cwd(), "chrome/lib")
-          }
-        }))
-        .pipe(gulp.dest("build-chrome")),
-    gulp.src("locale/**/*.properties")
-        .pipe(utils.toChromeLocale())
-        .pipe(gulp.dest("build-chrome/_locales"))
+        .pipe(gulp.dest("build-chrome"))
   );
 });
 
-gulp.task("build-webext", ["build-chrome"], function()
+gulp.task("build-webext", ["validate"], function()
 {
   let manifest = require("./package.json");
   return merge(
-    gulp.src(["build-chrome/**", "!build-chrome/manifest.json", "!build-chrome/**/*.crx", "!build-chrome/**/*.zip"])
-        .pipe(gulp.dest("build-webext")),
-    gulp.src("build-chrome/manifest.json")
+    buildWebExtCommon("build-webext"),
+    gulp.src("manifest.json")
         .pipe(utils.jsonModify(data =>
         {
+          data.version = manifest.version;
+
           delete data.minimum_chrome_version;
           let index = data.permissions.indexOf("unlimitedStorage");
           if (index >= 0)

@@ -17,7 +17,7 @@
   "background": {
     "persistent": true,
     "scripts": [
-      "background.js"
+      "index.js"
     ]
   },
   "options_ui": {
