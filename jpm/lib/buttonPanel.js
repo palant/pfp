@@ -29,14 +29,10 @@ require("./bug1258706_hotfix").fixButton(() =>
   });
 });
 
-let contentScripts = manifest.buttonPanel.contentScript || [];
-if (typeof contentScripts.join != "function")
-  contentScripts = [contentScripts];
-contentScripts = contentScripts.map(file => data.url(file));
-
 let panel = require("sdk/panel").Panel({
   contentURL: data.url(manifest.buttonPanel.contentURL),
-  contentScriptFile: contentScripts,
+  contentScriptFile: (manifest.buttonPanel.contentScripts || [])
+                     .map(file => data.url(file)),
   position: button
 });
 require("./bug918600_hotfix").fixPanel(panel);

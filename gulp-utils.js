@@ -45,7 +45,7 @@ function transform(modifier, opts)
     if (!file.isBuffer())
       throw new Error("Unexpected file type");
 
-    if (opts.pathregexp && !opts.pathregexp.test(file.path))
+    if (opts.files && opts.files.indexOf(file.path) < 0)
     {
       callback(null, file);
       return;

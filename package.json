@@ -35,16 +35,10 @@
       "48": "images/icon48.png",
       "64": "images/icon64.png"
     },
-    "contentURL": "panel/panel.html",
-    "contentScript": [
-      "panel/zxcvbn-4.3.0.js",
-      "panel/jsqr-1.0.2.js",
-      "panel/index.js"
-    ]
+    "contentURL": "panel/panel.html"
   },
   "contentPage": {
-    "contentURL": "allpasswords/allpasswords.html",
-    "contentScript": "allpasswords/index.js"
+    "contentURL": "allpasswords/allpasswords.html"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",

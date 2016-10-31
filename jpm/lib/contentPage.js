@@ -15,14 +15,10 @@ let manifest = require("./package.json");
 if (!manifest.contentPage)
   throw new Error("No contentPage configuration in package.json");
 
-let contentScripts = manifest.contentPage.contentScript || [];
-if (typeof contentScripts.join != "function")
-  contentScripts = [contentScripts];
-contentScripts = contentScripts.map(file => data.url(file));
-
 require("sdk/page-mod").PageMod({
   include: data.url(manifest.contentPage.contentURL),
-  contentScriptFile: contentScripts,
+  contentScriptFile: (manifest.contentPage.contentScripts || [])
+                     .map(file => data.url(file)),
   contentScriptWhen: "ready",
   onAttach: function(worker)
   {

@@ -7,13 +7,15 @@
 "use strict";
 
 let path = require("path");
-let gulp = require("gulp");
-let sass = require("gulp-sass");
-let rename = require("gulp-rename");
-let merge = require("merge-stream");
+let url = require("url");
+
 let del = require("del");
+let gulp = require("gulp");
 let eslint = require("gulp-eslint");
 let htmlhint = require("gulp-htmlhint");
+let rename = require("gulp-rename");
+let sass = require("gulp-sass");
+let merge = require("merge-stream");
 let stylelint = require("gulp-stylelint");
 let zip = require("gulp-zip");
 let webpack = require("webpack-stream");
@@ -24,18 +26,13 @@ gulp.task("default", ["xpi"], function()
 {
 });
 
-function buildCommon(targetdir, platform)
+function buildCommon(targetdir, platform, customTransform)
 {
   return merge(
     gulp.src("LICENSE.TXT")
         .pipe(gulp.dest(`${targetdir}`)),
     gulp.src(["data/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", `${platform}/data/contentScript-compat.js`, `${platform}/data/**/*.html`, `${platform}/data/**/*.png`])
-        .pipe(utils.transform((filepath, contents) =>
-        {
-          // Process conditional comments
-          let regexp = new RegExp(`<!--\\[if${platform}\\b([\\s\\S]*?)\\]-->`, "g");
-          return [filepath, contents.replace(regexp, "$1")];
-        }, {pathregexp: /\.html$/}))
+        .pipe(customTransform || utils.transform(null, {files: ["////"]}))
         .pipe(gulp.dest(`${targetdir}/data`)),
     gulp.src(["data/panel/zxcvbn-*.js", "data/panel/jsqr-*.js"])
         .pipe(gulp.dest(`${targetdir}/data/panel`)),
@@ -114,10 +111,39 @@ function buildWebExtCommon(targetdir)
   );
 }
 
-gulp.task("build-jpm", ["validate"], function()
+let jpmPages = new Map();
+
+gulp.task("build-jpm-common", ["validate"], function()
+{
+  let manifest = require("./package.json");
+  for (let info of [manifest.buttonPanel, manifest.contentPage])
+  {
+    if (!info)
+      continue;
+
+    jpmPages.set(path.resolve(process.cwd(), "data", info.contentURL), {
+      url: info.contentURL,
+      contentScripts: []
+    });
+  }
+
+  let customTransform = utils.transform((filepath, contents) =>
+  {
+    // Convert page-loaded scripts to content scripts
+    let page = jpmPages.get(filepath);
+    return [filepath, contents.replace(/<script\b[^>]*\bsrc="(.*?)"[^>]*><\/script>/g, (match, src) =>
+    {
+      page.contentScripts.push(url.resolve(page.url, src));
+      return "";
+    })];
+  }, {files: Array.from(jpmPages.keys())});
+
+  return buildCommon("build-jpm", "jpm", customTransform);
+});
+
+gulp.task("build-jpm", ["build-jpm-common"], function()
 {
   return merge(
-    buildCommon("build-jpm", "jpm"),
     gulp.src("package.json")
         .pipe(utils.jsonModify(data =>
         {
@@ -130,6 +156,18 @@ gulp.task("build-jpm", ["validate"], function()
           {
             if (!whitelist.has(key))
               delete data[key];
+          }
+
+          for (let key of ["buttonPanel", "contentPage"])
+          {
+            if (key in data)
+            {
+              for (let page of jpmPages.values())
+              {
+                if (page.url == data[key].contentURL)
+                  data[key].contentScripts = page.contentScripts;
+              }
+            }
           }
         }))
         .pipe(gulp.dest("build-jpm")),
