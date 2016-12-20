@@ -35,7 +35,8 @@
       "48": "images/icon48.png",
       "64": "images/icon64.png"
     },
-    "contentURL": "panel/panel.html"
+    "contentURL": "panel/panel.html",
+    "hotkey": "Ctrl+Shift+E"
   },
   "contentPage": {
     "contentURL": "allpasswords/allpasswords.html"

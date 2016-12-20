@@ -188,7 +188,18 @@ gulp.task("build-chrome", ["validate"], function()
     gulp.src("manifest.json")
         .pipe(utils.jsonModify(data =>
         {
-          data.version = require("./package.json").version;
+          let manifest = require("./package.json");
+          data.version = manifest.version;
+          if ("buttonPanel" in manifest && "hotkey" in manifest.buttonPanel)
+          {
+            if (!data.commands)
+              data.commands = {};
+            data.commands._execute_browser_action = {
+              suggested_key: {
+                default: manifest.buttonPanel.hotkey
+              }
+            };
+          }
         }))
         .pipe(gulp.dest("build-chrome"))
   );

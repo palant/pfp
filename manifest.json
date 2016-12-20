@@ -45,12 +45,5 @@
     },
     "default_popup": "data/panel/panel.html",
     "default_title": "__MSG_name__"
-  },
-  "commands": {
-    "_execute_browser_action": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+E"
-      }
-    }
   }
 }

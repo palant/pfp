@@ -37,6 +37,15 @@ let panel = require("sdk/panel").Panel({
 });
 require("./bug918600_hotfix").fixPanel(panel);
 
+if (manifest.buttonPanel.hotkey)
+{
+  require("sdk/hotkeys").Hotkey({
+    combo: manifest.buttonPanel.hotkey.replace(/\bctrl\b/gi, "accel")
+                   .replace(/\+/g, "-"),
+    onPress: () => panel.show()
+  });
+}
+
 button.on("change", state => state.checked && panel.show());
 panel.on("hide", () => button.state("window", {checked: false}));
 
