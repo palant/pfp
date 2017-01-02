@@ -190,6 +190,7 @@ gulp.task("build-chrome", ["validate"], function()
         {
           let manifest = require("./package.json");
           data.version = manifest.version;
+          data.homepage_url = manifest.homepage;
           if ("buttonPanel" in manifest && "hotkey" in manifest.buttonPanel)
           {
             if (!data.commands)
@@ -214,6 +215,7 @@ gulp.task("build-webext", ["validate"], function()
         .pipe(utils.jsonModify(data =>
         {
           data.version = manifest.version;
+          data.homepage_url = manifest.homepage;
 
           delete data.minimum_chrome_version;
           let index = data.permissions.indexOf("unlimitedStorage");
