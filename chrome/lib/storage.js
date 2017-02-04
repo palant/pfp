@@ -7,6 +7,7 @@
 "use strict";
 
 let browser = require("./browserAPI");
+let prefs = require("./prefs");
 
 function get(name)
 {
@@ -29,7 +30,14 @@ exports.getAllByPrefix = getAllByPrefix;
 
 function set(name, value)
 {
-  return browser.storage.local.set({[name]: value});
+  return prefs.get("site_storage").then(site_storage =>
+  {
+    if (!site_storage && name.startsWith("site:"))
+    {
+      return Promise.reject("Storage is disabled, check extension preferences");
+    }
+    return browser.storage.local.set({[name]: value});
+  });
 }
 exports.set = set;
 

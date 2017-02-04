@@ -6,6 +6,8 @@
 
 "use strict";
 
+let prefs = require("prefs");
+let sp = require("sdk/simple-prefs");
 let {indexedDB, IDBKeyRange} = require("sdk/indexed-db");
 
 const DB_NAME = "storage";
@@ -95,10 +97,17 @@ exports.getAllByPrefix = getAllByPrefix;
 
 function set(name, value)
 {
-  return connection.then(db =>
+  return prefs.get("site_storage").then(site_storage =>
   {
-    let store = db.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME);
-    return promisify(store.put({name, value}));
+    if (!site_storage && name.startsWith("site:"))
+    {
+      return Promise.reject("Storage is disabled, check extension preferences");
+    }
+    return connection.then(db =>
+    {
+      let store = db.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME);
+      return promisify(store.put({name, value}));
+    });
   });
 }
 exports.set = set;
