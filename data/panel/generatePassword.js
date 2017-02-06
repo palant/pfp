@@ -83,9 +83,16 @@ function addGeneratedPassword()
       if (site_storage)
         setActivePanel("password-list");
       else
-        passwordRetrieval.copyToClipboard(site, name, revision)
-        .then(() => showSuccessMessage(messages["password-copied-message"]))
-        .catch(showUnknownError).then(() => passwords.removePassword(site, name, revision));
+        passwordRetrieval.fillIn(site, name, revision)
+        .then(() =>
+          passwords.removePassword(site, name, revision)
+          .then(() => require("platform").close()))
+        .catch(() =>
+          passwordRetrieval.copyToClipboard(site, name, revision)
+          .then(() => showSuccessMessage(messages["password-copied-message"]))
+          .catch(showUnknownError)
+          .then(() => passwords.removePassword(site, name, revision))
+        );
     });
   }).catch(error =>
   {
