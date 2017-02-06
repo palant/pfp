@@ -64,10 +64,11 @@ function addGeneratedPassword()
   let revision = $("password-revision").value.trim();
   if (revision == "1")
     revision = "";
-
+  let site = $("generate-password-site").value;
+  let name = $("generate-password-user-name").value;
   passwords.addGenerated({
-    site: state.site,
-    name: $("generate-password-user-name").value,
+    site: site,
+    name: name,
     revision,
     length: $("password-length").value,
     lower: $("charset-lower").checked,
@@ -82,9 +83,9 @@ function addGeneratedPassword()
       if (site_storage)
         setActivePanel("password-list");
       else
-        passwordRetrieval.copyToClipboard(state.site, pwdList[0].name, revision)
+        passwordRetrieval.copyToClipboard(site, name, revision)
         .then(() => showSuccessMessage(messages["password-copied-message"]))
-        .catch(showUnknownError);
+        .catch(showUnknownError).then(() => passwords.removePassword(site, name, revision));
     });
   }).catch(error =>
   {
