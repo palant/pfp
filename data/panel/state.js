@@ -7,6 +7,7 @@
 "use strict";
 
 let {EventTarget, emit} = require("../../lib/eventTarget");
+let {prefs} = require("../proxy");
 
 module.exports = exports = new EventTarget();
 exports.site = null;
@@ -17,7 +18,8 @@ exports.masterPasswordState = null;
 let stateToPanel = {
   "unset": ["change-master"],
   "set": ["enter-master", "change-master"],
-  "known": ["password-list", "generate-password", "legacy-password", "qrcode", "sync-setup", "sync-state", "confirm"]
+  "known": ["password-list", "generate-password", "legacy-password", "qrcode", "sync-setup", "sync-state", "confirm"],
+  "known:no-site-storage": ["generate-password", "confirm"]
 };
 
 function set(state)
@@ -27,10 +29,17 @@ function set(state)
 
   if ("masterPasswordState" in state)
   {
-    let {getActivePanel, setActivePanel} = require("./utils");
-    let panels = stateToPanel[state.masterPasswordState];
-    if (panels.indexOf(getActivePanel()) < 0)
-      setActivePanel(panels[0]);
+    prefs.get("site_storage").then(site_storage =>
+    {
+      let {getActivePanel, setActivePanel} = require("./utils");
+      let stateKey = state.masterPasswordState;
+      let tryStateKey = state.masterPasswordState + ":no-site-storage";
+      if (!site_storage && tryStateKey in stateToPanel)
+        stateKey = tryStateKey;
+      let panels = stateToPanel[stateKey];
+      if (panels.indexOf(getActivePanel()) < 0)
+        setActivePanel(panels[0]);
+    });
   }
 
   emit(exports, "update");
