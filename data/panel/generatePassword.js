@@ -6,11 +6,11 @@
 
 "use strict";
 
-let {passwords, prefs} = require("../proxy");
+let {prefs, passwords, passwordRetrieval} = require("../proxy");
 let {setCommandHandler, setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
-let {$, setActivePanel, showUnknownError, messages} = require("./utils");
+let {$, setActivePanel, showUnknownError, showSuccessMessage, messages} = require("./utils");
 
 $("password-length").addEventListener("input", updatePasswordLengthDisplay);
 $("generate-password").addEventListener("reset", () =>
@@ -81,16 +81,11 @@ function addGeneratedPassword()
     prefs.get("site_storage").then(site_storage =>
     {
       if (site_storage)
-      {
         setActivePanel("password-list");
-      }
       else
-      {
-        let passwordData = pwdList[0];
-        passwords.getGeneratedPassword(state.site, passwordData).then(password =>
-          showUnknownError(password)
-        );
-      }
+        passwordRetrieval.copyToClipboard(state.site, pwdList[0].name, revision)
+        .then(() => showSuccessMessage(messages["password-copied-message"]))
+        .catch(showUnknownError);
     });
   }).catch(error =>
   {

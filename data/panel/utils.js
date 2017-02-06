@@ -96,11 +96,19 @@ function setActivePanel(id)
     resetForm(form);
     form.setAttribute("data-active", "true");
     $("unknown-error").hidden = true;
+    $("success-message").hidden = true;
 
     setFocus();
   }
 }
 exports.setActivePanel = setActivePanel;
+
+function showSuccessMessage(msg)
+{
+  $("success-message").textContent = msg;
+  $("success-message").hidden = false;
+}
+exports.showSuccessMessage = showSuccessMessage;
 
 function showUnknownError(e)
 {
