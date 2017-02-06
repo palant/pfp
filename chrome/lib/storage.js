@@ -9,21 +9,48 @@
 let browser = require("./browserAPI");
 let prefs = require("./prefs");
 
+let MEM = {};  // temporary site storage
+const SITE_PREFIX = "site:";
+
 function get(name)
 {
-  return browser.storage.local.get(name).then(items => items[name]);
+  return prefs.get("site_storage").then(site_storage =>
+  {
+    if (!site_storage && name.startsWith(SITE_PREFIX))
+      return Promise.resolve().then(() => MEM[name] ? MEM[name] : null);
+    else
+      return browser.storage.local.get(name).then(items => items[name]);
+  });
 }
 exports.get = get;
 
-function getAllByPrefix(prefix)
+function _noStorageGetAllByPrefix(prefix)
 {
-  return browser.storage.local.get(null).then(items =>
+  return Promise.resolve().then(() =>
   {
     let result = {};
-    for (let name in items)
+    for (let name in MEM)
       if (name.substr(0, prefix.length) == prefix)
-        result[name.substr(prefix.length)] = items[name];
+        result[name.substr(prefix.length)] = MEM[name];
     return result;
+  });
+}
+
+function getAllByPrefix(prefix)
+{
+  return prefs.get("site_storage").then(site_storage =>
+  {
+    if (!site_storage && prefix.startsWith(SITE_PREFIX))
+      return _noStorageGetAllByPrefix();
+    else
+      return browser.storage.local.get(null).then(items =>
+      {
+        let result = {};
+        for (let name in items)
+          if (name.substr(0, prefix.length) == prefix)
+            result[name.substr(prefix.length)] = items[name];
+        return result;
+      });
   });
 }
 exports.getAllByPrefix = getAllByPrefix;
@@ -32,11 +59,10 @@ function set(name, value)
 {
   return prefs.get("site_storage").then(site_storage =>
   {
-    if (!site_storage && name.startsWith("site:"))
-    {
-      return Promise.reject("storageDisabled");
-    }
-    return browser.storage.local.set({[name]: value});
+    if (!site_storage && name.startsWith(SITE_PREFIX))
+      return Promise.resolve().then(() => MEM[name] = value);
+    else
+      return browser.storage.local.set({[name]: value});
   });
 }
 exports.set = set;
