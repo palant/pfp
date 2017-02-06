@@ -18,10 +18,18 @@ function $(id)
 window.addEventListener("DOMContentLoaded", function()
 {
   Promise.all([
+    prefs.get("site_storage"),
     prefs.get("autolock"),
     prefs.get("autolock_delay")
-  ]).then(([autolock, autolock_delay]) =>
+  ]).then(([site_storage, autolock, autolock_delay]) =>
   {
+    let storageElement = $("site_storage");
+    storageElement.checked = site_storage;
+    storageElement.addEventListener("click", function()
+    {
+      prefs.set("site_storage", storageElement.checked);
+    });
+
     let autolockElement = $("autolock");
     autolockElement.checked = autolock;
     autolockElement.addEventListener("click", function()

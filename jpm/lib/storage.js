@@ -6,11 +6,16 @@
 
 "use strict";
 
+let prefs = require("prefs");
+let sp = require("sdk/simple-prefs");
 let {indexedDB, IDBKeyRange} = require("sdk/indexed-db");
 
 const DB_NAME = "storage";
 const DB_VERSION = 1;
 const STORE_NAME = "data";
+
+let MEM = {};  // temporary site storage
+const SITE_PREFIX = "site:";
 
 function prefixToRange(prefix)
 {
@@ -55,50 +60,80 @@ let connection = Promise.resolve().then(() =>
 
 function get(name)
 {
-  return connection.then(db =>
+  return prefs.get("site_storage").then(site_storage =>
   {
-    let store = db.transaction(STORE_NAME).objectStore(STORE_NAME);
-    return promisify(store.get(name)).then(result => result ? result.value : null);
+    if (!site_storage && name.startsWith(SITE_PREFIX))
+      return Promise.resolve().then(() => MEM[name] ? MEM[name] : null);
+    else
+      return connection.then(db =>
+      {
+        let store = db.transaction(STORE_NAME).objectStore(STORE_NAME);
+        return promisify(store.get(name)).then(result => result ? result.value : null);
+      });
   });
 }
 exports.get = get;
 
+function _noStorageGetAllByPrefix(prefix)
+{
+  return Promise.resolve().then(() =>
+  {
+    let result = {};
+    for (let name in MEM)
+      if (name.substr(0, prefix.length) == prefix)
+        result[name.substr(prefix.length)] = MEM[name];
+    return result;
+  });
+}
+
 function getAllByPrefix(prefix)
 {
-  return connection.then(db =>
+  return prefs.get("site_storage").then(site_storage =>
   {
-    return new Promise((resolve, reject) =>
-    {
-      let store = db.transaction(STORE_NAME).objectStore(STORE_NAME);
-      let request = store.openCursor(prefixToRange(prefix));
-      let result = {};
-      request.onsuccess = event =>
+    if (!site_storage && prefix.startsWith(SITE_PREFIX))
+      return _noStorageGetAllByPrefix(prefix);
+    else
+      return connection.then(db =>
       {
-        let cursor = request.result;
-        if (cursor)
+        return new Promise((resolve, reject) =>
         {
-          let {name, value} = cursor.value;
-          result[name.substr(prefix.length)] = value;
-          cursor.continue();
-        }
-        else
-          resolve(result);
-      };
-      request.onerror = event =>
-      {
-        reject(request.error);
-      };
-    });
+          let store = db.transaction(STORE_NAME).objectStore(STORE_NAME);
+          let request = store.openCursor(prefixToRange(prefix));
+          let result = {};
+          request.onsuccess = event =>
+          {
+            let cursor = request.result;
+            if (cursor)
+            {
+              let {name, value} = cursor.value;
+              result[name.substr(prefix.length)] = value;
+              cursor.continue();
+            }
+            else
+              resolve(result);
+          };
+          request.onerror = event =>
+          {
+            reject(request.error);
+          };
+        });
+      });
   });
 }
 exports.getAllByPrefix = getAllByPrefix;
 
 function set(name, value)
 {
-  return connection.then(db =>
+  return prefs.get("site_storage").then(site_storage =>
   {
-    let store = db.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME);
-    return promisify(store.put({name, value}));
+    if (!site_storage && name.startsWith(SITE_PREFIX))
+      return Promise.resolve().then(() => MEM[name] = value);
+    else
+      return connection.then(db =>
+      {
+        let store = db.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME);
+        return promisify(store.put({name, value}));
+      });
   });
 }
 exports.set = set;

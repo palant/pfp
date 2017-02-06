@@ -7,6 +7,7 @@
 "use strict";
 
 let {port} = require("platform");
+let {prefs} = require("../proxy");
 
 let messages = exports.messages = {};
 let messageElements = $("messages").children;
@@ -41,30 +42,45 @@ function setFocus()
     $(defaultElement).focus();
 }
 
+function _processFormCustomRules(custom, toggle = false)
+{
+  for (let statement of custom.split(/\s*,\s*/))
+  {
+    let match = /^([^\.]+)\.([^=]+)(?:=(.*))?/.exec(statement);
+    if (match && match[3])
+      if (toggle)
+        $(match[1]).removeAttribute(match[2]);
+      else
+        $(match[1]).setAttribute(match[2], match[3]);
+    else if (match)
+      if (toggle)
+        $(match[1]).setAttribute(match[2], match[2]);
+      else
+        $(match[1]).removeAttribute(match[2]);
+  }
+}
+
 function resetForm(form)
 {
-  require("./events").disableResetHandlers = true;
-  try
+  prefs.get("site_storage").then(site_storage =>
   {
-    form.reset();
-    let custom = form.dataset.customReset;
-    if (custom)
+    require("./events").disableResetHandlers = true;
+    try
     {
-      for (let statement of custom.split(/\s*,\s*/))
-      {
-        let match = /^([^\.]+)\.([^=]+)(?:=(.*))?/.exec(statement);
-        if (match && match[3])
-          $(match[1]).setAttribute(match[2], match[3]);
-        else if (match)
-          $(match[1]).removeAttribute(match[2]);
-      }
+      form.reset();
+      let custom = form.dataset.customReset;
+      if (custom)
+        _processFormCustomRules(custom);
+      let toggle = form.dataset.toggleSiteStorage;
+      if (toggle)
+        _processFormCustomRules(toggle, !site_storage);
+      require("./formValidation").updateForm(form);
     }
-    require("./formValidation").updateForm(form);
-  }
-  finally
-  {
-    require("./events").disableResetHandlers = false;
-  }
+    finally
+    {
+      require("./events").disableResetHandlers = false;
+    }
+  });
 }
 
 function resetForms()
@@ -96,11 +112,19 @@ function setActivePanel(id)
     resetForm(form);
     form.setAttribute("data-active", "true");
     $("unknown-error").hidden = true;
+    $("success-message").hidden = true;
 
     setFocus();
   }
 }
 exports.setActivePanel = setActivePanel;
+
+function showSuccessMessage(msg)
+{
+  $("success-message").textContent = msg;
+  $("success-message").hidden = false;
+}
+exports.showSuccessMessage = showSuccessMessage;
 
 function showUnknownError(e)
 {

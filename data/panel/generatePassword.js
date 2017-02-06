@@ -6,11 +6,11 @@
 
 "use strict";
 
-let {passwords} = require("../proxy");
+let {prefs, passwords, passwordRetrieval} = require("../proxy");
 let {setCommandHandler, setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
-let {$, setActivePanel, showUnknownError, messages} = require("./utils");
+let {$, setActivePanel, showUnknownError, showSuccessMessage, messages} = require("./utils");
 
 $("password-length").addEventListener("input", updatePasswordLengthDisplay);
 $("generate-password").addEventListener("reset", () =>
@@ -35,7 +35,7 @@ updateSite();
 
 function updateSite()
 {
-  $("generate-password-site").textContent = state.site;
+  $("generate-password-site").setAttribute("value", state.site);
 }
 
 function updatePasswordLengthDisplay()
@@ -64,10 +64,11 @@ function addGeneratedPassword()
   let revision = $("password-revision").value.trim();
   if (revision == "1")
     revision = "";
-
+  let site = $("generate-password-site").value;
+  let name = $("generate-password-user-name").value;
   passwords.addGenerated({
-    site: state.site,
-    name: $("generate-password-user-name").value,
+    site: site,
+    name: name,
     revision,
     length: $("password-length").value,
     lower: $("charset-lower").checked,
@@ -77,7 +78,22 @@ function addGeneratedPassword()
   }).then(pwdList =>
   {
     state.set({pwdList});
-    setActivePanel("password-list");
+    prefs.get("site_storage").then(site_storage =>
+    {
+      if (site_storage)
+        setActivePanel("password-list");
+      else
+        passwordRetrieval.fillIn(site, name, revision)
+        .then(() =>
+          passwords.removePassword(site, name, revision)
+          .then(() => require("platform").close()))
+        .catch(() =>
+          passwordRetrieval.copyToClipboard(site, name, revision)
+          .then(() => showSuccessMessage(messages["password-copied-message"]))
+          .catch(showUnknownError)
+          .then(() => passwords.removePassword(site, name, revision))
+        );
+    });
   }).catch(error =>
   {
     if (error == "alreadyExists")
