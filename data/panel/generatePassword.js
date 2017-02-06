@@ -6,7 +6,7 @@
 
 "use strict";
 
-let {passwords} = require("../proxy");
+let {passwords, prefs} = require("../proxy");
 let {setCommandHandler, setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
@@ -36,6 +36,7 @@ updateSite();
 function updateSite()
 {
   $("generate-password-site").textContent = state.site;
+  $("generate-password-site").setAttribute("value", state.site);
 }
 
 function updatePasswordLengthDisplay()
@@ -77,7 +78,20 @@ function addGeneratedPassword()
   }).then(pwdList =>
   {
     state.set({pwdList});
-    setActivePanel("password-list");
+    prefs.get("site_storage").then(site_storage =>
+    {
+      if (site_storage)
+      {
+        setActivePanel("password-list");
+      }
+      else
+      {
+        let passwordData = pwdList[0];
+        passwords.getGeneratedPassword(state.site, passwordData).then(password =>
+          showUnknownError(password)
+        );
+      }
+    });
   }).catch(error =>
   {
     if (error == "alreadyExists")

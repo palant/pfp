@@ -101,7 +101,7 @@ function set(name, value)
   {
     if (!site_storage && name.startsWith("site:"))
     {
-      return Promise.reject("Storage is disabled, check extension preferences");
+      return Promise.reject("storageDisabled");
     }
     return connection.then(db =>
     {
