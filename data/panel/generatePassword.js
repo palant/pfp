@@ -35,7 +35,6 @@ updateSite();
 
 function updateSite()
 {
-  $("generate-password-site").textContent = state.site;
   $("generate-password-site").setAttribute("value", state.site);
 }
 

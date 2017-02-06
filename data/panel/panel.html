@@ -156,9 +156,9 @@
       </div>
     </form>
 
-    <form id="generate-password" class="slide" data-default-element="generate-password-user-name" data-custom-reset="change-password-revision.hidden,password-revision-container.hidden=true">
-      <label data-l10n-id="site"></label>
-      <div id="generate-password-site"></div>
+    <form id="generate-password" class="slide" data-default-element="generate-password-user-name" data-custom-reset="change-password-revision.hidden,password-revision-container.hidden=true" data-toggle-site-storage="generate-password-site.readonly=readonly,generate-password-cancel.hidden">
+      <label class="block-start" for="generate-password-site" data-l10n-id="site"></label>
+      <input id="generate-password-site" type="text" readonly>
       <label class="block-start" for="generate-password-user-name" data-l10n-id="user-name"></label>
       <input id="generate-password-user-name" type="text">
       <div class="error" hidden></div>
