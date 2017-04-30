@@ -7,6 +7,9 @@
 "use strict";
 
 let {header, parseCSV, parseLastpassCSV} = require("../lib/lastpassImport");
+let masterPassword = require("../lib/masterPassword");
+
+let dummyMaster = "foobar";
 
 function genCSV(entries)
 {
@@ -36,6 +39,16 @@ function stripQuotes(values)
   }
   return values;
 }
+
+exports.setUp = function(callback)
+{
+  masterPassword.changePassword(dummyMaster).then(callback);
+};
+
+exports.tearDown = function(callback)
+{
+  masterPassword.forgetPassword().then(callback);
+};
 
 exports.testParseCSV = function(test)
 {
@@ -85,10 +98,68 @@ exports.testParseLastpassCSV = function(test)
     "Duplicate entries for domain + user combination causes an exception"
   );
 
-  // FIXME - Write more tests:
-  //         - Decoding of HTML entities.
-  //         - Encryption of notes and passwords.
-  //         - Corect format of the records.
+  // FIXME - These tests fail since the encrypted data seems to change each
+  //         time the tests are run. Why?!
+  parseLastpassCSV(genCSV(simpleValues)).then(
+    data =>
+    {
+      test.deepEqual(
+        data, {
+          application: "easypasswords",
+          format: 1,
+          sites: {
+            "foo.example.com": {
+              passwords: {
+                user: {
+                  name: "Foo",
+                  notes: "FR/lSIIUBYdaxuNb0uYBAw==_0MubqUvaqlxTKCWWT/auAA==",
+                  type: "stored",
+                  password: "nGajA3CaJK+LOkpjsrIHhg==_3b8cYoBcXXgtD5rv9IeRdg=="
+                },
+                anotheruser: {
+                  name: "foo",
+                  notes: "mjFWoUUXzjgdfIglC61Txw==_mYCwntXPsQ3WSmKohhOdew=="
+                }
+              }
+            },
+            "easypasswords.invalid": {
+              passwords: {
+                u: {
+                  name: "name",
+                  type: "stored",
+                  password: "PXdLdRF+nAX/7zrFG8FwiQ==_XmDYrTxbTYNEOdOrOpxblw=="
+                }
+              }
+            }
+          }
+        },
+        "Correct structure produced from simple CSV"
+      );
 
-  test.done();
+      return parseLastpassCSV("\n   \n" + genCSV(trickyValues) + "    ");
+    }
+  ).then(
+    data =>
+    {
+      test.deepEqual(
+        data, {
+          application: "easypasswords",
+          format: 1,
+          sites: {
+            "example.com": {
+              passwords: {
+                "&\n": {
+                  name: " ",
+                  notes: "Z3OP83j1tVhqIGNmEdcH9Q==_WzE7WoD0gG+UaOj6iTZdLw==",
+                  type: "stored",
+                  password: "WKK5Yk7rVP3jvhXGi1HHOg==_4XulrotryD3aKdHltBp2+Q=="
+                }
+              }
+            }
+          }
+        },
+        "Correct structure produced from tricky CSV"
+      );
+    }
+  ).then(test.done);
 };
