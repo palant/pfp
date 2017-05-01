@@ -8,6 +8,7 @@
 
 let {header, parseCSV, parseLastpassCSV} = require("../lib/lastpassImport");
 let masterPassword = require("../lib/masterPassword");
+const {decryptPassword} = require("../lib/crypto");
 
 let dummyMaster = "foobar";
 
@@ -38,6 +39,16 @@ function stripQuotes(values)
     });
   }
   return values;
+}
+
+function decryptEqual(test, params, encrypted, expected)
+{
+  params.masterPassword = masterPassword.get();
+  params.encrypted = encrypted;
+  return decryptPassword(params).then(decrypted =>
+  {
+    test.equal(decrypted, expected);
+  });
 }
 
 exports.setUp = function(callback)
@@ -98,68 +109,89 @@ exports.testParseLastpassCSV = function(test)
     "Duplicate entries for domain + user combination causes an exception"
   );
 
-  // FIXME - These tests fail since the encrypted data seems to change each
-  //         time the tests are run. Why?!
   parseLastpassCSV(genCSV(simpleValues)).then(
     data =>
     {
+      test.equal(data.application, "easypasswords");
+      test.equal(data.format, 1);
       test.deepEqual(
-        data, {
-          application: "easypasswords",
-          format: 1,
-          sites: {
-            "foo.example.com": {
-              passwords: {
-                user: {
-                  name: "Foo",
-                  notes: "FR/lSIIUBYdaxuNb0uYBAw==_0MubqUvaqlxTKCWWT/auAA==",
-                  type: "stored",
-                  password: "nGajA3CaJK+LOkpjsrIHhg==_3b8cYoBcXXgtD5rv9IeRdg=="
-                },
-                anotheruser: {
-                  name: "foo",
-                  notes: "mjFWoUUXzjgdfIglC61Txw==_mYCwntXPsQ3WSmKohhOdew=="
-                }
-              }
-            },
-            "easypasswords.invalid": {
-              passwords: {
-                u: {
-                  name: "name",
-                  type: "stored",
-                  password: "PXdLdRF+nAX/7zrFG8FwiQ==_XmDYrTxbTYNEOdOrOpxblw=="
-                }
-              }
-            }
-          }
-        },
-        "Correct structure produced from simple CSV"
+        Object.getOwnPropertyNames(data.sites),
+        ["foo.example.com", "easypasswords.invalid"]
       );
+      test.deepEqual(
+        Object.getOwnPropertyNames(data.sites["foo.example.com"].passwords),
+        ["user", "anotheruser"]
+      );
+      test.deepEqual(
+        Object.getOwnPropertyNames(data.sites["easypasswords.invalid"].passwords),
+        ["u"]
+      );
+      test.equal(data.sites["foo.example.com"].passwords["user"].name, "Foo");
+      test.equal(data.sites["foo.example.com"].passwords["user"].type, "stored");
+      test.equal(data.sites["foo.example.com"].passwords["anotheruser"].name, "foo");
+      test.equal(data.sites["easypasswords.invalid"].passwords["u"].name, "name");
+      test.equal(data.sites["easypasswords.invalid"].passwords["u"].type, "stored");
 
-      return parseLastpassCSV("\n   \n" + genCSV(trickyValues) + "    ");
+      return Promise.all([
+        decryptEqual(
+          test,
+          {domain: "foo.example.com", name: "user\0\0notes"},
+          data.sites["foo.example.com"].passwords["user"].notes,
+          "some\nnotes\nyada"
+        ),
+        decryptEqual(
+          test,
+          {domain: "foo.example.com", name: "user"},
+          data.sites["foo.example.com"].passwords["user"].password,
+          "password"
+        ),
+        decryptEqual(
+          test,
+          {domain: "foo.example.com", name: "anotheruser\0\0notes"},
+          data.sites["foo.example.com"].passwords["anotheruser"].notes,
+          "Notes"
+        ),
+        decryptEqual(
+          test,
+          {domain: "easypasswords.invalid", name: "u"},
+          data.sites["easypasswords.invalid"].passwords["u"].password,
+          "secret123"
+        )
+      ]);
     }
-  ).then(
+  ).then(() => parseLastpassCSV("\n   \n" + genCSV(trickyValues) + "    ")).then(
     data =>
     {
+      test.equal(data.application, "easypasswords");
+      test.equal(data.format, 1);
       test.deepEqual(
-        data, {
-          application: "easypasswords",
-          format: 1,
-          sites: {
-            "example.com": {
-              passwords: {
-                "&\n": {
-                  name: " ",
-                  notes: "Z3OP83j1tVhqIGNmEdcH9Q==_WzE7WoD0gG+UaOj6iTZdLw==",
-                  type: "stored",
-                  password: "WKK5Yk7rVP3jvhXGi1HHOg==_4XulrotryD3aKdHltBp2+Q=="
-                }
-              }
-            }
-          }
-        },
-        "Correct structure produced from tricky CSV"
+        Object.getOwnPropertyNames(data.sites),
+        ["example.com"]
       );
+      test.deepEqual(
+        Object.getOwnPropertyNames(data.sites["example.com"].passwords),
+        ["&\n"]
+      );
+      test.equal(data.sites["example.com"].passwords["&\n"].name, " ");
+      test.equal(data.sites["example.com"].passwords["&\n"].type, "stored");
+
+      return Promise.all([
+        decryptEqual(
+          test,
+          {domain: "example.com", name: "&\n\0\0notes"},
+          data.sites["example.com"].passwords["&\n"].notes,
+          "\""
+        ),
+        decryptEqual(
+          test,
+          {domain: "example.com", name: "&\n"},
+          data.sites["example.com"].passwords["&\n"].password,
+          ","
+        )
+      ]);
     }
-  ).then(test.done);
+  ).then(() =>
+  {
+    test.done();
+  });
 };
