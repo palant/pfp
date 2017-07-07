@@ -466,3 +466,10 @@ a:hover
 {
   font-size: $font-size-small;
 }
+
+#sync-setup-link,
+#sync-state-link
+{
+  /* Don't show sync UI yet, it is unfinished */
+  display: none;
+}
