@@ -26,13 +26,12 @@ gulp.task("default", ["xpi"], function()
 {
 });
 
-function buildCommon(targetdir, platform, customTransform)
+function buildCommon(targetdir)
 {
   return merge(
     gulp.src("LICENSE.TXT")
         .pipe(gulp.dest(`${targetdir}`)),
-    gulp.src(["data/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg", `${platform}/data/contentScript-compat.js`, `${platform}/data/**/*.html`, `${platform}/data/**/*.png`])
-        .pipe(customTransform || utils.transform(null, {files: ["////"]}))
+    gulp.src(["data/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg"])
         .pipe(gulp.dest(`${targetdir}/data`)),
     gulp.src(["data/panel/zxcvbn-*.js", "data/panel/jsqr-*.js"])
         .pipe(gulp.dest(`${targetdir}/data/panel`)),
@@ -42,9 +41,6 @@ function buildCommon(targetdir, platform, customTransform)
             filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
-          },
-          resolve: {
-            root: path.resolve(process.cwd(), `${platform}/data`)
           },
           externals: {
             "zxcvbn": "var zxcvbn",
@@ -58,179 +54,77 @@ function buildCommon(targetdir, platform, customTransform)
             filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
-          },
-          resolve: {
-            root: path.resolve(process.cwd(), `${platform}/data`)
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data/allpasswords`)),
-    gulp.src(["data/**/*.scss", `${platform}/data/**/*.scss`])
-        .pipe(sass())
-        .pipe(gulp.dest(`${targetdir}/data`)),
-    gulp.src([`${platform}/lib/init.js`, "lib/main.js"])
+    gulp.src(["data/options/main.js"])
         .pipe(webpack({
           output: {
             filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
-          },
-          resolve: {
-            root: path.resolve(process.cwd(), `${platform}/lib`)
-          },
-          externals: function(context, request, callback)
-          {
-            if (platform == "jpm" && (request == "./package.json" || request == "chrome" || request.indexOf("sdk/") == 0))
-              callback(null, "commonjs " + request);
-            else
-              callback();
+          }
+        }))
+        .pipe(gulp.dest(`${targetdir}/data/options`)),
+    gulp.src(["data/**/*.scss"])
+        .pipe(sass())
+        .pipe(gulp.dest(`${targetdir}/data`)),
+    gulp.src("locale/**/*.properties")
+        .pipe(utils.toChromeLocale())
+        .pipe(gulp.dest(`${targetdir}/_locales`)),
+    gulp.src(["lib/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
           }
         }))
         .pipe(gulp.dest(`${targetdir}`))
   );
 }
 
-function buildWebExtCommon(targetdir)
-{
-  return merge(
-    buildCommon(targetdir, "chrome"),
-    gulp.src(["chrome/data/options/main.js"])
-        .pipe(webpack({
-          output: {
-            filename: "index.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          },
-          resolve: {
-            root: path.resolve(process.cwd(), "chrome/data")
-          }
-        }))
-        .pipe(gulp.dest(`${targetdir}/data/options`)),
-    gulp.src("locale/**/*.properties")
-        .pipe(utils.toChromeLocale())
-        .pipe(gulp.dest(`${targetdir}/_locales`))
-  );
-}
-
-let jpmPages = new Map();
-
-gulp.task("build-jpm-common", ["validate"], function()
-{
-  let manifest = require("./package.json");
-  for (let info of [manifest.buttonPanel, manifest.contentPage])
-  {
-    if (!info)
-      continue;
-
-    jpmPages.set(path.resolve(process.cwd(), "data", info.contentURL), {
-      url: info.contentURL,
-      contentScripts: []
-    });
-  }
-
-  let customTransform = utils.transform((filepath, contents) =>
-  {
-    // Convert page-loaded scripts to content scripts
-    let page = jpmPages.get(filepath);
-    return [filepath, contents.replace(/<script\b[^>]*\bsrc="(.*?)"[^>]*><\/script>/g, (match, src) =>
-    {
-      page.contentScripts.push(url.resolve(page.url, src));
-      return "";
-    })];
-  }, {files: Array.from(jpmPages.keys())});
-
-  return buildCommon("build-jpm", "jpm", customTransform);
-});
-
-gulp.task("build-jpm", ["build-jpm-common"], function()
-{
-  return merge(
-    gulp.src("package.json")
-        .pipe(utils.jsonModify(data =>
-        {
-          let whitelist = new Set([
-            "name", "title", "id", "version", "description", "main", "author",
-            "homepage", "permissions", "preferences", "engines", "license",
-            "buttonPanel", "contentPage"
-          ]);
-          for (let key of Object.keys(data))
-          {
-            if (!whitelist.has(key))
-              delete data[key];
-          }
-
-          for (let key of ["buttonPanel", "contentPage"])
-          {
-            if (key in data)
-            {
-              for (let page of jpmPages.values())
-              {
-                if (page.url == data[key].contentURL)
-                  data[key].contentScripts = page.contentScripts;
-              }
-            }
-          }
-        }))
-        .pipe(gulp.dest("build-jpm")),
-    gulp.src(["data/images/icon64.png"])
-        .pipe(gulp.dest("build-jpm")),
-    gulp.src("data/images/icon48.png")
-        .pipe(rename("icon.png"))
-        .pipe(gulp.dest("build-jpm")),
-    gulp.src("locale/**/*.properties")
-        .pipe(gulp.dest("build-jpm/locale"))
-  );
-});
-
 gulp.task("build-chrome", ["validate"], function()
 {
   return merge(
-    buildWebExtCommon("build-chrome"),
+    buildCommon("build-chrome"),
     gulp.src("manifest.json")
         .pipe(utils.jsonModify(data =>
         {
-          let manifest = require("./package.json");
-          data.version = manifest.version;
-          data.homepage_url = manifest.homepage;
-          if ("buttonPanel" in manifest && "hotkey" in manifest.buttonPanel)
-          {
-            if (!data.commands)
-              data.commands = {};
-            data.commands._execute_browser_action = {
-              suggested_key: {
-                default: manifest.buttonPanel.hotkey
-              }
-            };
-          }
+          delete data.applications;
         }))
         .pipe(gulp.dest("build-chrome"))
   );
 });
 
-gulp.task("build-webext", ["validate"], function()
+gulp.task("watch-chrome", ["build-chrome"], function()
 {
-  let manifest = require("./package.json");
+  gulp.watch(["*.js", "*.json", "data/**/*", "lib/**/*", "locale/**/*"], ["build-chrome"]);
+});
+
+gulp.task("build-firefox", ["validate"], function()
+{
   return merge(
-    buildWebExtCommon("build-webext"),
+    buildCommon("build-firefox"),
     gulp.src("manifest.json")
         .pipe(utils.jsonModify(data =>
         {
-          data.version = manifest.version;
-          data.homepage_url = manifest.homepage;
-
           delete data.minimum_chrome_version;
+          delete data.minimum_opera_version;
+
           let index = data.permissions.indexOf("unlimitedStorage");
           if (index >= 0)
             data.permissions.splice(index, 1);
 
-          data.applications = {
-            gecko: {
-              id: manifest.id
-            }
-          };
           data.browser_action.browser_style = false;
         }))
-        .pipe(gulp.dest("build-webext"))
+        .pipe(gulp.dest("build-firefox"))
   );
+});
+
+gulp.task("watch-firefox", ["build-firefox"], function()
+{
+  gulp.watch(["*.js", "*.json", "data/**/*", "lib/**/*", "locale/**/*"], ["build-firefox"]);
 });
 
 gulp.task("eslint-node", function()
@@ -251,7 +145,7 @@ gulp.task("eslint-data", function()
 
 gulp.task("eslint-datamodules", function()
 {
-  return gulp.src(["data/**/*.js", "!data/fillIn.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js", "chrome/data/**/*.js", "jpm/data/**/*.js",  "!**/contentScript-compat.js"])
+  return gulp.src(["data/**/*.js", "!data/fillIn.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js", "!**/contentScript-compat.js"])
              .pipe(eslint({envs: ["browser", "commonjs", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
@@ -259,7 +153,7 @@ gulp.task("eslint-datamodules", function()
 
 gulp.task("eslint-lib", function()
 {
-  return gulp.src(["lib/**/*.js", "jpm/lib/**/*.js", "chrome/lib/**/*.js"])
+  return gulp.src(["lib/**/*.js"])
              .pipe(eslint({
                envs: ["commonjs", "es6"],
                globals: {
@@ -280,7 +174,7 @@ gulp.task("eslint-lib", function()
 
 gulp.task("htmlhint", function()
 {
-  return gulp.src(["data/**/*.html", "chrome/data/**/*.html"])
+  return gulp.src(["data/**/*.html"])
              .pipe(htmlhint({
                "title-require": false
              }))
@@ -289,7 +183,7 @@ gulp.task("htmlhint", function()
 
 gulp.task("stylelint", function()
 {
-  return gulp.src(["data/**/*.scss", "chrome/data/**/*.scss"])
+  return gulp.src(["data/**/*.scss"])
              .pipe(stylelint({
                "failAfterError": true,
                "syntax": "scss",
@@ -317,30 +211,9 @@ gulp.task("validate", ["eslint-node", "eslint-data", "eslint-datamodules", "esli
 {
 });
 
-gulp.task("xpi", ["build-jpm"], function()
-{
-  return utils.jpm(["xpi"]);
-});
-
-gulp.task("post", ["build-jpm"], function()
-{
-  let postUrl = utils.readArg("--post-url=", "http://localhost:8888/");
-  if (/^\d+$/.test(postUrl))
-    postUrl = "localhost:" + postUrl;
-  if (postUrl.indexOf("://") < 0)
-    postUrl = "http://" + postUrl;
-
-  return utils.jpm(["post", "--post-url", postUrl]);
-});
-
-gulp.task("watch", ["post"], function()
-{
-  gulp.watch(["data/**/*", "lib/**/*", "locale/**/*"], ["post"]);
-});
-
 gulp.task("crx", ["build-chrome"], function()
 {
-  let manifest = require("./package.json");
+  let manifest = require("./manifest.json");
   let result = gulp.src(["build-chrome/**", "!build-chrome/**/.*", "!build-chrome/**/*.zip", "!build-chrome/**/*.crx"])
                    .pipe(zip("easypasswords-" + manifest.version + ".zip"));
   let keyFile = utils.readArg("--private-key=");
@@ -349,12 +222,12 @@ gulp.task("crx", ["build-chrome"], function()
   return result.pipe(gulp.dest("build-chrome"));
 });
 
-gulp.task("webext", ["build-webext"], function()
+gulp.task("xpi", ["build-firefox"], function()
 {
-  let manifest = require("./package.json");
-  return gulp.src(["build-webext/**", "!build-webext/**/.*", "!build-webext/**/*.xpi"])
+  let manifest = require("./manifest.json");
+  return gulp.src(["build-firefox/**", "!build-firefox/**/.*", "!build-firefox/**/*.xpi"])
              .pipe(zip("easypasswords-" + manifest.version + ".xpi"))
-             .pipe(gulp.dest("build-webext"));
+             .pipe(gulp.dest("build-firefox"));
 });
 
 gulp.task("test", ["validate"], function()
@@ -365,5 +238,5 @@ gulp.task("test", ["validate"], function()
 
 gulp.task("clean", function()
 {
-  return del(["build-jpm", "build-chrome", "build-webext"]);
+  return del(["build-chrome", "build-firefox"]);
 });

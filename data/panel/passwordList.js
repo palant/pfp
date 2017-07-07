@@ -27,7 +27,7 @@ setCommandHandler("remove-alias", removeAlias);
 setCommandHandler("show-all", () =>
 {
   ui.showAllPasswords()
-    .then(() => require("platform").close())
+    .then(() => require("../platform").close())
     .catch(showUnknownError);
 });
 setCommandHandler("lock-passwords", () =>
@@ -288,7 +288,7 @@ function fillInPassword(password)
 {
   let {site} = state;
   passwordRetrieval.fillIn(site, password.name, password.revision)
-    .then(() => require("platform").close())
+    .then(() => require("../platform").close())
     .catch(showPasswordMessage);
 }
 

@@ -6,7 +6,7 @@
 
 "use strict";
 
-let {port} = require("platform");
+let {port} = require("./platform");
 
 let maxMessageId = 0;
 function sendMessage(message)

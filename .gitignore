@@ -1,6 +1,5 @@
-/build-jpm/
+/build-firefox/
 /build-chrome/
-/build-webext/
 /node_modules/
 *.xpi
 *.crx

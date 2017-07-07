@@ -35,7 +35,7 @@ window.addEventListener("DOMContentLoaded", function()
 
 let messageQueue = [];
 
-let {EventTarget, emit} = require("../../lib/eventTarget");
+let {EventTarget, emit} = require("../lib/eventTarget");
 
 let port = browser.runtime.connect({name: document.documentElement.dataset.porttype});
 

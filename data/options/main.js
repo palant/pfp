@@ -6,9 +6,9 @@
 
 "use strict";
 
-require("platform");
+require("../platform");
 
-let {prefs} = require("../../../data/proxy");
+let {prefs} = require("../proxy");
 
 function $(id)
 {

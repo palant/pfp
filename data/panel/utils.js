@@ -6,7 +6,7 @@
 
 "use strict";
 
-let {port} = require("platform");
+let {port} = require("../platform");
 
 let messages = exports.messages = {};
 let messageElements = $("messages").children;

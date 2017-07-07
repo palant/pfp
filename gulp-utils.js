@@ -21,19 +21,6 @@ exports.readArg = function(prefix, defaultValue)
   return defaultValue;
 };
 
-exports.jpm = function(args)
-{
-  return new Promise((resolve, reject) =>
-  {
-    let builddir = path.resolve(process.cwd(), "build-jpm");
-    let jpm = path.resolve(process.cwd(), "node_modules/.bin/jpm");
-    let ps = spawn(jpm, args, {cwd: builddir});
-    ps.stdout.pipe(process.stdout);
-    ps.stderr.pipe(process.stderr);
-    ps.on("close", resolve);
-  });
-};
-
 function transform(modifier, opts)
 {
   if (!opts)

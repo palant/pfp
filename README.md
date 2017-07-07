@@ -25,43 +25,28 @@ If all the dependencies are installed, building EasyPasswords for Firefox is sim
 
     gulp xpi
 
-This will create a package inside the `build-jpm` directory with the file name like `easypasswords@palant.de-n.n.n.xpi` that you can install in Firefox.
+This will create a package inside the `build-firefox` directory with the file name like `easypasswords-n.n.n.xpi` that you can install in Firefox.
 
 Creating a Chrome and Opera build is similar:
 
     gulp crx --private-key=key.pem
 
-This will create a package inside the `build-chrome` directory with the file name like `easypasswords.de-n.n.n.crx` that you can install in Chrome and Opera. If you don't specify a signing key it will create a ZIP file that can be uploaded to Chrome Web Store or Opera Add-ons.
+This will create a package inside the `build-chrome` directory with the file name like `easypasswords-n.n.n.crx` that you can install in Chrome and Opera. If you don't specify a signing key it will create a ZIP file that can be uploaded to Chrome Web Store or Opera Add-ons.
 
-How to test in Firefox
-----------------------
+How to test
+-----------
 
-Testing your changes is easiest if you install the [Extension Auto-Installer extension](https://addons.mozilla.org/addon/autoinstaller/). Then you can push the current repository state to your browser using the following command:
+Testing your changes is easiest by creating a test directory. For Firefox you should use the following command:
 
-    gulp post
+    gulp build-firefox
 
-This will install Easy Passwords in your browser automatically, without any prompts or browser restarts. If you changed the port that Extension Auto-Installer is listening to you will have to specify it on the command line:
+This will create a `build-firefox` directory that you can load as a temporary extension in Firefox via `about:debugging` page. If you want the directory to be updated automatically whenever you change any source files, you can use `gulp watch-firefox` instead, then you will only have to reload the extension in the browser.
 
-    gulp post --post-url=7777
-
-If you want to test on another computer you can specify a host as well:
-
-    gulp post --post-url=device.localdomain:8888
-
-You can also make Gulp watch the repository for changes and reinstall Easy Passwords whenever some file changes:
-
-    gulp watch
-
-Here you can use the same `--post-url` parameter as with `gulp post`.
-
-How to test in Chrome and Opera
--------------------------------
-
-You can create a test directory by running the following command:
+Similarly, creating a test directory for Chrome and Opera can be done by running the following command:
 
     gulp build-chrome
 
-This will create a `build-chrome` directory that you can load as an unpacked extension in Chrome or Opera. If you change something you can rerun the command and reload the extension in the browser then.
+This will create a `build-chrome` directory that you can load as an unpacked extension in Chrome or Opera. Running `gulp watch-chrome` instead will update the test directory automatically whenever you change any source files.
 
 Cleaning up the repository
 --------------------------

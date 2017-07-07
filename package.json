@@ -1,46 +1,8 @@
 {
   "title": "Easy Passwords",
   "name": "easypasswords",
-  "id": "easypasswords@palant.de",
-  "version": "1.1.5",
   "description": "Use a single master password to generate secure passwords for all websites - without losing track of passwords you cannot change.",
-  "main": "index.js",
   "author": "Wladimir Palant",
-  "homepage": "https://github.com/palant/easypasswords",
-  "permissions": {
-    "private-browsing": true,
-    "multiprocess": true
-  },
-  "preferences": [
-    {
-      "name": "autolock",
-      "type": "bool",
-      "value": true,
-      "title": " "
-    },
-    {
-      "name": "autolock_delay",
-      "type": "integer",
-      "value": 10,
-      "title": " "
-    }
-  ],
-  "engines": {
-    "firefox": "41.0 - 54.0"
-  },
-  "buttonPanel": {
-    "icon": {
-      "16": "images/icon16.png",
-      "32": "images/icon32.png",
-      "48": "images/icon48.png",
-      "64": "images/icon64.png"
-    },
-    "contentURL": "panel/panel.html",
-    "hotkey": "Ctrl+Shift+E"
-  },
-  "contentPage": {
-    "contentURL": "allpasswords/allpasswords.html"
-  },
   "eslintConfig": {
     "extends": "eslint:recommended",
     "parserOptions": {
@@ -119,7 +81,6 @@
     "gulp-sass": "^2.3.2",
     "gulp-stylelint": "^2.0.2",
     "gulp-zip": "^3.2.0",
-    "jpm": "^1.0.6",
     "merge-stream": "^1.0.0",
     "node-rsa": "^0.3.2",
     "nodeunit": "^0.9.1",
