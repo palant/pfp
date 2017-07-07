@@ -18,8 +18,8 @@ function $(id)
 window.addEventListener("DOMContentLoaded", function()
 {
   Promise.all([
-    prefs.get("autolock"),
-    prefs.get("autolock_delay")
+    prefs.get("autolock", true),
+    prefs.get("autolock_delay", 10)
   ]).then(([autolock, autolock_delay]) =>
   {
     let autolockElement = $("autolock");
