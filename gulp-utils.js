@@ -144,7 +144,7 @@ exports.runTests = function()
     for (let file of fs.readdirSync("test-lib"))
       if (path.extname(file) == ".js")
         modules.set(path.basename(file, ".js"), path.resolve("test-lib", file));
-    return source.replace(/(\brequire\(["'])([^"']+)/g, (match, prefix, request) =>
+    return source.replace(/(\brequire\(["']).\/([^"']+)/g, (match, prefix, request) =>
     {
       if (modules.has(request))
         return prefix + escape_string(modules.get(request));

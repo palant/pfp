@@ -64,11 +64,11 @@ function done()
 
 exports.setUp = function(callback)
 {
-  let {data: storage} = require("storage");
+  let {data: storage} = require("../test-lib/storage");
   for (let key of Object.keys(storage))
     delete storage[key];
 
-  let {data: prefs} = require("prefs");
+  let {data: prefs} = require("../test-lib/prefs");
   for (let key of Object.keys(prefs))
     delete prefs[key];
 

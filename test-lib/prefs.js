@@ -13,9 +13,9 @@ module.exports = exports = EventTarget();
 let data = {};
 exports.data = data;
 
-exports.get = function(name)
+exports.get = function(name, defaultValue)
 {
-  return Promise.resolve(data[name]);
+  return Promise.resolve(name in data ? data[name] : defaultValue);
 };
 
 exports.set = function(name, value)
