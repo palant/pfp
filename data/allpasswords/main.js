@@ -28,8 +28,9 @@ function setCommandHandler(element, handler)
 
 function copyToClipboard(site, password, passwordInfo)
 {
-  passwordRetrieval.copyToClipboard(site, password.name, password.revision).then(() =>
+  passwords.getPassword(site, password.name, password.revision).then(password =>
   {
+    require("../clipboard").set(password);
     let message = passwordInfo.querySelector(".password-copied-message");
     message.hidden = false;
     setTimeout(() =>

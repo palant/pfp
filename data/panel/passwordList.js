@@ -295,9 +295,11 @@ function fillInPassword(password)
 function copyToClipboard(password)
 {
   let {site} = state;
-  passwordRetrieval.copyToClipboard(site, password.name, password.revision)
-    .then(() => showPasswordMessage("password-copied-message"))
-    .catch(showPasswordMessage);
+  passwords.getPassword(site, password.name, password.revision).then(password =>
+  {
+    require("../clipboard").set(password);
+    showPasswordMessage("password-copied-message");
+  }).catch(showPasswordMessage);
 }
 
 function showQRCode(password)
