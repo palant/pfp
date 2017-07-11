@@ -70,7 +70,16 @@ function exportData()
     }
     else
     {
-      let link = $("exportData");
+      // See https://bugzil.la/1379960, in Firefox this will only work with a
+      // link inside a frame.
+      let frameDoc = $("exportDataFrame").contentDocument;
+      let link = frameDoc.body.lastChild;
+      if (!link || link.localName != "a")
+      {
+        link = frameDoc.createElement("a");
+        frameDoc.body.appendChild(link);
+      }
+
       let blob = new Blob([JSON.stringify(data)], {type: "application/json"});
       link.href = URL.createObjectURL(blob);
       link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
