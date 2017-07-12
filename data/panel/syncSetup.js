@@ -25,5 +25,5 @@ function updateLink()
 function authorize()
 {
   sync.authorize();
-  require("../platform").close();
+  window.close();
 }
