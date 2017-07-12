@@ -31,10 +31,18 @@ function buildCommon(targetdir)
   return merge(
     gulp.src("LICENSE.TXT")
         .pipe(gulp.dest(`${targetdir}`)),
-    gulp.src(["data/*.js", "data/**/*.html", "data/**/*.png", "data/**/*.svg"])
+    gulp.src(["data/**/*.html", "data/**/*.png", "data/**/*.svg"])
         .pipe(gulp.dest(`${targetdir}/data`)),
     gulp.src(["data/panel/zxcvbn-*.js", "data/panel/jsqr-*.js"])
         .pipe(gulp.dest(`${targetdir}/data/panel`)),
+    gulp.src(["data/fillIn.js"])
+        .pipe(webpack({
+          output: {
+            filename: "fillIn.js",
+            pathinfo: true
+          }
+        }))
+        .pipe(gulp.dest(`${targetdir}/data`)),
     gulp.src(["data/platform.js", "data/panel/main.js"])
         .pipe(webpack({
           output: {
@@ -135,17 +143,9 @@ gulp.task("eslint-node", function()
              .pipe(eslint.failAfterError());
 });
 
-gulp.task("eslint-data", function()
-{
-  return gulp.src(["data/fillIn.js", "**/contentScript-compat.js"])
-             .pipe(eslint({envs: ["browser", "es6"]}))
-             .pipe(eslint.format())
-             .pipe(eslint.failAfterError());
-});
-
 gulp.task("eslint-datamodules", function()
 {
-  return gulp.src(["data/**/*.js", "!data/fillIn.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js", "!**/contentScript-compat.js"])
+  return gulp.src(["data/**/*.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js"])
              .pipe(eslint({envs: ["browser", "commonjs", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
@@ -207,7 +207,7 @@ gulp.task("stylelint", function()
              }));
 });
 
-gulp.task("validate", ["eslint-node", "eslint-data", "eslint-datamodules", "eslint-lib", "htmlhint", "stylelint"], function()
+gulp.task("validate", ["eslint-node", "eslint-datamodules", "eslint-lib", "htmlhint", "stylelint"], function()
 {
 });
 

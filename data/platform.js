@@ -6,15 +6,7 @@
 
 "use strict";
 
-/* global window, chrome, browser */
-
-if (typeof browser == "undefined")
-{
-  window.browser = {
-    runtime: chrome.runtime,
-    i18n: chrome.i18n
-  };
-}
+let browser = require("./browserAPI");
 
 // i18n
 
