@@ -252,7 +252,7 @@ function pbkdf2(password, salt, iterations, length)
   for (let i = 0; i < result.length; i++)
     view.setInt32(i << 2, result[i], false);
 
-  return new Uint8Array(result.buffer, 0, length);
+  return result.buffer.slice(0, length);
 }
 
 exports.pbkdf2 = pbkdf2;
@@ -261,7 +261,7 @@ if (typeof self != "undefined")
 {
   self.onmessage = function({data: {password, salt, iterations, length}})
   {
-    self.postMessage(pbkdf2(password, salt, iterations, length).buffer);
+    self.postMessage(pbkdf2(password, salt, iterations, length));
   };
 }
 

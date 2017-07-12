@@ -17,7 +17,7 @@ function compare(test, password, salt, iterations, length, expected)
     length
   );
   expected = expected.trim().split(/\s+/).map(n => parseInt(n, 16));
-  test.deepEqual(result.join(",").split(","), expected);
+  test.deepEqual(new Uint8Array(result).join(",").split(","), expected);
 }
 
 exports.testRFC6070Vectors = function(test)
