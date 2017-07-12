@@ -6,8 +6,6 @@
 
 "use strict";
 
-/* global exports */
-
 // We expand += intentionally to improve Chrome performance
 /* eslint operator-assignment: "off" */
 
@@ -257,17 +255,14 @@ function pbkdf2(password, salt, iterations, length)
   return new Uint8Array(result.buffer, 0, length);
 }
 
-if (typeof exports == "undefined")
+exports.pbkdf2 = pbkdf2;
+
+if (typeof self != "undefined")
 {
   self.onmessage = function({data: {password, salt, iterations, length}})
   {
     self.postMessage(pbkdf2(password, salt, iterations, length).buffer);
   };
-}
-else
-{
-  // Allow importing as module, for unit tests.
-  exports.pbkdf2 = pbkdf2;
 }
 
 // The following snippet is taken from rusha 0.8.4:

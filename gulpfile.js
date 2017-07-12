@@ -43,6 +43,14 @@ function buildCommon(targetdir)
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data`)),
+    gulp.src(["data/pbkdf2.js"])
+        .pipe(webpack({
+          output: {
+            filename: "pbkdf2.js",
+            pathinfo: true
+          }
+        }))
+        .pipe(gulp.dest(`${targetdir}/data`)),
     gulp.src(["data/platform.js", "data/panel/main.js"])
         .pipe(webpack({
           output: {
