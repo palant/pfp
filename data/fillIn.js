@@ -6,27 +6,7 @@
 
 "use strict";
 
-/* global scriptID */
-
-let {port} = require("./messaging");
-
-port.on("fillIn", ({target, host, name, password}) =>
-{
-  if (target != scriptID)
-    return;
-
-  let result = null;
-  if (window.location.hostname != host)
-    result = "wrong-site-message";
-  else if (!fillIn(window, name, password))
-    result = "no-password-fields";
-
-  port.emit("done", {
-    source: scriptID,
-    result
-  });
-  port.disconnect();
-});
+/* global _parameters */
 
 function getActiveElement(doc)
 {
@@ -120,3 +100,19 @@ function fillIn(wnd, name, password, noFocus)
 
   return result;
 }
+
+(function({scriptID, host, name, password})
+{
+  let result = null;
+  if (window.location.hostname != host)
+    result = "wrong-site-message";
+  else if (!fillIn(window, name, password))
+    result = "no-password-fields";
+
+  let {port} = require("./messaging");
+  port.emit("done", {
+    scriptID,
+    result
+  });
+  port.disconnect();
+})(_parameters);
