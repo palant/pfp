@@ -88,7 +88,7 @@ function buildCommon(targetdir)
     gulp.src("locale/**/*.properties")
         .pipe(utils.toChromeLocale())
         .pipe(gulp.dest(`${targetdir}/_locales`)),
-    gulp.src(["lib/main.js"])
+    gulp.src(["lib/platform.js", "lib/main.js"])
         .pipe(webpack({
           output: {
             filename: "index.js",
