@@ -37,9 +37,10 @@ let messageQueue = [];
 
 let {EventTarget, emit} = require("../lib/eventTarget");
 
-let port = browser.runtime.connect({name: document.documentElement.dataset.porttype});
+let port = browser.runtime.connect({name: document.documentElement.dataset.portname});
 
 exports.port = new EventTarget();
+exports.port.name = port.name;
 
 exports.port.emit = function(eventName, ...args)
 {

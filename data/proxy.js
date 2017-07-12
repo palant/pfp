@@ -13,7 +13,7 @@ function sendMessage(message)
 {
   return new Promise((resolve, reject) =>
   {
-    let messageId = message.messageId = ++maxMessageId;
+    let messageId = message.messageId = port.name + ++maxMessageId;
     port.once("_proxyResponse-" + messageId, ([error, result]) =>
     {
       if (error)

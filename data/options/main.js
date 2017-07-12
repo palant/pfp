@@ -6,8 +6,6 @@
 
 "use strict";
 
-require("../platform");
-
 let {prefs} = require("../proxy");
 
 function $(id)
