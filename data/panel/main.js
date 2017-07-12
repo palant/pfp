@@ -6,7 +6,7 @@
 
 "use strict";
 
-let {port} = require("../platform");
+let {port} = require("../messaging");
 port.on("init", state =>
 {
   require("./state").set(state);

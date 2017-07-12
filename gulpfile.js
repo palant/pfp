@@ -35,7 +35,7 @@ function buildCommon(targetdir)
         .pipe(gulp.dest(`${targetdir}/data`)),
     gulp.src(["data/panel/zxcvbn-*.js", "data/panel/jsqr-*.js"])
         .pipe(gulp.dest(`${targetdir}/data/panel`)),
-    gulp.src(["data/panel/main.js"])
+    gulp.src(["data/platform.js", "data/panel/main.js"])
         .pipe(webpack({
           output: {
             filename: "index.js",
@@ -48,7 +48,7 @@ function buildCommon(targetdir)
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data/panel`)),
-    gulp.src(["data/allpasswords/main.js"])
+    gulp.src(["data/platform.js", "data/allpasswords/main.js"])
         .pipe(webpack({
           output: {
             filename: "index.js",
@@ -57,7 +57,7 @@ function buildCommon(targetdir)
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data/allpasswords`)),
-    gulp.src(["data/options/main.js"])
+    gulp.src(["data/platform.js", "data/options/main.js"])
         .pipe(webpack({
           output: {
             filename: "index.js",

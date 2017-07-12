@@ -6,8 +6,6 @@
 
 "use strict";
 
-let {port} = require("../platform");
-
 let messages = exports.messages = {};
 let messageElements = $("messages").children;
 for (let i = 0; i < messageElements.length; i++)
@@ -21,14 +19,6 @@ function $(id)
   return document.getElementById(id);
 }
 exports.$ = $;
-
-function hide()
-{
-  setActivePanel(null);
-
-  // Make sure we don't have any sensitive data stuck in the forms
-  resetForms();
-}
 
 function setFocus()
 {
@@ -65,13 +55,6 @@ function resetForm(form)
   {
     require("./events").disableResetHandlers = false;
   }
-}
-
-function resetForms()
-{
-  let forms = document.forms;
-  for (let i = 0; i < forms.length; i++)
-    resetForm(forms[i]);
 }
 
 function getActivePanel()
@@ -120,5 +103,3 @@ Promise.resolve().then(() =>
     $("unknown-error-details").hidden = false;
   });
 });
-
-port.on("hide", hide);

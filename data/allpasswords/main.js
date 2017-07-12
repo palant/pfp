@@ -7,7 +7,7 @@
 "use strict";
 
 let {passwords, passwordRetrieval} = require("../proxy");
-let {port} = require("../platform");
+let {port} = require("../messaging");
 
 function $(id)
 {
