@@ -23,6 +23,7 @@
     "unlimitedStorage"
   ],
   "background": {
+    "persistent": true,
     "scripts": [
       "index.js"
     ]

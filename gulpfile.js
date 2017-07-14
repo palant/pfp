@@ -127,6 +127,7 @@ gulp.task("build-firefox", ["validate"], function()
         {
           delete data.minimum_chrome_version;
           delete data.minimum_opera_version;
+          delete data.background.persistent;
 
           let index = data.permissions.indexOf("unlimitedStorage");
           if (index >= 0)
