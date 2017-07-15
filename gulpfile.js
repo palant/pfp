@@ -121,7 +121,7 @@ gulp.task("watch-chrome", ["build-chrome"], function()
 gulp.task("build-firefox", ["validate"], function()
 {
   return merge(
-    buildCommon("build-firefox"),
+    buildCommon("build-firefox/webextension"),
     gulp.src("manifest.json")
         .pipe(utils.jsonModify(data =>
         {
@@ -129,19 +129,25 @@ gulp.task("build-firefox", ["validate"], function()
           delete data.minimum_opera_version;
           delete data.background.persistent;
 
+          data.background.scripts.push("data_migration.js");
+
           let index = data.permissions.indexOf("unlimitedStorage");
           if (index >= 0)
             data.permissions.splice(index, 1);
 
           data.browser_action.browser_style = false;
         }))
+        .pipe(gulp.dest("build-firefox/webextension")),
+    gulp.src("firefox_data_migration/data_migration.js")
+        .pipe(gulp.dest("build-firefox/webextension")),
+    gulp.src(["firefox_data_migration/install.rdf", "firefox_data_migration/bootstrap.js"])
         .pipe(gulp.dest("build-firefox"))
   );
 });
 
 gulp.task("watch-firefox", ["build-firefox"], function()
 {
-  gulp.watch(["*.js", "*.json", "data/**/*", "lib/**/*", "locale/**/*"], ["build-firefox"]);
+  gulp.watch(["*.js", "*.json", "data/**/*", "lib/**/*", "locale/**/*", "firefox_data_migration/*"], ["build-firefox"]);
 });
 
 gulp.task("eslint-node", function()
