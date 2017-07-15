@@ -65,10 +65,14 @@ function retrieveData()
           cursor.continue();
         }
         else
+        {
+          db.close();
           resolve(result);
+        }
       };
       request.onerror = event =>
       {
+        db.close();
         reject(request.error);
       };
     });
