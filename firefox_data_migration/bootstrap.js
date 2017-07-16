@@ -43,12 +43,24 @@ function promisify(request)
 
 function retrieveData()
 {
+  let upgraded = false;
   return Promise.resolve().then(() =>
   {
     let principal = getPrincipal();
-    return promisify(indexedDB.openForPrincipal(principal, DB_NAME, {version: DB_VERSION, storage: "persistent"}));
+    let request = indexedDB.openForPrincipal(principal, DB_NAME, {version: DB_VERSION, storage: "persistent"});
+    request.onupgradeneeded = () =>
+    {
+      upgraded = true;
+    };
+    return promisify(request);
   }).then(db =>
   {
+    if (upgraded)
+    {
+      db.close();
+      return deleteData().then(() => null);
+    }
+
     let store = db.transaction(STORE_NAME).objectStore(STORE_NAME);
     let range = IDBKeyRange.lowerBound("");
     return new Promise((resolve, reject) =>
@@ -76,11 +88,15 @@ function retrieveData()
         reject(request.error);
       };
     });
-  }).catch(e =>
+  });
+}
+
+function deleteData()
+{
+  let principal = getPrincipal();
+  return Promise.resolve().then(() =>
   {
-    if (e instanceof DOMException && e.name == "NotFoundError")
-      return null;
-    throw e;
+    return promisify(indexedDB.deleteForPrincipal(principal, DB_NAME, {storage: "persistent"}));
   });
 }
 
@@ -107,11 +123,7 @@ function startup({id, webExtension})
         if (!success)
           return;
 
-        Promise.resolve().then(() =>
-        {
-          let principal = getPrincipal();
-          return promisify(indexedDB.deleteForPrincipal(principal, DB_NAME, {storage: "persistent"}));
-        }).then(() =>
+        deleteData().then(() =>
         {
           AddonManager.getAddonByID(id, addon => addon.reload());
         }).catch(e => console.error(e));
