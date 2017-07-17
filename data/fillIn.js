@@ -50,12 +50,71 @@ function fillInName(passwordField, name)
     fakeInput(nameField, name);
 }
 
+function fillInPassword(fields, name, password, noFocus)
+{
+  if (!fields.length)
+    return false;
+
+  for (let field of fields)
+    fakeInput(field, password);
+
+  if (!noFocus)
+    fields[0].focus();
+  fillInName(fields[0], name);
+  return true;
+}
+
+function fillInPartialPassword(fields, name, password, noFocus)
+{
+  if (fields.length < 3)
+    return false;
+
+  // See #57, this appears to be a partial password request, each field
+  // asks for a single password letter. Try to find a common name prefix.
+  let match = /^(.*?)(\d+)$/.exec(fields[0].name);
+  if (!match)
+    return false;
+
+  let prefix = match[1];
+  let zeroBased = !!fields[0].ownerDocument.getElementById(prefix + "0");
+
+  function isValidField(field)
+  {
+    let match = /^(.*?)(\d+)$/.exec(field.name);
+    if (!match)
+      return false;
+
+    if (match[1] != prefix)
+      return false;
+
+    let index = parseInt(match[2]);
+    if (!zeroBased)
+      index--;
+    if (index >= password.length)
+      return false;
+
+    field.__index = index;
+    return true;
+  }
+
+  if (!fields.every(isValidField))
+    return false;
+
+  for (let field of fields)
+    fakeInput(field, password[field.__index]);
+
+  if (!noFocus)
+    fields[0].focus();
+  fillInName(fields[0], name);
+  return true;
+}
+
 function fillIn(wnd, name, password, noFocus)
 {
   if (wnd == wnd.top)
   {
     let field = getActiveElement(wnd.document);
-    if (field instanceof HTMLInputElement && field.type == "password")
+    if (field instanceof HTMLInputElement && field.type == "password" && field.maxLength != 1)
     {
       fakeInput(field, password);
       fillInName(field, name);
@@ -63,24 +122,28 @@ function fillIn(wnd, name, password, noFocus)
     }
   }
 
-  let fields = wnd.document.querySelectorAll("input[type=password]");
-  let result = false;
+  let fields = [];
+  let oneCharFields = [];
+  for (let field of wnd.document.querySelectorAll("input[type=password]"))
+  {
+    if (field.maxLength == 1)
+      oneCharFields.push(field);
+    else
+      fields.push(field);
+  }
 
   if (wnd.location.host != "accounts.google.com")
   {
     // accounts.google.com has the password field hidden while email is being
     // entered, fill in here despite being hidden.
-    fields = [].filter.call(fields, element => element.offsetHeight && element.offsetWidth);
+    fields = fields.filter(element => element.offsetHeight && element.offsetWidth);
   }
-  if (fields.length > 0)
-  {
+
+  let result = false;
+  if (fillInPassword(fields, name, password, noFocus))
     result = true;
-    for (let field of fields)
-      fakeInput(field, password);
-    if (!noFocus)
-      fields[0].focus();
-    fillInName(fields[0], name);
-  }
+  if (fillInPartialPassword(oneCharFields, name, password, noFocus))
+    result = true;
 
   for (let i = 0; i < wnd.frames.length; i++)
   {
