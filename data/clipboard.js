@@ -8,15 +8,21 @@
 
 /* global document */
 
+let clipboardDummy = null;
+
 exports.set = function(data)
 {
-  // Solution by courtesy of https://stackoverflow.com/a/12693636/785541
-  let listener = event =>
+  if (!clipboardDummy)
   {
-    event.clipboardData.setData("text/plain", data);
-    event.preventDefault();
-  };
-  document.addEventListener("copy", listener);
+    clipboardDummy = document.createElement("textarea");
+    clipboardDummy.style.position = "absolute";
+    clipboardDummy.style.width = "0px";
+    clipboardDummy.style.height = "0px";
+    clipboardDummy.style.left = "-1000px";
+    document.body.appendChild(clipboardDummy);
+  }
+
+  clipboardDummy.value = data;
+  clipboardDummy.select();
   document.execCommand("copy", false, null);
-  document.removeEventListener("copy", listener);
 };
