@@ -18,7 +18,7 @@ let sass = require("gulp-sass");
 let merge = require("merge-stream");
 let stylelint = require("gulp-stylelint");
 let zip = require("gulp-zip");
-let webpack = require("webpack-stream");
+let webpack = require("webpack2-stream-watch");
 
 let utils = require("./gulp-utils");
 

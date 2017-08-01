@@ -89,6 +89,6 @@
     "stylelint-config-standard": "^10.0.0",
     "subtle": "^0.1.8",
     "text-encoding": "^0.6.0",
-    "webpack-stream": "^3.2.0"
+    "webpack2-stream-watch": "^3.2.2"
   }
 }
