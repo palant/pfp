@@ -150,6 +150,9 @@ exports.runTests = function()
         return prefix + escape_string(modules.get(request));
       else
         return match;
+    }).replace(/(\brequire\(["'])(@stablelib)/g, (match, prefix, suffix) =>
+    {
+      return prefix + escape_string(path.resolve("third-party")) + "/" + suffix;
     });
   }
 

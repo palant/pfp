@@ -51,6 +51,17 @@ function buildCommon(targetdir)
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data`)),
+    gulp.src(["data/scrypt.js"])
+        .pipe(webpack({
+          output: {
+            filename: "scrypt.js",
+            pathinfo: true
+          },
+          resolve: {
+            modules: [path.resolve(__dirname, "third-party")]
+          }
+        }))
+        .pipe(gulp.dest(`${targetdir}/data`)),
     gulp.src(["data/platform.js", "data/panel/main.js"])
         .pipe(webpack({
           output: {
