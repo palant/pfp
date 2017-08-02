@@ -19,6 +19,7 @@ let generated1 = {
   upper: false,
   number: true,
   symbol: false,
+  legacy: true,
   password: "r8hx8be6"
 };
 
@@ -31,7 +32,7 @@ let generated2 = {
   upper: true,
   number: false,
   symbol: true,
-  password: "VX~RBJ^NCBH(#;N["
+  password: "$X*RR~V}?;FY[T|~"
 };
 
 let legacy1 = {
@@ -100,7 +101,7 @@ exports.testAddRemoveGenerated = function(test)
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
       name: generated2.name,
       revision: generated2.revision,
       length: generated2.length,
@@ -151,7 +152,7 @@ exports.testAddRemoveGenerated = function(test)
   }).catch(unexpectedError.bind(test)).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
       name: generated2.name,
       revision: generated2.revision,
       length: generated2.length,
@@ -449,7 +450,7 @@ exports.testNotes = function(test)
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
       name: generated2.name,
       revision: generated2.revision,
       length: generated2.length,
@@ -474,7 +475,7 @@ exports.testNotes = function(test)
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
       name: generated2.name,
       revision: generated2.revision,
       length: generated2.length,
@@ -494,7 +495,7 @@ exports.testNotes = function(test)
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
       name: generated2.name,
       revision: generated2.revision,
       length: generated2.length,
@@ -514,7 +515,7 @@ exports.testNotes = function(test)
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
       name: generated2.name,
       revision: generated2.revision,
       length: generated2.length,
@@ -625,7 +626,7 @@ exports.testAllPasswords = function(test)
       },
       ["sub." + generated2.site]: {
         passwords: [{
-          type: "generated",
+          type: "generated2",
           name: generated2.name,
           revision: generated2.revision,
           length: generated2.length,
@@ -666,7 +667,7 @@ exports.testAllPasswords = function(test)
       },
       ["sub." + generated2.site]: {
         passwords: [{
-          type: "generated",
+          type: "generated2",
           name: generated2.name,
           revision: generated2.revision,
           length: generated2.length,
@@ -772,7 +773,7 @@ exports.testExport = function(test)
               symbol: generated1.symbol
             },
             [generated2.name + "\n" + generated2.revision]: {
-              type: "generated",
+              type: "generated2",
               length: generated2.length,
               lower: generated2.lower,
               upper: generated2.upper,
@@ -810,7 +811,7 @@ exports.testExport = function(test)
               symbol: generated1.symbol
             },
             [generated2.name + "\n" + generated2.revision]: {
-              type: "generated",
+              type: "generated2",
               length: generated2.length,
               lower: generated2.lower,
               upper: generated2.upper,
@@ -938,7 +939,7 @@ exports.testImport = function(test)
               symbol: generated1.symbol
             },
             [generated2.name + "\n" + generated2.revision]: {
-              type: "generated",
+              type: "generated2",
               length: generated2.length,
               lower: generated2.lower,
               upper: generated2.upper,
@@ -962,7 +963,7 @@ exports.testImport = function(test)
     test.deepEqual(allPasswords, {
       [generated1.site]: {
         passwords: [{
-          type: "generated",
+          type: "generated2",
           name: generated2.name,
           revision: generated2.revision,
           length: generated2.length,
@@ -1013,7 +1014,7 @@ exports.testImport = function(test)
     test.deepEqual(allPasswords, {
       [generated1.site]: {
         passwords: [{
-          type: "generated",
+          type: "generated2",
           name: generated2.name,
           revision: generated2.revision,
           length: generated2.length,
@@ -1055,7 +1056,7 @@ exports.testImport = function(test)
     test.deepEqual(allPasswords, {
       [generated1.site]: {
         passwords: [{
-          type: "generated",
+          type: "generated2",
           name: generated2.name,
           revision: generated2.revision,
           length: generated2.length,
