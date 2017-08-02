@@ -10,6 +10,7 @@ const N = 32768;
 const r = 8;
 const p = 1;
 
+let {toTypedArray} = require("../lib/typedArrayConversion");
 let {Scrypt} = require("@stablelib/scrypt");
 let hasher = new Scrypt(N, r, p);
 
@@ -21,7 +22,7 @@ if (typeof self != "undefined")
   {
     self.postMessage({
       jobId,
-      result: hasher.deriveKey(password, salt, length)
+      result: hasher.deriveKey(toTypedArray(password), toTypedArray(salt), length)
     });
   };
 }

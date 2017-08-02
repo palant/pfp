@@ -12,17 +12,11 @@ function Key(keyData, algo, usages)
 {
   this._data = new Buffer(keyData);
   this._algo = algo;
-  this._deriveKey = false;
-  this._deriveBits = false;
   this._encrypt = false;
   this._decrypt = false;
   for (let usage of usages)
   {
-    if (usage == "deriveKey")
-      this._deriveKey = true;
-    else if (usage == "deriveBits")
-      this._deriveBits = true;
-    else if (usage == "encrypt")
+    if (usage == "encrypt")
       this._encrypt = true;
     else if (usage == "decrypt")
       this._decrypt = true;
@@ -46,46 +40,12 @@ exports.subtle = {
     {
       if (format != "raw")
         throw new Error("Unexpected data format");
-      if (algo != "PBKDF2")
+      if (algo != "AES-CBC")
         throw new Error("Unexpected algorithm");
       if (extractable)
         throw new Error("Extractable keys not supported");
 
       return new Key(keyData, algo, usages);
-    });
-  },
-
-  deriveBits: function(algo, masterKey, bits)
-  {
-    return Promise.resolve().then(() =>
-    {
-      if (algo.name != "PBKDF2" && algo.hash != "SHA-1")
-        throw new Error("Unexpected algorithm");
-      if (masterKey._algo != "PBKDF2" || !masterKey._deriveBits)
-        throw new Error("Master key not suitable for bit derivation");
-
-      let data = crypto.pbkdf2Sync(masterKey._data, algo.salt, algo.iterations,
-                                   Math.ceil(bits / 8), "sha1");
-      return new Buffer(data, "binary");
-    });
-  },
-
-  deriveKey: function(algo, masterKey, derivedKeyAlgo, extractable, keyUsages)
-  {
-    return Promise.resolve().then(() =>
-    {
-      if (algo.name != "PBKDF2" && algo.hash != "SHA-1")
-        throw new Error("Unexpected algorithm");
-      if (masterKey._algo != "PBKDF2" || !masterKey._deriveKey)
-        throw new Error("Master key not suitable for key derivation");
-      if (derivedKeyAlgo.name != "AES-CBC")
-        throw new Error("Unexpected derived key algorithm");
-      if (extractable)
-        throw new Error("Extractable keys not supported");
-
-      let data = crypto.pbkdf2Sync(masterKey._data, algo.salt, algo.iterations,
-                                   Math.ceil(derivedKeyAlgo.length / 8), "sha1");
-      return new Key(data, derivedKeyAlgo.name, keyUsages);
     });
   },
 
