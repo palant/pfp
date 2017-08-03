@@ -215,9 +215,10 @@ port.on("init", function(sites)
       setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, passwordData, passwordInfo));
       setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, site, passwordData, passwordInfo));
 
-      if (passwordData.type == "generated")
+      if (passwordData.type == "generated2" || passwordData.type == "generated")
       {
         passwordInfo.querySelector(".password-info.legacy").hidden = true;
+        passwordInfo.querySelector(".password-type." + passwordData.type).hidden = false;
         passwordInfo.querySelector(".password-length-value").textContent = passwordData.length;
 
         let chars = [];

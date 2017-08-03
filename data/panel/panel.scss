@@ -310,6 +310,16 @@ a:hover
   background-repeat: no-repeat;
 }
 
+.user-name-container.legacy-warning
+{
+  min-width: $icon-size;
+  min-height: $icon-size;
+  background-size: $icon-size;
+  background-repeat: no-repeat;
+  background-position: right;
+  background-image: url("../images/android-warning.svg");
+}
+
 .password-menu-link
 {
   background-image: url("../images/android-menu.svg");

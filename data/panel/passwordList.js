@@ -209,9 +209,9 @@ function showPasswords()
     for (let password of pwdList)
     {
       let tooltip;
-      if (password.type == "generated")
+      if (password.type == "generated2" || password.type == "generated")
       {
-        tooltip = messages["password-type-generated"];
+        tooltip = messages["password-type-" + password.type];
 
         tooltip += "\n" + document.querySelector('label[for="password-length"]').textContent;
         tooltip += " " + password.length;
@@ -238,6 +238,8 @@ function showPasswords()
       setCommandHandler(entry.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, password));
 
       entry.querySelector(".user-name-container").setAttribute("title", tooltip);
+      if (password.type == "generated")
+        entry.querySelector(".user-name-container").classList.add("legacy-warning");
       entry.querySelector(".user-name").textContent = password.name;
 
       let revisionNode = entry.querySelector(".password-revision");
@@ -330,7 +332,7 @@ function bumpRevision(password)
     revision++;
   $("password-revision").value = revision;
 
-  if (password.type == "generated")
+  if (password.type == "generated2" || password.type == "generated")
   {
     $("password-length").value = password.length;
     $("charset-lower").checked = password.lower;
