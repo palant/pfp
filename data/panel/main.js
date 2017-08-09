@@ -20,7 +20,7 @@ function init()
   require("./changeMaster");
   require("./passwordList");
   require("./generatePassword");
-  require("./legacyPassword");
+  require("./storedPassword");
   require("./syncSetup");
   require("./syncState");
 }

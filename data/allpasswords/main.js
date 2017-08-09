@@ -217,7 +217,7 @@ port.on("init", function(sites)
 
       if (passwordData.type == "generated2" || passwordData.type == "generated")
       {
-        passwordInfo.querySelector(".password-info.legacy").hidden = true;
+        passwordInfo.querySelector(".password-info.stored").hidden = true;
         passwordInfo.querySelector(".password-type." + passwordData.type).hidden = false;
         passwordInfo.querySelector(".password-length-value").textContent = passwordData.length;
 

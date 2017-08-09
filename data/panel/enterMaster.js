@@ -16,7 +16,7 @@ let {validateMasterPassword} = require("./changeMaster");
 
 setCommandHandler("reset-master-link", () => setActivePanel("change-master"));
 setCommandHandler("generate-password-link", () => setActivePanel("generate-password"));
-setCommandHandler("legacy-password-link", () => setActivePanel("legacy-password"));
+setCommandHandler("stored-password-link", () => setActivePanel("stored-password"));
 
 setValidator("master-password", validateMasterPassword);
 setSubmitHandler("enter-master", () =>

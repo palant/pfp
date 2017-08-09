@@ -88,7 +88,7 @@ function setSite()
   field.setAttribute("value", site || "???");
   field.value = field.getAttribute("value");
   field.setAttribute("readonly", "readonly");
-  $("generate-password-link").hidden = $("legacy-password-link").hidden = !site;
+  $("generate-password-link").hidden = $("stored-password-link").hidden = !site;
 }
 
 function hidePasswordMessages()
@@ -227,7 +227,7 @@ function showPasswords()
           tooltip += " " + "+^;";
       }
       else if (password.type == "stored")
-        tooltip = messages["password-type-legacy"];
+        tooltip = messages["password-type-stored"];
 
       if (password.hasNotes)
         tooltip += "\n" + messages["password-notes-stored"];

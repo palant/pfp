@@ -27,7 +27,7 @@
       <div data-l10n-id="password-value-required"></div>
       <div data-l10n-id="password-type-generated"></div>
       <div data-l10n-id="password-type-generated2"></div>
-      <div data-l10n-id="password-type-legacy"></div>
+      <div data-l10n-id="password-type-stored"></div>
       <div data-l10n-id="password-notes-stored"></div>
       <div data-l10n-id="remove-password-confirmation"></div>
       <div data-l10n-id="remove-alias-confirmation"></div>
@@ -145,7 +145,7 @@
       <div id="no-passwords-message" data-l10n-id="no-passwords-message"></div>
       <div id="password-list-container"></div>
       <a href="#" id="generate-password-link" data-l10n-id="generate-password-link"></a>
-      <a href="#" id="legacy-password-link" data-l10n-id="legacy-password-link"></a>
+      <a href="#" id="stored-password-link" data-l10n-id="stored-password-link"></a>
       <div class="link-container">
         <a id="show-all" href="#" data-l10n-id="show-all-passwords"></a>
         <a id="sync-setup-link" href="#" data-l10n-id="sync-setup" hidden></a>
@@ -189,18 +189,19 @@
       </div>
     </form>
 
-    <form id="legacy-password" class="slide" data-default-element="legacy-password-user-name">
+    <form id="stored-password" class="slide" data-default-element="stored-password-user-name">
       <label data-l10n-id="site"></label>
-      <div id="legacy-password-site"></div>
-      <label class="block-start" for="legacy-password-user-name" data-l10n-id="user-name"></label>
-      <input id="legacy-password-user-name" type="text">
+      <div id="stored-password-site"></div>
+      <div class="warning block-start" data-l10n-id="stored-password-warning"></div>
+      <label class="block-start" for="stored-password-user-name" data-l10n-id="user-name"></label>
+      <input id="stored-password-user-name" type="text">
       <div class="error" hidden></div>
-      <label class="block-start" for="legacy-password-value" data-l10n-id="password-value"></label>
-      <input id="legacy-password-value" type="password">
+      <label class="block-start" for="stored-password-value" data-l10n-id="password-value"></label>
+      <input id="stored-password-value" type="password">
       <div class="error" hidden></div>
       <div class="button-container">
-        <button id="legacy-password-save" type="submit" data-l10n-id="save-password"></button>
-        <button id="legacy-password-cancel" type="reset" data-l10n-id="cancel"></button>
+        <button id="stored-password-save" type="submit" data-l10n-id="save-password"></button>
+        <button id="stored-password-cancel" type="reset" data-l10n-id="cancel"></button>
       </div>
     </form>
 

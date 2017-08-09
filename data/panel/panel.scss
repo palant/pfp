@@ -418,7 +418,7 @@ a:hover
 }
 
 #generate-password-link,
-#legacy-password-link
+#stored-password-link
 {
   min-height: $icon-size;
   @include padding-inline-start($icon-size + $inline-spacing);
