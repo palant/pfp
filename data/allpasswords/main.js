@@ -66,7 +66,7 @@ function exportData()
       // data: URIs don't work either (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/4282810/).
       // Let the user copy the text manually, that's the only way.
       if (confirm($("allpasswords-export-edge").textContent))
-        document.body.textContent = JSON.stringify(data);
+        document.body.textContent = data;
     }
     else
     {
@@ -80,7 +80,7 @@ function exportData()
         frameDoc.body.appendChild(link);
       }
 
-      let blob = new Blob([JSON.stringify(data)], {type: "application/json"});
+      let blob = new Blob([data], {type: "application/json"});
       link.href = URL.createObjectURL(blob);
       link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
       link.click();
@@ -237,7 +237,7 @@ port.on("init", function(sites)
         passwordInfo.querySelector(".password-info.generated").hidden = true;
       }
 
-      passwordInfo.querySelector(".password-info.notes").hidden = !passwordData.hasNotes;
+      passwordInfo.querySelector(".password-info.notes").hidden = !passwordData.notes;
 
       siteInfo.appendChild(passwordInfo);
     }

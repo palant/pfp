@@ -24,7 +24,7 @@ function updateSiteName()
   $("notes-website-name").textContent = state.site;
 }
 
-function edit(password, notes)
+function edit(password)
 {
   currentPassword = password;
 
@@ -36,20 +36,14 @@ function edit(password, notes)
   revisionField.hidden = !password.revision;
   revisionField.textContent = password.revision;
 
-  $("notes-textarea").value = notes;
+  $("notes-textarea").value = password.notes || "";
 }
 exports.edit = edit;
 
 function saveNotes()
 {
   let notes = $("notes-textarea").value.trim();
-  let action;
-  if (notes)
-    action = passwords.setNotes(state.site, currentPassword.name, currentPassword.revision, notes);
-  else
-    action = passwords.removeNotes(state.site, currentPassword.name, currentPassword.revision);
-
-  action.then(pwdList =>
+  passwords.setNotes(state.site, currentPassword.name, currentPassword.revision, notes).then(pwdList =>
   {
     state.set({pwdList});
     setActivePanel("password-list");

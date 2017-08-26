@@ -14,3 +14,47 @@ exports.runtime = {
     return path.resolve(__dirname, "..", "build-test", ...filepath.split("/"));
   }
 };
+
+let storageData = exports.storageData = Object.create(null);
+
+function clone(value)
+{
+  return JSON.parse(JSON.stringify(value));
+}
+
+exports.storage = {
+  local: {
+    get: function(keys)
+    {
+      let items = {};
+      if (typeof keys == "string")
+        keys = [keys];
+      if (!keys)
+        keys = Object.keys(storageData);
+      for (let key of keys)
+        if (key in storageData)
+          items[key] = clone(storageData[key]);
+      return Promise.resolve(items);
+    },
+
+    set: function(items)
+    {
+      return Promise.resolve().then(() =>
+      {
+        for (let key of Object.keys(items))
+          storageData[key] = clone(items[key]);
+      });
+    },
+
+    remove: function(keys)
+    {
+      return Promise.resolve().then(() =>
+      {
+        if (typeof keys == "string")
+          keys = [keys];
+        for (let key of keys)
+          delete storageData[key];
+      });
+    }
+  }
+};

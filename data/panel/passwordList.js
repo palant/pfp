@@ -229,7 +229,7 @@ function showPasswords()
       else if (password.type == "stored")
         tooltip = messages["password-type-stored"];
 
-      if (password.hasNotes)
+      if (password.notes)
         tooltip += "\n" + messages["password-notes-stored"];
 
       let entry = template.cloneNode(true);
@@ -257,7 +257,7 @@ function showMenu(password, element)
 {
   hideMenu();
 
-  let notes_link_msg = password.hasNotes ? "edit-notes" : "add-notes";
+  let notes_link_msg = password.notes ? "edit-notes" : "add-notes";
   menu.querySelector(".menu-notes-link").textContent = messages[notes_link_msg];
 
   menuPassword = password;
@@ -313,9 +313,7 @@ function showQRCode(password)
 
 function showNotes(password)
 {
-  passwords.getNotes(state.site, password.name, password.revision)
-    .then(value => require("./notes").edit(password, value))
-    .catch(showPasswordMessage);
+  require("./notes").edit(password);
 }
 
 function bumpRevision(password)

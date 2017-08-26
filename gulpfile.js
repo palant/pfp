@@ -175,7 +175,7 @@ gulp.task("watch-firefox", ["build-firefox"], function()
 
 gulp.task("eslint-node", function()
 {
-  return gulp.src(["*.js", "test/**/*.js"])
+  return gulp.src(["*.js", "test/**/*.js", "test-lib/**/*.js"])
              .pipe(eslint({envs: ["node", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());

@@ -6,7 +6,7 @@
 
 "use strict";
 
-let {masterPassword} = require("../proxy");
+let {masterPassword, passwords} = require("../proxy");
 let {setCommandHandler, setSubmitHandler} = require("./events");
 let {setValidator, markInvalid} = require("./formValidation");
 let state = require("./state");
@@ -22,8 +22,11 @@ setValidator("master-password", validateMasterPassword);
 setSubmitHandler("enter-master", () =>
 {
   masterPassword.checkPassword($("master-password").value.trim())
-    .then(() => state.set({masterPasswordState: "known"}))
-    .catch(error =>
+    .then(() => passwords.getPasswords(state.origSite))
+    .then(([origSite, site, pwdList]) =>
+    {
+      state.set({origSite, site, pwdList, masterPasswordState: "known"});
+    }).catch(error =>
     {
       if (error == "declined")
         markInvalid("master-password", messages["password-declined"]);
