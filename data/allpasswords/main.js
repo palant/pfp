@@ -237,7 +237,10 @@ port.on("init", function(sites)
         passwordInfo.querySelector(".password-info.generated").hidden = true;
       }
 
-      passwordInfo.querySelector(".password-info.notes").hidden = !passwordData.notes;
+      let notes = passwordInfo.querySelector(".password-info.notes");
+      notes.hidden = !passwordData.notes;
+      if (passwordData.notes)
+        notes.textContent += " " + passwordData.notes;
 
       siteInfo.appendChild(passwordInfo);
     }

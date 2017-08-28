@@ -230,7 +230,7 @@ function showPasswords()
         tooltip = messages["password-type-stored"];
 
       if (password.notes)
-        tooltip += "\n" + messages["password-notes-stored"];
+        tooltip += "\n" + messages["password-info-notes"] + " " + password.notes;
 
       let entry = template.cloneNode(true);
       setCommandHandler(entry.querySelector(".password-menu-link"), toggleMenu.bind(null, password, entry));
