@@ -888,6 +888,95 @@ exports.testExport = function(test)
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
+exports.testDecryptingImport = function(test)
+{
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    let atob = str => new Buffer(str, "base64").toString("binary");
+    let btoa = str => new Buffer(str, "binary").toString("base64");
+    let salt = "asdf";
+    let hmacSecret = "fdsa";
+    let key = "4MgE2P1PbjLyAz7JxczGjOPNtaaqNKofAmGSbNvRtUM=";
+    let iv = "fakeivwhatever";
+    let cryptoPrefix = "AES-GCM!" + atob(key) + "!" + iv + "!";
+    let hmacPrefix = "HMAC!" + hmacSecret + "!";
+    let encrypt = data => btoa(iv) + "_" + btoa(cryptoPrefix + JSON.stringify(data));
+    let digest = data => btoa(hmacPrefix + data);
+
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 2,
+      data: {
+        salt: btoa(salt),
+        "hmac-secret": encrypt(hmacSecret),
+        [`site:${digest(generated1.site)}`]: encrypt({
+          site: generated1.site
+        }),
+        [`site:${digest(generated1.site)}:${digest(generated1.site + "\0" + generated1.name + "\0")}`]: encrypt({
+          type: "generated",
+          site: generated1.site,
+          name: generated1.name,
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }),
+        [`site:${digest(generated2.site)}:${digest(generated2.site + "\0" + generated2.name + "\0" + generated2.revision)}`]: encrypt({
+          type: "generated2",
+          site: generated2.site,
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol
+        }),
+        [`site:${digest("sub." + generated1.site)}`]: encrypt({
+          site: "sub." + generated1.site,
+          alias: generated1.site
+        })
+      }
+    }));
+  }).then(() =>
+  {
+    return passwords.getAllPasswords();
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {
+      [generated1.site]: {
+        site: generated1.site,
+        passwords: [{
+          type: "generated2",
+          site: generated2.site,
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol
+        },
+        {
+          type: "generated",
+          site: generated1.site,
+          name: generated1.name,
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }],
+        aliases: ["sub." + generated1.site]
+      }
+    });
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
+
 exports.testImportErrors = function(test)
 {
   Promise.resolve().then(() =>
