@@ -6,25 +6,10 @@
 
 "use strict";
 
+require("./enterMaster");
+let {$, setCommandHandler, showError} = require("./utils");
 let {passwords, passwordRetrieval} = require("../proxy");
 let {port} = require("../messaging");
-
-function $(id)
-{
-  return document.getElementById(id);
-}
-
-function setCommandHandler(element, handler)
-{
-  if (typeof element == "string")
-    element = $(element);
-  let wrapper = (event) =>
-  {
-    event.preventDefault();
-    handler.call(element, event);
-  };
-  element.addEventListener("click", wrapper);
-}
 
 function copyToClipboard(site, password, passwordInfo)
 {
@@ -169,7 +154,7 @@ window.addEventListener("DOMContentLoaded", function()
   });
 });
 
-port.on("init", function(sites)
+passwords.getAllPasswords().then(sites =>
 {
   let siteTemplate = $("site-template").firstElementChild;
   let passwordTemplate = $("password-template").firstElementChild;
@@ -269,17 +254,7 @@ port.on("init", function(sites)
       prevInfo._nextSiteInfo = siteInfo;
     prevInfo = siteInfo;
   }
-});
-
-function showError(error)
-{
-  let message = $(error);
-  if (message && message.parentNode.id == "messages")
-    message = message.textContent;
-  else
-    message = error;
-  alert(message);
-}
+}).catch(showError);
 
 // Hack: expose __webpack_require__ for simpler debugging
 /* global __webpack_require__ */
