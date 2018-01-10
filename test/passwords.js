@@ -977,6 +977,187 @@ exports.testDecryptingImport = function(test)
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
+exports.testLegacyImport = function(test)
+{
+  let nodeCrypto = require("crypto");
+  function getKey(salt)
+  {
+    return nodeCrypto.pbkdf2Sync(dummyMaster, salt, 256 * 1024, 32, "sha1").toString("binary");
+  }
+
+  let iv = "abcdefgh";
+  let btoa = str => new Buffer(str, "binary").toString("base64");
+
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 1,
+      sites: {
+        [generated1.site]: {
+          passwords: {
+            [generated1.name]: {
+              type: "pbkdf2-sha1-generated",
+              length: generated1.length,
+              lower: generated1.lower,
+              upper: generated1.upper,
+              number: generated1.number,
+              symbol: generated1.symbol
+            }
+          },
+          aliases: []
+        }
+      }
+    }));
+  }).then(() =>
+  {
+    return passwords.getAllPasswords();
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {
+      [generated1.site]: {
+        site: generated1.site,
+        passwords: [{
+          type: "generated",
+          site: generated1.site,
+          name: generated1.name,
+          revision: "",
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }],
+        aliases: []
+      }
+    });
+  }).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 1,
+      sites: {
+        [generated1.site]: {
+          passwords: {
+            [generated1.name]: {
+              type: "pbkdf2-sha1-generated",
+              length: generated1.length,
+              lower: generated1.lower,
+              upper: generated1.upper,
+              number: generated1.number,
+              symbol: generated1.symbol
+            },
+            [generated2.name + "\n" + generated2.revision]: {
+              type: "generated",
+              length: generated2.length,
+              lower: generated2.lower,
+              upper: generated2.upper,
+              number: generated2.number,
+              symbol: generated2.symbol,
+              notes: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${generated2.site}\0${generated2.name}\0${generated2.revision}\0notes`) + `!${iv}!some notes here`)
+            },
+            [stored2.name]: {
+              type: "pbkdf2-sha1-aes256-encrypted",
+              password: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored2.site}\0${stored2.name}`) + `!${iv}!${stored2.password}`)
+            }
+          },
+          aliases: ["example.info"]
+        }
+      }
+    }));
+  }).then(() =>
+  {
+    return passwords.getAllPasswords();
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {
+      [generated1.site]: {
+        site: generated1.site,
+        passwords: [{
+          type: "stored",
+          site: stored2.site,
+          name: stored2.name,
+          password: stored2.password
+        }, {
+          type: "generated",
+          site: generated2.site,
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol,
+          notes: "some notes here"
+        }, {
+          type: "generated",
+          site: generated1.site,
+          name: generated1.name,
+          revision: "",
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }],
+        aliases: ["example.info"]
+      }
+    });
+  }).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 1,
+      sites: {
+        [stored1.site]: {
+          passwords: {
+            [stored1.name]: {
+              type: "stored",
+              password: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored1.site}\0${stored1.name}`) + `!${iv}!${stored1.password}`)
+            }
+          }
+        }
+      }
+    }));
+  }).then(() =>
+  {
+    return passwords.getAllPasswords();
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {
+      [generated1.site]: {
+        site: generated1.site,
+        passwords: [{
+          type: "stored",
+          site: stored2.site,
+          name: stored2.name,
+          password: stored2.password
+        }, {
+          type: "generated",
+          site: generated2.site,
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol,
+          notes: "some notes here"
+        }, {
+          type: "stored",
+          site: stored1.site,
+          name: stored1.name,
+          password: stored1.password
+        }],
+        aliases: ["example.info"]
+      }
+    });
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
+
 exports.testImportErrors = function(test)
 {
   Promise.resolve().then(() =>
@@ -1061,6 +1242,26 @@ exports.testImportErrors = function(test)
   }).then(() =>
   {
     test.ok(false, "Imported data without salt");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 1,
+      sites: null
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported legacy null data");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 1,
+      sites: 12
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported legacy non-object data");
   }).catch(expectedValue.bind(test, "unknown-data-format"))
     .then(done.bind(test));
 };

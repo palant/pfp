@@ -88,8 +88,11 @@ exports.subtle = {
 
       let prefix = getEncryptionPrefix(algo.name, key, algo.iv);
       ciphertext = Buffer.from(ciphertext);
-      if (ciphertext.compare(prefix, 0, prefix.length, 0, prefix.length) != 0)
+      if (ciphertext.length < prefix.length ||
+          ciphertext.compare(prefix, 0, prefix.length, 0, prefix.length) != 0)
+      {
         throw new Error("Ciphertext encrypted with wrong algorithm");
+      }
 
       return ciphertext.slice(prefix.length);
     });
