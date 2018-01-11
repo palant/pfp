@@ -69,7 +69,7 @@ exports.setErrorHandler = (error, handler) => errorHandlers.set(error, handler);
 exports.passwords = Proxy("passwords", [
   "exportPasswordData", "importPasswordData", "getPasswords", "addAlias",
   "removeAlias", "addGenerated", "addStored", "removePassword", "getPassword",
-  "setNotes", "getAllPasswords"
+  "setNotes", "getAllPasswords", "isMigrating"
 ]);
 
 exports.masterPassword = Proxy("masterPassword", [

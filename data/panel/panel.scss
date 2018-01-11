@@ -64,10 +64,18 @@ body
 
 body,
 input,
-button
+button,
+h1
 {
   font-family: $font-family;
   font-size: $font-size;
+}
+
+h1
+{
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: $block-spacing;
 }
 
 input[type="checkbox"]
@@ -123,8 +131,8 @@ a:hover
   border-radius: $block-padding;
 }
 
-.button-container,
-.link-container
+.button-container:not([hidden]),
+.link-container:not([hidden])
 {
   display: flex;
   flex-direction: row;
@@ -211,6 +219,35 @@ a:hover
   {
     background-color: #0f0;
   }
+}
+
+#migration > p,
+#migration > ul
+{
+  font-size: $font-size-small;
+}
+
+#migration > p
+{
+  margin: $block-spacing / 2 0;
+}
+
+#migration-in-progress:not([hidden])
+{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#migration-spinning-wheel
+{
+  @include margin-inline-end($inline-spacing);
+  $image-size: $font-size;
+  min-width: $image-size;
+  min-height: $image-size;
+  background-size: $image-size;
+  background-repeat: no-repeat;
+  background-image: url(../images/circles.svg);
 }
 
 #site-container

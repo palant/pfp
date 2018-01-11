@@ -30,6 +30,8 @@ setSubmitHandler("enter-master", () =>
     {
       if (error == "declined")
         markInvalid("master-password", messages["password-declined"]);
+      else if (error == "migrating")
+        state.set({masterPasswordState: "migrating"});
       else
         showUnknownError(error);
     });

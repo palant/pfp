@@ -18,6 +18,7 @@ function init()
 
   require("./enterMaster");
   require("./changeMaster");
+  require("./migration");
   require("./passwordList");
   require("./generatePassword");
   require("./storedPassword");

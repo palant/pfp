@@ -17,6 +17,7 @@ exports.masterPasswordState = null;
 let stateToPanel = {
   "unset": ["change-master"],
   "set": ["enter-master", "change-master"],
+  "migrating": ["migration"],
   "known": ["password-list", "generate-password", "stored-password", "qrcode", "sync-setup", "sync-state", "confirm"]
 };
 
