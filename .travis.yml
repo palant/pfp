@@ -1,9 +1,9 @@
 language: node_js
 node_js:
   - "6"
-  - "6.0"
   - "7"
-  - "7.0"
+  - "8"
+  - "9"
 before_script:
   - npm install -g gulp
 script:
