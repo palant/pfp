@@ -144,27 +144,77 @@ exports.runTests = function()
     for (let file of fs.readdirSync("test-lib"))
       if (path.extname(file) == ".js")
         modules.set(path.basename(file, ".js"), path.resolve("test-lib", file));
-    return source.replace(/(\brequire\(["']).\/([^"']+)/g, (match, prefix, request) =>
+    return source.replace(/(\brequire\(["'])\.\/([^"']+)/g, (match, prefix, request) =>
     {
       if (modules.has(request))
         return prefix + escape_string(modules.get(request));
       else
         return match;
+    }).replace(/(\brequire\(["'])(@stablelib)/g, (match, prefix, suffix) =>
+    {
+      return prefix + escape_string(path.resolve("third-party")) + "/" + suffix;
     });
   }
 
   let {TextEncoder, TextDecoder} = require("text-encoding");
+  let Worker = require("tiny-worker");
+  let activeWorkers = [];
+
+  class WorkerWrapper extends Worker
+  {
+    constructor(...args)
+    {
+      super(...args);
+
+      // tiny-worker doesn't have proper listeners, fake them here.
+      // See https://github.com/avoidwork/tiny-worker/issues/19
+      let listeners = {
+        message: [],
+        error: []
+      };
+      this.addEventListener = (type, listener) =>
+      {
+        if (!listeners.hasOwnProperty(type))
+          return;
+        listeners[type].push(listener);
+      };
+      this.removeEventListener = (type, listener) =>
+      {
+        if (!listeners.hasOwnProperty(type))
+          return;
+        let index = listeners[type].indexOf(listener);
+        if (index >= 0)
+          listeners[type].splice(index, 1);
+      };
+      this.onmessage = event =>
+      {
+        for (let listener of listeners.message)
+          listener(event);
+      };
+      this.onerror = event =>
+      {
+        for (let listener of listeners.error)
+          listener(event);
+      };
+
+      activeWorkers.push(this);
+    }
+  }
+
   let crypto = require("./test-lib/fake-crypto");
   let atob = str => new Buffer(str, "base64").toString("binary");
   let btoa = str => new Buffer(str, "binary").toString("base64");
 
   let nodeunit = require("sandboxed-module").require("nodeunit", {
     sourceTransformers: {rewriteRequires},
-    globals: {TextEncoder, TextDecoder, crypto, atob, btoa}
+    globals: {
+      TextEncoder, TextDecoder, crypto, atob, btoa,
+      Worker: WorkerWrapper
+    }
   });
   let reporter = nodeunit.reporters.default;
 
-  return transform((filepath, contents) =>
+  let stream = transform((filepath, contents) =>
   {
     return new Promise((resolve, reject) =>
     {
@@ -177,4 +227,12 @@ exports.runTests = function()
       });
     });
   });
+
+  stream.on("finish", () =>
+  {
+    for (let worker of activeWorkers)
+      worker.terminate();
+  });
+
+  return stream;
 };

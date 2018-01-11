@@ -17,6 +17,10 @@ $("generate-password").addEventListener("reset", () =>
 {
   setTimeout(updatePasswordLengthDisplay, 0);
 });
+$("generate-legacy").addEventListener("click", () =>
+{
+  $("generate-legacy-warning").hidden = !$("generate-legacy").checked;
+});
 updatePasswordLengthDisplay();
 
 setValidator("generate-password-user-name", enforceValue.bind(null, "user-name-required"));
@@ -73,7 +77,8 @@ function addGeneratedPassword()
     lower: $("charset-lower").checked,
     upper: $("charset-upper").checked,
     number: $("charset-number").checked,
-    symbol: $("charset-symbol").checked
+    symbol: $("charset-symbol").checked,
+    legacy: $("generate-legacy").checked
   }).then(pwdList =>
   {
     state.set({pwdList});

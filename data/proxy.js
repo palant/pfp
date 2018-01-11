@@ -8,6 +8,9 @@
 
 let {port} = require("./messaging");
 
+let errorHandlers = new Map();
+let currentHandlers = new Map();
+
 let maxMessageId = 0;
 function sendMessage(message)
 {
@@ -17,7 +20,30 @@ function sendMessage(message)
     port.once("_proxyResponse-" + messageId, ([error, result]) =>
     {
       if (error)
-        reject(error);
+      {
+        let handler = errorHandlers.get(error);
+        if (handler)
+        {
+          let promise = currentHandlers.get(error);
+          if (!promise)
+          {
+            promise = handler(error, message).then(() =>
+            {
+              currentHandlers.delete(error);
+            }).catch(e =>
+            {
+              currentHandlers.delete(error);
+              throw e;
+            });
+            currentHandlers.set(error, promise);
+          }
+
+          // Have the handler deal with the error and retry.
+          promise.then(() => sendMessage(message)).then(resolve, reject);
+        }
+        else
+          reject(error);
+      }
       else
         resolve(result);
     });
@@ -38,10 +64,12 @@ function Proxy(moduleName, methods)
   return proxy;
 }
 
+exports.setErrorHandler = (error, handler) => errorHandlers.set(error, handler);
+
 exports.passwords = Proxy("passwords", [
   "exportPasswordData", "importPasswordData", "getPasswords", "addAlias",
-  "removeAlias", "addGenerated", "addLegacy", "removePassword", "getPassword",
-  "setNotes", "removeNotes", "getNotes"
+  "removeAlias", "addGenerated", "addStored", "removePassword", "getPassword",
+  "setNotes", "getAllPasswords", "isMigrating"
 ]);
 
 exports.masterPassword = Proxy("masterPassword", [

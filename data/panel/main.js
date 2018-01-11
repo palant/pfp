@@ -18,9 +18,10 @@ function init()
 
   require("./enterMaster");
   require("./changeMaster");
+  require("./migration");
   require("./passwordList");
   require("./generatePassword");
-  require("./legacyPassword");
+  require("./storedPassword");
   require("./syncSetup");
   require("./syncState");
 }

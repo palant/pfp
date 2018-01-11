@@ -29,13 +29,9 @@ function done()
 
 exports.setUp = function(callback)
 {
-  let {data: storage} = require("../test-lib/storage");
+  let {storageData: storage} = require("../test-lib/browserAPI");
   for (let key of Object.keys(storage))
     delete storage[key];
-
-  let {data: prefs} = require("../test-lib/prefs");
-  for (let key of Object.keys(prefs))
-    delete prefs[key];
 
   masterPassword.forgetPassword();
 
@@ -46,8 +42,10 @@ exports.testGetAndForget = function(test)
 {
   Promise.resolve().then(() =>
   {
-    test.equal(masterPassword.get(), null);
-
+    masterPassword.get();
+    test.ok(false, "Getting master password didn't throw");
+  }).catch(expectedValue.bind(test, "master-password-required")).then(() =>
+  {
     return masterPassword.changePassword(dummyMaster);
   }).then(() =>
   {
@@ -56,8 +54,10 @@ exports.testGetAndForget = function(test)
     return masterPassword.forgetPassword();
   }).catch(unexpectedError.bind(test)).then(() =>
   {
-    test.equal(masterPassword.get(), null);
-
+    masterPassword.get();
+    test.ok(false, "Getting master password didn't throw");
+  }).catch(expectedValue.bind(test, "master-password-required")).then(() =>
+  {
     return masterPassword.forgetPassword();
   }).then(() =>
   {

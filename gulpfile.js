@@ -26,6 +26,41 @@ gulp.task("default", ["xpi"], function()
 {
 });
 
+function buildWorkers(targetdir)
+{
+  let resolveConfig = {
+    modules: [path.resolve(__dirname, "third-party")]
+  };
+
+  if (targetdir == "build-test")
+  {
+    resolveConfig.alias = {
+      "../lib/typedArrayConversion$": path.resolve(__dirname, "test-lib", "typedArrayConversion.js")
+    };
+  }
+
+  return merge(
+    gulp.src(["data/pbkdf2.js"])
+        .pipe(webpack({
+          output: {
+            filename: "pbkdf2.js",
+            pathinfo: true
+          },
+          resolve: resolveConfig
+        }))
+        .pipe(gulp.dest(`${targetdir}/data`)),
+    gulp.src(["data/scrypt.js"])
+        .pipe(webpack({
+          output: {
+            filename: "scrypt.js",
+            pathinfo: true
+          },
+          resolve: resolveConfig
+        }))
+        .pipe(gulp.dest(`${targetdir}/data`))
+  );
+}
+
 function buildCommon(targetdir)
 {
   return merge(
@@ -39,14 +74,6 @@ function buildCommon(targetdir)
         .pipe(webpack({
           output: {
             filename: "fillIn.js",
-            pathinfo: true
-          }
-        }))
-        .pipe(gulp.dest(`${targetdir}/data`)),
-    gulp.src(["data/pbkdf2.js"])
-        .pipe(webpack({
-          output: {
-            filename: "pbkdf2.js",
             pathinfo: true
           }
         }))
@@ -96,7 +123,8 @@ function buildCommon(targetdir)
             library: "__webpack_require__"
           }
         }))
-        .pipe(gulp.dest(`${targetdir}`))
+        .pipe(gulp.dest(`${targetdir}`)),
+    buildWorkers(targetdir)
   );
 }
 
@@ -135,6 +163,11 @@ gulp.task("build-firefox", ["validate"], function()
   );
 });
 
+gulp.task("build-test", ["validate"], function()
+{
+  return buildWorkers("build-test");
+});
+
 gulp.task("watch-firefox", ["build-firefox"], function()
 {
   gulp.watch(["*.js", "*.json", "data/**/*", "lib/**/*", "locale/**/*"], ["build-firefox"]);
@@ -142,7 +175,7 @@ gulp.task("watch-firefox", ["build-firefox"], function()
 
 gulp.task("eslint-node", function()
 {
-  return gulp.src(["*.js", "test/**/*.js"])
+  return gulp.src(["*.js", "test/**/*.js", "test-lib/**/*.js"])
              .pipe(eslint({envs: ["node", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
@@ -235,7 +268,7 @@ gulp.task("xpi", ["build-firefox"], function()
              .pipe(gulp.dest("build-firefox"));
 });
 
-gulp.task("test", ["validate"], function()
+gulp.task("test", ["validate", "build-test"], function()
 {
   return gulp.src(["test/**/*.js"])
              .pipe(utils.runTests());

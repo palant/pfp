@@ -12,18 +12,18 @@ let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
 let {$, setActivePanel, showUnknownError, messages} = require("./utils");
 
-setValidator("legacy-password-user-name", enforceValue.bind(null, "user-name-required"));
-setValidator("legacy-password-value", enforceValue.bind(null, "password-value-required"));
+setValidator("stored-password-user-name", enforceValue.bind(null, "user-name-required"));
+setValidator("stored-password-value", enforceValue.bind(null, "password-value-required"));
 
-setSubmitHandler("legacy-password", addLegacyPassword);
-setResetHandler("legacy-password", () => setActivePanel("password-list"));
+setSubmitHandler("stored-password", addStoredPassword);
+setResetHandler("stored-password", () => setActivePanel("password-list"));
 
 state.on("update", updateSite);
 updateSite();
 
 function updateSite()
 {
-  $("legacy-password-site").textContent = state.site;
+  $("stored-password-site").textContent = state.site;
 }
 
 function enforcePasswordValue(element)
@@ -35,12 +35,12 @@ function enforcePasswordValue(element)
   return null;
 }
 
-function addLegacyPassword()
+function addStoredPassword()
 {
-  passwords.addLegacy({
+  passwords.addStored({
     site: state.site,
-    name: $("legacy-password-user-name").value,
-    password: $("legacy-password-value").value
+    name: $("stored-password-user-name").value,
+    password: $("stored-password-value").value
   }).then(pwdList =>
   {
     state.set({pwdList});
@@ -48,7 +48,7 @@ function addLegacyPassword()
   }).catch(error =>
   {
     if (error == "alreadyExists")
-      markInvalid("legacy-password-user-name", messages["user-name-exists"]);
+      markInvalid("stored-password-user-name", messages["user-name-exists"]);
     else
       showUnknownError(error);
   });

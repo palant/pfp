@@ -6,9 +6,12 @@
 
 "use strict";
 
+let {toTypedArray} = require("../lib/typedArrayConversion");
+
 // We expand += intentionally to improve Chrome performance
 /* eslint operator-assignment: "off" */
 
+const NUM_ITERATIONS = 256 * 1024;
 const DIGEST_LENGTH = 20;
 const BLOCK_SIZE = 64;
 
@@ -252,16 +255,19 @@ function pbkdf2(password, salt, iterations, length)
   for (let i = 0; i < result.length; i++)
     view.setInt32(i << 2, result[i], false);
 
-  return result.buffer.slice(0, length);
+  return new Uint8Array(result.buffer, 0, length);
 }
 
 exports.pbkdf2 = pbkdf2;
 
 if (typeof self != "undefined")
 {
-  self.onmessage = function({data: {password, salt, iterations, length}})
+  self.onmessage = function({data: {jobId, password, salt, length}})
   {
-    self.postMessage(pbkdf2(password, salt, iterations, length));
+    self.postMessage({
+      jobId,
+      result: pbkdf2(toTypedArray(password), toTypedArray(salt), NUM_ITERATIONS, length)
+    });
   };
 }
 

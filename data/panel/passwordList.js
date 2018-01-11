@@ -88,7 +88,7 @@ function setSite()
   field.setAttribute("value", site || "???");
   field.value = field.getAttribute("value");
   field.setAttribute("readonly", "readonly");
-  $("generate-password-link").hidden = $("legacy-password-link").hidden = !site;
+  $("generate-password-link").hidden = $("stored-password-link").hidden = !site;
 }
 
 function hidePasswordMessages()
@@ -209,9 +209,9 @@ function showPasswords()
     for (let password of pwdList)
     {
       let tooltip;
-      if (password.type == "generated")
+      if (password.type == "generated2" || password.type == "generated")
       {
-        tooltip = messages["password-type-generated"];
+        tooltip = messages["password-type-" + password.type];
 
         tooltip += "\n" + document.querySelector('label[for="password-length"]').textContent;
         tooltip += " " + password.length;
@@ -227,10 +227,10 @@ function showPasswords()
           tooltip += " " + "+^;";
       }
       else if (password.type == "stored")
-        tooltip = messages["password-type-legacy"];
+        tooltip = messages["password-type-stored"];
 
-      if (password.hasNotes)
-        tooltip += "\n" + messages["password-notes-stored"];
+      if (password.notes)
+        tooltip += "\n" + messages["password-info-notes"] + " " + password.notes;
 
       let entry = template.cloneNode(true);
       setCommandHandler(entry.querySelector(".password-menu-link"), toggleMenu.bind(null, password, entry));
@@ -238,6 +238,8 @@ function showPasswords()
       setCommandHandler(entry.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, password));
 
       entry.querySelector(".user-name-container").setAttribute("title", tooltip);
+      if (password.type == "generated")
+        entry.querySelector(".user-name-container").classList.add("legacy-warning");
       entry.querySelector(".user-name").textContent = password.name;
 
       let revisionNode = entry.querySelector(".password-revision");
@@ -255,7 +257,7 @@ function showMenu(password, element)
 {
   hideMenu();
 
-  let notes_link_msg = password.hasNotes ? "edit-notes" : "add-notes";
+  let notes_link_msg = password.notes ? "edit-notes" : "add-notes";
   menu.querySelector(".menu-notes-link").textContent = messages[notes_link_msg];
 
   menuPassword = password;
@@ -311,9 +313,7 @@ function showQRCode(password)
 
 function showNotes(password)
 {
-  passwords.getNotes(state.site, password.name, password.revision)
-    .then(value => require("./notes").edit(password, value))
-    .catch(showPasswordMessage);
+  require("./notes").edit(password);
 }
 
 function bumpRevision(password)
@@ -330,7 +330,7 @@ function bumpRevision(password)
     revision++;
   $("password-revision").value = revision;
 
-  if (password.type == "generated")
+  if (password.type == "generated2" || password.type == "generated")
   {
     $("password-length").value = password.length;
     $("charset-lower").checked = password.lower;

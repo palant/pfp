@@ -6,25 +6,11 @@
 
 "use strict";
 
+require("./enterMaster");
+let {$, setCommandHandler, showError} = require("./utils");
+let modal = require("./modal");
 let {passwords, passwordRetrieval} = require("../proxy");
 let {port} = require("../messaging");
-
-function $(id)
-{
-  return document.getElementById(id);
-}
-
-function setCommandHandler(element, handler)
-{
-  if (typeof element == "string")
-    element = $(element);
-  let wrapper = (event) =>
-  {
-    event.preventDefault();
-    handler.call(element, event);
-  };
-  element.addEventListener("click", wrapper);
-}
 
 function copyToClipboard(site, password, passwordInfo)
 {
@@ -66,7 +52,7 @@ function exportData()
       // data: URIs don't work either (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/4282810/).
       // Let the user copy the text manually, that's the only way.
       if (confirm($("allpasswords-export-edge").textContent))
-        document.body.textContent = JSON.stringify(data);
+        document.body.textContent = data;
     }
     else
     {
@@ -80,7 +66,7 @@ function exportData()
         frameDoc.body.appendChild(link);
       }
 
-      let blob = new Blob([JSON.stringify(data)], {type: "application/json"});
+      let blob = new Blob([data], {type: "application/json"});
       link.href = URL.createObjectURL(blob);
       link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
       link.click();
@@ -100,11 +86,17 @@ function importDataFromFile(file)
   {
     if (confirm($("allpasswords-import-confirm").textContent))
     {
+      modal.show("in-progress");
       passwords.importPasswordData(reader.result).then(() =>
       {
+        modal.hide();
         alert($("allpasswords-import-success").textContent);
         window.location.reload();
-      }).catch(showError);
+      }).catch(error =>
+      {
+        modal.hide();
+        showError(error);
+      });
     }
   };
   reader.readAsText(file);
@@ -169,7 +161,7 @@ window.addEventListener("DOMContentLoaded", function()
   });
 });
 
-port.on("init", function(sites)
+passwords.getAllPasswords().then(sites =>
 {
   let siteTemplate = $("site-template").firstElementChild;
   let passwordTemplate = $("password-template").firstElementChild;
@@ -215,9 +207,10 @@ port.on("init", function(sites)
       setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, passwordData, passwordInfo));
       setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, site, passwordData, passwordInfo));
 
-      if (passwordData.type == "generated")
+      if (passwordData.type == "generated2" || passwordData.type == "generated")
       {
-        passwordInfo.querySelector(".password-info.legacy").hidden = true;
+        passwordInfo.querySelector(".password-info.stored").hidden = true;
+        passwordInfo.querySelector(".password-type." + passwordData.type).hidden = false;
         passwordInfo.querySelector(".password-length-value").textContent = passwordData.length;
 
         let chars = [];
@@ -236,7 +229,10 @@ port.on("init", function(sites)
         passwordInfo.querySelector(".password-info.generated").hidden = true;
       }
 
-      passwordInfo.querySelector(".password-info.notes").hidden = !passwordData.hasNotes;
+      let notes = passwordInfo.querySelector(".password-info.notes");
+      notes.hidden = !passwordData.notes;
+      if (passwordData.notes)
+        notes.textContent += " " + passwordData.notes;
 
       siteInfo.appendChild(passwordInfo);
     }
@@ -265,17 +261,7 @@ port.on("init", function(sites)
       prevInfo._nextSiteInfo = siteInfo;
     prevInfo = siteInfo;
   }
-});
-
-function showError(error)
-{
-  let message = $(error);
-  if (message && message.parentNode.id == "messages")
-    message = message.textContent;
-  else
-    message = error;
-  alert(message);
-}
+}).catch(showError);
 
 // Hack: expose __webpack_require__ for simpler debugging
 /* global __webpack_require__ */

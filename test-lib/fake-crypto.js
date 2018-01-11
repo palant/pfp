@@ -10,22 +10,19 @@ let crypto = require("crypto");
 
 function Key(keyData, algo, usages)
 {
-  this._data = new Buffer(keyData);
+  this._data = keyData;
   this._algo = algo;
-  this._deriveKey = false;
-  this._deriveBits = false;
   this._encrypt = false;
   this._decrypt = false;
+  this._sign = false;
   for (let usage of usages)
   {
-    if (usage == "deriveKey")
-      this._deriveKey = true;
-    else if (usage == "deriveBits")
-      this._deriveBits = true;
-    else if (usage == "encrypt")
+    if (usage == "encrypt")
       this._encrypt = true;
     else if (usage == "decrypt")
       this._decrypt = true;
+    else if (usage == "sign")
+      this._sign = true;
     else
       throw new Error("Unexpected key usage");
   }
@@ -39,6 +36,18 @@ exports.getRandomValues = function(buf)
   buf.set(bytes);
 };
 
+function getEncryptionPrefix(algoName, key, iv)
+{
+  return Buffer.concat([
+    Buffer.from(algoName, "utf-8"),
+    Buffer.from("!", "utf-8"),
+    Buffer.from(key._data),
+    Buffer.from("!", "utf-8"),
+    Buffer.from(iv),
+    Buffer.from("!", "utf-8")
+  ]);
+}
+
 exports.subtle = {
   importKey: function(format, keyData, algo, extractable, usages)
   {
@@ -46,46 +55,12 @@ exports.subtle = {
     {
       if (format != "raw")
         throw new Error("Unexpected data format");
-      if (algo != "PBKDF2")
-        throw new Error("Unexpected algorithm");
       if (extractable)
         throw new Error("Extractable keys not supported");
 
+      if (typeof algo == "object")
+        algo = algo.name;
       return new Key(keyData, algo, usages);
-    });
-  },
-
-  deriveBits: function(algo, masterKey, bits)
-  {
-    return Promise.resolve().then(() =>
-    {
-      if (algo.name != "PBKDF2" && algo.hash != "SHA-1")
-        throw new Error("Unexpected algorithm");
-      if (masterKey._algo != "PBKDF2" || !masterKey._deriveBits)
-        throw new Error("Master key not suitable for bit derivation");
-
-      let data = crypto.pbkdf2Sync(masterKey._data, algo.salt, algo.iterations,
-                                   Math.ceil(bits / 8), "sha1");
-      return new Buffer(data, "binary");
-    });
-  },
-
-  deriveKey: function(algo, masterKey, derivedKeyAlgo, extractable, keyUsages)
-  {
-    return Promise.resolve().then(() =>
-    {
-      if (algo.name != "PBKDF2" && algo.hash != "SHA-1")
-        throw new Error("Unexpected algorithm");
-      if (masterKey._algo != "PBKDF2" || !masterKey._deriveKey)
-        throw new Error("Master key not suitable for key derivation");
-      if (derivedKeyAlgo.name != "AES-CBC")
-        throw new Error("Unexpected derived key algorithm");
-      if (extractable)
-        throw new Error("Extractable keys not supported");
-
-      let data = crypto.pbkdf2Sync(masterKey._data, algo.salt, algo.iterations,
-                                   Math.ceil(derivedKeyAlgo.length / 8), "sha1");
-      return new Key(data, derivedKeyAlgo.name, keyUsages);
     });
   },
 
@@ -93,14 +68,12 @@ exports.subtle = {
   {
     return Promise.resolve().then(() =>
     {
-      if (algo.name != "AES-CBC")
-        throw new Error("Unexpected algorithm");
-      if (key._algo != "AES-CBC" || !key._encrypt)
+      if (key._algo != algo.name)
+        throw new Error("Key algorithm doesn't match encryption algorithm");
+      if (!key._encrypt)
         throw new Error("Key not suitable for encryption");
 
-      let algoName = "aes-" + (key._data.length * 8) + "-cbc";
-      let cipher = crypto.createCipheriv(algoName, key._data, algo.iv);
-      return Buffer.concat([cipher.update(cleartext), cipher.final()]);
+      return Buffer.concat([getEncryptionPrefix(algo.name, key, algo.iv), Buffer.from(cleartext)]);
     });
   },
 
@@ -108,14 +81,41 @@ exports.subtle = {
   {
     return Promise.resolve().then(() =>
     {
-      if (algo.name != "AES-CBC")
-        throw new Error("Unexpected algorithm");
-      if (key._algo != "AES-CBC" || !key._decrypt)
+      if (key._algo != algo.name)
+        throw new Error("Key algorithm doesn't match decryption algorithm");
+      if (!key._decrypt)
         throw new Error("Key not suitable for decryption");
 
-      let algoName = "aes-" + (key._data.length * 8) + "-cbc";
-      let decipher = crypto.createDecipheriv(algoName, key._data, algo.iv);
-      return Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+      let prefix = getEncryptionPrefix(algo.name, key, algo.iv);
+      ciphertext = Buffer.from(ciphertext);
+      if (ciphertext.length < prefix.length ||
+          ciphertext.compare(prefix, 0, prefix.length, 0, prefix.length) != 0)
+      {
+        throw new Error("Ciphertext encrypted with wrong algorithm");
+      }
+
+      return ciphertext.slice(prefix.length);
+    });
+  },
+
+  sign: function(algo, key, cleartext)
+  {
+    return Promise.resolve().then(() =>
+    {
+      if (algo != "HMAC")
+        throw new Error("Unexpected signing algorithm");
+      if (key._algo != algo)
+        throw new Error("Key algorithm doesn't match signing algorithm");
+      if (!key._sign)
+        throw new Error("Key not suitable for signing");
+
+      return Buffer.concat([
+        Buffer.from(algo, "utf-8"),
+        Buffer.from("!", "utf-8"),
+        Buffer.from(key._data),
+        Buffer.from("!", "utf-8"),
+        Buffer.from(cleartext)
+      ]);
     });
   }
 };

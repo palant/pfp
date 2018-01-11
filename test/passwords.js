@@ -19,6 +19,7 @@ let generated1 = {
   upper: false,
   number: true,
   symbol: false,
+  legacy: true,
   password: "r8hx8be6"
 };
 
@@ -31,16 +32,16 @@ let generated2 = {
   upper: true,
   number: false,
   symbol: true,
-  password: "VX~RBJ^NCBH(#;N["
+  password: "$X*RR~V}?;FY[T|~"
 };
 
-let legacy1 = {
+let stored1 = {
   site: "example.com",
   name: "foo",
   password: "bar"
 };
 
-let legacy2 = {
+let stored2 = {
   site: "example.com",
   name: "bar",
   password: "foo"
@@ -64,13 +65,9 @@ function done()
 
 exports.setUp = function(callback)
 {
-  let {data: storage} = require("../test-lib/storage");
+  let {storageData: storage} = require("../test-lib/browserAPI");
   for (let key of Object.keys(storage))
     delete storage[key];
-
-  let {data: prefs} = require("../test-lib/prefs");
-  for (let key of Object.keys(prefs))
-    delete prefs[key];
 
   masterPassword.forgetPassword();
 
@@ -81,45 +78,46 @@ exports.testAddRemoveGenerated = function(test)
 {
   Promise.resolve().then(() =>
   {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
     return passwords.addGenerated(generated1);
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
       type: "generated",
+      site: generated1.site,
       name: generated1.name,
-      revision: "",
       length: generated1.length,
       lower: generated1.lower,
       upper: generated1.upper,
       number: generated1.number,
-      symbol: generated1.symbol,
-      hasNotes: false
+      symbol: generated1.symbol
     }]);
 
     return passwords.addGenerated(generated2);
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
+      site: generated2.site,
       name: generated2.name,
       revision: generated2.revision,
       length: generated2.length,
       lower: generated2.lower,
       upper: generated2.upper,
       number: generated2.number,
-      symbol: generated2.symbol,
-      hasNotes: false
+      symbol: generated2.symbol
     },
     {
       type: "generated",
+      site: generated1.site,
       name: generated1.name,
-      revision: "",
       length: generated1.length,
       lower: generated1.lower,
       upper: generated1.upper,
       number: generated1.number,
-      symbol: generated1.symbol,
-      hasNotes: false
+      symbol: generated1.symbol
     }]);
 
     return Promise.all([
@@ -151,15 +149,15 @@ exports.testAddRemoveGenerated = function(test)
   }).catch(unexpectedError.bind(test)).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
+      site: generated2.site,
       name: generated2.name,
       revision: generated2.revision,
       length: generated2.length,
       lower: generated2.lower,
       upper: generated2.upper,
       number: generated2.number,
-      symbol: generated2.symbol,
-      hasNotes: false
+      symbol: generated2.symbol
     }]);
 
     return passwords.removePassword(generated1.site, generated1.name, generated1.revision);
@@ -181,81 +179,85 @@ exports.testAddRemoveGenerated = function(test)
   }).catch(expectedValue.bind(test, "no-such-password")).then(done.bind(test));
 };
 
-exports.testAddRemoveLegacy = function(test)
+exports.testAddRemoveStored = function(test)
 {
   Promise.resolve().then(() =>
   {
-    return passwords.addLegacy(legacy1);
+    return passwords.addStored(stored1);
   }).then(() =>
   {
-    test.ok(false, "Added legacy password before knowing master password");
+    test.ok(false, "Added stored password before knowing master password");
   }).catch(expectedValue.bind(test, "master-password-required")).then(() =>
   {
     return masterPassword.changePassword(dummyMaster);
   }).then(() =>
   {
-    return passwords.addLegacy(legacy1);
+    return passwords.addStored(stored1);
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
       type: "stored",
-      name: legacy1.name,
-      hasNotes: false
+      site: stored1.site,
+      name: stored1.name,
+      password: stored1.password
     }]);
-    return passwords.addLegacy(legacy2);
+    return passwords.addStored(stored2);
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
       type: "stored",
-      name: legacy2.name,
-      hasNotes: false
+      site: stored2.site,
+      name: stored2.name,
+      password: stored2.password
     }, {
       type: "stored",
-      name: legacy1.name,
-      hasNotes: false
+      site: stored1.site,
+      name: stored1.name,
+      password: stored1.password
     }]);
 
     return Promise.all([
       pwdList,
-      passwords.getPasswords(legacy1.site),
-      passwords.getPasswords("www." + legacy1.site),
-      passwords.getPasswords("www." + legacy1.site + "."),
-      passwords.getPasswords("sub." + legacy1.site + ".")
+      passwords.getPasswords(stored1.site),
+      passwords.getPasswords("www." + stored1.site),
+      passwords.getPasswords("www." + stored1.site + "."),
+      passwords.getPasswords("sub." + stored1.site + ".")
     ]);
   }).then(([pwdList, siteData, wwwSiteData, wwwSiteData2, subSiteData]) =>
   {
     let [origSite, site, pwdList2] = siteData;
-    test.equal(origSite, legacy1.site);
-    test.equal(site, legacy1.site);
+    test.equal(origSite, stored1.site);
+    test.equal(site, stored1.site);
     test.deepEqual(pwdList2, pwdList);
 
     [origSite, site, pwdList2] = wwwSiteData;
-    test.equal(origSite, legacy1.site);
-    test.equal(site, legacy1.site);
+    test.equal(origSite, stored1.site);
+    test.equal(site, stored1.site);
     test.deepEqual(pwdList2, pwdList);
     test.deepEqual(wwwSiteData, wwwSiteData2);
 
     [origSite, site, pwdList2] = subSiteData;
-    test.equal(origSite, "sub." + legacy1.site);
-    test.equal(site, "sub." + legacy1.site);
+    test.equal(origSite, "sub." + stored1.site);
+    test.equal(site, "sub." + stored1.site);
     test.deepEqual(pwdList2, []);
 
-    return passwords.removePassword(legacy1.site, legacy1.name);
+    return passwords.removePassword(stored1.site, stored1.name);
   }).catch(unexpectedError.bind(test)).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
       type: "stored",
-      name: legacy2.name,
-      hasNotes: false
+      site: stored2.site,
+      name: stored2.name,
+      password: stored2.password
     }]);
 
-    return passwords.removePassword(legacy1.site, legacy1.name);
+    return passwords.removePassword(stored1.site, stored1.name);
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
   }).catch(expectedValue.bind(test, "no-such-password")).then(() =>
   {
-    return passwords.removePassword("sub." + legacy2.site, legacy2.name);
+    return passwords.removePassword("sub." + stored2.site, stored2.name);
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
@@ -278,13 +280,13 @@ exports.testAddGeneratedExisting = function(test)
     test.ok(false, "Succeeded adding the same password twice");
   }).catch(expectedValue.bind(test, "alreadyExists")).then(() =>
   {
-    return passwords.addLegacy(legacy1);
+    return passwords.addStored(stored1);
   }).catch(expectedValue.bind(test, "alreadyExists")).then(() =>
   {
     return passwords.removePassword(generated1.site, generated1.name, generated1.revision);
   }).then(() =>
   {
-    return passwords.addLegacy(legacy1);
+    return passwords.addStored(stored1);
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
@@ -309,13 +311,13 @@ exports.testRetrieval = function(test)
   }).then(pwd =>
   {
     test.equal(pwd, generated2.password);
-    return passwords.addLegacy(legacy2);
+    return passwords.addStored(stored2);
   }).then(pwdList =>
   {
-    return passwords.getPassword(legacy2.site, legacy2.name);
+    return passwords.getPassword(stored2.site, stored2.name);
   }).then(pwd =>
   {
-    test.equal(pwd, legacy2.password);
+    test.equal(pwd, stored2.password);
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
@@ -364,7 +366,13 @@ exports.testAliases = function(test)
     });
   }
 
-  Promise.resolve().then(() => passwords.addGenerated(generated1)).then(() =>
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return passwords.addGenerated(generated1);
+  }).then(() =>
   {
     return expectData(expectedSite, []);
   }).then(() =>
@@ -374,14 +382,13 @@ exports.testAliases = function(test)
   {
     return expectData(generated1.site, [{
       type: "generated",
+      site: generated1.site,
       name: generated1.name,
-      revision: "",
       length: generated1.length,
       lower: generated1.lower,
       upper: generated1.upper,
       number: generated1.number,
-      symbol: generated1.symbol,
-      hasNotes: false
+      symbol: generated1.symbol
     }]);
   }).then(() =>
   {
@@ -394,7 +401,13 @@ exports.testAliases = function(test)
 
 exports.testAliasErrors = function(test)
 {
-  Promise.resolve().then(() => passwords.addGenerated(generated1)).then(() =>
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return passwords.addGenerated(generated1);
+  }).then(() =>
   {
     return passwords.addAlias(generated1.site, "example.info");
   }).then(() =>
@@ -449,7 +462,8 @@ exports.testNotes = function(test)
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
+      site: generated2.site,
       name: generated2.name,
       revision: generated2.revision,
       length: generated2.length,
@@ -457,7 +471,7 @@ exports.testNotes = function(test)
       upper: generated2.upper,
       number: generated2.number,
       symbol: generated2.symbol,
-      hasNotes: true
+      notes: notes1
     }]);
 
     return Promise.all([pwdList, passwords.getPasswords(generated2.site)]);
@@ -474,7 +488,8 @@ exports.testNotes = function(test)
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
+      site: generated2.site,
       name: generated2.name,
       revision: generated2.revision,
       length: generated2.length,
@@ -482,7 +497,7 @@ exports.testNotes = function(test)
       upper: generated2.upper,
       number: generated2.number,
       symbol: generated2.symbol,
-      hasNotes: true
+      notes: notes2
     }]);
 
     return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
@@ -490,19 +505,19 @@ exports.testNotes = function(test)
   {
     test.equal(notes, notes2);
 
-    return passwords.removeNotes(generated2.site, generated2.name, generated2.revision);
+    return passwords.setNotes(generated2.site, generated2.name, generated2.revision, null);
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
+      site: generated2.site,
       name: generated2.name,
       revision: generated2.revision,
       length: generated2.length,
       lower: generated2.lower,
       upper: generated2.upper,
       number: generated2.number,
-      symbol: generated2.symbol,
-      hasNotes: false
+      symbol: generated2.symbol
     }]);
 
     return Promise.all([pwdList, passwords.getPasswords(generated2.site)]);
@@ -510,19 +525,19 @@ exports.testNotes = function(test)
   {
     test.deepEqual(pwdList2, pwdList);
 
-    return passwords.removeNotes(generated2.site, generated2.name, generated2.revision);
+    return passwords.setNotes(generated2.site, generated2.name, generated2.revision, null);
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
+      site: generated2.site,
       name: generated2.name,
       revision: generated2.revision,
       length: generated2.length,
       lower: generated2.lower,
       upper: generated2.upper,
       number: generated2.number,
-      symbol: generated2.symbol,
-      hasNotes: false
+      symbol: generated2.symbol
     }]);
     return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
   }).then(notes =>
@@ -551,22 +566,22 @@ exports.testAllPasswords = function(test)
   {
     test.deepEqual(allPasswords, {
       [generated1.site]: {
+        site: generated1.site,
         passwords: [{
           type: "generated",
+          site: generated1.site,
           name: generated1.name,
-          revision: "",
           length: generated1.length,
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol,
-          hasNotes: false
+          symbol: generated1.symbol
         }],
         aliases: []
       }
     });
 
-    return passwords.addLegacy(legacy2);
+    return passwords.addStored(stored2);
   }).then(pwdList =>
   {
     return passwords.getAllPasswords();
@@ -574,20 +589,21 @@ exports.testAllPasswords = function(test)
   {
     test.deepEqual(allPasswords, {
       [generated1.site]: {
+        site: generated1.site,
         passwords: [{
           type: "stored",
-          name: legacy2.name,
-          hasNotes: false
+          site: stored2.site,
+          name: stored2.name,
+          password: stored2.password
         }, {
           type: "generated",
+          site: generated1.site,
           name: generated1.name,
-          revision: "",
           length: generated1.length,
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol,
-          hasNotes: false
+          symbol: generated1.symbol
         }],
         aliases: []
       }
@@ -606,40 +622,42 @@ exports.testAllPasswords = function(test)
   {
     test.deepEqual(allPasswords, {
       [generated1.site]: {
+        site: generated1.site,
         passwords: [{
           type: "stored",
-          name: legacy2.name,
-          hasNotes: false
+          site: stored2.site,
+          name: stored2.name,
+          password: stored2.password
         }, {
           type: "generated",
+          site: generated1.site,
           name: generated1.name,
-          revision: "",
           length: generated1.length,
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol,
-          hasNotes: false
+          symbol: generated1.symbol
         }],
         aliases: ["example.info", "sub1.example.info"]
       },
       ["sub." + generated2.site]: {
+        site: "sub." + generated2.site,
         passwords: [{
-          type: "generated",
+          type: "generated2",
+          site: "sub." + generated2.site,
           name: generated2.name,
           revision: generated2.revision,
           length: generated2.length,
           lower: generated2.lower,
           upper: generated2.upper,
           number: generated2.number,
-          symbol: generated2.symbol,
-          hasNotes: false
+          symbol: generated2.symbol
         }],
         aliases: ["sub2.example.info"]
       }
     });
 
-    return passwords.setNotes(legacy2.site, legacy2.name, "", "foobarnotes");
+    return passwords.setNotes(stored2.site, stored2.name, "", "foobarnotes");
   }).then(pwdList =>
   {
     return passwords.getAllPasswords();
@@ -647,34 +665,37 @@ exports.testAllPasswords = function(test)
   {
     test.deepEqual(allPasswords, {
       [generated1.site]: {
+        site: generated1.site,
         passwords: [{
           type: "stored",
-          name: legacy2.name,
-          hasNotes: true
+          site: stored2.site,
+          name: stored2.name,
+          password: stored2.password,
+          notes: "foobarnotes"
         }, {
           type: "generated",
+          site: generated1.site,
           name: generated1.name,
-          revision: "",
           length: generated1.length,
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol,
-          hasNotes: false
+          symbol: generated1.symbol
         }],
         aliases: ["example.info", "sub1.example.info"]
       },
       ["sub." + generated2.site]: {
+        site: "sub." + generated2.site,
         passwords: [{
-          type: "generated",
+          type: "generated2",
+          site: "sub." + generated2.site,
           name: generated2.name,
           revision: generated2.revision,
           length: generated2.length,
           lower: generated2.lower,
           upper: generated2.upper,
           number: generated2.number,
-          symbol: generated2.symbol,
-          hasNotes: false
+          symbol: generated2.symbol
         }],
         aliases: ["sub2.example.info"]
       }
@@ -688,20 +709,22 @@ exports.testAllPasswords = function(test)
   {
     test.deepEqual(allPasswords, {
       [generated1.site]: {
+        site: generated1.site,
         passwords: [{
           type: "stored",
-          name: legacy2.name,
-          hasNotes: true
+          site: stored2.site,
+          name: stored2.name,
+          password: stored2.password,
+          notes: "foobarnotes"
         }, {
           type: "generated",
+          site: generated1.site,
           name: generated1.name,
-          revision: "",
           length: generated1.length,
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol,
-          hasNotes: false
+          symbol: generated1.symbol
         }],
         aliases: ["example.info", "sub1.example.info"]
       }
@@ -711,6 +734,24 @@ exports.testAllPasswords = function(test)
 
 exports.testExport = function(test)
 {
+  function checkExport(test, exportData)
+  {
+    let parsed = JSON.parse(exportData);
+    test.equal(parsed.application, "easypasswords");
+    test.equal(parsed.format, 2);
+    test.ok(typeof parsed.data == "object");
+    test.ok(parsed.data["salt"]);
+    test.ok(parsed.data["hmac-secret"]);
+
+    return passwords.removeAll().then(() =>
+    {
+      return passwords.importPasswordData(exportData);
+    }).then(() =>
+    {
+      return passwords.getAllPasswords();
+    });
+  }
+
   Promise.resolve().then(() =>
   {
     return masterPassword.changePassword(dummyMaster);
@@ -719,11 +760,10 @@ exports.testExport = function(test)
     return passwords.exportPasswordData();
   }).then(exportData =>
   {
-    test.deepEqual(exportData, {
-      application: "easypasswords",
-      format: 1,
-      sites: {}
-    });
+    return checkExport(test, exportData);
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {});
 
     return passwords.addGenerated(generated1);
   }).then(pwdList =>
@@ -731,23 +771,23 @@ exports.testExport = function(test)
     return passwords.exportPasswordData();
   }).then(exportData =>
   {
-    test.deepEqual(exportData, {
-      application: "easypasswords",
-      format: 1,
-      sites: {
-        [generated1.site]: {
-          passwords: {
-            [generated1.name]: {
-              type: "generated",
-              length: generated1.length,
-              lower: generated1.lower,
-              upper: generated1.upper,
-              number: generated1.number,
-              symbol: generated1.symbol
-            }
-          },
-          aliases: []
-        }
+    return checkExport(test, exportData);
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {
+      [generated1.site]: {
+        site: generated1.site,
+        passwords: [{
+          type: "generated",
+          site: generated1.site,
+          name: generated1.name,
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }],
+        aliases: []
       }
     });
 
@@ -757,72 +797,78 @@ exports.testExport = function(test)
     return passwords.exportPasswordData();
   }).then(exportData =>
   {
-    test.deepEqual(exportData, {
-      application: "easypasswords",
-      format: 1,
-      sites: {
-        [generated1.site]: {
-          passwords: {
-            [generated1.name]: {
-              type: "generated",
-              length: generated1.length,
-              lower: generated1.lower,
-              upper: generated1.upper,
-              number: generated1.number,
-              symbol: generated1.symbol
-            },
-            [generated2.name + "\n" + generated2.revision]: {
-              type: "generated",
-              length: generated2.length,
-              lower: generated2.lower,
-              upper: generated2.upper,
-              number: generated2.number,
-              symbol: generated2.symbol
-            }
-          },
-          aliases: []
-        }
+    return checkExport(test, exportData);
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {
+      [generated1.site]: {
+        site: generated1.site,
+        passwords: [{
+          type: "generated2",
+          site: generated2.site,
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol
+        },
+        {
+          type: "generated",
+          site: generated1.site,
+          name: generated1.name,
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }],
+        aliases: []
       }
     });
 
     return Promise.all([
       passwords.addAlias("example.info", generated1.site),
-      passwords.addLegacy(legacy2)
+      passwords.addStored(stored2)
     ]);
   }).then(() =>
   {
     return passwords.exportPasswordData();
   }).then(exportData =>
   {
-    delete exportData.sites[legacy2.site].passwords[legacy2.name].password;
-    test.deepEqual(exportData, {
-      application: "easypasswords",
-      format: 1,
-      sites: {
-        [generated1.site]: {
-          passwords: {
-            [generated1.name]: {
-              type: "generated",
-              length: generated1.length,
-              lower: generated1.lower,
-              upper: generated1.upper,
-              number: generated1.number,
-              symbol: generated1.symbol
-            },
-            [generated2.name + "\n" + generated2.revision]: {
-              type: "generated",
-              length: generated2.length,
-              lower: generated2.lower,
-              upper: generated2.upper,
-              number: generated2.number,
-              symbol: generated2.symbol
-            },
-            [legacy2.name]: {
-              type: "stored"
-            }
-          },
-          aliases: ["example.info"]
-        }
+    return checkExport(test, exportData);
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {
+      [generated1.site]: {
+        site: generated1.site,
+        passwords: [{
+          type: "stored",
+          site: stored2.site,
+          name: stored2.name,
+          password: stored2.password
+        }, {
+          type: "generated2",
+          site: generated2.site,
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol
+        }, {
+          type: "generated",
+          site: generated1.site,
+          name: generated1.name,
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }],
+        aliases: ["example.info"]
       }
     });
 
@@ -832,50 +878,116 @@ exports.testExport = function(test)
     return passwords.exportPasswordData();
   }).then(exportData =>
   {
-    test.ok(exportData.sites[generated2.site].passwords[generated2.name + "\n" + generated2.revision].notes);
+    return checkExport(test, exportData);
+  }).then(allPasswords =>
+  {
+    return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
+  }).then(notes =>
+  {
+    test.equal(notes, "foobarnotes");
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
-exports.testImportErrors = function(test)
+exports.testDecryptingImport = function(test)
 {
   Promise.resolve().then(() =>
   {
-    return passwords.importPasswordData("foobar");
+    return masterPassword.changePassword(dummyMaster);
   }).then(() =>
   {
-    test.ok(false, "Imported malformed JSON");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
-  {
-    return passwords.importPasswordData(JSON.stringify(42));
-  }).then(() =>
-  {
-    test.ok(false, "Imported non-object");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
-  {
-    return passwords.importPasswordData(JSON.stringify({
-      application: "foobar",
-      format: 1,
-      sites: {}
-    }));
-  }).then(() =>
-  {
-    test.ok(false, "Imported unknown application data");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
-  {
+    let atob = str => new Buffer(str, "base64").toString("binary");
+    let btoa = str => new Buffer(str, "binary").toString("base64");
+    let salt = "asdf";
+    let hmacSecret = "fdsa";
+    let key = "4MgE2P1PbjLyAz7JxczGjOPNtaaqNKofAmGSbNvRtUM=";
+    let iv = "fakeivwhatever";
+    let cryptoPrefix = "AES-GCM!" + atob(key) + "!" + iv + "!";
+    let hmacPrefix = "HMAC!" + hmacSecret + "!";
+    let encrypt = data => btoa(iv) + "_" + btoa(cryptoPrefix + JSON.stringify(data));
+    let digest = data => btoa(hmacPrefix + data);
+
     return passwords.importPasswordData(JSON.stringify({
       application: "easypasswords",
-      format: 33,
-      sites: {}
+      format: 2,
+      data: {
+        salt: btoa(salt),
+        "hmac-secret": encrypt(hmacSecret),
+        [`site:${digest(generated1.site)}`]: encrypt({
+          site: generated1.site
+        }),
+        [`site:${digest(generated1.site)}:${digest(generated1.site + "\0" + generated1.name + "\0")}`]: encrypt({
+          type: "generated",
+          site: generated1.site,
+          name: generated1.name,
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }),
+        [`site:${digest(generated2.site)}:${digest(generated2.site + "\0" + generated2.name + "\0" + generated2.revision)}`]: encrypt({
+          type: "generated2",
+          site: generated2.site,
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol
+        }),
+        [`site:${digest("sub." + generated1.site)}`]: encrypt({
+          site: "sub." + generated1.site,
+          alias: generated1.site
+        })
+      }
     }));
   }).then(() =>
   {
-    test.ok(false, "Imported unknown format version");
-  }).catch(expectedValue.bind(test, "unknown-data-format"))
-    .then(done.bind(test));
+    return passwords.getAllPasswords();
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {
+      [generated1.site]: {
+        site: generated1.site,
+        passwords: [{
+          type: "generated2",
+          site: generated2.site,
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol
+        },
+        {
+          type: "generated",
+          site: generated1.site,
+          name: generated1.name,
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }],
+        aliases: ["sub." + generated1.site]
+      }
+    });
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
-exports.testImport = function(test)
+exports.testLegacyImport = function(test)
 {
+  let nodeCrypto = require("crypto");
+  function getKey(salt)
+  {
+    return nodeCrypto.pbkdf2Sync(dummyMaster, salt, 256 * 1024, 32, "sha1").toString("binary");
+  }
+
+  let iv = "abcdefgh";
+  let btoa = str => new Buffer(str, "binary").toString("base64");
+
   Promise.resolve().then(() =>
   {
     return masterPassword.changePassword(dummyMaster);
@@ -907,16 +1019,17 @@ exports.testImport = function(test)
   {
     test.deepEqual(allPasswords, {
       [generated1.site]: {
+        site: generated1.site,
         passwords: [{
           type: "generated",
+          site: generated1.site,
           name: generated1.name,
           revision: "",
           length: generated1.length,
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol,
-          hasNotes: false
+          symbol: generated1.symbol
         }],
         aliases: []
       }
@@ -944,10 +1057,11 @@ exports.testImport = function(test)
               upper: generated2.upper,
               number: generated2.number,
               symbol: generated2.symbol,
-              notes: "JUcNu0W/U+zrGe1qxOSi1Q==_dOxyFz2Gbx0TxauU+dQkeA=="
+              notes: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${generated2.site}\0${generated2.name}\0${generated2.revision}\0notes`) + `!${iv}!some notes here`)
             },
-            [legacy2.name]: {
-              type: "pbkdf2-sha1-aes256-encrypted"
+            [stored2.name]: {
+              type: "pbkdf2-sha1-aes256-encrypted",
+              password: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored2.site}\0${stored2.name}`) + `!${iv}!${stored2.password}`)
             }
           },
           aliases: ["example.info"]
@@ -961,8 +1075,15 @@ exports.testImport = function(test)
   {
     test.deepEqual(allPasswords, {
       [generated1.site]: {
+        site: generated1.site,
         passwords: [{
+          type: "stored",
+          site: stored2.site,
+          name: stored2.name,
+          password: stored2.password
+        }, {
           type: "generated",
+          site: generated2.site,
           name: generated2.name,
           revision: generated2.revision,
           length: generated2.length,
@@ -970,36 +1091,32 @@ exports.testImport = function(test)
           upper: generated2.upper,
           number: generated2.number,
           symbol: generated2.symbol,
-          hasNotes: true
+          notes: "some notes here"
         }, {
           type: "generated",
+          site: generated1.site,
           name: generated1.name,
           revision: "",
           length: generated1.length,
           lower: generated1.lower,
           upper: generated1.upper,
           number: generated1.number,
-          symbol: generated1.symbol,
-          hasNotes: false
+          symbol: generated1.symbol
         }],
         aliases: ["example.info"]
       }
     });
-
-    return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
-  }).then(notes =>
+  }).then(() =>
   {
-    test.equal(notes, "foobarnotes");
-
     return passwords.importPasswordData(JSON.stringify({
       application: "easypasswords",
       format: 1,
       sites: {
-        [legacy1.site]: {
+        [stored1.site]: {
           passwords: {
-            [legacy1.name]: {
-              type: "pbkdf2-sha1-aes256-encrypted",
-              password: "BaxABw0KMZmYxGTB8vdwIQ==_smbTbzvo8hdAIjnM45A97Q=="
+            [stored1.name]: {
+              type: "stored",
+              password: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored1.site}\0${stored1.name}`) + `!${iv}!${stored1.password}`)
             }
           }
         }
@@ -1012,8 +1129,15 @@ exports.testImport = function(test)
   {
     test.deepEqual(allPasswords, {
       [generated1.site]: {
+        site: generated1.site,
         passwords: [{
+          type: "stored",
+          site: stored2.site,
+          name: stored2.name,
+          password: stored2.password
+        }, {
           type: "generated",
+          site: generated2.site,
           name: generated2.name,
           revision: generated2.revision,
           length: generated2.length,
@@ -1021,58 +1145,125 @@ exports.testImport = function(test)
           upper: generated2.upper,
           number: generated2.number,
           symbol: generated2.symbol,
-          hasNotes: true
+          notes: "some notes here"
         }, {
           type: "stored",
-          name: legacy1.name,
-          hasNotes: false
+          site: stored1.site,
+          name: stored1.name,
+          password: stored1.password
         }],
         aliases: ["example.info"]
       }
     });
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
 
-    return passwords.getPassword(legacy1.site, legacy1.name);
-  }).then(pwd =>
+exports.testImportErrors = function(test)
+{
+  Promise.resolve().then(() =>
   {
-    test.equal(pwd, legacy1.password);
+    return passwords.importPasswordData("foobar");
   }).then(() =>
   {
+    test.ok(false, "Imported malformed JSON");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify(42));
+  }).then(() =>
+  {
+    test.ok(false, "Imported non-object");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
     return passwords.importPasswordData(JSON.stringify({
-      application: "easypasswords",
-      format: 1,
-      sites: {
-        "example.info": {
-          passwords: {},
-          aliases: [generated1.site]
-        }
+      application: "foobar",
+      format: 2,
+      data: {
+        salt: "asdf",
+        "hmac-secret": "fdsa"
       }
     }));
   }).then(() =>
   {
-    return passwords.getAllPasswords();
-  }).then(allPasswords =>
+    test.ok(false, "Imported unknown application data");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
   {
-    test.deepEqual(allPasswords, {
-      [generated1.site]: {
-        passwords: [{
-          type: "generated",
-          name: generated2.name,
-          revision: generated2.revision,
-          length: generated2.length,
-          lower: generated2.lower,
-          upper: generated2.upper,
-          number: generated2.number,
-          symbol: generated2.symbol,
-          hasNotes: true
-        }, {
-          type: "stored",
-          name: legacy1.name,
-          hasNotes: false
-        }],
-        aliases: []
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 33,
+      data: {
+        salt: "asdf",
+        "hmac-secret": "fdsa"
       }
-    });
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported unknown format version");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 2,
+      data: null
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported null data");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 2,
+      data: {}
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported empty data");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 2,
+      data: {
+        salt: "asdf"
+      }
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported data without HMAC secret");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 2,
+      data: {
+        "hmac-secret": "fdsa"
+      }
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported data without salt");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 1,
+      sites: null
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported legacy null data");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "easypasswords",
+      format: 1,
+      sites: 12
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported legacy non-object data");
+  }).catch(expectedValue.bind(test, "unknown-data-format"))
+    .then(done.bind(test));
 };
 
 exports.testRemoveAll = function(test)
@@ -1081,7 +1272,7 @@ exports.testRemoveAll = function(test)
   {
     return Promise.all([
       passwords.addGenerated(generated1),
-      passwords.addLegacy(legacy2),
+      passwords.addStored(stored2),
       passwords.addGenerated(Object.assign({}, generated2, {site: "sub." + generated2.site})),
       passwords.addAlias("example.info", generated1.site)
     ]);

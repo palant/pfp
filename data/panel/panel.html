@@ -26,8 +26,9 @@
       <div data-l10n-id="no-characters-selected"></div>
       <div data-l10n-id="password-value-required"></div>
       <div data-l10n-id="password-type-generated"></div>
-      <div data-l10n-id="password-type-legacy"></div>
-      <div data-l10n-id="password-notes-stored"></div>
+      <div data-l10n-id="password-type-generated2"></div>
+      <div data-l10n-id="password-type-stored"></div>
+      <div data-l10n-id="password-info-notes"></div>
       <div data-l10n-id="remove-password-confirmation"></div>
       <div data-l10n-id="remove-alias-confirmation"></div>
       <div data-l10n-id="add-notes"></div>
@@ -73,6 +74,28 @@
       </div>
       <div class="link-container">
         <a id="reset-master-link" href="#" data-l10n-id="reset-master-link"></a>
+      </div>
+    </form>
+
+    <form id="migration" class="slide">
+      <h1 data-l10n-id="migration-title"></h1>
+      <div id="migration-in-progress">
+        <div id="migration-spinning-wheel"></div>
+        <div data-l10n-id="migration-in-progress"></div>
+      </div>
+      <p data-l10n-id="migration-features-intro"></p>
+      <ul>
+        <li data-l10n-id="migration-feature1"></li>
+        <li data-l10n-id="migration-feature2"></li>
+        <li data-l10n-id="migration-feature3"></li>
+      </ul>
+      <p data-l10n-id="migration-todos-intro"></p>
+      <ul>
+        <li data-l10n-id="migration-todo1"></li>
+        <li data-l10n-id="migration-todo2"></li>
+      </ul>
+      <div id="migration-buttons" class="button-container" hidden>
+        <button id="migration-continue" type="submit" data-l10n-id="migration-continue"></button>
       </div>
     </form>
 
@@ -144,7 +167,7 @@
       <div id="no-passwords-message" data-l10n-id="no-passwords-message"></div>
       <div id="password-list-container"></div>
       <a href="#" id="generate-password-link" data-l10n-id="generate-password-link"></a>
-      <a href="#" id="legacy-password-link" data-l10n-id="legacy-password-link"></a>
+      <a href="#" id="stored-password-link" data-l10n-id="stored-password-link"></a>
       <div class="link-container">
         <a id="show-all" href="#" data-l10n-id="show-all-passwords"></a>
         <a id="sync-setup-link" href="#" data-l10n-id="sync-setup" hidden></a>
@@ -153,7 +176,7 @@
       </div>
     </form>
 
-    <form id="generate-password" class="slide" data-default-element="generate-password-user-name" data-custom-reset="change-password-revision.hidden,password-revision-container.hidden=true">
+    <form id="generate-password" class="slide" data-default-element="generate-password-user-name" data-custom-reset="change-password-revision.hidden,password-revision-container.hidden=true,generate-legacy-warning.hidden=true">
       <label data-l10n-id="site"></label>
       <div id="generate-password-site"></div>
       <label class="block-start" for="generate-password-user-name" data-l10n-id="user-name"></label>
@@ -177,24 +200,30 @@
         <label><input id="charset-symbol" type="checkbox" data-error="charsets-error" checked>+^;</label>
       </div>
       <div id="charsets-error" class="error" hidden></div>
+      <div id="generate-legacy-container" class="block-start">
+        <input id="generate-legacy" type="checkbox">
+        <label for="generate-legacy" data-l10n-id="generate-legacy"></label>
+      </div>
+      <div id="generate-legacy-warning" class="warning" data-l10n-id="generate-legacy-warning" hidden></div>
       <div class="button-container">
         <button id="generate-password-submit" type="submit" data-l10n-id="generate-password"></button>
         <button id="generate-password-cancel" type="reset" data-l10n-id="cancel"></button>
       </div>
     </form>
 
-    <form id="legacy-password" class="slide" data-default-element="legacy-password-user-name">
+    <form id="stored-password" class="slide" data-default-element="stored-password-user-name">
       <label data-l10n-id="site"></label>
-      <div id="legacy-password-site"></div>
-      <label class="block-start" for="legacy-password-user-name" data-l10n-id="user-name"></label>
-      <input id="legacy-password-user-name" type="text">
+      <div id="stored-password-site"></div>
+      <div class="warning block-start" data-l10n-id="stored-password-warning"></div>
+      <label class="block-start" for="stored-password-user-name" data-l10n-id="user-name"></label>
+      <input id="stored-password-user-name" type="text">
       <div class="error" hidden></div>
-      <label class="block-start" for="legacy-password-value" data-l10n-id="password-value"></label>
-      <input id="legacy-password-value" type="password">
+      <label class="block-start" for="stored-password-value" data-l10n-id="password-value"></label>
+      <input id="stored-password-value" type="password">
       <div class="error" hidden></div>
       <div class="button-container">
-        <button id="legacy-password-save" type="submit" data-l10n-id="save-password"></button>
-        <button id="legacy-password-cancel" type="reset" data-l10n-id="cancel"></button>
+        <button id="stored-password-save" type="submit" data-l10n-id="save-password"></button>
+        <button id="stored-password-cancel" type="reset" data-l10n-id="cancel"></button>
       </div>
     </form>
 
