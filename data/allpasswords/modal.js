@@ -10,6 +10,8 @@ let {$} = require("./utils");
 
 function show(id)
 {
+  hide();
+
   let element = $(id);
   if (!element || element.parentNode.id != "modalOverlay")
     throw new Error("Invalid modal dialog ID");
@@ -27,3 +29,10 @@ function hide()
   $("modalOverlay").hidden = true;
 }
 exports.hide = hide;
+
+function active()
+{
+  let active = document.querySelector("#modalOverlay > [active='true']");
+  return active ? active.id : null;
+}
+exports.active = active;

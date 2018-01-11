@@ -8,6 +8,7 @@
 
 require("./enterMaster");
 let {$, setCommandHandler, showError} = require("./utils");
+let modal = require("./modal");
 let {passwords, passwordRetrieval} = require("../proxy");
 let {port} = require("../messaging");
 
@@ -85,11 +86,17 @@ function importDataFromFile(file)
   {
     if (confirm($("allpasswords-import-confirm").textContent))
     {
+      modal.show("in-progress");
       passwords.importPasswordData(reader.result).then(() =>
       {
+        modal.hide();
         alert($("allpasswords-import-success").textContent);
         window.location.reload();
-      }).catch(showError);
+      }).catch(error =>
+      {
+        modal.hide();
+        showError(error);
+      });
     }
   };
   reader.readAsText(file);

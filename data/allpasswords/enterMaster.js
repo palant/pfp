@@ -12,12 +12,14 @@ let proxy = require("../proxy");
 let {masterPassword} = proxy;
 
 let currentAction = null;
+let previousModal = null;
 
 function enterMaster()
 {
   return new Promise((resolve, reject) =>
   {
     currentAction = {resolve, reject};
+    previousModal = modal.active();
     modal.show("enter-master");
     $("master-password").focus();
   });
@@ -40,7 +42,12 @@ window.addEventListener("DOMContentLoaded", function()
 
     masterPassword.checkPassword(value).then(() =>
     {
-      modal.hide();
+      if (previousModal)
+        modal.show(previousModal);
+      else
+        modal.hide();
+      previousModal = null;
+
       currentAction.resolve();
       currentAction = null;
       form.reset();
