@@ -1306,3 +1306,127 @@ exports.testRemoveAll = function(test)
     test.deepEqual(allPasswords, {});
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
+
+exports.testMigration = function(test)
+{
+  let nodeCrypto = require("crypto");
+  function getKey(salt)
+  {
+    return nodeCrypto.pbkdf2Sync(dummyMaster, salt, 256 * 1024, 32, "sha1").toString("binary");
+  }
+
+  function getPasswordHash(salt)
+  {
+    let chars = "abcdefghjkmnpqrstuvwxyz";
+    let key = getKey("\0" + salt);
+    return chars[key.charCodeAt(0) % chars.length] + chars[key.charCodeAt(1) % chars.length];
+  }
+
+  let iv = "abcdefgh";
+  let btoa = str => new Buffer(str, "binary").toString("base64");
+
+  let {storageData} = require("../test-lib/browserAPI");
+  storageData.masterPassword = {salt: "abcd"};
+  storageData.masterPassword.hash = getPasswordHash(storageData.masterPassword.salt);
+
+  storageData[`site:${generated1.site}`] = {
+    passwords: {
+      [generated1.name]: {
+        type: "generated",
+        length: generated1.length,
+        lower: generated1.lower,
+        upper: generated1.upper,
+        number: generated1.number,
+        symbol: generated1.symbol
+      },
+      [generated2.name + "\n" + generated2.revision]: {
+        type: "generated",
+        length: generated2.length,
+        lower: generated2.lower,
+        upper: generated2.upper,
+        number: generated2.number,
+        symbol: generated2.symbol,
+        notes: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${generated2.site}\0${generated2.name}\0${generated2.revision}\0notes`) + `!${iv}!some notes here`)
+      },
+      [stored2.name]: {
+        type: "pbkdf2-sha1-aes256-encrypted",
+        password: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored2.site}\0${stored2.name}`) + `!${iv}!${stored2.password}`)
+      }
+    }
+  };
+
+  storageData["site:example.info"] = {
+    alias: generated1.site
+  };
+
+  let origKeys = Object.keys(storageData);
+
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.checkPassword(dummyMaster);
+  }).then(() =>
+  {
+    test.ok(false, "Checking master password didn't trigger migration");
+  }).catch(expectedValue.bind(test, "migrating")).then(() =>
+  {
+    function checkState()
+    {
+      return masterPassword.state.then(state =>
+      {
+        if (state != "migrating")
+          return state;
+
+        return new Promise((resolve, reject) =>
+        {
+          setTimeout(() =>
+          {
+            resolve(checkState());
+          }, 10);
+        });
+      });
+    }
+
+    return checkState();
+  }).then(expectedValue.bind(test, "known")).then(() =>
+  {
+    for (let key of origKeys)
+      test.ok(!(key in storageData), `Key ${key} removed from storage`);
+
+    return passwords.getAllPasswords();
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {
+      [generated1.site]: {
+        site: generated1.site,
+        passwords: [{
+          type: "stored",
+          site: stored2.site,
+          name: stored2.name,
+          password: stored2.password
+        }, {
+          type: "generated",
+          site: generated2.site,
+          name: generated2.name,
+          revision: generated2.revision,
+          length: generated2.length,
+          lower: generated2.lower,
+          upper: generated2.upper,
+          number: generated2.number,
+          symbol: generated2.symbol,
+          notes: "some notes here"
+        }, {
+          type: "generated",
+          site: generated1.site,
+          name: generated1.name,
+          revision: "",
+          length: generated1.length,
+          lower: generated1.lower,
+          upper: generated1.upper,
+          number: generated1.number,
+          symbol: generated1.symbol
+        }],
+        aliases: ["example.info"]
+      }
+    });
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
