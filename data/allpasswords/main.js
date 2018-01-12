@@ -211,6 +211,8 @@ passwords.getAllPasswords().then(sites =>
       {
         passwordInfo.querySelector(".password-info.stored").hidden = true;
         passwordInfo.querySelector(".password-type." + passwordData.type).hidden = false;
+        if (passwordData.type == "generated")
+          passwordInfo.querySelector(".password-type.generated-print").hidden = false;
         passwordInfo.querySelector(".password-length-value").textContent = passwordData.length;
 
         let chars = [];
