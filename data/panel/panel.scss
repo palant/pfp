@@ -82,6 +82,20 @@ input[type="checkbox"]
 {
   width: $font-size;
   height: $font-size;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid black;
+  border-radius: 2px;
+  margin: 0;
+  @include margin-inline-end($inline-spacing);
+}
+
+input[type="checkbox"]:checked
+{
+  background-image: url(../images/checkmark.svg);
+  background-size: $font-size - 4px;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 a
