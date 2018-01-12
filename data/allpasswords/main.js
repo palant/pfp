@@ -102,12 +102,46 @@ function importDataFromFile(file)
   reader.readAsText(file);
 }
 
-function showPasswords()
+function showNotes(event)
 {
-  if (confirm($("allpasswords-show-confirm").textContent))
+  let state = event.target.checked;
+  if (state)
   {
-    $("show").hidden = true;
+    $("list").classList.add("show-notes");
+    delete window.localStorage.hideNotes;
+  }
+  else
+  {
+    $("list").classList.remove("show-notes");
+    window.localStorage.hideNotes = true;
+  }
+}
 
+let askedPasswords = false;
+let retrievedPasswords = false;
+
+function showPasswords(event)
+{
+  let state = event.target.checked;
+  if (state && !askedPasswords)
+  {
+    if (confirm($("allpasswords-show-confirm").textContent))
+      askedPasswords = true;
+    else
+    {
+      event.target.checked = false;
+      return;
+    }
+  }
+
+  if (state)
+    $("list").classList.add("show-passwords");
+  else
+    $("list").classList.remove("show-passwords");
+
+  if (state && !retrievedPasswords)
+  {
+    retrievedPasswords = true;
     Promise.resolve().then(() =>
     {
       let actions = [];
@@ -127,7 +161,7 @@ function showPasswords()
       return Promise.all(actions);
     }).catch(e =>
     {
-      $("show").hidden = false;
+      retrievedPasswords = false;
       showError(e);
     });
   }
@@ -143,7 +177,6 @@ window.addEventListener("DOMContentLoaded", function()
   let globalActions = {
     export: exportData,
     import: importData,
-    show: showPasswords,
     print: printPage
   };
 
@@ -159,6 +192,13 @@ window.addEventListener("DOMContentLoaded", function()
   {
     importDataFromFile(event.target.files[0]);
   });
+
+  let notesCheckbox = $("show-notes");
+  notesCheckbox.addEventListener("click", showNotes);
+  notesCheckbox.checked = !("hideNotes" in window.localStorage);
+  showNotes({target: notesCheckbox});
+
+  $("show-passwords").addEventListener("click", showPasswords);
 });
 
 passwords.getAllPasswords().then(sites =>
