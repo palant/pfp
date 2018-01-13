@@ -1240,7 +1240,8 @@ exports.testLastPassImport = function(test)
         passwords: [{
           site: "foo.example.com",
           type: "stored",
-          notes: "Notes"
+          notes: "Notes",
+          name: "anotheruser"
         }, {
           site: "foo.example.com",
           type: "stored",
@@ -1265,8 +1266,8 @@ exports.testLastPassImport = function(test)
         passwords: [{
           site: "example.com",
           type: "stored",
-          notes: "\"",
           name: "&\n",
+          notes: "\"",
           password: ","
         }],
         aliases: []
@@ -1286,12 +1287,13 @@ exports.testLastPassImport = function(test)
         passwords: [{
           site: "foo.example.com",
           type: "stored",
+          name: "anotheruser",
           notes: "Notes"
         }, {
           site: "foo.example.com",
           type: "stored",
-          notes: "some\nnotes\nyada",
           name: "user",
+          notes: "some\nnotes\nyada",
           password: "password"
         }],
         aliases: []
