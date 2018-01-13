@@ -8,6 +8,7 @@
 
 let passwords = require("../lib/passwords");
 let masterPassword = require("../lib/masterPassword");
+let {header: csvHeader, parseCSV} = require("../lib/importers/lastPass");
 
 let dummyMaster = "foobar";
 
@@ -61,6 +62,11 @@ function unexpectedError(error)
 function done()
 {
   this.done();
+}
+
+function genCSV(entries)
+{
+  return csvHeader + "\n" + entries.map(entry => entry.join(",")).join("\n");
 }
 
 exports.setUp = function(callback)
@@ -1158,6 +1164,142 @@ exports.testLegacyImport = function(test)
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
+exports.testLastPassImport = function(test)
+{
+  let simpleValues = [
+    ["foo.example.com", "user", "password", "\"some\nnotes\nyada\"", "Foo", "", ""],
+    ["http://foo.example.com/bar?hello", "anotheruser", "", "Notes", "foo", "", ""],
+    ["", "u", "secret123", "", "name", "", ""]
+  ];
+  let trickyValues = [
+    ["http://example.com", "\"&amp;\n\"", "\",\"", "\"\"\"\"", " ", "", ""]
+  ];
+
+  function stripQuotes(values)
+  {
+    values = values.slice();
+    for (let i = 0; i < values.length; i++)
+    {
+      values[i] = values[i].map(value =>
+      {
+        if (value[0] == "\"" && value[value.length - 1] == "\"")
+          return value.substr(1, value.length - 2).replace(/""/g, "\"");
+        return value;
+      });
+    }
+    return values;
+  }
+
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    test.throws(
+      () => parseCSV(genCSV([["http://example.com", 2, 3, 4, 5, 6, 7],
+                             ["http://example.com", "bar"]])),
+      // FIXME - Nodeunit doesn't seem to actually check the message is correct!
+      "Line 3: Wrong number of values for entry. Saw 2, but expected 7.",
+      "Entries with wrong number of fields cause exception"
+    );
+
+    test.throws(
+      () => parseCSV(genCSV(["http://example.com", 2, 3, 4, "\"5", 6, 7])),
+      "Syntax error, quotation mark was opened but never closed!",
+      "Entry with unballanced quote causes an exception"
+    );
+
+    test.deepEqual(parseCSV(genCSV(simpleValues)).slice(1),
+                   stripQuotes(simpleValues),
+                   "Well formed CSV is parsed properly");
+
+    test.deepEqual(parseCSV("\n   \n" + genCSV(trickyValues) + "    ").slice(1),
+                   stripQuotes(trickyValues),
+                   "Tricky CSV is parsed properly");
+  }).then(() =>
+  {
+    return passwords.importPasswordData(genCSV(simpleValues));
+  }).then(() =>
+  {
+    return passwords.getAllPasswords();
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {
+      "easypasswords.invalid": {
+        site: "easypasswords.invalid",
+        passwords: [{
+          site: "easypasswords.invalid",
+          type: "stored",
+          name: "u",
+          password: "secret123"
+        }],
+        aliases: []
+      },
+      "foo.example.com": {
+        site: "foo.example.com",
+        passwords: [{
+          site: "foo.example.com",
+          type: "stored",
+          notes: "Notes"
+        }, {
+          site: "foo.example.com",
+          type: "stored",
+          notes: "some\nnotes\nyada",
+          name: "user",
+          password: "password"
+        }],
+        aliases: []
+      }
+    });
+  }).then(() =>
+  {
+    return passwords.importPasswordData("\n   \n" + genCSV(trickyValues) + " ");
+  }).then(() =>
+  {
+    return passwords.getAllPasswords();
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {
+      "example.com": {
+        site: "example.com",
+        passwords: [{
+          site: "example.com",
+          type: "stored",
+          notes: "\"",
+          name: "&\n",
+          password: ","
+        }],
+        aliases: []
+      },
+      "easypasswords.invalid": {
+        site: "easypasswords.invalid",
+        passwords: [{
+          site: "easypasswords.invalid",
+          type: "stored",
+          name: "u",
+          password: "secret123"
+        }],
+        aliases: []
+      },
+      "foo.example.com": {
+        site: "foo.example.com",
+        passwords: [{
+          site: "foo.example.com",
+          type: "stored",
+          notes: "Notes"
+        }, {
+          site: "foo.example.com",
+          type: "stored",
+          notes: "some\nnotes\nyada",
+          name: "user",
+          password: "password"
+        }],
+        aliases: []
+      }
+    });
+  }).then(done.bind(test));
+};
+
 exports.testImportErrors = function(test)
 {
   Promise.resolve().then(() =>
@@ -1262,8 +1404,19 @@ exports.testImportErrors = function(test)
   }).then(() =>
   {
     test.ok(false, "Imported legacy non-object data");
-  }).catch(expectedValue.bind(test, "unknown-data-format"))
-    .then(done.bind(test));
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    return passwords.importPasswordData("url,username,password");
+  }).then(() =>
+  {
+    test.ok(false, "Imported LastPass CSV with incorrect header");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  {
+    return passwords.importPasswordData(genCSV([["foo, bar"]]));
+  }).then(() =>
+  {
+    test.ok(false, "Imported invalid LastPass CSV");
+  }).catch(expectedValue.bind(test, "unknown-data-format")).then(done.bind(test));
 };
 
 exports.testRemoveAll = function(test)

@@ -205,10 +205,24 @@ exports.runTests = function()
   let atob = str => new Buffer(str, "base64").toString("binary");
   let btoa = str => new Buffer(str, "binary").toString("base64");
 
+  let document = {
+    createElement()
+    {
+      return Object.create(null, {
+        value: {
+          get(s)
+          {
+            return (this.innerHTML || "").replace(/&amp;/g, "&");
+          }
+        }
+      });
+    }
+  };
+
   let nodeunit = require("sandboxed-module").require("nodeunit", {
     sourceTransformers: {rewriteRequires},
     globals: {
-      TextEncoder, TextDecoder, crypto, atob, btoa,
+      TextEncoder, TextDecoder, crypto, atob, btoa, document,
       Worker: WorkerWrapper
     }
   });
