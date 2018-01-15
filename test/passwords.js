@@ -1225,10 +1225,10 @@ exports.testLastPassImport = function(test)
   }).then(allPasswords =>
   {
     test.deepEqual(allPasswords, {
-      "easypasswords.invalid": {
-        site: "easypasswords.invalid",
+      "name": {
+        site: "name",
         passwords: [{
-          site: "easypasswords.invalid",
+          site: "name",
           type: "stored",
           name: "u",
           password: "secret123"
@@ -1272,10 +1272,10 @@ exports.testLastPassImport = function(test)
         }],
         aliases: []
       },
-      "easypasswords.invalid": {
-        site: "easypasswords.invalid",
+      "name": {
+        site: "name",
         passwords: [{
-          site: "easypasswords.invalid",
+          site: "name",
           type: "stored",
           name: "u",
           password: "secret123"
