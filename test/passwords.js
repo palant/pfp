@@ -1393,7 +1393,8 @@ exports.testMigration = function(test)
       },
       [stored2.name]: {
         type: "stored",
-        password: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored2.site}\0${stored2.name}`) + `!${iv}!${stored2.password}`)
+        password: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored2.site}\0${stored2.name}`) + `!${iv}!${stored2.password}`),
+        notes: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored2.site}\0${stored2.name}\0\0notes`) + `!${iv}!some more notes here`)
       }
     }
   };
@@ -1446,7 +1447,8 @@ exports.testMigration = function(test)
           site: stored2.site,
           name: stored2.name,
           revision: "",
-          password: stored2.password
+          password: stored2.password,
+          notes: "some more notes here"
         }, {
           type: "generated",
           site: generated2.site,
