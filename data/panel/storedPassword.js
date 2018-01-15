@@ -7,13 +7,18 @@
 "use strict";
 
 let {passwords} = require("../proxy");
-let {setSubmitHandler, setResetHandler} = require("./events");
+let {setCommandHandler, setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
 let {$, setActivePanel, showUnknownError, messages} = require("./utils");
 
 setValidator("stored-password-user-name", enforceValue.bind(null, "user-name-required"));
 setValidator("stored-password-value", enforceValue.bind(null, "password-value-required"));
+
+// Dummy validator makes sure validation state is reset when necessary.
+setValidator("stored-password-revision", () => null);
+
+setCommandHandler("stored-change-password-revision", showRevision);
 
 setSubmitHandler("stored-password", addStoredPassword);
 setResetHandler("stored-password", () => setActivePanel("password-list"));
@@ -35,11 +40,23 @@ function enforcePasswordValue(element)
   return null;
 }
 
+function showRevision()
+{
+  $("stored-change-password-revision").hidden = true;
+  $("stored-password-revision-container").hidden = false;
+  $("stored-password-revision").focus();
+}
+
 function addStoredPassword()
 {
+  let revision = $("stored-password-revision").value.trim();
+  if (revision == "1")
+    revision = "";
+
   passwords.addStored({
     site: state.site,
     name: $("stored-password-user-name").value,
+    revision,
     password: $("stored-password-value").value
   }).then(pwdList =>
   {
@@ -48,7 +65,7 @@ function addStoredPassword()
   }).catch(error =>
   {
     if (error == "alreadyExists")
-      markInvalid("stored-password-user-name", messages["user-name-exists"]);
+      markInvalid([$("stored-password-user-name"), $("stored-password-revision")], messages["user-name-exists"]);
     else
       showUnknownError(error);
   });

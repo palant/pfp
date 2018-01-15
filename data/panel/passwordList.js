@@ -328,7 +328,7 @@ function bumpRevision(password)
     revision = 2;
   while (pwdList.some(pwd => pwd.name == password.name && pwd.revision == revision))
     revision++;
-  $("password-revision").value = revision;
+  $("generate-password-revision").value = revision;
 
   if (password.type == "generated2" || password.type == "generated")
   {

@@ -47,6 +47,13 @@ let stored2 = {
   password: "foo"
 };
 
+let stored3 = {
+  site: "example.com",
+  name: "bar",
+  revision: "2",
+  password: "foobar"
+};
+
 function expectedValue(expected, value)
 {
   this.equal(value, expected);
@@ -216,6 +223,27 @@ exports.testAddRemoveStored = function(test)
       password: stored1.password
     }]);
 
+    return passwords.addStored(stored3);
+  }).then(pwdList =>
+  {
+    test.deepEqual(pwdList, [{
+      type: "stored",
+      site: stored2.site,
+      name: stored2.name,
+      password: stored2.password
+    }, {
+      type: "stored",
+      site: stored3.site,
+      name: stored3.name,
+      revision: stored3.revision,
+      password: stored3.password
+    }, {
+      type: "stored",
+      site: stored1.site,
+      name: stored1.name,
+      password: stored1.password
+    }]);
+
     return Promise.all([
       pwdList,
       passwords.getPasswords(stored1.site),
@@ -241,7 +269,7 @@ exports.testAddRemoveStored = function(test)
     test.equal(site, "sub." + stored1.site);
     test.deepEqual(pwdList2, []);
 
-    return passwords.removePassword(stored1.site, stored1.name);
+    return passwords.removePassword(stored3.site, stored3.name, stored3.revision);
   }).catch(unexpectedError.bind(test)).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
@@ -249,9 +277,14 @@ exports.testAddRemoveStored = function(test)
       site: stored2.site,
       name: stored2.name,
       password: stored2.password
+    }, {
+      type: "stored",
+      site: stored1.site,
+      name: stored1.name,
+      password: stored1.password
     }]);
 
-    return passwords.removePassword(stored1.site, stored1.name);
+    return passwords.removePassword(stored3.site, stored3.name, stored3.revision);
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
@@ -311,13 +344,20 @@ exports.testRetrieval = function(test)
   }).then(pwd =>
   {
     test.equal(pwd, generated2.password);
-    return passwords.addStored(stored2);
+    return passwords.removePassword(generated2.site, generated2.name, generated2.revision);
   }).then(pwdList =>
+  {
+    return Promise.all([passwords.addStored(stored2), passwords.addStored(stored3)]);
+  }).then(([pwdList1, pwdList2]) =>
   {
     return passwords.getPassword(stored2.site, stored2.name);
   }).then(pwd =>
   {
     test.equal(pwd, stored2.password);
+    return passwords.getPassword(stored3.site, stored3.name, stored3.revision);
+  }).then(pwd =>
+  {
+    test.equal(pwd, stored3.password);
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
@@ -1080,6 +1120,7 @@ exports.testLegacyImport = function(test)
           type: "stored",
           site: stored2.site,
           name: stored2.name,
+          revision: "",
           password: stored2.password
         }, {
           type: "generated",
@@ -1134,6 +1175,7 @@ exports.testLegacyImport = function(test)
           type: "stored",
           site: stored2.site,
           name: stored2.name,
+          revision: "",
           password: stored2.password
         }, {
           type: "generated",
@@ -1150,6 +1192,7 @@ exports.testLegacyImport = function(test)
           type: "stored",
           site: stored1.site,
           name: stored1.name,
+          revision: "",
           password: stored1.password
         }],
         aliases: ["example.info"]
@@ -1349,7 +1392,7 @@ exports.testMigration = function(test)
         notes: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${generated2.site}\0${generated2.name}\0${generated2.revision}\0notes`) + `!${iv}!some notes here`)
       },
       [stored2.name]: {
-        type: "pbkdf2-sha1-aes256-encrypted",
+        type: "stored",
         password: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored2.site}\0${stored2.name}`) + `!${iv}!${stored2.password}`)
       }
     }
@@ -1402,6 +1445,7 @@ exports.testMigration = function(test)
           type: "stored",
           site: stored2.site,
           name: stored2.name,
+          revision: "",
           password: stored2.password
         }, {
           type: "generated",

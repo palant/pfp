@@ -492,12 +492,14 @@ a:hover
   font-size: $font-size-small;
 }
 
-#change-password-revision
+#generate-change-password-revision,
+#stored-change-password-revision
 {
   font-size: $font-size-small;
 }
 
-#password-revision-container:not([hidden])
+#generate-password-revision-container:not([hidden]),
+#stored-password-revision-container:not([hidden])
 {
   display: flex;
   flex-direction: column;

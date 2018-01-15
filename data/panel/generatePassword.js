@@ -27,9 +27,9 @@ setValidator("generate-password-user-name", enforceValue.bind(null, "user-name-r
 setValidator(["charset-lower", "charset-upper", "charset-number", "charset-symbol"], validateCharsets);
 
 // Dummy validator makes sure validation state is reset when necessary.
-setValidator("password-revision", () => null);
+setValidator("generate-password-revision", () => null);
 
-setCommandHandler("change-password-revision", showRevision);
+setCommandHandler("generate-change-password-revision", showRevision);
 
 setSubmitHandler("generate-password", addGeneratedPassword);
 setResetHandler("generate-password", () => setActivePanel("password-list"));
@@ -57,15 +57,15 @@ function validateCharsets(element1, element2, element3, element4)
 
 function showRevision()
 {
-  $("change-password-revision").hidden = true;
-  $("password-revision-container").hidden = false;
-  $("password-revision").focus();
+  $("generate-change-password-revision").hidden = true;
+  $("generate-password-revision-container").hidden = false;
+  $("generate-password-revision").focus();
 }
 exports.showRevision = showRevision;
 
 function addGeneratedPassword()
 {
-  let revision = $("password-revision").value.trim();
+  let revision = $("generate-password-revision").value.trim();
   if (revision == "1")
     revision = "";
 
@@ -87,7 +87,7 @@ function addGeneratedPassword()
   {
     if (error == "alreadyExists")
     {
-      markInvalid([$("generate-password-user-name"), $("password-revision")], messages["user-name-exists-generated"]);
+      markInvalid([$("generate-password-user-name"), $("generate-password-revision")], messages["user-name-exists-generated"]);
       showRevision();
     }
     else
