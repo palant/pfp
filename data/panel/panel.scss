@@ -493,7 +493,8 @@ a:hover
 }
 
 #generate-change-password-revision,
-#stored-change-password-revision
+#stored-change-password-revision,
+#stored-use-recovery
 {
   font-size: $font-size-small;
 }
@@ -513,6 +514,29 @@ a:hover
 #password-length-value
 {
   min-width: 3ch;
+}
+
+#recovery-code-accepted-container
+{
+  margin: 0;
+  font-size: $font-size-small;
+}
+
+#recovery-code-accepted:empty + #recovery-code-strip
+{
+  display: none;
+}
+
+#recovery-code-strip
+{
+  display: inline-block;
+  $icon-size: $font-size-small;
+  min-width: $icon-size;
+  min-height: $icon-size;
+  margin: -2px $inline-spacing;
+  background-size: $icon-size;
+  background-repeat: no-repeat;
+  background-image: url("../images/close-round.svg");
 }
 
 #qrcode-canvas

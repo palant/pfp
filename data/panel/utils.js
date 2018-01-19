@@ -64,7 +64,7 @@ function getActivePanel()
 }
 exports.getActivePanel = getActivePanel;
 
-function setActivePanel(id)
+function setActivePanel(id, noReset)
 {
   let oldSelection = getActivePanel();
   if (oldSelection == id)
@@ -76,7 +76,8 @@ function setActivePanel(id)
   if (id)
   {
     let form = $(id);
-    resetForm(form);
+    if (!noReset)
+      resetForm(form);
     form.setAttribute("data-active", "true");
     $("unknown-error").hidden = true;
 

@@ -183,7 +183,7 @@ gulp.task("eslint-node", function()
 
 gulp.task("eslint-datamodules", function()
 {
-  return gulp.src(["data/**/*.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js"])
+  return gulp.src(["data/**/*.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js", "!data/panel/formatter.js"])
              .pipe(eslint({envs: ["browser", "commonjs", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());

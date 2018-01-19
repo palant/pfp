@@ -9,7 +9,7 @@
 require("./enterMaster");
 let {$, setCommandHandler, showError} = require("./utils");
 let modal = require("./modal");
-let {passwords, passwordRetrieval} = require("../proxy");
+let {passwords, passwordRetrieval, recoveryCodes} = require("../proxy");
 let {port} = require("../messaging");
 
 function copyToClipboard(site, password, passwordInfo)
@@ -219,6 +219,7 @@ passwords.getAllPasswords().then(sites =>
   let siteNames = Object.keys(sites);
   siteNames.sort();
 
+  let recoveryCodeOperations = [];
   let container = $("list");
   let currentLetter = null;
   let prevInfo = null;
@@ -269,6 +270,10 @@ passwords.getAllPasswords().then(sites =>
       else
       {
         passwordInfo.querySelector(".password-info.generated").hidden = true;
+        recoveryCodeOperations.push(recoveryCodes.getCode(site, passwordData.name, passwordData.revision).then(code =>
+        {
+          passwordInfo.querySelector(".password-recovery").textContent = code;
+        }));
       }
 
       let notes = passwordInfo.querySelector(".password-info.notes");
@@ -303,6 +308,8 @@ passwords.getAllPasswords().then(sites =>
       prevInfo._nextSiteInfo = siteInfo;
     prevInfo = siteInfo;
   }
+
+  Promise.all(recoveryCodeOperations).catch(showError);
 }).catch(showError);
 
 // Hack: expose __webpack_require__ for simpler debugging

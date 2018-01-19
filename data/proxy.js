@@ -82,6 +82,10 @@ exports.passwordRetrieval = Proxy("passwordRetrieval", [
 
 exports.prefs = Proxy("prefs", ["get", "set"]);
 
+exports.recoveryCodes = Proxy("recoveryCodes", [
+  "getValidChars", "getCode", "formatCode", "isValid", "decodeCode"
+]);
+
 exports.sync = Proxy("sync", ["authorize", "disable"]);
 
 exports.ui = Proxy("ui", ["showAllPasswords"]);

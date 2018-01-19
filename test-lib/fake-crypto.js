@@ -8,6 +8,18 @@
 
 let crypto = require("crypto");
 
+let fakeEncryption = true;
+
+exports.enableFakeEncryption = () =>
+{
+  fakeEncryption = true;
+};
+
+exports.disableFakeEncryption = () =>
+{
+  fakeEncryption = false;
+};
+
 function Key(keyData, algo, usages)
 {
   this._data = keyData;
@@ -73,7 +85,18 @@ exports.subtle = {
       if (!key._encrypt)
         throw new Error("Key not suitable for encryption");
 
-      return Buffer.concat([getEncryptionPrefix(algo.name, key, algo.iv), Buffer.from(cleartext)]);
+      if (fakeEncryption)
+        return Buffer.concat([getEncryptionPrefix(algo.name, key, algo.iv), Buffer.from(cleartext)]);
+      else
+      {
+        if (algo.name != "AES-GCM" || key._data.length != 32)
+          throw new Error("Only AES256-GCM is supported");
+
+        let cipher = crypto.createCipheriv("aes-256-gcm", key._data, algo.iv);
+        let encrypted = [cipher.update(cleartext), cipher.final()];
+        encrypted.unshift(cipher.getAuthTag());
+        return Buffer.concat(encrypted);
+      }
     });
   },
 
@@ -86,15 +109,28 @@ exports.subtle = {
       if (!key._decrypt)
         throw new Error("Key not suitable for decryption");
 
-      let prefix = getEncryptionPrefix(algo.name, key, algo.iv);
-      ciphertext = Buffer.from(ciphertext);
-      if (ciphertext.length < prefix.length ||
-          ciphertext.compare(prefix, 0, prefix.length, 0, prefix.length) != 0)
+      if (fakeEncryption)
       {
-        throw new Error("Ciphertext encrypted with wrong algorithm");
-      }
+        let prefix = getEncryptionPrefix(algo.name, key, algo.iv);
+        ciphertext = Buffer.from(ciphertext);
+        if (ciphertext.length < prefix.length ||
+            ciphertext.compare(prefix, 0, prefix.length, 0, prefix.length) != 0)
+        {
+          throw new Error("Ciphertext encrypted with wrong algorithm");
+        }
 
-      return ciphertext.slice(prefix.length);
+        return ciphertext.slice(prefix.length);
+      }
+      else
+      {
+        if (algo.name != "AES-GCM" || key._data.length != 32)
+          throw new Error("Only AES256-GCM is supported");
+
+        let decipher = crypto.createDecipheriv("aes-256-gcm", key._data, algo.iv);
+        decipher.setAuthTag(ciphertext.slice(0, 16));
+        let decrypted = [decipher.update(ciphertext.slice(16)), decipher.final()];
+        return Buffer.concat(decrypted);
+      }
     });
   },
 

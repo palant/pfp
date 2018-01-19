@@ -19,6 +19,7 @@ setValidator("stored-password-value", enforceValue.bind(null, "password-value-re
 setValidator("stored-password-revision", () => null);
 
 setCommandHandler("stored-change-password-revision", showRevision);
+setCommandHandler("stored-use-recovery", showRecovery);
 
 setSubmitHandler("stored-password", addStoredPassword);
 setResetHandler("stored-password", () => setActivePanel("password-list"));
@@ -45,6 +46,11 @@ function showRevision()
   $("stored-change-password-revision").hidden = true;
   $("stored-password-revision-container").hidden = false;
   $("stored-password-revision").focus();
+}
+
+function showRecovery()
+{
+  require("./recoveryCode").show($("stored-password-value"));
 }
 
 function addStoredPassword()

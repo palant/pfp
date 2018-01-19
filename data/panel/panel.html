@@ -35,6 +35,7 @@
       <div data-l10n-id="edit-notes"></div>
       <div data-l10n-id="sync-lastTime-never"></div>
       <div data-l10n-id="sync-disable-confirmation"></div>
+      <div data-l10n-id="recovery-checksum-mismatch"></div>
     </div>
 
     <div id="unknown-error" class="warning" hidden>
@@ -225,9 +226,22 @@
       <label class="block-start" for="stored-password-value" data-l10n-id="password-value"></label>
       <input id="stored-password-value" type="password">
       <div class="error" hidden></div>
+      <a href="#" id="stored-use-recovery" data-l10n-id="use-recovery"></a>
       <div class="button-container">
         <button id="stored-password-save" type="submit" data-l10n-id="save-password"></button>
         <button id="stored-password-cancel" type="reset" data-l10n-id="cancel"></button>
+      </div>
+    </form>
+
+    <form id="recovery-code" class="slide" data-default-element="recovery-code-input">
+      <label data-l10n-id="site"></label>
+      <div id="recovery-code-website-name"></div>
+      <label class="block-start" for="recovery-code-value" data-l10n-id="recovery-code"></label>
+      <pre id="recovery-code-accepted-container"><span id="recovery-code-accepted"></span><a href="#" id="recovery-code-strip"></a></pre>
+      <input id="recovery-code-input" type="text">
+      <div class="error" hidden></div>
+      <div class="button-container">
+        <button id="recovery-code-cancel" type="reset" data-l10n-id="cancel"></button>
       </div>
     </form>
 
