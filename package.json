@@ -27,12 +27,21 @@
       "eol-last": "error",
       "indent": [
         "error",
-        2
+        2,
+        {
+          "SwitchCase": 1
+        }
       ],
       "key-spacing": "error",
       "keyword-spacing": "error",
       "linebreak-style": "error",
       "new-parens": "error",
+      "no-empty": [
+        "error",
+        {
+          "allowEmptyCatch": true
+        }
+      ],
       "no-spaced-func": "error",
       "no-trailing-spaces": "error",
       "no-var": "error",
