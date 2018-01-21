@@ -1203,15 +1203,13 @@ exports.testLastPassImport = function(test)
       ["", "user", "password", "note", "dcom", "", ""],
       ["", "user", "password", "note", "e.com/path", "", ""],
       ["", "user", "password", "note", "This is f.com", "", ""],
-      ["", "user", "password", "note", ".com", "", ""],
-      ["", "user", "password", "note", ".", "", ""],
       ["http://sn", "user", "password", "note", "g.com", "", ""],
       ["http://www.h.com.", "user", "password", "note", "", "", ""],
       ["http://i.com", "", "", "note", "name", "", ""],
       ["http://j.com", "", "password", "note", "name", "", ""],
       ["http://k.com", "", "password", "", "name", "", ""],
       ["http://l.com", "user", "", "", "name", "", ""],
-      ["https://m.m.com/path?query", "user", "password", "before\"in\nside\"\"&amp;&lt;&gt;\"after", "name", "", ""]
+      ["https://m.m.com/path?query", "user", "password", "before\"in\nside\"\"&amp;&lt;&gt;\"after&amp;lt;", "name", "", ""]
     ]));
   }).then(() =>
   {
@@ -1226,7 +1224,7 @@ exports.testLastPassImport = function(test)
           type: "stored",
           name: "user",
           password: "password",
-          notes: "beforein\nside\"&<>after"
+          notes: "beforein\nside\"&<>after&lt;"
         }],
         aliases: []
       },
