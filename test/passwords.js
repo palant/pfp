@@ -70,6 +70,8 @@ function done()
   this.done();
 }
 
+let origConsoleError;
+
 exports.setUp = function(callback)
 {
   let {storageData: storage} = require("../test-lib/browserAPI");
@@ -78,6 +80,19 @@ exports.setUp = function(callback)
 
   masterPassword.forgetPassword();
 
+  origConsoleError = console.error;
+  console.error = function(...args)
+  {
+    if (!String(args[0]).includes("Syntax error"))
+      origConsoleError.call(this, ...args);
+  };
+
+  callback();
+};
+
+exports.tearDown = function(callback)
+{
+  console.error = origConsoleError;
   callback();
 };
 
@@ -1203,10 +1218,9 @@ exports.testLegacyImport = function(test)
 
 exports.testLastPassImport = function(test)
 {
-  function genCSV(entries)
+  function addHeader(contents)
   {
-    return "url,username,password,extra,name,grouping,fav" +
-      "\n" + entries.map(entry => entry.join(",")).join("\n");
+    return "url,username,password,extra,name,grouping,fav\n" + contents.trim();
   }
 
   Promise.resolve().then(() =>
@@ -1215,21 +1229,25 @@ exports.testLastPassImport = function(test)
   }).then(() =>
   {
     return passwords.importPasswordData(
-      genCSV([["http://example.com", 2, 3, 4, 5, 6, 7],
-              ["http://example.com", "bar"]])
+      addHeader(`
+http://example.com,2,3,4,5,6,7
+http://example.com,bar
+      `)
     );
   }).then(() =>
   {
     test.ok(false, "Imported LastPass CSV which has the wrong number of values.");
-  }).catch(expectedValue.bind(test, "csv-wrong-number-of-values")).then(() =>
+  }).catch(expectedValue.bind(test, "syntax-error")).then(() =>
   {
     return passwords.importPasswordData(
-      genCSV([["http://example.com", 2, 3, 4, "\"5", 6, 7]])
+      addHeader(`
+http://example.com,2,3,4,"5,6,7
+      `)
     );
   }).then(() =>
   {
     test.ok(false, "Imported LastPass CSV with dangling quote.");
-  }).catch(expectedValue.bind(test, "csv-unclosed-quote")).then(() =>
+  }).catch(expectedValue.bind(test, "syntax-error")).then(() =>
   {
     return passwords.getAllPasswords();
   }).then(allPasswords =>
@@ -1237,95 +1255,91 @@ exports.testLastPassImport = function(test)
     test.deepEqual(allPasswords, {});
   }).then(() =>
   {
-    return passwords.importPasswordData(genCSV([
-      ["http://a.com", "user", "password", "note", "name", "", ""],
-      ["http://a.com", "user", "another password", "", "another name", "", ""],
-      ["http://a.com", "anotheruser", "password", "", "name", "", ""],
-      ["", "user", "password", "note", "b.com", "", ""],
-      ["junk", "user", "password", "note", "c.com", "", ""],
-      ["", "user", "password", "note", "dcom", "", ""],
-      ["", "user", "password", "note", "e.com/path", "", ""],
-      ["", "user", "password", "note", "This is f.com", "", ""],
-      ["http://sn", "user", "password", "note", "g.com", "", ""],
-      ["http://www.h.com.", "user", "password", "note", "", "", ""],
-      ["http://i.com", "", "", "note", "name", "", ""],
-      ["http://j.com", "", "password", "note", "name", "", ""],
-      ["http://k.com", "", "password", "", "name", "", ""],
-      ["http://l.com", "user", "", "", "name", "", ""],
-      ["https://m.m.com/path?query", "user", "password", "before\"in\nside\"\"&amp;&lt;&gt;\"after&amp;lt;", "name", "", ""]
-    ]));
+    return passwords.importPasswordData(addHeader(`
+http://a.com,user,password,note,name,,
+http://a.com,user,another password,note,name,,
+http://a.com,user,another password,,another name,,
+http://a.com,anotheruser,password,,name44,,
+http://a.com,anotheruser,another password,,name44,,
+http://a.com,user,password,,,,
+http://a.com,user,another password,,,,
+,user,password,note,b.com,,
+junk,user,password,note,c.com,,
+,user,password,note,dcom,,
+,user,password,note,e.com/path,,
+,user,password,note,This is f.com,,
+http://f.com,,password,note,,,
+http://sn,user,password,note,g.com,,
+http://www.h.com,user,password,note,,,
+http://i.com,,,note,name,,
+http://j.com,,password,note,name,,
+http://k.com,,password,,name,,
+http://l.com,user,,,name,,
+https://m.m.com/path?query,user,password,"before""in
+side""""&amp;&lt;&gt;""after&amp;lt;",name,,
+    `));
   }).then(() =>
   {
     return passwords.getAllPasswords();
   }).then(allPasswords =>
   {
     test.deepEqual(allPasswords, {
-      "m.m.com": {
-        site: "m.m.com",
+      "a.com": {
+        site: "a.com",
         passwords: [{
-          site: "m.m.com",
+          site: "a.com",
           type: "stored",
-          name: "user",
-          password: "password",
-          notes: "beforein\nside\"&<>after&lt;"
-        }],
-        aliases: []
-      },
-      // FIXME - Should a site with no entries be listed?
-      // "l.com": {
-      //   site: "l.com",
-      //   passwords: [],
-      //   aliases: []
-      // },
-      "k.com": {
-        site: "k.com",
-        passwords: [{
-          site: "k.com",
-          type: "stored",
-          name: "",
+          name: "anotheruser",
+          revision: "name44",
           password: "password"
-        }],
-        aliases: []
-      },
-      "j.com": {
-        site: "j.com",
-        passwords: [{
-          site: "j.com",
+        }, {
+          site: "a.com",
           type: "stored",
-          name: "",
-          password: "password",
-          notes: "note"
-        }],
-        aliases: []
-      },
-      "i.com": {
-        site: "i.com",
-        passwords: [{
-          site: "i.com",
-          type: "stored",
-          name: "name",
-          password: "",
-          notes: "note"
-        }],
-        aliases: []
-      },
-      "h.com": {
-        site: "h.com",
-        passwords: [{
-          site: "h.com",
+          name: "anotheruser",
+          revision: "name45",
+          password: "another password"
+        }, {
+          site: "a.com",
           type: "stored",
           name: "user",
+          revision: "",
+          password: "password"
+        }, {
+          site: "a.com",
+          type: "stored",
+          name: "user",
+          revision: "2",
+          password: "another password"
+        }, {
+          site: "a.com",
+          type: "stored",
+          name: "user",
+          revision: "another name",
+          password: "another password"
+        }, {
+          site: "a.com",
+          type: "stored",
+          name: "user",
+          revision: "name",
           password: "password",
+          notes: "note"
+        }, {
+          site: "a.com",
+          type: "stored",
+          name: "user",
+          revision: "name2",
+          password: "another password",
           notes: "note"
         }],
         aliases: []
       },
-      "easypasswords.invalid": {
-        site: "easypasswords.invalid",
+      "b.com": {
+        site: "b.com",
         passwords: [{
-          site: "easypasswords.invalid",
+          site: "b.com",
           type: "stored",
           name: "user",
+          revision: "",
           password: "password",
           notes: "note"
         }],
@@ -1337,41 +1351,85 @@ exports.testLastPassImport = function(test)
           site: "c.com",
           type: "stored",
           name: "user",
+          revision: "",
           password: "password",
           notes: "note"
         }],
         aliases: []
       },
-      "b.com": {
-        site: "b.com",
+      "easypasswords.invalid": {
+        site: "easypasswords.invalid",
         passwords: [{
-          site: "b.com",
+          site: "easypasswords.invalid",
           type: "stored",
           name: "user",
+          revision: "g.com",
           password: "password",
           notes: "note"
         }],
         aliases: []
       },
-      "a.com": {
-        site: "a.com",
+      "h.com": {
+        site: "h.com",
         passwords: [{
-          site: "a.com",
+          site: "h.com",
           type: "stored",
-          name: "anotheruser",
+          name: "user",
+          revision: "",
+          password: "password",
+          notes: "note"
+        }],
+        aliases: []
+      },
+      "i.com": {
+        site: "i.com",
+        passwords: [{
+          site: "i.com",
+          type: "stored",
+          name: "name",
+          revision: "",
+          password: "",
+          notes: "note"
+        }],
+        aliases: []
+      },
+      "j.com": {
+        site: "j.com",
+        passwords: [{
+          site: "j.com",
+          type: "stored",
+          name: "name",
+          revision: "",
+          password: "password",
+          notes: "note"
+        }],
+        aliases: []
+      },
+      "k.com": {
+        site: "k.com",
+        passwords: [{
+          site: "k.com",
+          type: "stored",
+          name: "name",
+          revision: "",
           password: "password"
-        }, {
-          site: "a.com",
+        }],
+        aliases: []
+      },
+      "m.m.com": {
+        site: "m.m.com",
+        passwords: [{
+          site: "m.m.com",
           type: "stored",
           name: "user",
-          password: "another password"
-          // FIXME - Should an overwritten password not inherit the note?
-          // notes: "note"
+          revision: "name",
+          password: "password",
+          notes: 'before"in\nside""&<>"after&lt;'
         }],
         aliases: []
       }
     });
-  }).then(done.bind(test));
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
 exports.testImportErrors = function(test)
@@ -1480,7 +1538,7 @@ exports.testImportErrors = function(test)
     test.ok(false, "Imported legacy non-object data");
   }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
   {
-    return passwords.importPasswordData("url,username,password");
+    return passwords.importPasswordData("url,username,password\n");
   }).then(() =>
   {
     test.ok(false, "Imported LastPass CSV with incorrect header");
