@@ -204,11 +204,12 @@ exports.runTests = function()
   let crypto = require("./test-lib/fake-crypto");
   let atob = str => new Buffer(str, "base64").toString("binary");
   let btoa = str => new Buffer(str, "binary").toString("base64");
+  let {URL} = require("url");
 
   let nodeunit = require("sandboxed-module").require("nodeunit", {
     sourceTransformers: {rewriteRequires},
     globals: {
-      TextEncoder, TextDecoder, crypto, atob, btoa,
+      TextEncoder, TextDecoder, crypto, atob, btoa, URL,
       Worker: WorkerWrapper
     }
   });
