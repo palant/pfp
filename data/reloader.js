@@ -6,7 +6,7 @@
 
 "use strict";
 
-/* global window, chrome, XMLHttpRequest */
+/* global chrome */
 
 let random = null;
 
