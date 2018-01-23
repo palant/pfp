@@ -13,7 +13,6 @@ let del = require("del");
 let gulp = require("gulp");
 let eslint = require("gulp-eslint");
 let htmlhint = require("gulp-htmlhint");
-let rename = require("gulp-rename");
 let sass = require("gulp-sass");
 let merge = require("merge-stream");
 let stylelint = require("gulp-stylelint");
