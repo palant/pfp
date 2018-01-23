@@ -253,7 +253,7 @@ gulp.task("crx", ["build-chrome"], function()
 {
   let manifest = require("./manifest.json");
   let result = gulp.src(["build-chrome/**", "!build-chrome/**/.*", "!build-chrome/**/*.zip", "!build-chrome/**/*.crx"])
-                   .pipe(zip("easypasswords-" + manifest.version + ".zip"));
+                   .pipe(zip("pfp-" + manifest.version + ".zip"));
   let keyFile = utils.readArg("--private-key=");
   if (keyFile)
     result = result.pipe(utils.signCRX(keyFile));
@@ -264,7 +264,7 @@ gulp.task("xpi", ["build-firefox"], function()
 {
   let manifest = require("./manifest.json");
   return gulp.src(["build-firefox/**", "!build-firefox/**/.*", "!build-firefox/**/*.xpi"])
-             .pipe(zip("easypasswords-" + manifest.version + ".xpi"))
+             .pipe(zip("pfp-" + manifest.version + ".xpi"))
              .pipe(gulp.dest("build-firefox"));
 });
 

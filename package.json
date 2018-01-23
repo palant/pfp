@@ -1,6 +1,6 @@
 {
-  "title": "Easy Passwords",
-  "name": "easypasswords",
+  "title": "PfP - Pain-free Passwords",
+  "name": "pfp",
   "description": "Use a single master password to generate secure passwords for all websites - without losing track of passwords you cannot change.",
   "author": "Wladimir Palant",
   "eslintConfig": {

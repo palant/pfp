@@ -792,7 +792,7 @@ exports.testExport = function(test)
   function checkExport(test, exportData)
   {
     let parsed = JSON.parse(exportData);
-    test.equal(parsed.application, "easypasswords");
+    test.equal(parsed.application, "pfp");
     test.equal(parsed.format, 2);
     test.ok(typeof parsed.data == "object");
     test.ok(parsed.data["salt"]);
@@ -962,7 +962,7 @@ exports.testDecryptingImport = function(test)
     let digest = data => btoa(hmacPrefix + data);
 
     return passwords.importPasswordData(JSON.stringify({
-      application: "easypasswords",
+      application: "pfp",
       format: 2,
       data: {
         salt: btoa(salt),
@@ -1357,10 +1357,10 @@ side""""&amp;&lt;&gt;""after&amp;lt;",name,,
         }],
         aliases: []
       },
-      "easypasswords.invalid": {
-        site: "easypasswords.invalid",
+      "pfp.invalid": {
+        site: "pfp.invalid",
         passwords: [{
-          site: "easypasswords.invalid",
+          site: "pfp.invalid",
           type: "stored",
           name: "user",
           revision: "g.com",
@@ -1462,7 +1462,7 @@ exports.testImportErrors = function(test)
   }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
-      application: "easypasswords",
+      application: "pfp",
       format: 33,
       data: {
         salt: "asdf",
@@ -1475,7 +1475,7 @@ exports.testImportErrors = function(test)
   }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
-      application: "easypasswords",
+      application: "pfp",
       format: 2,
       data: null
     }));
@@ -1485,7 +1485,7 @@ exports.testImportErrors = function(test)
   }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
-      application: "easypasswords",
+      application: "pfp",
       format: 2,
       data: {}
     }));
@@ -1495,7 +1495,7 @@ exports.testImportErrors = function(test)
   }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
-      application: "easypasswords",
+      application: "pfp",
       format: 2,
       data: {
         salt: "asdf"
@@ -1507,7 +1507,7 @@ exports.testImportErrors = function(test)
   }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
-      application: "easypasswords",
+      application: "pfp",
       format: 2,
       data: {
         "hmac-secret": "fdsa"
