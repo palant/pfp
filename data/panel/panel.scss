@@ -235,6 +235,18 @@ a:hover
   }
 }
 
+#enter-master
+{
+  $image-size: 128px;
+  $image-spacing: 16px;
+  @include padding-inline-start($image-size + 2 * $image-spacing);
+  background-size: $image-size;
+  background-repeat: no-repeat;
+  background-position: $image-spacing;
+  background-image: url(../images/icon.svg);
+  min-height: $image-size;
+}
+
 #migration > p,
 #migration > ul
 {
