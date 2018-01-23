@@ -26,7 +26,8 @@
   "background": {
     "persistent": true,
     "scripts": [
-      "index.js"
+      "index.js",
+      "data/reloader.js"
     ]
   },
   "options_ui": {

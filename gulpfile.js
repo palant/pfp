@@ -124,8 +124,20 @@ function buildCommon(targetdir)
           }
         }))
         .pipe(gulp.dest(`${targetdir}`)),
+    gulp.src(["data/reloader.js"])
+        .pipe(gulp.dest(`${targetdir}/data`)),
+    gulp.src(["package.json"])
+        .pipe(utils.jsonModify(data => Math.random(), "random.json"))
+        .pipe(gulp.dest(`${targetdir}`)),
     buildWorkers(targetdir)
   );
+}
+
+function removeReloader(data)
+{
+  let index = data.background.scripts.indexOf("data/reloader.js");
+  if (index >= 0)
+    data.background.scripts.splice(index, 1);
 }
 
 gulp.task("build-chrome", ["validate"], function()
@@ -252,8 +264,14 @@ gulp.task("validate", ["eslint-node", "eslint-datamodules", "eslint-lib", "htmlh
 gulp.task("crx", ["build-chrome"], function()
 {
   let manifest = require("./manifest.json");
-  let result = gulp.src(["build-chrome/**", "!build-chrome/**/.*", "!build-chrome/**/*.zip", "!build-chrome/**/*.crx"])
-                   .pipe(zip("pfp-" + manifest.version + ".zip"));
+  let result = merge(
+    gulp.src([
+      "build-chrome/**",
+      "!build-chrome/manifest.json", "!build-chrome/data/reloader.js", "!build-chrome/random.json",
+      "!build-chrome/**/.*", "!build-chrome/**/*.zip", "!build-chrome/**/*.crx"
+    ]),
+    gulp.src("build-chrome/manifest.json").pipe(utils.jsonModify(removeReloader))
+  ).pipe(zip("pfp-" + manifest.version + ".zip"));
   let keyFile = utils.readArg("--private-key=");
   if (keyFile)
     result = result.pipe(utils.signCRX(keyFile));
@@ -263,9 +281,14 @@ gulp.task("crx", ["build-chrome"], function()
 gulp.task("xpi", ["build-firefox"], function()
 {
   let manifest = require("./manifest.json");
-  return gulp.src(["build-firefox/**", "!build-firefox/**/.*", "!build-firefox/**/*.xpi"])
-             .pipe(zip("pfp-" + manifest.version + ".xpi"))
-             .pipe(gulp.dest("build-firefox"));
+  return merge(
+    gulp.src([
+      "build-firefox/**",
+      "!build-chrome/manifest.json", "!build-firefox/data/reloader.js", "!build-firefox/random.json",
+      "!build-firefox/**/.*", "!build-firefox/**/*.xpi"
+    ]),
+    gulp.src("build-firefox/manifest.json").pipe(utils.jsonModify(removeReloader))
+  ).pipe(zip("pfp-" + manifest.version + ".xpi")).pipe(gulp.dest("build-firefox"));
 });
 
 gulp.task("test", ["validate", "build-test"], function()
