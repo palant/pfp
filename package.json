@@ -83,6 +83,7 @@
     "gulp-sass": "^2.3.2",
     "gulp-stylelint": "^2.0.2",
     "gulp-zip": "^3.2.0",
+    "imports-loader": "^0.7.1",
     "merge-stream": "^1.0.0",
     "node-rsa": "^0.3.2",
     "nodeunit": "^0.9.1",

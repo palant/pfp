@@ -36,7 +36,7 @@ function show(password, text)
 
   originalSelection = getActivePanel();
 
-  let qr = new (require("jsqr"))();
+  let qr = new (require("./jsqr-1.0.2").JSQR)();
 
   let code = new qr.Code();
   code.encodeMode = code.ENCODE_MODE.BYTE;

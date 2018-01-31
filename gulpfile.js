@@ -67,8 +67,6 @@ function buildCommon(targetdir)
         .pipe(gulp.dest(`${targetdir}`)),
     gulp.src(["data/**/*.html", "data/**/*.png", "data/**/*.svg"])
         .pipe(gulp.dest(`${targetdir}/data`)),
-    gulp.src(["data/panel/zxcvbn-*.js", "data/panel/jsqr-*.js"])
-        .pipe(gulp.dest(`${targetdir}/data/panel`)),
     gulp.src(["data/fillIn.js"])
         .pipe(webpack({
           output: {
@@ -84,8 +82,13 @@ function buildCommon(targetdir)
             pathinfo: true,
             library: "__webpack_require__"
           },
-          externals: {
-            "jsqr": "var JSQR"
+          module: {
+            rules: [
+              {
+                test: /\/jsqr-.*?\.js$/,
+                use: "imports-loader?window=>exports"
+              }
+            ]
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data/panel`)),
