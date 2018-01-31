@@ -85,7 +85,6 @@ function buildCommon(targetdir)
             library: "__webpack_require__"
           },
           externals: {
-            "zxcvbn": "var zxcvbn",
             "jsqr": "var JSQR"
           }
         }))

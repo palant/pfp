@@ -14,7 +14,7 @@ let {$, setActivePanel, showUnknownError, messages} = require("./utils");
 
 let {confirm} = require("./confirm");
 
-let zxcvbn = require("zxcvbn");
+let zxcvbn = require("./zxcvbn-4.4.2");
 
 setValidator("new-master", validateMasterPassword);
 setValidator("new-master-repeat", validateMasterPasswordRepeat);
