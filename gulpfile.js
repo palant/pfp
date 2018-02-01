@@ -373,7 +373,7 @@ gulp.task("xpi", ["build-firefox"], function()
   return merge(
     gulp.src([
       "build-firefox/**",
-      "!build-chrome/manifest.json", "!build-firefox/data/reloader.js", "!build-firefox/random.json",
+      "!build-firefox/manifest.json", "!build-firefox/data/reloader.js", "!build-firefox/random.json",
       "!build-firefox/**/.*", "!build-firefox/**/*.xpi"
     ]),
     gulp.src("build-firefox/manifest.json").pipe(utils.jsonModify(removeReloader))
