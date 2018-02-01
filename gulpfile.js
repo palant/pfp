@@ -300,5 +300,5 @@ gulp.task("test", ["validate", "build-test"], function()
 
 gulp.task("clean", function()
 {
-  return del(["build-chrome", "build-firefox"]);
+  return del(["build-chrome", "build-firefox", "build-test"]);
 });
