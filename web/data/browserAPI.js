@@ -34,10 +34,17 @@ module.exports = {
     connect: function(params)
     {
       let id = null;
+      let queue = [];
 
       let port = {
         postMessage: payload =>
         {
+          if (id === null)
+          {
+            queue.push(payload);
+            return;
+          }
+
           top.postMessage({
             type: "message",
             payload,
@@ -69,6 +76,10 @@ module.exports = {
           id,
           target: "background"
         }, targetOrigin);
+
+        for (let payload of queue)
+          port.postMessage(payload);
+        queue = null;
       });
 
       return port;

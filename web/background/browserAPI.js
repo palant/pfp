@@ -82,12 +82,15 @@ module.exports = {
     {
       return Promise.resolve([]);
     },
-    create: url =>
+    create: params =>
     {
-      return Promise.resolve().then(() =>
-      {
-        window.open(url, "_blank");
-      });
+      if (params.url != "../allpasswords/allpasswords.html")
+        return Promise.reject(new Error("Not implemented"));
+
+      top.postMessage({
+        type: "show-allpasswords"
+      }, targetOrigin);
+      return Promise.resolve();
     }
   },
   runtime: {
