@@ -9,6 +9,8 @@
 let locale = require("locale");
 let {EventTarget} = require("../eventTarget");
 
+document.documentElement.classList.add("webclient");
+
 let ports = [];
 
 // Posting messages to proper origin isn't possible on file://
