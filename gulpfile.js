@@ -31,7 +31,7 @@ function buildWorkers(targetdir)
     modules: [path.resolve(__dirname, "third-party")]
   };
 
-  if (targetdir == "build-test")
+  if (targetdir == "build-test/data")
   {
     resolveConfig.alias = {
       "../lib/typedArrayConversion$": path.resolve(__dirname, "test-lib", "typedArrayConversion.js")
@@ -47,7 +47,7 @@ function buildWorkers(targetdir)
           },
           resolve: resolveConfig
         }))
-        .pipe(gulp.dest(`${targetdir}/data`)),
+        .pipe(gulp.dest(`${targetdir}`)),
     gulp.src(["data/scrypt.js"])
         .pipe(webpack({
           output: {
@@ -56,7 +56,7 @@ function buildWorkers(targetdir)
           },
           resolve: resolveConfig
         }))
-        .pipe(gulp.dest(`${targetdir}/data`))
+        .pipe(gulp.dest(`${targetdir}`))
   );
 }
 
@@ -130,7 +130,7 @@ function buildCommon(targetdir)
     gulp.src(["package.json"])
         .pipe(utils.jsonModify(data => Math.random(), "random.json"))
         .pipe(gulp.dest(`${targetdir}`)),
-    buildWorkers(targetdir)
+    buildWorkers(`${targetdir}/data`)
   );
 }
 
@@ -178,12 +178,100 @@ gulp.task("build-firefox", ["validate"], function()
 
 gulp.task("build-test", ["validate"], function()
 {
-  return buildWorkers("build-test");
+  return buildWorkers("build-test/data");
 });
 
 gulp.task("watch-firefox", ["build-firefox"], function()
 {
   gulp.watch(["*.js", "*.json", "data/**/*", "lib/**/*", "locale/**/*"], ["build-firefox"]);
+});
+
+gulp.task("build-web", ["validate"], function()
+{
+  let targetdir = "build-web";
+  return merge(
+    gulp.src("LICENSE.TXT")
+        .pipe(gulp.dest(`${targetdir}`)),
+    gulp.src(["data/**/*.html", "data/**/*.png", "data/**/*.svg", "!data/options/options.html"])
+        .pipe(gulp.dest(`${targetdir}`)),
+    gulp.src(["data/platform.js", "data/panel/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          module: {
+            rules: [
+              {
+                test: /\/jsqr-.*?\.js$/,
+                use: "imports-loader?window=>exports"
+              },
+              {
+                test: /\.properties$/,
+                use: path.resolve(__dirname, "localeLoader.js")
+              }
+            ]
+          },
+          resolve: {
+            alias: {
+              "./browserAPI$": path.resolve(__dirname, "web", "data", "browserAPI.js"),
+              "locale$": path.resolve(__dirname, "locale", "en-US.properties")
+            }
+          }
+        }))
+        .pipe(gulp.dest(`${targetdir}/panel`)),
+    gulp.src(["data/platform.js", "data/allpasswords/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          module: {
+            rules: [
+              {
+                test: /\.properties$/,
+                use: path.resolve(__dirname, "localeLoader.js")
+              }
+            ]
+          },
+          resolve: {
+            alias: {
+              "./browserAPI$": path.resolve(__dirname, "web", "data", "browserAPI.js"),
+              "locale$": path.resolve(__dirname, "locale", "en-US.properties")
+            }
+          }
+        }))
+        .pipe(gulp.dest(`${targetdir}/allpasswords`)),
+    gulp.src(["data/**/*.scss", "!data/options/options.scss"])
+        .pipe(sass())
+        .pipe(gulp.dest(`${targetdir}`)),
+    gulp.src(["lib/platform.js", "lib/main.js"])
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          module: {
+            rules: [
+              {
+                test: /\/(scrypt|pbkdf2)\.js$/,
+                use: path.resolve(__dirname, "workerLoader.js")
+              }
+            ]
+          },
+          resolve: {
+            alias: {
+              "./browserAPI$": path.resolve(__dirname, "web", "background", "browserAPI.js")
+            }
+          }
+        }))
+        .pipe(gulp.dest(`${targetdir}/background`)),
+    gulp.src(["web/**/*.html", "web/index.js", "web/index.css"])
+        .pipe(gulp.dest(targetdir))
+  );
 });
 
 gulp.task("eslint-node", function()
@@ -196,7 +284,7 @@ gulp.task("eslint-node", function()
 
 gulp.task("eslint-datamodules", function()
 {
-  return gulp.src(["data/**/*.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js", "!data/panel/formatter.js"])
+  return gulp.src(["data/**/*.js", "web/**/*.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js", "!data/panel/formatter.js"])
              .pipe(eslint({envs: ["browser", "commonjs", "es6"]}))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
@@ -292,6 +380,15 @@ gulp.task("xpi", ["build-firefox"], function()
   ).pipe(zip("pfp-" + manifest.version + ".xpi")).pipe(gulp.dest("build-firefox"));
 });
 
+gulp.task("web", ["build-web"], function()
+{
+  let manifest = require("./manifest.json");
+  gulp.src([
+    "build-web/**",
+    "!build-web/**/.*", "!build-web/**/*.zip"
+  ]).pipe(zip("pfp-web-" + manifest.version + ".zip")).pipe(gulp.dest("build-web"));
+});
+
 gulp.task("test", ["validate", "build-test"], function()
 {
   return gulp.src(["test/**/*.js"])
@@ -300,5 +397,5 @@ gulp.task("test", ["validate", "build-test"], function()
 
 gulp.task("clean", function()
 {
-  return del(["build-chrome", "build-firefox", "build-test"]);
+  return del(["build-chrome", "build-firefox", "build-test", "build-web"]);
 });

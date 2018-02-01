@@ -1,6 +1,7 @@
 /build-firefox/
 /build-chrome/
 /build-test/
+/build-web/
 /node_modules/
 *.xpi
 *.crx

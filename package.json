@@ -84,6 +84,7 @@
     "gulp-stylelint": "^2.0.2",
     "gulp-zip": "^3.2.0",
     "imports-loader": "^0.7.1",
+    "memory-fs": "^0.4.1",
     "merge-stream": "^1.0.0",
     "node-rsa": "^0.3.2",
     "nodeunit": "^0.9.1",
@@ -94,5 +95,6 @@
     "text-encoding": "^0.6.0",
     "tiny-worker": "^2.1.1",
     "webpack2-stream-watch": "^3.2.2"
-  }
+  },
+  "dependencies": {}
 }
