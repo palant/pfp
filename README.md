@@ -19,44 +19,54 @@ Additional dependencies are installed using the following command in the extensi
 How to build
 ------------
 
-If all the dependencies are installed, building PfP for Firefox is simply a matter of running Gulp:
+### Firefox
+
+The following command with produce a file with a name like `build-firefox/pfp-n.n.n.xpi`:
 
     gulp xpi
 
-This will create a package inside the `build-firefox` directory with a file name like `pfp-n.n.n.xpi` that you can install in Firefox.
+### Chrome and Opera
 
-Creating a Chrome and Opera build is similar:
+The following command with produce a file with a name like `build-chrome/pfp-n.n.n.crx`:
 
     gulp crx --private-key=key.pem
 
-This will create a package inside the `build-chrome` directory with a file name like `pfp-n.n.n.crx` that you can install in Chrome and Opera. If you don't specify a signing key it will create a ZIP file that can be uploaded to Chrome Web Store or Opera Add-ons.
+You can also omit the `--private-key` parameter, an unsigned ZIP file will be created then which can be uploaded to Chrome Web Store or Opera Add-ons.
 
-You can also generate a web client:
+### Web client
+
+The following command with produce a file with a name like `build-web/pfp-web-n.n.n.zip`:
 
     gulp web
 
-This will produce a package inside the `build-web` directory with a file name like `pfp-web-n.n.n.zip`. After unpacking it, you can open `index.html` file and use it directly in the browser.
+After unpacking the package, you can open `index.html` in the browser which will give you a slightly feature-reduced version of PfP.
 
 How to test
 -----------
 
-Testing your changes is easiest by creating a test directory. For Firefox you should use the following command:
+### Firefox
+
+The following command will create a `build-firefox` directory:
 
     gulp build-firefox
 
-This will create a `build-firefox` directory that you can load as a temporary extension in Firefox via `about:debugging` page. An already loaded extension will reload automatically on rebuild. If you want the directory to be updated automatically whenever you change any source files, you can use `gulp watch-firefox` instead.
+You can load this directory as a temporary extension in Firefox via `about:debugging` page. An already loaded extension will reload automatically on rebuild. If you want the directory to be updated automatically whenever you change any source files, you can use `gulp watch-firefox` instead.
 
-Similarly, creating a test directory for Chrome and Opera can be done by running the following command:
+### Chrome and Opera
+
+The following command will create a `build-chrome` directory:
 
     gulp build-chrome
 
-This will create a `build-chrome` directory that you can load as an unpacked extension in Chrome or Opera. Running `gulp watch-chrome` instead will update the test directory automatically whenever you change any source files.
+You can load this directory as an unpacked extension in Chrome or Opera. An already loaded extension will reload automatically on rebuild. If you want the directory to be updated automatically whenever you change any source files, you can use `gulp watch-chrome` instead.
 
-To test the web client run:
+### Web client
+
+The following command will create a `build-web` directory:
 
     gulp build-web
 
-You can then open `build-web/index.html` in your browser.
+You can then open `build-web/index.html` in your browser to test then.
 
 Cleaning up the repository
 --------------------------
