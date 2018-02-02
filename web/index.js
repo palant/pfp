@@ -36,6 +36,7 @@ let maxPortID = 0;
 
 window.addEventListener("message", event =>
 {
+  // On Chrome, file:// is used as document origin yet messages get origin null
   if (event.origin != location.origin && !(event.origin == "null" && location.origin == "file://"))
     return;
 
