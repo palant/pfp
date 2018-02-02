@@ -242,7 +242,7 @@ a:hover
   @include padding-inline-start($image-size + 2 * $image-spacing);
   background-size: $image-size;
   background-repeat: no-repeat;
-  background-position: $image-spacing;
+  background-position: $image-spacing $image-spacing;
   background-image: url(../images/icon.svg);
   min-height: $image-size;
 }
