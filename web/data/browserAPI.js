@@ -116,3 +116,10 @@ window.addEventListener("message", event =>
       port.onMessage._emit(message.payload);
   }
 });
+
+window.addEventListener("show-panel", event =>
+{
+  top.postMessage({
+    type: "show-panel"
+  }, targetOrigin);
+});

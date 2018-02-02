@@ -172,6 +172,19 @@ function printPage()
   window.print();
 }
 
+function goToSite(site, event)
+{
+  event.preventDefault();
+  passwords.getPasswords(site).then(([origSite, site, pwdList]) =>
+  {
+    require("../messaging").port.emit("forward-to-panel", {
+      name: "init",
+      args: [{origSite, site, pwdList}]
+    });
+  });
+  window.dispatchEvent(new Event("show-panel"));
+}
+
 window.addEventListener("DOMContentLoaded", function()
 {
   let globalActions = {
@@ -223,12 +236,22 @@ passwords.getAllPasswords().then(sites =>
   let container = $("list");
   let currentLetter = null;
   let prevInfo = null;
+  let isWebClient = document.documentElement.classList.contains("webclient");
   for (let site of siteNames)
   {
     let {passwords, aliases} = sites[site];
 
     let siteInfo = siteTemplate.cloneNode(true);
-    siteInfo.querySelector(".site-name").textContent = site;
+    if (isWebClient)
+    {
+      let link = document.createElement("a");
+      link.setAttribute("href", "#");
+      link.textContent = site;
+      link.addEventListener("click", goToSite.bind(null, site));
+      siteInfo.querySelector(".site-name").appendChild(link);
+    }
+    else
+      siteInfo.querySelector(".site-name").textContent = site;
 
     if (aliases.length)
       siteInfo.querySelector(".site-aliases-value").textContent = aliases.sort().join(", ");

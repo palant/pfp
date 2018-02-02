@@ -47,6 +47,12 @@ window.addEventListener("message", event =>
     }, targetOrigin);
     return;
   }
+  else if (event.data.type == "show-panel")
+  {
+    document.getElementById("allpasswords").removeAttribute("data-active");
+    document.getElementById("panel").setAttribute("data-active", "true");
+    return;
+  }
   else if (event.data.type == "show-allpasswords")
   {
     document.getElementById("panel").removeAttribute("data-active");
