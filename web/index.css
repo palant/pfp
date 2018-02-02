@@ -4,6 +4,14 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
+body
+{
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 24px;
+  background-color: #fff;
+  color: #000;
+}
+
 #background,
 #panel,
 #allpasswords
@@ -31,4 +39,11 @@
 {
   width: 620px;
   left: calc((100% - 620px) / 2);
+}
+
+.warning
+{
+  background-color: #faa;
+  border-radius: 5px;
+  padding: 5px;
 }
