@@ -302,6 +302,7 @@ passwords.getAllPasswords().then(sites =>
           div.scrollIntoView(true);
       });
       $("shortcuts").appendChild(link);
+      link.focus();
     }
 
     if (prevInfo)
