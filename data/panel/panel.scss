@@ -308,6 +308,11 @@ a:hover
   background-image: url(../images/close-round.svg);
 }
 
+#site-edit-cancel[disabled="true"]
+{
+  opacity: 0.2;
+}
+
 #site[readonly] + #site-edit-cancel
 {
   display: none;

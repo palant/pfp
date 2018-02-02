@@ -21,8 +21,7 @@ for (let element of ["site-edit-accept", "site-edit-cancel"].map($))
   element.textContent = "";
 }
 
-setCommandHandler("set-site", editSite);
-setCommandHandler("add-alias", editSite);
+setCommandHandler("add-alias", () => editSite());
 setCommandHandler("remove-alias", removeAlias);
 setCommandHandler("show-all", () =>
 {
@@ -81,7 +80,6 @@ function setSite()
     $("alias-container").hidden = true;
 
   $("site-edit-container").hidden = false;
-  $("set-site").hidden = site;
   $("add-alias").hidden = (!site || origSite != site || state.pwdList.length);
 
   let field = $("site");
@@ -89,6 +87,9 @@ function setSite()
   field.value = field.getAttribute("value");
   field.setAttribute("readonly", "readonly");
   $("generate-password-link").hidden = $("stored-password-link").hidden = !site;
+
+  if (!site)
+    editSite(true);
 }
 
 function hidePasswordMessages()
@@ -117,9 +118,10 @@ function showPasswordMessage(error)
   hidePasswordMessagesTimeout = window.setTimeout(hidePasswordMessages, 3000);
 }
 
-function editSite()
+function editSite(mandatory)
 {
   $("site-edit-container").hidden = true;
+  $("site-edit-cancel").setAttribute("disabled", mandatory ? "true" : null);
 
   let field = $("site");
   field.removeAttribute("readonly");
@@ -161,6 +163,9 @@ function finishEditingSite()
 
 function abortEditingSite()
 {
+  if ($("site-edit-cancel").getAttribute("disabled") == "true")
+    return;
+
   setSite();
 }
 
