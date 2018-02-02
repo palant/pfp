@@ -68,3 +68,7 @@ window.addEventListener("message", event =>
   let target = document.getElementById(event.data.target).contentWindow;
   target.postMessage(event.data, targetOrigin);
 });
+
+// Hack: expose __webpack_require__ for simpler debugging
+/* global __webpack_require__ */
+module.exports = __webpack_require__;

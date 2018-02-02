@@ -210,6 +210,16 @@ gulp.task("build-web", ["validate"], function()
               {
                 test: /\.properties$/,
                 use: path.resolve(__dirname, "localeLoader.js")
+              },
+              {
+                test: /\.js$/,
+                exclude: /\/zxcvbn-.*\.js$/,
+                use: {
+                  loader: "babel-loader",
+                  options: {
+                    presets: ["babel-preset-env"]
+                  }
+                }
               }
             ]
           },
@@ -233,6 +243,15 @@ gulp.task("build-web", ["validate"], function()
               {
                 test: /\.properties$/,
                 use: path.resolve(__dirname, "localeLoader.js")
+              },
+              {
+                test: /\.js$/,
+                use: {
+                  loader: "babel-loader",
+                  options: {
+                    presets: ["babel-preset-env"]
+                  }
+                }
               }
             ]
           },
@@ -259,6 +278,15 @@ gulp.task("build-web", ["validate"], function()
               {
                 test: /\/(scrypt|pbkdf2)\.js$/,
                 use: path.resolve(__dirname, "workerLoader.js")
+              },
+              {
+                test: /\.js$/,
+                use: {
+                  loader: "babel-loader",
+                  options: {
+                    presets: ["babel-preset-env"]
+                  }
+                }
               }
             ]
           },
@@ -269,7 +297,29 @@ gulp.task("build-web", ["validate"], function()
           }
         }))
         .pipe(gulp.dest(`${targetdir}/background`)),
-    gulp.src(["web/**/*.html", "web/index.js", "web/index.css"])
+    gulp.src("web/index.js")
+        .pipe(webpack({
+          output: {
+            filename: "index.js",
+            pathinfo: true,
+            library: "__webpack_require__"
+          },
+          module: {
+            rules: [
+              {
+                test: /\.js$/,
+                use: {
+                  loader: "babel-loader",
+                  options: {
+                    presets: ["babel-preset-env"]
+                  }
+                }
+              }
+            ]
+          }
+        }))
+        .pipe(gulp.dest(targetdir)),
+    gulp.src(["web/**/*.html", "web/index.css"])
         .pipe(gulp.dest(targetdir))
   );
 });
