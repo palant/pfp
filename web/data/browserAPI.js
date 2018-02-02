@@ -23,7 +23,7 @@ function getPortId()
   return new Promise((resolve, reject) =>
   {
     expectedPortIds.push(resolve);
-    top.postMessage({
+    parent.postMessage({
       type: "get-port-id"
     }, targetOrigin);
   });
@@ -45,7 +45,7 @@ module.exports = {
             return;
           }
 
-          top.postMessage({
+          parent.postMessage({
             type: "message",
             payload,
             id,
@@ -56,7 +56,7 @@ module.exports = {
         disconnect: message =>
         {
           delete ports[id];
-          top.postMessage({
+          parent.postMessage({
             type: "disconnect",
             id,
             target: "background"
@@ -70,7 +70,7 @@ module.exports = {
       {
         id = response;
         ports[id] = port;
-        top.postMessage({
+        parent.postMessage({
           type: "connect",
           name: params.name,
           id,
@@ -120,7 +120,7 @@ window.addEventListener("message", event =>
 
 window.addEventListener("show-panel", event =>
 {
-  top.postMessage({
+  parent.postMessage({
     type: "show-panel"
   }, targetOrigin);
 });

@@ -87,7 +87,7 @@ module.exports = {
       if (params.url != "../allpasswords/allpasswords.html")
         return Promise.reject(new Error("Not implemented"));
 
-      top.postMessage({
+      parent.postMessage({
         type: "show-allpasswords"
       }, targetOrigin);
       return Promise.resolve();
