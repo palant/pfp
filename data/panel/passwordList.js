@@ -98,7 +98,7 @@ function hidePasswordMessages()
     window.clearTimeout(hidePasswordMessagesTimeout);
   hidePasswordMessagesTimeout = null;
 
-  for (let id of ["empty-site-name", "password-copied-message", "no-such-password", "unknown-generation-method", "wrong-site-message", "no-password-fields"])
+  for (let id of ["empty-site-name", "password-ready-message", "password-copied-message", "no-such-password", "unknown-generation-method", "wrong-site-message", "no-password-fields"])
     $(id).hidden = true;
 }
 
@@ -304,8 +304,27 @@ function copyToClipboard(password)
   let {site} = state;
   passwords.getPassword(site, password.name, password.revision).then(password =>
   {
-    require("../clipboard").set(password);
-    showPasswordMessage("password-copied-message");
+    let doCopy = () =>
+    {
+      require("../clipboard").set(password);
+      showPasswordMessage("password-copied-message");
+    };
+
+    let isWebClient = document.documentElement.classList.contains("webclient");
+    if (!isWebClient)
+      doCopy();
+    else
+    {
+      showPasswordMessage("password-ready-message");
+      let handler = event =>
+      {
+        window.removeEventListener("click", handler, true);
+        event.stopPropagation();
+        event.preventDefault();
+        doCopy();
+      };
+      window.addEventListener("click", handler, true);
+    }
   }).catch(showPasswordMessage);
 }
 

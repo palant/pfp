@@ -16,13 +16,34 @@ function copyToClipboard(site, password, passwordInfo)
 {
   passwords.getPassword(site, password.name, password.revision).then(password =>
   {
-    require("../clipboard").set(password);
-    let message = passwordInfo.querySelector(".password-copied-message");
-    message.hidden = false;
-    setTimeout(() =>
+    let doCopy = () =>
     {
-      message.hidden = true;
-    }, 3000);
+      require("../clipboard").set(password);
+      let message = passwordInfo.querySelector(".password-copied-message");
+      message.hidden = false;
+      setTimeout(() =>
+      {
+        message.hidden = true;
+      }, 3000);
+    };
+
+    let isWebClient = document.documentElement.classList.contains("webclient");
+    if (!isWebClient)
+      doCopy();
+    else
+    {
+      let message = passwordInfo.querySelector(".password-ready-message");
+      message.hidden = false;
+      let handler = event =>
+      {
+        window.removeEventListener("click", handler, true);
+        message.hidden = true;
+        event.stopPropagation();
+        event.preventDefault();
+        doCopy();
+      };
+      window.addEventListener("click", handler, true);
+    }
   }).catch(showError);
 }
 
