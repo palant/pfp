@@ -48,6 +48,8 @@ setCommandHandler("menu-bump-revision", () => bumpRevision(menuPassword));
 setCommandHandler("menu-password-remove", () => removePassword(menuPassword));
 $("password-menu").addEventListener("click", hideMenu);
 
+removeWhitespace($("password-template"));
+
 let menu = $("password-menu");
 menu.parentNode.removeChild(menu);
 menu.removeAttribute("hidden");
@@ -379,4 +381,15 @@ function removePassword(password)
         .catch(showPasswordMessage);
     }
   });
+}
+
+function removeWhitespace(element)
+{
+  for (let i = 0; i < element.childNodes.length; i++)
+  {
+    if (element.childNodes[i].nodeType == 3 && element.childNodes[i].nodeValue.trim() == "")
+      element.removeChild(element.childNodes[i--]);
+    else if (element.childNodes[i].nodeType == 1)
+      removeWhitespace(element.childNodes[i]);
+  }
 }
