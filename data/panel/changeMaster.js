@@ -6,8 +6,8 @@
 
 "use strict";
 
-let {passwords, masterPassword} = require("../proxy");
-let {setSubmitHandler, setResetHandler} = require("./events");
+let {passwords, masterPassword, ui} = require("../proxy");
+let {setCommandHandler, setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator} = require("./formValidation");
 let state = require("./state");
 let {$, setActivePanel, showUnknownError, messages} = require("./utils");
@@ -20,6 +20,7 @@ setValidator("new-master", validateMasterPassword);
 setValidator("new-master-repeat", validateMasterPasswordRepeat);
 $("new-master").addEventListener("input", checkPasswordScore);
 
+setCommandHandler("master-security-learn-more", () => ui.openDocumentationLink("choosing-master-password").catch(showUnknownError));
 setSubmitHandler("change-master", changeMasterPassword);
 setResetHandler("change-master", () => setActivePanel("enter-master"));
 
