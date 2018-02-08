@@ -6,6 +6,7 @@
 
 "use strict";
 
+let fs = require("fs");
 let path = require("path");
 let url = require("url");
 
@@ -14,8 +15,9 @@ let gulp = require("gulp");
 let eslint = require("gulp-eslint");
 let htmlhint = require("gulp-htmlhint");
 let sass = require("gulp-sass");
-let merge = require("merge-stream");
 let stylelint = require("gulp-stylelint");
+let merge = require("merge-stream");
+let request = require("request");
 let zip = require("gulp-zip");
 let webpack = require("webpack2-stream-watch");
 
@@ -430,6 +432,76 @@ gulp.task("xpi", ["build-firefox"], function()
   ).pipe(zip("pfp-" + manifest.version + ".xpi")).pipe(gulp.dest("build-firefox"));
 });
 
+gulp.task("build-edge", ["build-chrome"], function()
+{
+  let version = require("./manifest.json").version;
+  while (version.split(".").length < 4)
+    version += ".0";
+
+  return merge(
+    gulp.src([
+      "build-chrome/**",
+      "!build-chrome/manifest.json", "!build-chrome/data/reloader.js", "!build-chrome/random.json",
+      "!build-chrome/**/.*", "!build-chrome/**/*.zip", "!build-chrome/**/*.crx"
+    ]).pipe(gulp.dest("build-edge/extension/Extension")),
+    gulp.src("build-chrome/manifest.json")
+        .pipe(utils.jsonModify(removeReloader))
+        .pipe(gulp.dest("build-edge/extension/Extension")),
+    gulp.src(["edge/**/*.xml", "edge/**/*.png"])
+        .pipe(utils.transform((filepath, contents) =>
+        {
+          return [filepath, contents.replace(/{{version}}/g, version)];
+        }), {files: ["appxmanifest.xml"]})
+        .pipe(gulp.dest("build-edge/extension")),
+    gulp.src("package.json")
+        .pipe(utils.jsonModify(data =>
+        {
+          return {
+            "DisplayName": data.title,
+            "_DisplayName.comment": "",
+            "Description": data.description,
+            "_Description.comment": ""
+          };
+        }, "resources.resjson"))
+        .pipe(gulp.dest("build-edge/extension/Resources/en-us"))
+  );
+});
+
+gulp.task("build-edge/extension.zip", ["build-edge"], function()
+{
+  return gulp.src([
+    "build-edge/**",
+    "!build-edge/**/*.zip", "!build-edge/**/*.appx"
+  ]).pipe(zip("extension.zip")).pipe(gulp.dest("build-edge"));
+});
+
+gulp.task("appx", ["build-edge/extension.zip"], function(callback)
+{
+  const endpoint = "https://cloudappx.azurewebsites.net/v3/build";
+  let req = request.post({
+    url: endpoint,
+    encoding: null
+  }, (err, response, responseBody) =>
+  {
+    if (err)
+    {
+      callback(err);
+      return;
+    }
+
+    if (response.statusCode != 200)
+    {
+      callback(new Error(`Calling CloudAppX service failed: ${response.statusCode} ${response.statusMessage} (${responseBody})`));
+      return;
+    }
+
+    let manifest = require("./manifest.json");
+    fs.writeFile("build-edge/pfp-" + manifest.version  + ".appx", responseBody, callback);
+  });
+
+  req.form().append("xml", fs.createReadStream("build-edge/extension.zip"));
+});
+
 gulp.task("web", ["build-web"], function()
 {
   let manifest = require("./manifest.json");
@@ -447,5 +519,5 @@ gulp.task("test", ["validate", "build-test"], function()
 
 gulp.task("clean", function()
 {
-  return del(["build-chrome", "build-firefox", "build-test", "build-web"]);
+  return del(["build-chrome", "build-firefox", "build-edge", "build-test", "build-web"]);
 });

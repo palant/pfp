@@ -33,6 +33,12 @@ The following command with produce a file with a name like `build-chrome/pfp-n.n
 
 You can also omit the `--private-key` parameter, an unsigned ZIP file will be created then which can be uploaded to Chrome Web Store or Opera Add-ons.
 
+### Microsoft Edge
+
+The following command will produce a file wiht a name like `build-edge/pfp-n.n.n.appx`:
+
+    gulp appx
+
 ### Web client
 
 The following command with produce a file with a name like `build-web/pfp-web-n.n.n.zip`:
@@ -52,13 +58,13 @@ The following command will create a `build-firefox` directory:
 
 You can load this directory as a temporary extension in Firefox via `about:debugging` page. An already loaded extension will reload automatically on rebuild. If you want the directory to be updated automatically whenever you change any source files, you can use `gulp watch-firefox` instead.
 
-### Chrome and Opera
+### Chrome, Opera and Edge
 
 The following command will create a `build-chrome` directory:
 
     gulp build-chrome
 
-You can load this directory as an unpacked extension in Chrome or Opera. An already loaded extension will reload automatically on rebuild. If you want the directory to be updated automatically whenever you change any source files, you can use `gulp watch-chrome` instead.
+You can load this directory as an unpacked extension in Chrome, Opera or Edge. An already loaded extension will reload automatically on rebuild. If you want the directory to be updated automatically whenever you change any source files, you can use `gulp watch-chrome` instead.
 
 ### Web client
 

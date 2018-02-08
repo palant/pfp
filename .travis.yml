@@ -6,4 +6,4 @@ node_js:
 before_script:
   - npm install -g gulp
 script:
-  - gulp xpi crx web test
+  - gulp xpi crx appx web test

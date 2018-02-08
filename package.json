@@ -92,6 +92,7 @@
     "node-rsa": "^0.3.2",
     "nodeunit": "^0.9.1",
     "properties-parser": "^0.3.1",
+    "request": "^2.83.0",
     "sandboxed-module": "^2.0.3",
     "stylelint-config-standard": "^10.0.0",
     "subtle": "^0.1.8",
