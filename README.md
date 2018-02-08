@@ -35,9 +35,11 @@ You can also omit the `--private-key` parameter, an unsigned ZIP file will be cr
 
 ### Microsoft Edge
 
-The following command will produce a file wiht a name like `build-edge/pfp-n.n.n.appx`:
+The following command will produce a file with a name like `build-edge/pfp-n.n.n.appx`:
 
     gulp appx
+
+Note that Internet connection is currely required for Edge builds, as an external service is used for packaging.
 
 ### Web client
 
