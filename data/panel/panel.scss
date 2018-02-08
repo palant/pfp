@@ -4,49 +4,12 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
-$font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-$font-size: 24px;
-$font-size-small: 16px;
+@import "../_shared.scss";
 
-$text-color: #000;
-$background-color: #fff;
 $hover-background: #e2f4ff;
-$warning-background: #faa;
-$success-background: #cfc;
-$error-text: #f44;
 
-$block-spacing: 15px;
-$block-padding: 5px;
-$inline-spacing: 5px;
-$icon-size: 32px;
 $menu-arrow-height: 7px;
 $menu-border-width: 1px;
-
-@mixin padding-inline-start($length)
-{
-  :root:not([dir="rtl"]) &
-  {
-    padding-left: $length;
-  }
-
-  :root[dir="rtl"] &
-  {
-    padding-right: $length;
-  }
-}
-
-@mixin margin-inline-end($length)
-{
-  :root:not([dir="rtl"]) &
-  {
-    margin-right: $length;
-  }
-
-  :root[dir="rtl"] &
-  {
-    margin-left: $length;
-  }
-}
 
 :root
 {
@@ -58,44 +21,14 @@ body
   margin: 0;
   width: 600px;
   padding: 10px;
-  background-color: $background-color;
-  color: $text-color;
-}
-
-body,
-input,
-button,
-h1
-{
-  font-family: $font-family;
-  font-size: $font-size;
 }
 
 h1
 {
+  font-size: 100%;
   font-weight: bold;
   margin-top: 0;
   margin-bottom: $block-spacing;
-}
-
-input[type="checkbox"]
-{
-  width: $font-size;
-  height: $font-size;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  border: 1px solid black;
-  border-radius: 2px;
-  margin: 0;
-  @include margin-inline-end($inline-spacing);
-}
-
-input[type="checkbox"]:checked
-{
-  background-image: url(../images/checkmark-round.svg);
-  background-size: $font-size - 4px;
-  background-repeat: no-repeat;
-  background-position: center;
 }
 
 a
@@ -126,25 +59,6 @@ a:hover
   margin-top: $block-spacing;
 }
 
-.warning
-{
-  background-color: $warning-background;
-  border-radius: $block-padding;
-
-  padding: $block-padding;
-  @include padding-inline-start($icon-size + $block-padding + $inline-spacing);
-  background-image: url(../images/android-warning.svg);
-  background-size: $icon-size;
-  background-position: $block-padding $block-padding;
-  background-repeat: no-repeat;
-}
-
-.success
-{
-  background-color: $success-background;
-  border-radius: $block-padding;
-}
-
 .button-container:not([hidden]),
 .link-container:not([hidden])
 {
@@ -156,12 +70,6 @@ a:hover
 .link-container
 {
   font-size: $font-size-small;
-}
-
-.error
-{
-  font-size: $font-size-small;
-  color: $error-text;
 }
 
 #unknown-error-details
@@ -237,14 +145,7 @@ a:hover
 
 #enter-master
 {
-  $image-size: 128px;
-  $image-spacing: 16px;
-  @include padding-inline-start($image-size + 2 * $image-spacing);
-  background-size: $image-size;
-  background-repeat: no-repeat;
-  background-position: $image-spacing $image-spacing;
-  background-image: url(../images/icon.svg);
-  min-height: $image-size;
+  @include logo;
 }
 
 #migration > p,
@@ -434,7 +335,7 @@ a:hover
   flex-direction: column;
   margin-top: $menu-arrow-height;
   border: $menu-border-width solid $text-color;
-  border-radius: $block-padding;
+  border-radius: $border-radius;
   padding: $block-padding;
 }
 

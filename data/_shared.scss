@@ -1,0 +1,146 @@
+/*
+ * This Source Code is subject to the terms of the Mozilla Public License
+ * version 2.0 (the "License"). You can obtain a copy of the License at
+ * http://mozilla.org/MPL/2.0/.
+ */
+
+$font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$font-size: 24px;
+$font-size-small: 16px;
+
+$text-color: #000;
+$background-color: #fff;
+$warning-background: #faa;
+$success-background: #cfc;
+$error-text: #f44;
+
+$block-spacing: 15px;
+$block-padding: 5px;
+$inline-spacing: 5px;
+$border-radius: $block-padding;
+
+$icon-size: 32px;
+$large-icon-size: 48px;
+$logo-size: 128px;
+$logo-spacing: 16px;
+
+@mixin padding-inline-start($length)
+{
+  :root:not([dir="rtl"]) &
+  {
+    padding-left: $length;
+  }
+
+  :root[dir="rtl"] &
+  {
+    padding-right: $length;
+  }
+}
+
+@mixin padding-inline-end($length)
+{
+  :root:not([dir="rtl"]) &
+  {
+    padding-right: $length;
+  }
+
+  :root[dir="rtl"] &
+  {
+    padding-left: $length;
+  }
+}
+
+@mixin margin-inline-start($length)
+{
+  :root:not([dir="rtl"]) &
+  {
+    margin-left: $length;
+  }
+
+  :root[dir="rtl"] &
+  {
+    margin-right: $length;
+  }
+}
+
+@mixin margin-inline-end($length)
+{
+  :root:not([dir="rtl"]) &
+  {
+    margin-right: $length;
+  }
+
+  :root[dir="rtl"] &
+  {
+    margin-left: $length;
+  }
+}
+
+@mixin logo
+{
+  @include padding-inline-start($logo-size + 2 * $logo-spacing);
+  background-size: $logo-size;
+  background-repeat: no-repeat;
+  background-position: $logo-spacing $logo-spacing;
+  background-image: url(../images/icon.svg);
+  min-height: $logo-size + 2 * $logo-spacing;
+}
+
+body
+{
+  background-color: $background-color;
+  color: $text-color;
+}
+
+body,
+input,
+button
+{
+  font-family: $font-family;
+  font-size: $font-size;
+}
+
+.warning
+{
+  background-color: $warning-background;
+  border-radius: $border-radius;
+
+  padding: $block-padding;
+  @include padding-inline-start($icon-size + $block-padding + $inline-spacing);
+  background-image: url(../images/android-warning.svg);
+  background-size: $icon-size;
+  background-position: $block-padding $block-padding;
+  background-repeat: no-repeat;
+}
+
+.success
+{
+  background-color: $success-background;
+  border-radius: $border-radius;
+}
+
+.error
+{
+  font-size: $font-size-small;
+  color: $error-text;
+}
+
+input[type="checkbox"]
+{
+  width: $font-size;
+  height: $font-size;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid black;
+  border-radius: 2px;
+  margin: 0;
+  @include margin-inline-end($inline-spacing);
+}
+
+input[type="checkbox"]:checked
+{
+  background-image: url(../images/checkmark-round.svg);
+  background-size: $font-size - 4px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
