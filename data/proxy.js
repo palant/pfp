@@ -88,6 +88,4 @@ exports.recoveryCodes = Proxy("recoveryCodes", [
 
 exports.sync = Proxy("sync", ["authorize", "disable"]);
 
-exports.ui = Proxy("ui", [
-  "showAllPasswords", "openReleaseNotes", "openDocumentationLink"
-]);
+exports.ui = Proxy("ui", ["showAllPasswords", "getLink", "openLink"]);

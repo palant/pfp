@@ -16,6 +16,28 @@ function init()
 {
   window.removeEventListener("load", init);
 
+  let {ui} = require("../proxy");
+  let {setCommandHandler} = require("./events");
+  let {showUnknownError} = require("./utils");
+
+  let isWebClient = document.documentElement.classList.contains("webclient");
+  let links = document.querySelectorAll("a[data-type]");
+  for (let i = 0; i < links.length; i++)
+  {
+    let link = links[i];
+    link.target = "_blank";
+
+    let options = {
+      type: link.getAttribute("data-type"),
+      param: link.getAttribute("data-param")
+    };
+    if (isWebClient)
+      ui.getLink(options).then(url => link.href = url).catch(showUnknownError);
+    else
+      setCommandHandler(link, () => ui.openLink(options).catch(showUnknownError));
+  }
+
+
   require("./enterMaster");
   require("./changeMaster");
   require("./migration");

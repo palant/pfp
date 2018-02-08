@@ -6,8 +6,8 @@
 
 "use strict";
 
-let {passwords, ui} = require("../proxy");
-let {setCommandHandler, setSubmitHandler} = require("./events");
+let {passwords} = require("../proxy");
+let {setSubmitHandler} = require("./events");
 let state = require("./state");
 let {$, showUnknownError} = require("./utils");
 
@@ -33,11 +33,6 @@ function checkMigrationStatus()
 }
 
 state.on("update", checkMigrationStatus);
-
-setCommandHandler("migration-learn-more", () =>
-{
-  ui.openReleaseNotes("2.0.0").catch(showUnknownError);
-});
 
 setSubmitHandler("migration", () =>
 {
