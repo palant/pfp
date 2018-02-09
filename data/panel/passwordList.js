@@ -44,6 +44,7 @@ setCommandHandler("menu-to-document", () => fillInPassword(menuPassword));
 setCommandHandler("menu-to-clipboard", () => copyToClipboard(menuPassword));
 setCommandHandler("menu-show-qrcode", () => showQRCode(menuPassword));
 setCommandHandler("menu-notes", () => showNotes(menuPassword));
+setCommandHandler("menu-upgrade-password", () => upgradePassword(menuPassword));
 setCommandHandler("menu-bump-revision", () => bumpRevision(menuPassword));
 setCommandHandler("menu-password-remove", () => removePassword(menuPassword));
 $("password-menu").addEventListener("click", hideMenu);
@@ -219,6 +220,8 @@ function showPasswords()
       if (password.type == "generated2" || password.type == "generated")
       {
         tooltip = messages["password-type-" + password.type];
+        if (password.type == "generated")
+          tooltip += "\n" + messages["password-type-generated-replace"];
 
         tooltip += "\n" + document.querySelector('label[for="password-length"]').textContent;
         tooltip += " " + password.length;
@@ -244,6 +247,15 @@ function showPasswords()
       setCommandHandler(entry.querySelector(".to-document-link"), fillInPassword.bind(null, password));
       setCommandHandler(entry.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, password));
 
+      if (password.type == "generated")
+      {
+        entry.querySelector(".user-name-container").addEventListener("click", ((password, event) =>
+        {
+          if (event.eventPhase == event.AT_TARGET)
+            upgradePassword(password);
+        }).bind(null, password));
+      }
+
       entry.querySelector(".user-name-container").setAttribute("title", tooltip);
       if (password.type == "generated")
         entry.querySelector(".user-name-container").classList.add("legacy-warning");
@@ -266,6 +278,8 @@ function showMenu(password, element)
 
   let notes_link_msg = password.notes ? "edit-notes" : "add-notes";
   menu.querySelector(".menu-notes-link").textContent = messages[notes_link_msg];
+
+  menu.querySelector("#menu-upgrade-password").hidden = (password.type != "generated");
 
   menuPassword = password;
   element.parentNode.insertBefore(menu, element.nextSibling);
@@ -340,6 +354,30 @@ function showQRCode(password)
 function showNotes(password)
 {
   require("./notes").edit(password);
+}
+
+function upgradePassword(password)
+{
+  let message = messages["upgrade-password-confirmation"].replace(/\{1\}/g, password.name).replace(/\{2\}/g, password.site);
+  confirm(message).then(response =>
+  {
+    if (response)
+    {
+      passwords.addGenerated({
+        site: password.site,
+        name: password.name,
+        revision: password.revision,
+        length: password.length,
+        lower: password.lower,
+        upper: password.upper,
+        number: password.number,
+        symbol: password.symbol,
+        legacy: false
+      }, true)
+        .then(pwdList => state.set({pwdList}))
+        .catch(showPasswordMessage);
+    }
+  });
 }
 
 function bumpRevision(password)

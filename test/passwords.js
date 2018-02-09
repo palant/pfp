@@ -331,6 +331,9 @@ exports.testAddGeneratedExisting = function(test)
     return passwords.addStored(stored1);
   }).catch(expectedValue.bind(test, "alreadyExists")).then(() =>
   {
+    return passwords.addGenerated(generated1, true);
+  }).catch(unexpectedError.bind(test)).then(() =>
+  {
     return passwords.removePassword(generated1.site, generated1.name, generated1.revision);
   }).then(() =>
   {
