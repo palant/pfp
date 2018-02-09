@@ -299,10 +299,10 @@ gulp.task("build-web", ["validate"], function()
           }
         }))
         .pipe(gulp.dest(`${targetdir}/background`)),
-    gulp.src("web/index.js")
+    gulp.src("web/index/index.js")
         .pipe(webpack({
           output: {
-            filename: "index.js",
+            filename: "index/index.js",
             pathinfo: true,
             library: "__webpack_require__"
           },
@@ -321,7 +321,10 @@ gulp.task("build-web", ["validate"], function()
           }
         }))
         .pipe(gulp.dest(targetdir)),
-    gulp.src(["web/**/*.html", "web/index.css"])
+    gulp.src("web/**/*.scss")
+        .pipe(sass())
+        .pipe(gulp.dest(targetdir)),
+    gulp.src("web/**/*.html")
         .pipe(gulp.dest(targetdir))
   );
 });

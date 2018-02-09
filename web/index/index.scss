@@ -1,0 +1,36 @@
+/*
+ * This Source Code is subject to the terms of the Mozilla Public License
+ * version 2.0 (the "License"). You can obtain a copy of the License at
+ * http://mozilla.org/MPL/2.0/.
+ */
+
+@import "../../data/_shared.scss";
+
+$panel-padding: 10px;
+$panel-width: 600px + $panel-padding * 2;
+
+iframe
+{
+  display: none;
+  position: fixed;
+  top: 0;
+  height: 100%;
+  border-width: 0;
+}
+
+iframe[data-active="true"]
+{
+  display: block;
+}
+
+#allpasswords
+{
+  left: 0;
+  width: 100%;
+}
+
+#panel
+{
+  width: $panel-width;
+  left: calc((100% - #{$panel-width}) / 2);
+}
