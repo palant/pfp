@@ -233,129 +233,129 @@ window.addEventListener("DOMContentLoaded", function()
   showNotes({target: notesCheckbox});
 
   $("show-passwords").addEventListener("click", showPasswords);
-});
 
-passwords.getAllPasswords().then(sites =>
-{
-  let siteTemplate = $("site-template").firstElementChild;
-  let passwordTemplate = $("password-template").firstElementChild;
-  let links = passwordTemplate.querySelectorAll("a");
-  for (let i = 0; i < links.length; i++)
+  passwords.getAllPasswords().then(sites =>
   {
-    let link = links[i];
-    if (link.textContent)
+    let siteTemplate = $("site-template").firstElementChild;
+    let passwordTemplate = $("password-template").firstElementChild;
+    let links = passwordTemplate.querySelectorAll("a");
+    for (let i = 0; i < links.length; i++)
     {
-      link.setAttribute("title", link.textContent);
-      link.textContent = "";
-    }
-  }
-
-  let siteNames = Object.keys(sites);
-  siteNames.sort();
-
-  let recoveryCodeOperations = [];
-  let container = $("list");
-  let currentLetter = null;
-  let prevInfo = null;
-  let isWebClient = document.documentElement.classList.contains("webclient");
-  for (let site of siteNames)
-  {
-    let {passwords, aliases} = sites[site];
-
-    let siteInfo = siteTemplate.cloneNode(true);
-    if (isWebClient)
-    {
-      let link = document.createElement("a");
-      link.setAttribute("href", "#");
-      link.textContent = site;
-      link.addEventListener("click", goToSite.bind(null, site));
-      siteInfo.querySelector(".site-name").appendChild(link);
-    }
-    else
-      siteInfo.querySelector(".site-name").textContent = site;
-
-    if (aliases.length)
-      siteInfo.querySelector(".site-aliases-value").textContent = aliases.sort().join(", ");
-    else
-      siteInfo.querySelector(".site-aliases").hidden = true;
-
-    for (let passwordData of passwords)
-    {
-      let passwordInfo = passwordTemplate.cloneNode(true);
-      passwordInfo._data = [site, passwordData];
-      passwordInfo.querySelector(".user-name").textContent = passwordData.name;
-
-      let revisionNode = passwordInfo.querySelector(".password-revision");
-      revisionNode.hidden = !passwordData.revision;
-      revisionNode.textContent = passwordData.revision;
-
-      setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, passwordData, passwordInfo));
-      setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, site, passwordData, passwordInfo));
-
-      if (passwordData.type == "generated2" || passwordData.type == "generated")
+      let link = links[i];
+      if (link.textContent)
       {
-        passwordInfo.querySelector(".password-info.stored").hidden = true;
-        passwordInfo.querySelector(".password-type." + passwordData.type).hidden = false;
-        if (passwordData.type == "generated")
-          passwordInfo.querySelector(".password-type.generated-print").hidden = false;
-        passwordInfo.querySelector(".password-length-value").textContent = passwordData.length;
+        link.setAttribute("title", link.textContent);
+        link.textContent = "";
+      }
+    }
 
-        let chars = [];
-        if (passwordData.lower)
-          chars.push("abc");
-        if (passwordData.upper)
-          chars.push("XYZ");
-        if (passwordData.number)
-          chars.push("789");
-        if (passwordData.symbol)
-          chars.push("+^;");
-        passwordInfo.querySelector(".password-allowed-chars-value").textContent = chars.join(" ");
+    let siteNames = Object.keys(sites);
+    siteNames.sort();
+
+    let recoveryCodeOperations = [];
+    let container = $("list");
+    let currentLetter = null;
+    let prevInfo = null;
+    let isWebClient = document.documentElement.classList.contains("webclient");
+    for (let site of siteNames)
+    {
+      let {passwords, aliases} = sites[site];
+
+      let siteInfo = siteTemplate.cloneNode(true);
+      if (isWebClient)
+      {
+        let link = document.createElement("a");
+        link.setAttribute("href", "#");
+        link.textContent = site;
+        link.addEventListener("click", goToSite.bind(null, site));
+        siteInfo.querySelector(".site-name").appendChild(link);
       }
       else
+        siteInfo.querySelector(".site-name").textContent = site;
+
+      if (aliases.length)
+        siteInfo.querySelector(".site-aliases-value").textContent = aliases.sort().join(", ");
+      else
+        siteInfo.querySelector(".site-aliases").hidden = true;
+
+      for (let passwordData of passwords)
       {
-        passwordInfo.querySelector(".password-info.generated").hidden = true;
-        recoveryCodeOperations.push(recoveryCodes.getCode(site, passwordData.name, passwordData.revision).then(code =>
+        let passwordInfo = passwordTemplate.cloneNode(true);
+        passwordInfo._data = [site, passwordData];
+        passwordInfo.querySelector(".user-name").textContent = passwordData.name;
+
+        let revisionNode = passwordInfo.querySelector(".password-revision");
+        revisionNode.hidden = !passwordData.revision;
+        revisionNode.textContent = passwordData.revision;
+
+        setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, passwordData, passwordInfo));
+        setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, site, passwordData, passwordInfo));
+
+        if (passwordData.type == "generated2" || passwordData.type == "generated")
         {
-          passwordInfo.querySelector(".password-recovery").textContent = code;
-        }));
+          passwordInfo.querySelector(".password-info.stored").hidden = true;
+          passwordInfo.querySelector(".password-type." + passwordData.type).hidden = false;
+          if (passwordData.type == "generated")
+            passwordInfo.querySelector(".password-type.generated-print").hidden = false;
+          passwordInfo.querySelector(".password-length-value").textContent = passwordData.length;
+
+          let chars = [];
+          if (passwordData.lower)
+            chars.push("abc");
+          if (passwordData.upper)
+            chars.push("XYZ");
+          if (passwordData.number)
+            chars.push("789");
+          if (passwordData.symbol)
+            chars.push("+^;");
+          passwordInfo.querySelector(".password-allowed-chars-value").textContent = chars.join(" ");
+        }
+        else
+        {
+          passwordInfo.querySelector(".password-info.generated").hidden = true;
+          recoveryCodeOperations.push(recoveryCodes.getCode(site, passwordData.name, passwordData.revision).then(code =>
+          {
+            passwordInfo.querySelector(".password-recovery").textContent = code;
+          }));
+        }
+
+        let notes = passwordInfo.querySelector(".password-info.notes");
+        notes.hidden = !passwordData.notes;
+        if (passwordData.notes)
+          notes.textContent += " " + passwordData.notes;
+
+        siteInfo.appendChild(passwordInfo);
       }
 
-      let notes = passwordInfo.querySelector(".password-info.notes");
-      notes.hidden = !passwordData.notes;
-      if (passwordData.notes)
-        notes.textContent += " " + passwordData.notes;
+      container.appendChild(siteInfo);
 
-      siteInfo.appendChild(passwordInfo);
-    }
-
-    container.appendChild(siteInfo);
-
-    let letter = site[0].toUpperCase();
-    if (letter != currentLetter)
-    {
-      currentLetter = letter;
-      let link = document.createElement("a");
-      link.textContent = currentLetter;
-      link.href = "#";
-      setCommandHandler(link, () =>
+      let letter = site[0].toUpperCase();
+      if (letter != currentLetter)
       {
-        let div = siteInfo;
-        while (div && !div.parentNode)
-          div = div._nextSiteInfo;
-        if (div)
-          div.scrollIntoView(true);
-      });
-      $("shortcuts").appendChild(link);
-      link.focus();
+        currentLetter = letter;
+        let link = document.createElement("a");
+        link.textContent = currentLetter;
+        link.href = "#";
+        setCommandHandler(link, () =>
+        {
+          let div = siteInfo;
+          while (div && !div.parentNode)
+            div = div._nextSiteInfo;
+          if (div)
+            div.scrollIntoView(true);
+        });
+        $("shortcuts").appendChild(link);
+        link.focus();
+      }
+
+      if (prevInfo)
+        prevInfo._nextSiteInfo = siteInfo;
+      prevInfo = siteInfo;
     }
 
-    if (prevInfo)
-      prevInfo._nextSiteInfo = siteInfo;
-    prevInfo = siteInfo;
-  }
-
-  Promise.all(recoveryCodeOperations).catch(showError);
-}).catch(showError);
+    Promise.all(recoveryCodeOperations).catch(showError);
+  }).catch(showError);
+});
 
 // Hack: expose __webpack_require__ for simpler debugging
 /* global __webpack_require__ */
