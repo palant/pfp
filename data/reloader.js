@@ -13,7 +13,7 @@ let random = null;
 function checkReload()
 {
   let request = new XMLHttpRequest();
-  request.open("GET", chrome.runtime.getURL("random.json"));
+  request.open("GET", (window.browser || window.chrome).runtime.getURL("random.json"));
   request.responseType = "json";
   request.onload = () =>
   {
