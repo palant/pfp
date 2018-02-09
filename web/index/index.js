@@ -28,10 +28,13 @@ window.addEventListener("load", function()
     return;
   }
 
+  document.getElementById("inProgressOverlay").hidden = false;
+
   createFrame("background", "background/background.html", () =>
   {
     createFrame("panel", "panel/panel.html", event =>
     {
+      document.getElementById("inProgressOverlay").hidden = true;
       event.target.setAttribute("data-active", "true");
     });
     createFrame("allpasswords", null);
