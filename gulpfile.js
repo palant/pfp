@@ -23,7 +23,11 @@ let webpack = require("webpack2-stream-watch");
 
 let utils = require("./gulp-utils");
 
-gulp.task("default", ["xpi"], function()
+gulp.task("default", ["all"], function()
+{
+});
+
+gulp.task("all", ["xpi", "crx", "appx", "web"], function()
 {
 });
 
