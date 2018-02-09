@@ -138,15 +138,15 @@ exports.subtle = {
   {
     return Promise.resolve().then(() =>
     {
-      if (algo != "HMAC")
+      if (algo.name != "HMAC" && algo.hash != "SHA-256")
         throw new Error("Unexpected signing algorithm");
-      if (key._algo != algo)
+      if (key._algo != algo.name)
         throw new Error("Key algorithm doesn't match signing algorithm");
       if (!key._sign)
         throw new Error("Key not suitable for signing");
 
       return Buffer.concat([
-        Buffer.from(algo, "utf-8"),
+        Buffer.from(algo.name, "utf-8"),
         Buffer.from("!", "utf-8"),
         Buffer.from(key._data),
         Buffer.from("!", "utf-8"),
