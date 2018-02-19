@@ -8,6 +8,7 @@
 
 let passwords = require("../lib/passwords");
 let masterPassword = require("../lib/masterPassword");
+let storage = require("../lib/storage");
 
 let dummyMaster = "foobar";
 
@@ -801,7 +802,10 @@ exports.testExport = function(test)
     test.ok(parsed.data["salt"]);
     test.ok(parsed.data["hmac-secret"]);
 
-    return passwords.removeAll().then(() =>
+    return storage.clear().then(() =>
+    {
+      return masterPassword.changePassword(dummyMaster);
+    }).then(() =>
     {
       return passwords.importPasswordData(exportData);
     }).then(() =>
@@ -1546,47 +1550,6 @@ exports.testImportErrors = function(test)
   {
     test.ok(false, "Imported LastPass CSV with incorrect header");
   }).catch(expectedValue.bind(test, "unknown-data-format")).then(done.bind(test));
-};
-
-exports.testRemoveAll = function(test)
-{
-  function addData()
-  {
-    return Promise.all([
-      passwords.addGenerated(generated1),
-      passwords.addStored(stored2),
-      passwords.addGenerated(Object.assign({}, generated2, {site: "sub." + generated2.site})),
-      passwords.addAlias("example.info", generated1.site)
-    ]);
-  }
-
-  Promise.resolve().then(() =>
-  {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    return addData();
-  }).then(() =>
-  {
-    return passwords.removeAll();
-  }).then(() =>
-  {
-    return passwords.getAllPasswords();
-  }).then(allPasswords =>
-  {
-    test.deepEqual(allPasswords, {});
-
-    return addData();
-  }).then(() =>
-  {
-    return masterPassword.changePassword(dummyMaster + dummyMaster);
-  }).then(() =>
-  {
-    return passwords.getAllPasswords();
-  }).then(allPasswords =>
-  {
-    test.deepEqual(allPasswords, {});
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
 exports.testMigration = function(test)

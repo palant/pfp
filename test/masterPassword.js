@@ -119,3 +119,56 @@ exports.testState = function(test)
     test.equal(state, "known");
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
+
+exports.testClearOnChange = function(test)
+{
+  function addData()
+  {
+    return Promise.all([
+      passwords.addGenerated({
+        site: "example.com",
+        name: "foo",
+        length: 8,
+        lower: true,
+        upper: false,
+        number: true,
+        symbol: false,
+        legacy: true
+      }),
+      passwords.addStored({
+        site: "example.info",
+        name: "bar",
+        password: "foo"
+      }),
+      passwords.addAlias("sub.example.info", "example.com")
+    ]);
+  }
+
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return addData();
+  }).then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return passwords.getAllPasswords();
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {});
+
+    return addData();
+  }).then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster + dummyMaster);
+  }).then(() =>
+  {
+    return passwords.getAllPasswords();
+  }).then(allPasswords =>
+  {
+    test.deepEqual(allPasswords, {});
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
