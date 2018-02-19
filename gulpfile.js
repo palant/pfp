@@ -453,6 +453,14 @@ gulp.task("build-edge", ["build-chrome"], function()
     ]).pipe(gulp.dest("build-edge/extension/Extension")),
     gulp.src("build-chrome/manifest.json")
         .pipe(utils.jsonModify(removeReloader))
+        .pipe(utils.jsonModify(data =>
+        {
+          data.browser_specific_settings = {
+            edge: {
+              browser_action_next_to_addressbar: true
+            }
+          };
+        }))
         .pipe(gulp.dest("build-edge/extension/Extension")),
     gulp.src(["edge/**/*.xml", "edge/**/*.png"])
         .pipe(utils.transform((filepath, contents) =>
