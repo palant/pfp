@@ -16,7 +16,7 @@ window.addEventListener("DOMContentLoaded", function()
   for (let i = 0; i < elements.length; i++)
   {
     let element = elements[i];
-    let id = element.getAttribute("data-l10n-id").replace(/-/g, "_");
+    let id = element.getAttribute("data-l10n-id");
     element.textContent = browser.i18n.getMessage(id);
   }
 });

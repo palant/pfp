@@ -9,8 +9,5 @@
 module.exports = function(source)
 {
   let data = require("properties-parser").parse(source);
-  let converted = {};
-  for (let key in data)
-    converted[key.replace(/-/g, "_")] = data[key];
-  return "module.exports = " + JSON.stringify(converted) + ";";
+  return "module.exports = " + JSON.stringify(data) + ";";
 };

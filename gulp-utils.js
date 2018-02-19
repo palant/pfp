@@ -109,7 +109,7 @@ exports.toChromeLocale = function()
     let properties = parser.parse(contents);
     let data = {};
     for (let key of Object.keys(properties))
-      data[key.replace(/-/g, "_")] = {message: properties[key]};
+      data[key] = {message: properties[key]};
 
     let locale = path.basename(filepath, ".properties");
     let manifest = require("./package.json");
