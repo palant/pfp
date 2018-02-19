@@ -232,6 +232,7 @@ gulp.task("build-web", ["validate"], function()
           resolve: {
             alias: {
               "./browserAPI$": path.resolve(__dirname, "web", "data", "browserAPI.js"),
+              "../browserAPI$": path.resolve(__dirname, "web", "data", "browserAPI.js"),
               "locale$": path.resolve(__dirname, "locale", "en-US.properties")
             }
           }
@@ -264,6 +265,7 @@ gulp.task("build-web", ["validate"], function()
           resolve: {
             alias: {
               "./browserAPI$": path.resolve(__dirname, "web", "data", "browserAPI.js"),
+              "../browserAPI$": path.resolve(__dirname, "web", "data", "browserAPI.js"),
               "locale$": path.resolve(__dirname, "locale", "en-US.properties")
             }
           }
@@ -298,7 +300,8 @@ gulp.task("build-web", ["validate"], function()
           },
           resolve: {
             alias: {
-              "./browserAPI$": path.resolve(__dirname, "web", "background", "browserAPI.js")
+              "./browserAPI$": path.resolve(__dirname, "web", "background", "browserAPI.js"),
+              "../browserAPI$": path.resolve(__dirname, "web", "data", "browserAPI.js")
             }
           }
         }))
