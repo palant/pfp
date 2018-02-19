@@ -6,11 +6,12 @@
 
 "use strict";
 
+let {i18n} = require("../browserAPI");
 let {confirm} = require("./confirm");
 let {setCommandHandler, setSubmitHandler, setResetHandler} = require("./events");
 let {sync} = require("../proxy");
 let state = require("./state");
-let {$, setActivePanel, messages} = require("./utils");
+let {$, setActivePanel} = require("./utils");
 
 setCommandHandler("sync-state-link", () => setActivePanel("sync-state"));
 setSubmitHandler("sync-state", disable);
@@ -25,12 +26,12 @@ function updateState()
   if (state.syncLastTime)
     $("sync-lastTime").textContent = new Date(state.syncLastTime).toLocaleString();
   else
-    $("sync-lastTime").textContent = messages["sync-lastTime-never"];
+    $("sync-lastTime").textContent = i18n.getMessage("sync_lastTime_never");
 }
 
 function disable()
 {
-  confirm(messages["sync-disable-confirmation"]).then(disable =>
+  confirm(i18n.getMessage("sync_disable_confirmation")).then(disable =>
   {
     if (disable)
     {

@@ -6,6 +6,8 @@
 
 "use strict";
 
+let {i18n} = require("../browserAPI");
+
 function $(id)
 {
   return document.getElementById(id);
@@ -30,11 +32,14 @@ function showError(error)
   if (error == "canceled")
     return;
 
-  let message = $(error);
-  if (message && message.parentNode.id == "messages")
-    message = message.textContent;
-  else
-    message = error;
-  alert(message);
+  try
+  {
+    alert(i18n.getMessage(String(error).replace(/-/g, "_")) || error);
+  }
+  catch (e)
+  {
+    // Edge will throw for unknown messages
+    alert(error);
+  }
 }
 exports.showError = showError;

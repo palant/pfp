@@ -6,6 +6,7 @@
 
 "use strict";
 
+let {i18n} = require("../browserAPI");
 require("./enterMaster");
 let {$, setCommandHandler, showError} = require("./utils");
 let modal = require("./modal");
@@ -49,7 +50,7 @@ function copyToClipboard(site, password, passwordInfo)
 
 function removePassword(site, password, passwordInfo)
 {
-  let message = $("remove-password-confirmation").textContent.replace(/\{1\}/g, password.name).replace(/\{2\}/g, site);
+  let message = i18n.getMessage("remove_password_confirmation").replace(/\{1\}/g, password.name).replace(/\{2\}/g, site);
   if (confirm(message))
   {
     passwords.removePassword(site, password.name, password.revision).then(() =>
@@ -72,7 +73,7 @@ function exportData()
       // and it would ignore the file name anyway (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/6594876/).
       // data: URIs don't work either (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/4282810/).
       // Let the user copy the text manually, that's the only way.
-      if (confirm($("allpasswords-export-edge").textContent))
+      if (confirm(i18n.getMessage("allpasswords_export_edge")))
         document.body.textContent = data;
     }
     else
@@ -105,13 +106,13 @@ function importDataFromFile(file)
   let reader = new FileReader();
   reader.onload = function()
   {
-    if (confirm($("allpasswords-import-confirm").textContent))
+    if (confirm(i18n.getMessage("allpasswords_import_confirm")))
     {
       modal.show("in-progress");
       passwords.importPasswordData(reader.result).then(() =>
       {
         modal.hide();
-        alert($("allpasswords-import-success").textContent);
+        alert(i18n.getMessage("allpasswords_import_success"));
         window.location.reload();
       }).catch(error =>
       {
@@ -146,7 +147,7 @@ function showPasswords(event)
   let state = event.target.checked;
   if (state && !askedPasswords)
   {
-    if (confirm($("allpasswords-show-confirm").textContent))
+    if (confirm(i18n.getMessage("allpasswords_show_confirm")))
       askedPasswords = true;
     else
     {

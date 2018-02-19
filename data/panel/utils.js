@@ -6,14 +6,6 @@
 
 "use strict";
 
-let messages = exports.messages = {};
-let messageElements = $("messages").children;
-for (let i = 0; i < messageElements.length; i++)
-{
-  let messageElement = messageElements[i];
-  messages[messageElement.getAttribute("data-l10n-id")] = messageElement.textContent;
-}
-
 function $(id)
 {
   return document.getElementById(id);

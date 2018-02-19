@@ -6,7 +6,8 @@
 
 "use strict";
 
-let {$, messages} = require("./utils");
+let {i18n} = require("../browserAPI");
+let {$} = require("./utils");
 
 function setValidator(id, validator)
 {
@@ -129,7 +130,7 @@ function enforceValue(messageId, element)
 {
   let value = element.value.trim();
   if (value.length < 1)
-    return messages[messageId];
+    return i18n.getMessage(messageId);
 
   return null;
 }

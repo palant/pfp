@@ -6,10 +6,11 @@
 
 "use strict";
 
+let {i18n} = require("../browserAPI");
 let {passwords, masterPassword, passwordRetrieval, ui} = require("../proxy");
 let {setCommandHandler, setSubmitHandler} = require("./events");
 let state = require("./state");
-let {$, setActivePanel, messages, showUnknownError} = require("./utils");
+let {$, setActivePanel, showUnknownError} = require("./utils");
 
 let {confirm} = require("./confirm");
 
@@ -175,7 +176,7 @@ function abortEditingSite()
 function removeAlias()
 {
   let {origSite, site} = state;
-  let message = messages["remove-alias-confirmation"].replace(/\{1\}/g, origSite).replace(/\{2\}/g, site);
+  let message = i18n.getMessage("remove_alias_confirmation").replace(/\{1\}/g, origSite).replace(/\{2\}/g, site);
   confirm(message).then(response =>
   {
     if (response)
@@ -219,9 +220,9 @@ function showPasswords()
       let tooltip;
       if (password.type == "generated2" || password.type == "generated")
       {
-        tooltip = messages["password-type-" + password.type];
+        tooltip = i18n.getMessage("password_type_" + password.type);
         if (password.type == "generated")
-          tooltip += "\n" + messages["password-type-generated-replace"];
+          tooltip += "\n" + i18n.getMessage("password_type_generated_replace");
 
         tooltip += "\n" + document.querySelector('label[for="password-length"]').textContent;
         tooltip += " " + password.length;
@@ -237,10 +238,10 @@ function showPasswords()
           tooltip += " " + "+^;";
       }
       else if (password.type == "stored")
-        tooltip = messages["password-type-stored"];
+        tooltip = i18n.getMessage("password_type_stored");
 
       if (password.notes)
-        tooltip += "\n" + messages["password-info-notes"] + " " + password.notes;
+        tooltip += "\n" + i18n.getMessage("password_info_notes") + " " + password.notes;
 
       let entry = template.cloneNode(true);
       setCommandHandler(entry.querySelector(".password-menu-link"), toggleMenu.bind(null, password, entry));
@@ -276,8 +277,8 @@ function showMenu(password, element)
 {
   hideMenu();
 
-  let notes_link_msg = password.notes ? "edit-notes" : "add-notes";
-  menu.querySelector(".menu-notes-link").textContent = messages[notes_link_msg];
+  let notes_link_msg = i18n.getMessage(password.notes ? "edit_notes" : "add_notes");
+  menu.querySelector(".menu-notes-link").textContent = notes_link_msg;
 
   menu.querySelector("#menu-upgrade-password").hidden = (password.type != "generated");
 
@@ -358,7 +359,7 @@ function showNotes(password)
 
 function upgradePassword(password)
 {
-  let message = messages["upgrade-password-confirmation"].replace(/\{1\}/g, password.name).replace(/\{2\}/g, password.site);
+  let message = i18n.getMessage("upgrade_password_confirmation").replace(/\{1\}/g, password.name).replace(/\{2\}/g, password.site);
   confirm(message).then(response =>
   {
     if (response)
@@ -409,7 +410,7 @@ function bumpRevision(password)
 function removePassword(password)
 {
   let {site} = state;
-  let message = messages["remove-password-confirmation"].replace(/\{1\}/g, password.name).replace(/\{2\}/g, site);
+  let message = i18n.getMessage("remove_password_confirmation").replace(/\{1\}/g, password.name).replace(/\{2\}/g, site);
   confirm(message).then(response =>
   {
     if (response)

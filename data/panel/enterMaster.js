@@ -6,11 +6,12 @@
 
 "use strict";
 
+let {i18n} = require("../browserAPI");
 let {masterPassword, passwords} = require("../proxy");
 let {setCommandHandler, setSubmitHandler} = require("./events");
 let {setValidator, markInvalid} = require("./formValidation");
 let state = require("./state");
-let {$, setActivePanel, showUnknownError, messages} = require("./utils");
+let {$, setActivePanel, showUnknownError} = require("./utils");
 
 let {validateMasterPassword} = require("./changeMaster");
 
@@ -29,7 +30,7 @@ setSubmitHandler("enter-master", () =>
     }).catch(error =>
     {
       if (error == "declined")
-        markInvalid("master-password", messages["password-declined"]);
+        markInvalid("master-password", i18n.getMessage("password_declined"));
       else if (error == "migrating")
         state.set({masterPasswordState: "migrating"});
       else

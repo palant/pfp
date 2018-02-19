@@ -6,11 +6,12 @@
 
 "use strict";
 
+let {i18n} = require("../browserAPI");
 let {passwords} = require("../proxy");
 let {setCommandHandler, setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
-let {$, setActivePanel, showUnknownError, messages} = require("./utils");
+let {$, setActivePanel, showUnknownError} = require("./utils");
 
 $("password-length").addEventListener("input", updatePasswordLengthDisplay);
 $("generate-password").addEventListener("reset", () =>
@@ -23,7 +24,7 @@ $("generate-legacy").addEventListener("click", () =>
 });
 updatePasswordLengthDisplay();
 
-setValidator("generate-password-user-name", enforceValue.bind(null, "user-name-required"));
+setValidator("generate-password-user-name", enforceValue.bind(null, "user_name_required"));
 setValidator(["charset-lower", "charset-upper", "charset-number", "charset-symbol"], validateCharsets);
 
 // Dummy validator makes sure validation state is reset when necessary.
@@ -50,7 +51,7 @@ function updatePasswordLengthDisplay()
 function validateCharsets(element1, element2, element3, element4)
 {
   if (!element1.checked && !element2.checked && !element3.checked && !element4.checked)
-    return messages["no-characters-selected"];
+    return i18n.getMessage("no_characters_selected");
 
   return null;
 }
@@ -87,7 +88,7 @@ function addGeneratedPassword()
   {
     if (error == "alreadyExists")
     {
-      markInvalid([$("generate-password-user-name"), $("generate-password-revision")], messages["user-name-exists-generated"]);
+      markInvalid([$("generate-password-user-name"), $("generate-password-revision")], i18n.getMessage("user_name_exists_generated"));
       showRevision();
     }
     else

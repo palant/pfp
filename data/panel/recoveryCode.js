@@ -6,11 +6,12 @@
 
 "use strict";
 
+let {i18n} = require("../browserAPI");
 let {recoveryCodes} = require("../proxy");
 let {setResetHandler, setCommandHandler} = require("./events");
 let {setValidator, markInvalid} = require("./formValidation");
 let state = require("./state");
-let {$, getActivePanel, setActivePanel, showUnknownError, messages} = require("./utils");
+let {$, getActivePanel, setActivePanel, showUnknownError} = require("./utils");
 let Formatter = require("./formatter");
 
 let originalSelection = null;
@@ -117,7 +118,7 @@ function processRecoveryCodeInput(formatter, validChars)
     }).catch(error =>
     {
       if (error == "checksum-mismatch")
-        return messages["recovery-checksum-mismatch"];
+        return i18n.getMessage("recovery_checksum_mismatch");
       else
         throw error;
     });
