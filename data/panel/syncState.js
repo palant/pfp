@@ -37,7 +37,6 @@ function disable()
     {
       sync.disable().then(() =>
       {
-        state.set({syncProvider: null});
         setActivePanel("password-list");
       });
     }
