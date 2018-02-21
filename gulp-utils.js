@@ -168,47 +168,64 @@ exports.runTests = function()
   }
 
   let {TextEncoder, TextDecoder} = require("text-encoding");
-  let Worker = require("tiny-worker");
-  let activeWorkers = [];
 
-  class WorkerWrapper extends Worker
+  class WorkerEventTarget
   {
-    constructor(...args)
+    constructor(other)
     {
-      super(...args);
+      if (other)
+      {
+        this.other = other;
+        this.other.other = this;
+      }
+      let listeners = [];
 
-      // tiny-worker doesn't have proper listeners, fake them here.
-      // See https://github.com/avoidwork/tiny-worker/issues/19
-      let listeners = {
-        message: [],
-        error: []
-      };
       this.addEventListener = (type, listener) =>
       {
-        if (!listeners.hasOwnProperty(type))
+        if (type != "message")
           return;
-        listeners[type].push(listener);
+        listeners.push(listener);
       };
       this.removeEventListener = (type, listener) =>
       {
-        if (!listeners.hasOwnProperty(type))
+        if (type != "message")
           return;
-        let index = listeners[type].indexOf(listener);
+        let index = listeners.indexOf(listener);
         if (index >= 0)
-          listeners[type].splice(index, 1);
+          listeners.splice(index, 1);
       };
-      this.onmessage = event =>
+      this.onmessage = null;
+
+      this.triggerListeners = function(data)
       {
-        for (let listener of listeners.message)
-          listener(event);
-      };
-      this.onerror = event =>
-      {
-        for (let listener of listeners.error)
+        let event = {type: "message", data};
+        if (typeof this.onmessage == "function")
+          this.onmessage(event);
+        for (let listener of listeners)
           listener(event);
       };
 
-      activeWorkers.push(this);
+      this.postMessage = data =>
+      {
+        Promise.resolve().then(() =>
+        {
+          this.other.triggerListeners(data);
+        });
+      };
+    }
+  }
+
+  class FakeWorker extends WorkerEventTarget
+  {
+    constructor(url)
+    {
+      super();
+
+      require("sandboxed-module").require(url, {
+        globals: {
+          self: new WorkerEventTarget(this)
+        }
+      });
     }
   }
 
@@ -221,12 +238,12 @@ exports.runTests = function()
     sourceTransformers: {rewriteRequires},
     globals: {
       TextEncoder, TextDecoder, crypto, atob, btoa, URL,
-      Worker: WorkerWrapper
+      Worker: FakeWorker
     }
   });
   let reporter = nodeunit.reporters.default;
 
-  let stream = transform((filepath, contents) =>
+  return transform((filepath, contents) =>
   {
     return new Promise((resolve, reject) =>
     {
@@ -239,12 +256,4 @@ exports.runTests = function()
       });
     });
   });
-
-  stream.on("finish", () =>
-  {
-    for (let worker of activeWorkers)
-      worker.terminate();
-  });
-
-  return stream;
 };
