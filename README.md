@@ -76,6 +76,17 @@ The following command will create a `build-web` directory:
 
 You can then open `build-web/index.html` in your browser to test then.
 
+Running unit tests
+------------------
+
+This repository contains an extensive test suite for the core functionality. You can run the unit tests using the following command:
+
+    gulp test
+
+You can also run an individual unit test file, for example:
+
+    gulp test --test=masterPassword
+
 Cleaning up the repository
 --------------------------
 

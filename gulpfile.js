@@ -531,7 +531,13 @@ gulp.task("web", ["build-web"], function()
 
 gulp.task("test", ["validate", "build-test"], function()
 {
-  return gulp.src(["test/**/*.js"])
+  let testFile = utils.readArg("--test=");
+  if (!testFile)
+    testFile = "**/*.js";
+  else if (!testFile.endsWith(".js"))
+    testFile += ".js";
+
+  return gulp.src("test/" + testFile)
              .pipe(utils.runTests());
 });
 
