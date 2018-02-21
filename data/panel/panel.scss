@@ -488,6 +488,17 @@ a:hover
   font-size: $font-size-small;
 }
 
+#sync-lastTime-container
+{
+  display: flex;
+  flex-direction: row;
+}
+
+#sync-lastTime
+{
+  flex-grow: 1;
+}
+
 :root.webclient #sync-setup-link,
 :root.webclient #sync-state-link
 {

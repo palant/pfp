@@ -19,7 +19,7 @@ state.on("update", updateLink);
 
 function updateLink()
 {
-  $("sync-setup-link").hidden = state.syncProvider;
+  $("sync-setup-link").hidden = state.sync.provider;
 }
 
 function authorize()

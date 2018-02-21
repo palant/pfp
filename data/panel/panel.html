@@ -272,11 +272,14 @@
       </div>
     </form>
 
-    <form id="sync-state" class="slide" data-default-element="sync-provider">
+    <form id="sync-state" class="slide" data-default-element="do-sync">
       <label for="sync-provider" data-l10n-id="sync_provider"></label>
       <div id="sync-provider"></div>
       <label class="block-start" for="sync-lastTime" data-l10n-id="sync_lastTime"></label>
-      <div id="sync-lastTime"></div>
+      <div id="sync-lastTime-container">
+        <div id="sync-lastTime"></div>
+        <button id="do-sync" data-l10n-id="do_sync"></button>
+      </div>
       <div class="button-container">
         <button id="sync-disable" type="submit" data-l10n-id="sync_disable"></button>
         <button id="sync-state-cancel" type="reset" data-l10n-id="cancel"></button>
