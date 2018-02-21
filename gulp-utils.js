@@ -138,12 +138,23 @@ exports.runTests = function()
     return str.replace(/(["'\\])/g, "\\$1");
   }
 
+  function* readdir(dir, prefix = "")
+  {
+    for (let file of fs.readdirSync(dir))
+    {
+      let stats = fs.statSync(path.join(dir, file));
+      if (stats.isDirectory())
+        yield* readdir(path.join(dir, file), prefix + file + "/");
+      else if (path.extname(file) == ".js")
+        yield prefix + file;
+    }
+  }
+
   function rewriteRequires(source)
   {
     let modules = new Map();
-    for (let file of fs.readdirSync("test-lib"))
-      if (path.extname(file) == ".js")
-        modules.set(path.basename(file, ".js"), path.resolve("test-lib", file));
+    for (let file of readdir("test-lib"))
+      modules.set(file.replace(/\.js$/, ""), path.resolve("test-lib", file));
     return source.replace(/(\brequire\(["'])\.\/([^"']+)/g, (match, prefix, request) =>
     {
       if (modules.has(request))
