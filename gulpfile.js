@@ -365,7 +365,9 @@ gulp.task("eslint-lib", function()
                  atob: false,
                  btoa: false,
                  setTimeout: false,
+                 setInterval: false,
                  clearTimeout: false,
+                 fetch: false,
                  URL: false
                }
              }))

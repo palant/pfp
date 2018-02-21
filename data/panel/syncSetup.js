@@ -24,6 +24,6 @@ function updateLink()
 
 function authorize()
 {
-  sync.authorize();
+  sync.authorize("dropbox");
   window.close();
 }
