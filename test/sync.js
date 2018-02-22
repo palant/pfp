@@ -290,3 +290,121 @@ exports.testMerge = function(test)
     }, "Local contents after remote removal of a previously synced key");
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
+
+exports.testErrors = function(test)
+{
+  return Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return masterPassword.forgetPassword();
+  }).then(() =>
+  {
+    return sync.authorize("dropbox");
+  }).then(() =>
+  {
+    return sync.sync();
+  }).then(() =>
+  {
+    test.ok(!sync.syncData.error, "No error after initial sync");
+    return storage.set("site:foo", "bar", null);
+  }).then(() =>
+  {
+    sync.syncData.token += "0";
+    return sync.sync();
+  }).then(() =>
+  {
+    test.equal(sync.syncData.error, "sync-invalid-token", "Attempting to sync with an invalid token");
+    sync.syncData.token = sync.syncData.token.slice(0, -1);
+
+    provider._set("/passwords.json", 2, "invalid JSON");
+    return sync.sync();
+  }).then(() =>
+  {
+    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with invalid JSON");
+
+    provider._set("/passwords.json", 3, JSON.stringify(null));
+    return sync.sync();
+  }).then(() =>
+  {
+    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with null data");
+
+    provider._set("/passwords.json", 4, JSON.stringify(123));
+    return sync.sync();
+  }).then(() =>
+  {
+    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with non-object");
+
+    provider._set("/passwords.json", 5, JSON.stringify({}));
+    return sync.sync();
+  }).then(() =>
+  {
+    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with empty object");
+
+    provider._set("/passwords.json", 6, JSON.stringify({
+      application: "foobar",
+      format: 2
+    }));
+    return sync.sync();
+  }).then(() =>
+  {
+    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with unknown application's data");
+
+    provider._set("/passwords.json", 7, JSON.stringify({
+      application: "pfp",
+      format: 321
+    }));
+    return sync.sync();
+  }).then(() =>
+  {
+    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with unknown format version");
+
+    provider._set("/passwords.json", 8, JSON.stringify({
+      application: "pfp",
+      format: 2,
+      data: null
+    }));
+    return sync.sync();
+  }).then(() =>
+  {
+    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with null data");
+
+    provider._set("/passwords.json", 9, JSON.stringify({
+      application: "pfp",
+      format: 2,
+      data: 456
+    }));
+    return sync.sync();
+  }).then(() =>
+  {
+    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with non-object data");
+
+    provider._set("/passwords.json", 9, JSON.stringify({
+      application: "pfp",
+      format: 2,
+      data: {}
+    }));
+    return Promise.all([
+      storage.get("salt", null),
+      storage.get("hmac-secret", null),
+      sync.sync()
+    ]);
+  }).then(([salt, hmac, _]) =>
+  {
+    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with empty data");
+
+    provider._set("/passwords.json", 8, JSON.stringify({
+      application: "pfp",
+      format: 2,
+      data: {
+        salt,
+        "hmac-secret": hmac
+      }
+    }));
+    return sync.sync();
+  }).then(() =>
+  {
+    test.ok(!sync.syncData.error, "Error reset after successful sync");
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
