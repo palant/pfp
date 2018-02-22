@@ -238,7 +238,10 @@ exports.runTests = function()
     sourceTransformers: {rewriteRequires},
     globals: {
       TextEncoder, TextDecoder, crypto, atob, btoa, URL,
-      Worker: FakeWorker
+      Worker: FakeWorker,
+      navigator: {
+        onLine: true
+      }
     }
   });
   let reporter = nodeunit.reporters.default;
