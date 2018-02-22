@@ -25,4 +25,4 @@ function checkReload()
   request.send();
 }
 
-window.setInterval(checkReload, 100);
+window.setInterval(checkReload, 1000);
