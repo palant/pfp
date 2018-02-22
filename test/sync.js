@@ -315,32 +315,32 @@ exports.testErrors = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync-invalid-token", "Attempting to sync with an invalid token");
+    test.equal(sync.syncData.error, "sync_invalid_token", "Attempting to sync with an invalid token");
     sync.syncData.token = sync.syncData.token.slice(0, -1);
 
     provider._set("/passwords.json", 2, "invalid JSON");
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with invalid JSON");
+    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with invalid JSON");
 
     provider._set("/passwords.json", 3, JSON.stringify(null));
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with null data");
+    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with null data");
 
     provider._set("/passwords.json", 4, JSON.stringify(123));
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with non-object");
+    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with non-object");
 
     provider._set("/passwords.json", 5, JSON.stringify({}));
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with empty object");
+    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with empty object");
 
     provider._set("/passwords.json", 6, JSON.stringify({
       application: "foobar",
@@ -349,7 +349,7 @@ exports.testErrors = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with unknown application's data");
+    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with unknown application's data");
 
     provider._set("/passwords.json", 7, JSON.stringify({
       application: "pfp",
@@ -358,7 +358,7 @@ exports.testErrors = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with unknown format version");
+    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with unknown format version");
 
     provider._set("/passwords.json", 8, JSON.stringify({
       application: "pfp",
@@ -368,7 +368,7 @@ exports.testErrors = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with null data");
+    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with null data");
 
     provider._set("/passwords.json", 9, JSON.stringify({
       application: "pfp",
@@ -378,7 +378,7 @@ exports.testErrors = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with non-object data");
+    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with non-object data");
 
     provider._set("/passwords.json", 9, JSON.stringify({
       application: "pfp",
@@ -392,7 +392,7 @@ exports.testErrors = function(test)
     ]);
   }).then(([salt, hmac, _]) =>
   {
-    test.equal(sync.syncData.error, "sync-unknown-data-format", "Attempting to sync with empty data");
+    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with empty data");
 
     provider._set("/passwords.json", 8, JSON.stringify({
       application: "pfp",

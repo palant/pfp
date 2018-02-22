@@ -26,11 +26,25 @@ function updateState()
   $("sync-provider").textContent = state.sync.provider;
   $("do-sync").disabled = state.sync.isSyncing;
   if (state.sync.isSyncing)
+  {
     $("sync-lastTime").textContent = i18n.getMessage("sync_lastTime_now");
+    $("sync-lastTime-container").className = "";
+  }
   else if (state.sync.lastSync)
+  {
     $("sync-lastTime").textContent = new Date(state.sync.lastSync).toLocaleString();
+    $("sync-lastTime-container").className = (state.sync.error ? "failed" : "succeeded");
+  }
   else
+  {
     $("sync-lastTime").textContent = i18n.getMessage("sync_lastTime_never");
+    $("sync-lastTime-container").className = "";
+  }
+
+  if (state.sync.error)
+    $("sync-error").textContent = i18n.getMessage(state.sync.error) || state.sync.error;
+  $("sync-error").hidden = !state.sync.error;
+  $("sync-state-link").className = (state.sync.error ? "failed" : "");
 }
 
 function disable()

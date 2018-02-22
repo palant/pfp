@@ -488,15 +488,41 @@ a:hover
   font-size: $font-size-small;
 }
 
+#sync-state-link.failed
+{
+  color: $error-text;
+}
+
 #sync-lastTime-container
 {
   display: flex;
   flex-direction: row;
 }
 
-#sync-lastTime
+#sync-lastTime-container:not(.succeeded) #sync-succeeded
+{
+  display: none;
+}
+
+#sync-lastTime-container:not(.failed) #sync-failed
+{
+  display: none;
+}
+
+#sync-failed
+{
+  color: $error-text;
+}
+
+#sync-status-container
 {
   flex-grow: 1;
+  margin: 0 $inline-spacing;
+}
+
+#sync-error
+{
+  margin-top: $block-spacing;
 }
 
 :root.webclient #sync-setup-link,
