@@ -33,10 +33,10 @@ exports.authorize = function()
 exports.get = function(path, token)
 {
   if (token != dummyToken)
-    return Promise.reject("unauthorized");
+    return Promise.reject("sync-invalid-token");
 
   if (!path.startsWith("/"))
-    return Promise.reject("invalid-path");
+    return Promise.reject("sync-invalid-path");
 
   return Promise.resolve(files.hasOwnProperty(path) ? files[path] : null);
 };
@@ -44,14 +44,14 @@ exports.get = function(path, token)
 exports.put = function(path, contents, replaceRevision, token)
 {
   if (token != dummyToken)
-    return Promise.reject("unauthorized");
+    return Promise.reject("sync-invalid-token");
 
   if (!path.startsWith("/"))
-    return Promise.reject("invalid-path");
+    return Promise.reject("sync-invalid-path");
 
   let currentRevision = files.hasOwnProperty(path) ? files[path].revision : null;
   if (currentRevision !== replaceRevision)
-    return Promise.reject("wrong-revision");
+    return Promise.reject("sync-wrong-revision");
 
   let revision = currentRevision ? String(parseInt(currentRevision, 10) + 1) : "1";
   return Promise.resolve().then(() =>
