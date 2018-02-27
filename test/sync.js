@@ -8,6 +8,7 @@
 
 let sync = require("../lib/sync");
 let masterPassword = require("../lib/masterPassword");
+let passwords = require("../lib/passwords");
 let storage = require("../lib/storage");
 let provider = require("../test-lib/sync-providers/dropbox");
 
@@ -452,5 +453,174 @@ exports.testNesting = function(test)
     let {revision, contents} = provider._get("/passwords.json");
     test.equal(JSON.parse(contents).data["site:foo"], "bar",
                "Remote contents unchanged after too many conflicts");
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
+
+exports.testRekey = function(test)
+{
+  let salt = null;
+  return Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return sync.authorize("dropbox");
+  }).then(() =>
+  {
+    return sync.sync();
+  }).then(() =>
+  {
+    salt = JSON.parse(provider._get("/passwords.json").contents).data.salt;
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return Promise.all([
+      passwords.addGenerated({
+        site: "example.com",
+        name: "foo",
+        length: 8,
+        lower: true,
+        upper: false,
+        number: true,
+        symbol: false,
+        legacy: true
+      }),
+      passwords.addGenerated({
+        site: "example.info",
+        name: "bar",
+        length: 16,
+        lower: false,
+        upper: true,
+        number: false,
+        symbol: true,
+        legacy: false
+      }),
+      passwords.addStored({
+        site: "example.com",
+        name: "foo",
+        revision: 2,
+        password: "bar"
+      }),
+      passwords.addAlias("example.net", "example.com")
+    ]);
+  }).then(() =>
+  {
+    return sync.authorize("dropbox");
+  }).then(() =>
+  {
+    return sync.sync();
+  }).then(() =>
+  {
+    test.ok(!sync.syncData.error, "No error after rekeying sync");
+    return Promise.all([
+      storage.get("salt", null),
+      passwords.getAllPasswords()
+    ]);
+  }).then(([storedSalt, allPasswords]) =>
+  {
+    test.equal(storedSalt, salt);
+
+    test.deepEqual(allPasswords, {
+      "example.com": {
+        site: "example.com",
+        passwords: [
+          {
+            type: "generated",
+            site: "example.com",
+            name: "foo",
+            length: 8,
+            lower: true,
+            upper: false,
+            number: true,
+            symbol: false
+          },
+          {
+            type: "stored",
+            site: "example.com",
+            name: "foo",
+            revision: 2,
+            password: "bar"
+          }
+        ],
+        aliases: ["example.net"]
+      },
+      "example.info": {
+        site: "example.info",
+        passwords: [
+          {
+            type: "generated2",
+            site: "example.info",
+            name: "bar",
+            length: 16,
+            lower: false,
+            upper: true,
+            number: false,
+            symbol: true
+          }
+        ],
+        aliases: []
+      }
+    });
+  }).then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return sync.authorize("dropbox");
+  }).then(() =>
+  {
+    return sync.sync();
+  }).then(() =>
+  {
+    test.ok(!sync.syncData.error, "No error after rekeying sync");
+    return Promise.all([
+      storage.get("salt", null),
+      passwords.getAllPasswords()
+    ]);
+  }).then(([storedSalt, allPasswords]) =>
+  {
+    test.equal(storedSalt, salt);
+
+    test.deepEqual(allPasswords, {
+      "example.com": {
+        site: "example.com",
+        passwords: [
+          {
+            type: "generated",
+            site: "example.com",
+            name: "foo",
+            length: 8,
+            lower: true,
+            upper: false,
+            number: true,
+            symbol: false
+          },
+          {
+            type: "stored",
+            site: "example.com",
+            name: "foo",
+            revision: 2,
+            password: "bar"
+          }
+        ],
+        aliases: ["example.net"]
+      },
+      "example.info": {
+        site: "example.info",
+        passwords: [
+          {
+            type: "generated2",
+            site: "example.info",
+            name: "bar",
+            length: 16,
+            lower: false,
+            upper: true,
+            number: false,
+            symbol: true
+          }
+        ],
+        aliases: []
+      }
+    });
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
