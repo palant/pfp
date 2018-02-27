@@ -408,3 +408,49 @@ exports.testErrors = function(test)
     test.ok(!sync.syncData.error, "Error reset after successful sync");
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
+
+exports.testNesting = function(test)
+{
+  return Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return masterPassword.forgetPassword();
+  }).then(() =>
+  {
+    return sync.authorize("dropbox");
+  }).then(() =>
+  {
+    return sync.sync();
+  }).then(() =>
+  {
+    test.ok(!sync.syncData.error, "No error after initial sync");
+
+    return storage.set("site:foo", "bar", null);
+  }).then(() =>
+  {
+    provider.changeRevisionOnGet = 1;
+    return sync.sync();
+  }).then(() =>
+  {
+    test.ok(!sync.syncData.error, "No error after conflict with another client");
+
+    let {revision, contents} = provider._get("/passwords.json");
+    test.equal(JSON.parse(contents).data["site:foo"], "bar",
+               "Remote contents after conflict with another client");
+
+    return storage.delete("site:foo");
+  }).then(() =>
+  {
+    provider.changeRevisionOnGet = 10;
+    return sync.sync();
+  }).then(() =>
+  {
+    test.equals(sync.syncData.error, "sync_too_many_retries", "Error on too many conflicts");
+
+    let {revision, contents} = provider._get("/passwords.json");
+    test.equal(JSON.parse(contents).data["site:foo"], "bar",
+               "Remote contents unchanged after too many conflicts");
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};

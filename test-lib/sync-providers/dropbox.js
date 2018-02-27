@@ -10,6 +10,8 @@ const dummyToken = String(Math.random()).substr(2);
 
 let files = {};
 
+exports.changeRevisionOnGet = 0;
+
 exports._get = function(path)
 {
   return files[path];
@@ -23,6 +25,7 @@ exports._set = function(path, revision, contents)
 exports._reset = function()
 {
   files = {};
+  exports.changeRevisionOnGet = 0;
 };
 
 exports.authorize = function()
@@ -38,7 +41,17 @@ exports.get = function(path, token)
   if (!path.startsWith("/"))
     return Promise.reject("sync_invalid_path");
 
-  return Promise.resolve(files.hasOwnProperty(path) ? files[path] : null);
+  return Promise.resolve(files.hasOwnProperty(path) ? files[path] : null).then(result =>
+  {
+    if (result)
+      result = Object.assign({}, result);
+    if (result && exports.changeRevisionOnGet > 0)
+    {
+      files[path].revision++;
+      exports.changeRevisionOnGet--;
+    }
+    return result;
+  });
 };
 
 exports.put = function(path, contents, replaceRevision, token)
