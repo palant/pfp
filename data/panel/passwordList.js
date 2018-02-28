@@ -87,7 +87,7 @@ function setSite()
   $("add-alias").hidden = (!site || origSite != site || state.pwdList.length);
 
   let field = $("site");
-  field.setAttribute("value", site || "???");
+  field.setAttribute("value", site);
   field.value = field.getAttribute("value");
   field.setAttribute("readonly", "readonly");
   $("generate-password-link").hidden = $("stored-password-link").hidden = !site;
