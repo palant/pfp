@@ -260,7 +260,12 @@
     </form>
 
     <form id="sync-setup" class="slide" data-default-element="sync-authorize">
-      <label data-l10n-id="sync_how_label"></label>
+      <label data-l10n-id="sync_selection_label"></label>
+      <div id="sync-provider-selection">
+        <img class="sync-storage-provider" data-provider="dropbox" src="../images/dropbox.svg" alt="Dropbox">
+        <img class="sync-storage-provider" data-provider="gdrive" src="../images/gdrive.png" alt="Google Drive">
+      </div>
+      <label class="block-start" data-l10n-id="sync_how_label"></label>
       <div>
         <span data-l10n-id="sync_how_explanation"></span>
         <a href="#" data-type="documentation" data-param="sync" data-l10n-id="learn_more"></a>
@@ -270,7 +275,6 @@
       <label class="block-start" data-l10n-id="sync_no_account_label"></label>
       <div data-l10n-id="sync_no_account_explanation"></div>
       <div class="button-container">
-        <button id="sync-authorize" type="submit" data-l10n-id="sync_authorize"></button>
         <button id="sync-setup-cancel" type="reset" data-l10n-id="cancel"></button>
       </div>
     </form>

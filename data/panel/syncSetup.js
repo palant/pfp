@@ -12,7 +12,7 @@ let state = require("./state");
 let {$, setActivePanel} = require("./utils");
 
 setCommandHandler("sync-setup-link", () => setActivePanel("sync-setup"));
-setSubmitHandler("sync-setup", authorize);
+setCommandHandler("sync-provider-selection", authorize);
 setResetHandler("sync-setup", () => setActivePanel("password-list"));
 
 state.on("update", updateLink);
@@ -22,8 +22,12 @@ function updateLink()
   $("sync-setup-link").hidden = state.sync.provider;
 }
 
-function authorize()
+function authorize(event)
 {
-  sync.authorize("dropbox");
+  let provider = event.target.getAttribute("data-provider");
+  if (!provider)
+    return;
+
+  sync.authorize(provider);
   window.close();
 }

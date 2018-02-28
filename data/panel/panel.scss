@@ -488,6 +488,20 @@ a:hover
   font-size: $font-size-small;
 }
 
+#sync-provider-selection
+{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.sync-storage-provider
+{
+  height: 32px;
+  margin-top: $block-spacing;
+  cursor: pointer;
+}
+
 #sync-state-link.failed
 {
   color: $error-text;

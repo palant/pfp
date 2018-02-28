@@ -344,34 +344,10 @@ gulp.task("eslint-node", function()
              .pipe(eslint.failAfterError());
 });
 
-gulp.task("eslint-datamodules", function()
+gulp.task("eslint-extension", function()
 {
-  return gulp.src(["data/**/*.js", "web/**/*.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js", "!data/panel/formatter.js"])
+  return gulp.src(["lib/**/*.js", "data/**/*.js", "web/**/*.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js", "!data/panel/formatter.js"])
              .pipe(eslint({envs: ["browser", "commonjs", "es6"]}))
-             .pipe(eslint.format())
-             .pipe(eslint.failAfterError());
-});
-
-gulp.task("eslint-lib", function()
-{
-  return gulp.src(["lib/**/*.js"])
-             .pipe(eslint({
-               envs: ["commonjs", "es6"],
-               globals: {
-                 external: false,
-                 crypto: false,
-                 TextEncoder: false,
-                 TextDecoder: false,
-                 atob: false,
-                 btoa: false,
-                 setTimeout: false,
-                 setInterval: false,
-                 clearTimeout: false,
-                 XMLHttpRequest: false,
-                 navigator: false,
-                 URL: false
-               }
-             }))
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
 });
@@ -411,7 +387,7 @@ gulp.task("stylelint", function()
              }));
 });
 
-gulp.task("validate", ["eslint-node", "eslint-datamodules", "eslint-lib", "htmlhint", "stylelint"], function()
+gulp.task("validate", ["eslint-node", "eslint-extension", "htmlhint", "stylelint"], function()
 {
 });
 

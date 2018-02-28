@@ -13,6 +13,11 @@ let {sync} = require("../proxy");
 let state = require("./state");
 let {$, setActivePanel} = require("./utils");
 
+const displayNames = new Map([
+  ["dropbox", "Dropbox"],
+  ["gdrive", "Google Drive"]
+]);
+
 setCommandHandler("sync-state-link", () => setActivePanel("sync-state"));
 setCommandHandler("do-sync", () => sync.sync());
 setSubmitHandler("sync-state", disable);
@@ -23,7 +28,7 @@ state.on("update", updateState);
 function updateState()
 {
   $("sync-state-link").hidden = !state.sync.provider;
-  $("sync-provider").textContent = state.sync.provider;
+  $("sync-provider").textContent = displayNames.get(state.sync.provider) || state.sync.provider;
   $("do-sync").disabled = state.sync.isSyncing;
   if (state.sync.isSyncing)
   {
