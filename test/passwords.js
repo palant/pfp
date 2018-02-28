@@ -187,19 +187,19 @@ exports.testAddRemoveGenerated = function(test)
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
-  }).catch(expectedValue.bind(test, "no-such-password")).then(() =>
+  }).catch(expectedValue.bind(test, "no_such_password")).then(() =>
   {
     return passwords.removePassword("sub." + generated2.site, generated2.name, "");
   }).then(() =>
   {
     test.ok(false, "Succeeded removing password with wrong revision number");
-  }).catch(expectedValue.bind(test, "no-such-password")).then(() =>
+  }).catch(expectedValue.bind(test, "no_such_password")).then(() =>
   {
     return passwords.removePassword("sub." + generated2.site, generated2.name, generated2.revision);
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
-  }).catch(expectedValue.bind(test, "no-such-password")).then(done.bind(test));
+  }).catch(expectedValue.bind(test, "no_such_password")).then(done.bind(test));
 };
 
 exports.testAddRemoveStored = function(test)
@@ -210,7 +210,7 @@ exports.testAddRemoveStored = function(test)
   }).then(() =>
   {
     test.ok(false, "Added stored password before knowing master password");
-  }).catch(expectedValue.bind(test, "master-password-required")).then(() =>
+  }).catch(expectedValue.bind(test, "master_password_required")).then(() =>
   {
     return masterPassword.changePassword(dummyMaster);
   }).then(() =>
@@ -304,13 +304,13 @@ exports.testAddRemoveStored = function(test)
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
-  }).catch(expectedValue.bind(test, "no-such-password")).then(() =>
+  }).catch(expectedValue.bind(test, "no_such_password")).then(() =>
   {
     return passwords.removePassword("sub." + stored2.site, stored2.name);
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
-  }).catch(expectedValue.bind(test, "no-such-password")).then(done.bind(test));
+  }).catch(expectedValue.bind(test, "no_such_password")).then(done.bind(test));
 };
 
 exports.testAddGeneratedExisting = function(test)
@@ -472,19 +472,19 @@ exports.testAliasErrors = function(test)
   }).then(() =>
   {
     test.ok(false, "Successfully added an alias for a site with passwords");
-  }).catch(expectedValue.bind(test, "site-has-passwords")).then(() =>
+  }).catch(expectedValue.bind(test, "site_has_passwords")).then(() =>
   {
     return passwords.removeAlias(generated1.site);
   }).then(() =>
   {
     test.ok(false, "Successfully removed a non-existant alias");
-  }).catch(expectedValue.bind(test, "no-such-alias")).then(() =>
+  }).catch(expectedValue.bind(test, "no_such_alias")).then(() =>
   {
     return passwords.removeAlias("example.info");
   }).then(() =>
   {
     test.ok(false, "Successfully removed a non-existant alias");
-  }).catch(expectedValue.bind(test, "no-such-alias")).then(done.bind(test));
+  }).catch(expectedValue.bind(test, "no_such_alias")).then(done.bind(test));
 };
 
 exports.testNotes = function(test)
@@ -504,13 +504,13 @@ exports.testNotes = function(test)
   }).then(() =>
   {
     test.ok(false, "Successfully set notes on a non-existant password");
-  }).catch(expectedValue.bind(test, "no-such-password")).then(() =>
+  }).catch(expectedValue.bind(test, "no_such_password")).then(() =>
   {
     return passwords.setNotes("sub." + generated2.site, generated2.name, generated2.revision, notes1);
   }).then(() =>
   {
     test.ok(false, "Successfully set notes on a non-existant password");
-  }).catch(expectedValue.bind(test, "no-such-password")).then(() =>
+  }).catch(expectedValue.bind(test, "no_such_password")).then(() =>
   {
     return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
   }).then(notes =>
@@ -1244,7 +1244,7 @@ http://example.com,bar
   }).then(() =>
   {
     test.ok(false, "Imported LastPass CSV which has the wrong number of values.");
-  }).catch(expectedValue.bind(test, "syntax-error")).then(() =>
+  }).catch(expectedValue.bind(test, "syntax_error")).then(() =>
   {
     return passwords.importPasswordData(
       addHeader(`
@@ -1254,7 +1254,7 @@ http://example.com,2,3,4,"5,6,7
   }).then(() =>
   {
     test.ok(false, "Imported LastPass CSV with dangling quote.");
-  }).catch(expectedValue.bind(test, "syntax-error")).then(() =>
+  }).catch(expectedValue.bind(test, "syntax_error")).then(() =>
   {
     return passwords.getAllPasswords();
   }).then(allPasswords =>
@@ -1447,13 +1447,13 @@ exports.testImportErrors = function(test)
   }).then(() =>
   {
     test.ok(false, "Imported malformed JSON");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify(42));
   }).then(() =>
   {
     test.ok(false, "Imported non-object");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "foobar",
@@ -1466,7 +1466,7 @@ exports.testImportErrors = function(test)
   }).then(() =>
   {
     test.ok(false, "Imported unknown application data");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "pfp",
@@ -1479,7 +1479,7 @@ exports.testImportErrors = function(test)
   }).then(() =>
   {
     test.ok(false, "Imported unknown format version");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "pfp",
@@ -1489,7 +1489,7 @@ exports.testImportErrors = function(test)
   }).then(() =>
   {
     test.ok(false, "Imported null data");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "pfp",
@@ -1499,7 +1499,7 @@ exports.testImportErrors = function(test)
   }).then(() =>
   {
     test.ok(false, "Imported empty data");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "pfp",
@@ -1511,7 +1511,7 @@ exports.testImportErrors = function(test)
   }).then(() =>
   {
     test.ok(false, "Imported data without HMAC secret");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "pfp",
@@ -1523,7 +1523,7 @@ exports.testImportErrors = function(test)
   }).then(() =>
   {
     test.ok(false, "Imported data without salt");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "easypasswords",
@@ -1533,7 +1533,7 @@ exports.testImportErrors = function(test)
   }).then(() =>
   {
     test.ok(false, "Imported legacy null data");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "easypasswords",
@@ -1543,13 +1543,13 @@ exports.testImportErrors = function(test)
   }).then(() =>
   {
     test.ok(false, "Imported legacy non-object data");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(() =>
+  }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
   {
     return passwords.importPasswordData("url,username,password\n");
   }).then(() =>
   {
     test.ok(false, "Imported LastPass CSV with incorrect header");
-  }).catch(expectedValue.bind(test, "unknown-data-format")).then(done.bind(test));
+  }).catch(expectedValue.bind(test, "unknown_data_format")).then(done.bind(test));
 };
 
 exports.testMigration = function(test)

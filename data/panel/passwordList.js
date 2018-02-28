@@ -102,7 +102,7 @@ function hidePasswordMessages()
     window.clearTimeout(hidePasswordMessagesTimeout);
   hidePasswordMessagesTimeout = null;
 
-  for (let id of ["empty-site-name", "password-ready-message", "password-copied-message", "no-such-password", "unknown-generation-method", "wrong-site-message", "no-password-fields"])
+  for (let id of ["empty_site_name", "password_ready_message", "password_copied_message", "no_such_password", "unknown_generation_method", "wrong_site_message", "no_password_fields"])
     $(id).hidden = true;
 }
 
@@ -140,7 +140,7 @@ function finishEditingSite()
   let alias = field.value.trim();
   if (!alias)
   {
-    showPasswordMessage("empty-site-name");
+    showPasswordMessage("empty_site_name");
     return;
   }
 
@@ -324,7 +324,7 @@ function copyToClipboard(password)
     let doCopy = () =>
     {
       require("../clipboard").set(password);
-      showPasswordMessage("password-copied-message");
+      showPasswordMessage("password_copied_message");
     };
 
     let isWebClient = document.documentElement.classList.contains("webclient");
@@ -332,7 +332,7 @@ function copyToClipboard(password)
       doCopy();
     else
     {
-      showPasswordMessage("password-ready-message");
+      showPasswordMessage("password_ready_message");
       let handler = event =>
       {
         window.removeEventListener("click", handler, true);

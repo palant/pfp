@@ -76,4 +76,4 @@ window.addEventListener("DOMContentLoaded", function()
   });
 });
 
-proxy.setErrorHandler("master-password-required", enterMaster);
+proxy.setErrorHandler("master_password_required", enterMaster);

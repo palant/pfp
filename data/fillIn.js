@@ -168,9 +168,9 @@ function fillIn(wnd, name, password, noFocus)
 {
   let result = null;
   if (window.location.hostname != host)
-    result = "wrong-site-message";
+    result = "wrong_site_message";
   else if (!fillIn(window, name, password))
-    result = "no-password-fields";
+    result = "no_password_fields";
 
   let {port} = require("./messaging");
   port.emit("done", {

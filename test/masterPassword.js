@@ -44,7 +44,7 @@ exports.testGetAndForget = function(test)
   {
     masterPassword.get();
     test.ok(false, "Getting master password didn't throw");
-  }).catch(expectedValue.bind(test, "master-password-required")).then(() =>
+  }).catch(expectedValue.bind(test, "master_password_required")).then(() =>
   {
     return masterPassword.changePassword(dummyMaster);
   }).then(() =>
@@ -56,7 +56,7 @@ exports.testGetAndForget = function(test)
   {
     masterPassword.get();
     test.ok(false, "Getting master password didn't throw");
-  }).catch(expectedValue.bind(test, "master-password-required")).then(() =>
+  }).catch(expectedValue.bind(test, "master_password_required")).then(() =>
   {
     return masterPassword.forgetPassword();
   }).then(() =>
