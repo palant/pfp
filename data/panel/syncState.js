@@ -44,7 +44,7 @@ function updateState()
   if (state.sync.error)
     $("sync-error").textContent = i18n.getMessage(state.sync.error) || state.sync.error;
   $("sync-error").hidden = !state.sync.error;
-  $("sync-state-link").className = (state.sync.error ? "failed" : "");
+  $("sync-state-link").className = (state.sync.error && state.sync.error != "sync_connection_error" ? "failed" : "");
 }
 
 function disable()
