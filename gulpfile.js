@@ -351,7 +351,7 @@ gulp.task("htmlhint", function()
 {
   return gulp.src(["data/**/*.html"])
              .pipe(htmlhint({
-               "title-require": false
+               htmlhintrc: ".htmlhintrc"
              }))
              .pipe(htmlhint.failReporter());
 });
