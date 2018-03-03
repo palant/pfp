@@ -133,11 +133,13 @@ function buildCommon(targetdir)
         .pipe(gulp.dest(`${targetdir}`)),
     gulp.src(["data/reloader.js"])
         .pipe(gulp.dest(`${targetdir}/data`)),
-    gulp.src(["package.json"])
-        .pipe(utils.jsonModify(data => Math.random(), "random.json"))
-        .pipe(gulp.dest(`${targetdir}`)),
     buildWorkers(`${targetdir}/data`)
   );
+}
+
+function touchReloader(targetdir)
+{
+  fs.writeFileSync(path.join(targetdir, "random.json"), Math.random());
 }
 
 function removeReloader(data)
@@ -149,7 +151,7 @@ function removeReloader(data)
 
 gulp.task("build-chrome", ["validate"], function()
 {
-  return merge(
+  let stream = merge(
     buildCommon("build-chrome"),
     gulp.src("manifest.json")
         .pipe(utils.jsonModify(data =>
@@ -158,6 +160,8 @@ gulp.task("build-chrome", ["validate"], function()
         }))
         .pipe(gulp.dest("build-chrome"))
   );
+  stream.on("finish", () => touchReloader("build-chrome"));
+  return stream;
 });
 
 gulp.task("watch-chrome", ["build-chrome"], function()
@@ -167,7 +171,7 @@ gulp.task("watch-chrome", ["build-chrome"], function()
 
 gulp.task("build-firefox", ["validate"], function()
 {
-  return merge(
+  let stream = merge(
     buildCommon("build-firefox"),
     gulp.src("manifest.json")
         .pipe(utils.jsonModify(data =>
@@ -180,6 +184,8 @@ gulp.task("build-firefox", ["validate"], function()
         }))
         .pipe(gulp.dest("build-firefox"))
   );
+  stream.on("finish", () => touchReloader("build-firefox"));
+  return stream;
 });
 
 gulp.task("build-test", ["validate"], function()
