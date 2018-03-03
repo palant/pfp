@@ -336,18 +336,13 @@ gulp.task("build-web", ["validate"], function()
   );
 });
 
-gulp.task("eslint-node", function()
+gulp.task("eslint", function()
 {
-  return gulp.src(["*.js", "test/**/*.js", "test-lib/**/*.js"])
-             .pipe(eslint({envs: ["node", "es6"]}))
-             .pipe(eslint.format())
-             .pipe(eslint.failAfterError());
-});
-
-gulp.task("eslint-extension", function()
-{
-  return gulp.src(["lib/**/*.js", "data/**/*.js", "web/**/*.js", "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js", "!data/panel/formatter.js"])
-             .pipe(eslint({envs: ["browser", "commonjs", "es6"]}))
+  return gulp.src(["*.js", "data/**/*.js", "lib/**/*.js", "test/**/*.js",
+                   "test-lib/**/*.js", "web/**/*.js",
+                   "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js",
+                   "!data/panel/formatter.js"])
+             .pipe(eslint())
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
 });
@@ -387,7 +382,7 @@ gulp.task("stylelint", function()
              }));
 });
 
-gulp.task("validate", ["eslint-node", "eslint-extension", "htmlhint", "stylelint"], function()
+gulp.task("validate", ["eslint", "htmlhint", "stylelint"], function()
 {
 });
 
