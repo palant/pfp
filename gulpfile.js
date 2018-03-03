@@ -350,9 +350,7 @@ gulp.task("eslint", function()
 gulp.task("htmlhint", function()
 {
   return gulp.src(["data/**/*.html"])
-             .pipe(htmlhint({
-               htmlhintrc: ".htmlhintrc"
-             }))
+             .pipe(htmlhint(".htmlhintrc"))
              .pipe(htmlhint.failReporter());
 });
 
