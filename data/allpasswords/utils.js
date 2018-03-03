@@ -27,19 +27,27 @@ function setCommandHandler(element, handler)
 }
 exports.setCommandHandler = setCommandHandler;
 
+function localize(error)
+{
+  if (/\s/.test(error))
+    return error;
+
+  try
+  {
+    return i18n.getMessage(error) || error;
+  }
+  catch (e)
+  {
+    // Edge will throw for unknown messages
+    return error;
+  }
+}
+
 function showError(error)
 {
   if (error == "canceled")
     return;
 
-  try
-  {
-    alert(i18n.getMessage(String(error).replace(/-/g, "_")) || error);
-  }
-  catch (e)
-  {
-    // Edge will throw for unknown messages
-    alert(error);
-  }
+  alert(localize(error));
 }
 exports.showError = showError;

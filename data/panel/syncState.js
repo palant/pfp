@@ -25,6 +25,22 @@ setResetHandler("sync-state", () => setActivePanel("password-list"));
 
 state.on("update", updateState);
 
+function localize(error)
+{
+  if (/\s/.test(error))
+    return error;
+
+  try
+  {
+    return i18n.getMessage(error) || error;
+  }
+  catch (e)
+  {
+    // Edge will throw for unknown messages
+    return error;
+  }
+}
+
 function updateState()
 {
   $("sync-state-link").hidden = !state.sync.provider;
@@ -47,7 +63,7 @@ function updateState()
   }
 
   if (state.sync.error)
-    $("sync-error").textContent = i18n.getMessage(state.sync.error) || state.sync.error;
+    $("sync-error").textContent = localize(state.sync.error);
   $("sync-error").hidden = !state.sync.error;
   $("sync-state-link").className = (state.sync.error && state.sync.error != "sync_connection_error" ? "failed" : "");
 }
