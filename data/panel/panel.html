@@ -80,7 +80,7 @@
       </div>
     </form>
 
-    <form id="password-list" class="slide" data-default-element="site">
+    <form id="password-list" class="slide">
       <!-- Cannot use <template> tag here, template contents are removed from document before l10n does its job -->
       <div id="password-template" hidden>
         <div class="password-container">
@@ -126,22 +126,15 @@
         </a>
       </div>
 
-      <label for="site" data-l10n-id="site"></label>
-      <div id="site-container">
-        <div id="site-name-container">
-          <input id="site" type="text" placeholder="example.com" readonly>
-          <a href="#" id="site-edit-cancel" data-l10n-id="site_edit_cancel"></a>
-          <a href="#" id="site-edit-accept" data-l10n-id="site_edit_accept"></a>
-        </div>
-        <div id="site-edit-container">
-          <a href="#" id="add-alias" data-l10n-id="add_alias" hidden></a>
-          <span id="alias-container" hidden>
-            <span id="alias-text" data-l10n-id="alias_description"></span>
-            <a href="#" id="remove-alias" data-l10n-id="remove_alias"></a>
-          </span>
-        </div>
+      <div id="password-list-site-container">
+        <label for="password-list-site" data-l10n-id="site"></label>
+        <div id="password-list-site"></div>
+        <a href="#" id="add-alias" data-l10n-id="add_alias" hidden></a>
+        <span id="alias-container" hidden>
+          <span id="alias-text" data-l10n-id="alias_description"></span>
+          <a href="#" id="remove-alias" data-l10n-id="remove_alias"></a>
+        </span>
       </div>
-      <div id="empty_site_name" class="warning" data-l10n-id="empty_site_name"></div>
       <div id="password_ready_message" class="warning" data-l10n-id="password_ready_message"></div>
       <div id="password_copied_message" class="success" data-l10n-id="password_copied_message"></div>
       <div id="no_such_password" class="warning" data-l10n-id="no_such_password"></div>
@@ -214,6 +207,15 @@
       <div class="button-container">
         <button id="stored-password-save" type="submit" data-l10n-id="save_password"></button>
         <button id="stored-password-cancel" type="reset" data-l10n-id="cancel"></button>
+      </div>
+    </form>
+
+    <form id="site-selection" class="slide" data-default-element="site-selection-site">
+      <label id="site-selection-label" for="site-selection-site"></label>
+      <input id="site-selection-site" type="text" placeholder="example.com">
+      <div class="button-container">
+        <button type="submit" data-l10n-id="ok"></button>
+        <button type="reset" data-l10n-id="cancel"></button>
       </div>
     </form>
 

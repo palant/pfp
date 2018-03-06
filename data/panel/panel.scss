@@ -177,59 +177,13 @@ a:hover
   background-image: url(../images/circles.svg);
 }
 
-#site-container
+#password-list-site-container
 {
   margin-bottom: $block-spacing;
 }
 
-#site-name-container
-{
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-}
-
-#site
-{
-  flex-grow: 1;
-}
-
-#site-edit-accept,
-#site-edit-cancel
-{
-  min-width: $icon-size;
-  min-height: $icon-size;
-  background-size: $icon-size;
-  background-repeat: no-repeat;
-  @include margin-inline-end($inline-spacing);
-}
-
-#site-edit-cancel
-{
-  background-image: url(../images/close-round.svg);
-}
-
-#site-edit-cancel[disabled="true"]
-{
-  opacity: 0.2;
-}
-
-#site[readonly] + #site-edit-cancel
-{
-  display: none;
-}
-
-#site-edit-accept
-{
-  background-image: url(../images/checkmark-round.svg);
-}
-
-#site[readonly] + * + #site-edit-accept
-{
-  display: none;
-}
-
-#site-edit-container
+#add-alias,
+#alias-container
 {
   font-size: $font-size-small;
 }

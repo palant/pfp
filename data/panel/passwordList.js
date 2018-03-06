@@ -9,6 +9,7 @@
 let {i18n} = require("../browserAPI");
 let {passwords, masterPassword, passwordRetrieval, ui} = require("../proxy");
 let {setCommandHandler, setSubmitHandler} = require("./events");
+let siteSelection = require("./siteSelection");
 let state = require("./state");
 let {$, setActivePanel, showUnknownError} = require("./utils");
 
@@ -16,13 +17,7 @@ let {confirm} = require("./confirm");
 
 let hidePasswordMessagesTimeout = null;
 
-for (let element of ["site-edit-accept", "site-edit-cancel"].map($))
-{
-  element.setAttribute("title", element.textContent);
-  element.textContent = "";
-}
-
-setCommandHandler("add-alias", () => editSite());
+setCommandHandler("add-alias", addAlias);
 setCommandHandler("remove-alias", removeAlias);
 setCommandHandler("show-all", () =>
 {
@@ -36,9 +31,6 @@ setCommandHandler("lock-passwords", () =>
     .then(() => state.set({masterPasswordState: "set"}))
     .catch(showUnknownError);
 });
-setCommandHandler("site-edit-accept", finishEditingSite);
-setCommandHandler("site-edit-cancel", abortEditingSite);
-setSubmitHandler("password-list", finishEditingSite);
 
 let menuPassword = null;
 setCommandHandler("menu-to-document", () => fillInPassword(menuPassword));
@@ -69,7 +61,7 @@ function initPasswordList()
 
 function setSite()
 {
-  let {origSite, site} = state;
+  let {origSite, site, masterPasswordState} = state;
 
   if (origSite != site)
   {
@@ -83,17 +75,14 @@ function setSite()
   else
     $("alias-container").hidden = true;
 
-  $("site-edit-container").hidden = false;
   $("add-alias").hidden = (!site || origSite != site || state.pwdList.length);
 
-  let field = $("site");
-  field.setAttribute("value", site);
-  field.value = field.getAttribute("value");
-  field.setAttribute("readonly", "readonly");
+  let field = $("password-list-site");
+  field.textContent = site || "???";
   $("generate-password-link").hidden = $("stored-password-link").hidden = !site;
 
-  if (!site)
-    editSite(true);
+  if (masterPasswordState == "known" && !site)
+    selectSite();
 }
 
 function hidePasswordMessages()
@@ -102,7 +91,7 @@ function hidePasswordMessages()
     window.clearTimeout(hidePasswordMessagesTimeout);
   hidePasswordMessagesTimeout = null;
 
-  for (let id of ["empty_site_name", "password_ready_message", "password_copied_message", "no_such_password", "unknown_generation_method", "wrong_site_message", "no_password_fields"])
+  for (let id of ["password_ready_message", "password_copied_message", "no_such_password", "unknown_generation_method", "wrong_site_message", "no_password_fields"])
     $(id).hidden = true;
 }
 
@@ -122,55 +111,37 @@ function showPasswordMessage(error)
   hidePasswordMessagesTimeout = window.setTimeout(hidePasswordMessages, 3000);
 }
 
-function editSite(mandatory)
+function selectSite()
 {
-  $("site-edit-container").hidden = true;
-  $("site-edit-cancel").setAttribute("disabled", mandatory ? "true" : null);
-
-  let field = $("site");
-  field.removeAttribute("readonly");
-  field.value = state.site;
-  field.select();
-  field.focus();
+  let message = i18n.getMessage("select_site");
+  siteSelection.show(message).then(site =>
+  {
+    passwords.getPasswords(site)
+      .then(([origSite, site, pwdList]) => state.set({origSite, site, pwdList}))
+      .catch(showUnknownError);
+  }).catch(() =>
+  {
+    // User cancelled
+  });
 }
 
-function finishEditingSite()
+function addAlias()
 {
-  let field = $("site");
-  let alias = field.value.trim();
-  if (!alias)
+  let {origSite} = state;
+  let message = i18n.getMessage("select_alias").replace(/\{1\}/g, origSite);
+  siteSelection.show(message).then(alias =>
   {
-    showPasswordMessage("empty_site_name");
-    return;
-  }
+    if (alias == origSite)
+      return;
 
-  let {site} = state;
-  if (alias == site)
+    passwords.addAlias(origSite, alias)
+      .then(() => passwords.getPasswords(state.origSite))
+      .then(([origSite, site, pwdList]) => state.set({origSite, site, pwdList}))
+      .catch(showUnknownError);
+  }).catch(() =>
   {
-    abortEditingSite();
-    return;
-  }
-
-  Promise.resolve()
-    .then(() =>
-    {
-      if (site)
-        return passwords.addAlias(site, alias);
-      else
-        return undefined;
-    })
-    .then(() => passwords.getPasswords(state.origSite || alias))
-    .then(([origSite, site, pwdList]) => state.set({origSite, site, pwdList}))
-    .catch(showUnknownError);
-  field.setAttribute("readonly", "readonly");
-}
-
-function abortEditingSite()
-{
-  if ($("site-edit-cancel").getAttribute("disabled") == "true")
-    return;
-
-  setSite();
+    // User cancelled
+  });
 }
 
 function removeAlias()

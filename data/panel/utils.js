@@ -21,6 +21,8 @@ function setFocus()
   let defaultElement = $(activePanel).getAttribute("data-default-element");
   if (defaultElement)
     $(defaultElement).focus();
+  else
+    document.documentElement.focus();
 }
 
 function resetForm(form)
