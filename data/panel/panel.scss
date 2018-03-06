@@ -177,9 +177,31 @@ a:hover
   background-image: url(../images/circles.svg);
 }
 
-#password-list-site-container
+#password-list-header
 {
   margin-bottom: $block-spacing;
+}
+
+#password-list-site-container
+{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#password-list-site
+{
+  flex-grow: 1;
+}
+
+#select-site
+{
+  min-width: $icon-size;
+  min-height: $icon-size;
+  background-image: url(../images/search.svg);
+  background-size: $icon-size;
+  background-repeat: no-repeat;
+  @include margin-inline-end($inline-spacing);
 }
 
 #add-alias,

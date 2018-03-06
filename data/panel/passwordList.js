@@ -17,6 +17,11 @@ let {confirm} = require("./confirm");
 
 let hidePasswordMessagesTimeout = null;
 
+let selectSiteElement = $("select-site");
+selectSiteElement.setAttribute("title", selectSiteElement.textContent);
+selectSiteElement.textContent = "";
+setCommandHandler(selectSiteElement, selectSite);
+
 setCommandHandler("add-alias", addAlias);
 setCommandHandler("remove-alias", removeAlias);
 setCommandHandler("show-all", () =>
