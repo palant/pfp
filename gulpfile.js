@@ -204,7 +204,7 @@ gulp.task("build-web", ["validate"], function()
   return merge(
     gulp.src("LICENSE.TXT")
         .pipe(gulp.dest(`${targetdir}`)),
-    gulp.src(["data/**/*.html", "data/**/*.svg", "!data/options/options.html"])
+    gulp.src(["data/**/*.html", "data/**/*.png", "data/**/*.svg", "!data/options/options.html"])
         .pipe(gulp.dest(`${targetdir}`)),
     gulp.src(["data/platform.js", "data/panel/main.js"])
         .pipe(webpack({

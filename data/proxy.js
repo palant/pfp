@@ -86,6 +86,8 @@ exports.recoveryCodes = Proxy("recoveryCodes", [
   "getValidChars", "getCode", "formatCode", "isValid", "decodeCode"
 ]);
 
-exports.sync = Proxy("sync", ["authorize", "disable", "sync"]);
+exports.sync = Proxy("sync", [
+  "authorize", "getManualAuthURL", "manualAuthorization", "disable", "sync"
+]);
 
 exports.ui = Proxy("ui", ["showAllPasswords", "getLink", "openLink"]);

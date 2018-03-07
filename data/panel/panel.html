@@ -268,8 +268,8 @@
     <form id="sync-setup" class="slide" data-default-element="sync-authorize">
       <label data-l10n-id="sync_selection_label"></label>
       <div id="sync-provider-selection">
-        <img class="sync-storage-provider" data-provider="dropbox" src="../images/dropbox.svg" alt="Dropbox">
-        <img class="sync-storage-provider" data-provider="gdrive" src="../images/gdrive.png" alt="Google Drive">
+        <a href="#" data-provider="dropbox"><img class="sync-storage-provider" src="../images/dropbox.svg" alt="Dropbox"></a>
+        <a href="#" data-provider="gdrive"><img class="sync-storage-provider" src="../images/gdrive.png" alt="Google Drive"></a>
       </div>
       <label class="block-start" data-l10n-id="sync_how_label"></label>
       <div>
@@ -282,6 +282,15 @@
       <div data-l10n-id="sync_no_account_explanation"></div>
       <div class="button-container">
         <button id="sync-setup-cancel" type="reset" data-l10n-id="cancel"></button>
+      </div>
+    </form>
+
+    <form id="sync-authorize" class="slide" data-default-element="sync-token">
+      <label for="sync-token" data-l10n-id="sync_token_label"></label>
+      <input id="sync-token">
+      <div class="button-container">
+        <button id="sync-authorize-ok" type="submit" data-l10n-id="ok"></button>
+        <button id="sync-authorize-cancel" type="reset" data-l10n-id="cancel"></button>
       </div>
     </form>
 

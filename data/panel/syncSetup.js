@@ -9,13 +9,47 @@
 let {setCommandHandler, setSubmitHandler, setResetHandler} = require("./events");
 let {sync} = require("../proxy");
 let state = require("./state");
-let {$, setActivePanel} = require("./utils");
+let {$, setActivePanel, showUnknownError} = require("./utils");
 
 setCommandHandler("sync-setup-link", () => setActivePanel("sync-setup"));
-setCommandHandler("sync-provider-selection", authorize);
 setResetHandler("sync-setup", () => setActivePanel("password-list"));
 
 state.on("update", updateLink);
+
+let isWebClient = document.documentElement.classList.contains("webclient");
+if (isWebClient)
+{
+  let nodes = $("sync-provider-selection").querySelectorAll("[data-provider]");
+  for (let i = 0; i < nodes.length; i++)
+  {
+    let node = nodes[i];
+    let provider = node.getAttribute("data-provider");
+    sync.getManualAuthURL(provider).then(url =>
+    {
+      node.hidden = !url;
+      if (url)
+      {
+        node.href = url;
+        node.target = "_blank";
+        node.addEventListener("click", () =>
+        {
+          require("./syncAuthorize").show().then(code =>
+          {
+            return sync.manualAuthorization(provider, code).then(() =>
+            {
+              setActivePanel("sync-state");
+            }).catch(showUnknownError);
+          }).catch(error =>
+          {
+            // User cancelled, ignore
+          });
+        });
+      }
+    }).catch(showUnknownError);
+  }
+}
+else
+  setCommandHandler("sync-provider-selection", authorize);
 
 function updateLink()
 {
@@ -24,10 +58,13 @@ function updateLink()
 
 function authorize(event)
 {
-  let provider = event.target.getAttribute("data-provider");
-  if (!provider)
+  let target = event.target;
+  while (target && target.id != "sync-provider-selection" && !target.hasAttribute("data-provider"))
+    target = target.parentNode;
+
+  if (!target || !target.hasAttribute("data-provider"))
     return;
 
-  sync.authorize(provider);
+  sync.authorize(target.getAttribute("data-provider"));
   window.close();
 }
