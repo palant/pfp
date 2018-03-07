@@ -421,6 +421,19 @@ a:hover
   min-width: 3ch;
 }
 
+#site-autocomplete
+{
+  border: $menu-border-width solid $text-color;
+  padding: $block-padding;
+  max-height: 8 * $font-size;
+  overflow: auto;
+}
+
+#site-autocomplete > [data-site]
+{
+  cursor: pointer;
+}
+
 #recovery-code-accepted-container
 {
   margin: 0;
