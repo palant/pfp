@@ -45,6 +45,7 @@ function show(message)
   $("site-selection-site").value = state.site;
   $("site-selection-site").select();
 
+  findMatchingSites();
   passwords.getAllSites().then(allSites =>
   {
     sites = allSites;
@@ -65,6 +66,9 @@ function findMatchingSites()
   let autocompleteBox = $("site-autocomplete");
   while (autocompleteBox.lastChild)
     autocompleteBox.removeChild(autocompleteBox.lastChild);
+
+  if (!sites)
+    return;
 
   let seenResult = false;
   let query = $("site-selection-site").value.trim();
