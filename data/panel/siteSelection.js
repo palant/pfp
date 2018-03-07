@@ -7,6 +7,7 @@
 "use strict";
 
 let {i18n} = require("../browserAPI");
+let {getSiteDisplayName} = require("../common");
 let {passwords} = require("../proxy");
 let {setResetHandler, setSubmitHandler, setCommandHandler} = require("./events");
 let state = require("./state");
@@ -42,13 +43,17 @@ function show(message)
   let originalSelection = getActivePanel();
   setActivePanel("site-selection");
 
-  $("site-selection-site").value = state.site;
+  $("site-selection-site").value = state.site && state.siteDisplayName;
   $("site-selection-site").select();
 
   findMatchingSites();
   passwords.getAllSites().then(allSites =>
   {
     sites = allSites;
+    let index = sites.indexOf("pfp.invalid");
+    if (index >= 0)
+      sites.splice(index, 1);
+    sites.unshift("pfp.invalid");
     findMatchingSites();
   }).catch(showUnknownError);
 
@@ -74,7 +79,8 @@ function findMatchingSites()
   let query = $("site-selection-site").value.trim();
   for (let site of sites)
   {
-    let index = site.indexOf(query);
+    let displayName = getSiteDisplayName(site);
+    let index = displayName.indexOf(query);
     if (index < 0)
       continue;
 
@@ -83,14 +89,14 @@ function findMatchingSites()
     let el = document.createElement("div");
     el.setAttribute("data-site", site);
     if (index > 0)
-      el.appendChild(document.createTextNode(site.substr(0, index)));
+      el.appendChild(document.createTextNode(displayName.substr(0, index)));
     if (query)
     {
       el.appendChild(document.createElement("strong"));
       el.lastChild.appendChild(document.createTextNode(query));
     }
     if (index + query.length < site.length)
-      el.appendChild(document.createTextNode(site.substr(index + query.length)));
+      el.appendChild(document.createTextNode(displayName.substr(index + query.length)));
     autocompleteBox.appendChild(el);
   }
 

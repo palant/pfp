@@ -40,7 +40,7 @@ updateSite();
 
 function updateSite()
 {
-  $("generate-password-site").textContent = state.site;
+  $("generate-password-site").textContent = state.siteDisplayName;
 }
 
 function updatePasswordLengthDisplay()

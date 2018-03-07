@@ -30,7 +30,7 @@ updateSite();
 
 function updateSite()
 {
-  $("stored-password-site").textContent = state.site;
+  $("stored-password-site").textContent = state.siteDisplayName;
 }
 
 function showRevision()

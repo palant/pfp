@@ -7,6 +7,7 @@
 "use strict";
 
 let {i18n} = require("../browserAPI");
+let {getSiteDisplayName} = require("../common");
 let {enterMaster} = require("./enterMaster");
 let {$, setCommandHandler, showError} = require("./utils");
 let modal = require("./modal");
@@ -266,6 +267,14 @@ window.addEventListener("DOMContentLoaded", function()
 
     let siteNames = Object.keys(sites);
     siteNames.sort();
+    {
+      let index = siteNames.indexOf("pfp.invalid");
+      if (index >= 0)
+      {
+        siteNames.splice(index, 1);
+        siteNames.unshift("pfp.invalid");
+      }
+    }
 
     let recoveryCodeOperations = [];
     let container = $("list");
@@ -276,17 +285,18 @@ window.addEventListener("DOMContentLoaded", function()
     {
       let {passwords, aliases} = sites[site];
 
+      let displayName = getSiteDisplayName(site);
       let siteInfo = siteTemplate.cloneNode(true);
       if (isWebClient)
       {
         let link = document.createElement("a");
         link.setAttribute("href", "#");
-        link.textContent = site;
+        link.textContent = displayName;
         link.addEventListener("click", goToSite.bind(null, site));
         siteInfo.querySelector(".site-name").appendChild(link);
       }
       else
-        siteInfo.querySelector(".site-name").textContent = site;
+        siteInfo.querySelector(".site-name").textContent = displayName;
 
       if (aliases.length)
         siteInfo.querySelector(".site-aliases-value").textContent = aliases.sort().join(", ");
@@ -344,8 +354,8 @@ window.addEventListener("DOMContentLoaded", function()
 
       container.appendChild(siteInfo);
 
-      let letter = site[0].toUpperCase();
-      if (letter != currentLetter)
+      let letter = displayName[0].toUpperCase();
+      if (letter != currentLetter && letter != "(")
       {
         currentLetter = letter;
         let link = document.createElement("a");

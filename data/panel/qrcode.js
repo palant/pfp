@@ -17,7 +17,7 @@ updateSiteName();
 
 function updateSiteName()
 {
-  $("qrcode-website-name").textContent = state.site;
+  $("qrcode-website-name").textContent = state.siteDisplayName;
 }
 
 setSubmitHandler("qrcode", () =>

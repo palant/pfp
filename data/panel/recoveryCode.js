@@ -55,7 +55,7 @@ recoveryCodes.getValidChars().then(validChars =>
 
 function updateSiteName()
 {
-  $("recovery-code-website-name").textContent = state.site;
+  $("recovery-code-website-name").textContent = state.siteDisplayName;
 }
 
 setResetHandler("recovery-code", () =>

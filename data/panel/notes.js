@@ -21,7 +21,7 @@ let currentPassword = null;
 
 function updateSiteName()
 {
-  $("notes-website-name").textContent = state.site;
+  $("notes-website-name").textContent = state.siteDisplayName;
 }
 
 function edit(password)

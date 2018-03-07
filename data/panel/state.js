@@ -11,6 +11,7 @@ let {EventTarget, emit} = require("../../lib/eventTarget");
 module.exports = exports = new EventTarget();
 exports.site = null;
 exports.origSite = null;
+exports.siteDisplayName = null;
 exports.pwdList = null;
 exports.masterPasswordState = null;
 
@@ -25,6 +26,9 @@ function set(state)
 {
   for (let key of Object.keys(state))
     exports[key] = state[key];
+
+  if ("site" in state)
+    exports.siteDisplayName = require("../common").getSiteDisplayName(state.site);
 
   if ("masterPasswordState" in state)
   {

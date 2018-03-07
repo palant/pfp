@@ -66,7 +66,7 @@ function initPasswordList()
 
 function setSite()
 {
-  let {origSite, site, masterPasswordState} = state;
+  let {origSite, site, siteDisplayName, masterPasswordState} = state;
 
   if (origSite != site)
   {
@@ -80,10 +80,10 @@ function setSite()
   else
     $("alias-container").hidden = true;
 
-  $("add-alias").hidden = (!site || origSite != site || state.pwdList.length);
+  $("add-alias").hidden = (!site || origSite != site || site == "pfp.invalid" || state.pwdList.length);
 
   let field = $("password-list-site");
-  field.textContent = site || "???";
+  field.textContent = siteDisplayName;
   $("generate-password-link").hidden = $("stored-password-link").hidden = !site;
 
   if (masterPasswordState == "known" && !site)
@@ -151,8 +151,8 @@ function addAlias()
 
 function removeAlias()
 {
-  let {origSite, site} = state;
-  let message = i18n.getMessage("remove_alias_confirmation").replace(/\{1\}/g, origSite).replace(/\{2\}/g, site);
+  let {origSite, siteDisplayName} = state;
+  let message = i18n.getMessage("remove_alias_confirmation").replace(/\{1\}/g, origSite).replace(/\{2\}/g, siteDisplayName);
   confirm(message).then(response =>
   {
     if (response)
@@ -335,7 +335,7 @@ function showNotes(password)
 
 function upgradePassword(password)
 {
-  let message = i18n.getMessage("upgrade_password_confirmation").replace(/\{1\}/g, password.name).replace(/\{2\}/g, password.site);
+  let message = i18n.getMessage("upgrade_password_confirmation").replace(/\{1\}/g, password.name).replace(/\{2\}/g, state.siteDisplayName);
   confirm(message).then(response =>
   {
     if (response)
@@ -385,13 +385,13 @@ function bumpRevision(password)
 
 function removePassword(password)
 {
-  let {site} = state;
-  let message = i18n.getMessage("remove_password_confirmation").replace(/\{1\}/g, password.name).replace(/\{2\}/g, site);
+  let {siteDisplayName} = state;
+  let message = i18n.getMessage("remove_password_confirmation").replace(/\{1\}/g, password.name).replace(/\{2\}/g, siteDisplayName);
   confirm(message).then(response =>
   {
     if (response)
     {
-      passwords.removePassword(site, password.name, password.revision)
+      passwords.removePassword(password.site, password.name, password.revision)
         .then(pwdList => state.set({pwdList}))
         .catch(showPasswordMessage);
     }
