@@ -434,6 +434,12 @@ a:hover
   cursor: pointer;
 }
 
+#site-autocomplete > .active[data-site],
+#site-autocomplete > [data-site]:hover
+{
+  background-color: $hover-background;
+}
+
 #recovery-code-accepted-container
 {
   margin: 0;

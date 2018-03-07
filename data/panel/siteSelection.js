@@ -19,6 +19,7 @@ setSubmitHandler("site-selection", () => done($("site-selection-site").value.tri
 setResetHandler("site-selection", () => done(null));
 setCommandHandler("site-autocomplete", handleAutocompleteClick);
 $("site-selection-site").addEventListener("input", findMatchingSites);
+$("site-selection-site").addEventListener("keydown", handleKeyDown);
 
 function done(value)
 {
@@ -101,4 +102,47 @@ function handleAutocompleteClick(event)
 
   if (target.hasAttribute("data-site"))
     done(target.getAttribute("data-site"));
+}
+
+function handleKeyDown(event)
+{
+  if (event.key == "ArrowDown")
+  {
+    let autocompleteBox = $("site-autocomplete");
+    let active = autocompleteBox.querySelector(".active");
+    if (active && active.nextSibling)
+    {
+      active.classList.remove("active");
+      active.nextSibling.classList.add("active");
+      active.nextSibling.scrollIntoView({block: "nearest"});
+    }
+    else if (!active && autocompleteBox.firstChild && autocompleteBox.firstChild.hasAttribute("data-site"))
+      autocompleteBox.firstChild.classList.add("active");
+    event.preventDefault();
+  }
+  else if (event.key == "ArrowUp")
+  {
+    let autocompleteBox = $("site-autocomplete");
+    let active = autocompleteBox.querySelector(".active");
+    if (active)
+    {
+      active.classList.remove("active");
+      if (active.previousSibling)
+      {
+        active.previousSibling.classList.add("active");
+        active.previousSibling.scrollIntoView({block: "nearest"});
+      }
+    }
+    event.preventDefault();
+  }
+  else if (event.key == "Enter")
+  {
+    let autocompleteBox = $("site-autocomplete");
+    let active = autocompleteBox.querySelector(".active");
+    if (active)
+    {
+      done(active.getAttribute("data-site"));
+      event.preventDefault();
+    }
+  }
 }
