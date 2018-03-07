@@ -53,3 +53,21 @@ function setResetHandler(element, handler)
   element.addEventListener("reset", wrapper);
 }
 exports.setResetHandler = setResetHandler;
+
+document.addEventListener("keydown", event =>
+{
+  // This currently doesn't work in Firefox: https://bugzil.la/1443758
+  if (event.key == "Escape")
+  {
+    let activePanel = require("./utils").getActivePanel();
+    if (activePanel)
+    {
+      let button = $(activePanel).querySelector("button[type='reset']");
+      if (button)
+      {
+        button.click();
+        event.preventDefault();
+      }
+    }
+  }
+});
