@@ -9,7 +9,7 @@
 let {passwords} = require("../proxy");
 let {setSubmitHandler, setResetHandler} = require("./events");
 let state = require("./state");
-let {$, setActivePanel, showUnknownError} = require("./utils");
+let {$, setActivePanel, setSiteName, showUnknownError} = require("./utils");
 
 setSubmitHandler("notes", saveNotes);
 setResetHandler("notes", setActivePanel.bind(null, "password-list"));
@@ -21,7 +21,7 @@ let currentPassword = null;
 
 function updateSiteName()
 {
-  $("notes-website-name").textContent = state.siteDisplayName;
+  setSiteName("notes-website-name");
 }
 
 function edit(password)

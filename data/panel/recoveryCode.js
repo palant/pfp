@@ -11,7 +11,7 @@ let {recoveryCodes} = require("../proxy");
 let {setResetHandler, setCommandHandler} = require("./events");
 let {setValidator, markInvalid} = require("./formValidation");
 let state = require("./state");
-let {$, getActivePanel, setActivePanel, showUnknownError} = require("./utils");
+let {$, getActivePanel, setActivePanel, setSiteName, showUnknownError} = require("./utils");
 let Formatter = require("./formatter");
 
 let originalSelection = null;
@@ -55,7 +55,7 @@ recoveryCodes.getValidChars().then(validChars =>
 
 function updateSiteName()
 {
-  $("recovery-code-website-name").textContent = state.siteDisplayName;
+  setSiteName("recovery-code-website-name");
 }
 
 setResetHandler("recovery-code", () =>

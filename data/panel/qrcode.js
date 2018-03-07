@@ -8,7 +8,7 @@
 
 let {setSubmitHandler} = require("./events");
 let state = require("./state");
-let {$, getActivePanel, setActivePanel} = require("./utils");
+let {$, getActivePanel, setSiteName, setActivePanel} = require("./utils");
 
 let originalSelection = null;
 
@@ -17,7 +17,7 @@ updateSiteName();
 
 function updateSiteName()
 {
-  $("qrcode-website-name").textContent = state.siteDisplayName;
+  setSiteName("qrcode-website-name");
 }
 
 setSubmitHandler("qrcode", () =>

@@ -11,7 +11,7 @@ let {passwords, masterPassword, passwordRetrieval, ui} = require("../proxy");
 let {setCommandHandler, setSubmitHandler} = require("./events");
 let siteSelection = require("./siteSelection");
 let state = require("./state");
-let {$, setActivePanel, showUnknownError} = require("./utils");
+let {$, setActivePanel, setSiteName, showUnknownError} = require("./utils");
 
 let {confirm} = require("./confirm");
 
@@ -66,7 +66,7 @@ function initPasswordList()
 
 function setSite()
 {
-  let {origSite, site, siteDisplayName, masterPasswordState} = state;
+  let {origSite, site, masterPasswordState} = state;
 
   if (origSite != site)
   {
@@ -83,7 +83,7 @@ function setSite()
   $("add-alias").hidden = (!site || origSite != site || site == "pfp.invalid" || state.pwdList.length);
 
   let field = $("password-list-site");
-  field.textContent = siteDisplayName;
+  setSiteName(field);
   $("generate-password-link").hidden = $("stored-password-link").hidden = !site;
 
   if (masterPasswordState == "known" && !site)

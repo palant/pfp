@@ -80,6 +80,20 @@ function setActivePanel(id, noReset)
 }
 exports.setActivePanel = setActivePanel;
 
+function setSiteName(element)
+{
+  if (typeof element == "string")
+    element = $(element);
+
+  let {site, siteDisplayName} = require("./state");
+  element.textContent = siteDisplayName;
+  if (site != siteDisplayName)
+    element.classList.add("special-site");
+  else
+    element.classList.remove("special-site");
+}
+exports.setSiteName = setSiteName;
+
 function showUnknownError(e)
 {
   $("unknown-error-details").textContent = e;

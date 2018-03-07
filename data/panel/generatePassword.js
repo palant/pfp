@@ -11,7 +11,7 @@ let {passwords} = require("../proxy");
 let {setCommandHandler, setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
-let {$, setActivePanel, showUnknownError} = require("./utils");
+let {$, setActivePanel, setSiteName, showUnknownError} = require("./utils");
 
 $("password-length").addEventListener("input", updatePasswordLengthDisplay);
 $("generate-password").addEventListener("reset", () =>
@@ -40,7 +40,7 @@ updateSite();
 
 function updateSite()
 {
-  $("generate-password-site").textContent = state.siteDisplayName;
+  setSiteName("generate-password-site");
 }
 
 function updatePasswordLengthDisplay()

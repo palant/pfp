@@ -87,6 +87,8 @@ function findMatchingSites()
     seenResult = true;
 
     let el = document.createElement("div");
+    if (site != displayName)
+      el.classList.add("special-site");
     el.setAttribute("data-site", site);
     if (index > 0)
       el.appendChild(document.createTextNode(displayName.substr(0, index)));

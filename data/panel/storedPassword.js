@@ -11,7 +11,7 @@ let {passwords} = require("../proxy");
 let {setCommandHandler, setSubmitHandler, setResetHandler} = require("./events");
 let {setValidator, markInvalid, enforceValue} = require("./formValidation");
 let state = require("./state");
-let {$, setActivePanel, showUnknownError} = require("./utils");
+let {$, setActivePanel, setSiteName, showUnknownError} = require("./utils");
 
 setValidator("stored-password-user-name", enforceValue.bind(null, "user_name_required"));
 setValidator("stored-password-value", enforceValue.bind(null, "password_value_required"));
@@ -30,7 +30,7 @@ updateSite();
 
 function updateSite()
 {
-  $("stored-password-site").textContent = state.siteDisplayName;
+  setSiteName("stored-password-site");
 }
 
 function showRevision()
