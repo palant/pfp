@@ -7,7 +7,7 @@
 "use strict";
 
 let {i18n} = require("../browserAPI");
-require("./enterMaster");
+let {enterMaster} = require("./enterMaster");
 let {$, setCommandHandler, showError} = require("./utils");
 let modal = require("./modal");
 let {passwords, passwordRetrieval, recoveryCodes} = require("../proxy");
@@ -107,21 +107,35 @@ function importDataFromFile(file)
   reader.onload = function()
   {
     if (confirm(i18n.getMessage("allpasswords_import_confirm")))
-    {
-      modal.show("in-progress");
-      passwords.importPasswordData(reader.result).then(() =>
-      {
-        modal.hide();
-        alert(i18n.getMessage("allpasswords_import_success"));
-        window.location.reload();
-      }).catch(error =>
-      {
-        modal.hide();
-        showError(error);
-      });
-    }
+      doImport(reader.result);
   };
   reader.readAsText(file);
+}
+
+function doImport(data, masterPass)
+{
+  modal.show("in-progress");
+  passwords.importPasswordData(data, masterPass).then(() =>
+  {
+    modal.hide();
+    alert(i18n.getMessage("allpasswords_import_success"));
+    window.location.reload();
+  }).catch(error =>
+  {
+    modal.hide();
+    if (error == "wrong_master_password")
+    {
+      enterMaster("allpasswords_import_with_master", true).then(newMaster =>
+      {
+        doImport(data, newMaster);
+      }).catch(error =>
+      {
+        // User cancelled, ignore
+      });
+    }
+    else
+      showError(error);
+  });
 }
 
 function showNotes(event)
