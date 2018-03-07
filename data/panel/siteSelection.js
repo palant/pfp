@@ -31,10 +31,12 @@ function done(value)
 function show(message)
 {
   $("site-selection-label").textContent = message;
-  $("site-selection-site").value = state.site;
 
   let originalSelection = getActivePanel();
   setActivePanel("site-selection");
+
+  $("site-selection-site").value = state.site;
+  $("site-selection-site").select();
 
   return new Promise((resolve, reject) =>
   {
