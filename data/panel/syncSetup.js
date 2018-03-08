@@ -26,25 +26,21 @@ if (isWebClient)
     let provider = node.getAttribute("data-provider");
     sync.getManualAuthURL(provider).then(url =>
     {
-      node.hidden = !url;
-      if (url)
+      node.href = url;
+      node.target = "_blank";
+      node.addEventListener("click", () =>
       {
-        node.href = url;
-        node.target = "_blank";
-        node.addEventListener("click", () =>
+        require("./syncAuthorize").show().then(code =>
         {
-          require("./syncAuthorize").show().then(code =>
+          return sync.manualAuthorization(provider, code).then(() =>
           {
-            return sync.manualAuthorization(provider, code).then(() =>
-            {
-              setActivePanel("sync-state");
-            }).catch(showUnknownError);
-          }).catch(error =>
-          {
-            // User cancelled, ignore
-          });
+            setActivePanel("sync-state");
+          }).catch(showUnknownError);
+        }).catch(error =>
+        {
+          // User cancelled, ignore
         });
-      }
+      });
     }).catch(showUnknownError);
   }
 }
