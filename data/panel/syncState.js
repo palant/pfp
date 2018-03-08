@@ -11,7 +11,7 @@ let {confirm} = require("./confirm");
 let {setCommandHandler, setSubmitHandler, setResetHandler} = require("./events");
 let {sync} = require("../proxy");
 let state = require("./state");
-let {$, setActivePanel} = require("./utils");
+let {$, setActivePanel, showUnknownError} = require("./utils");
 
 const displayNames = new Map([
   ["dropbox", "Dropbox"],
@@ -63,7 +63,48 @@ function updateState()
   }
 
   if (state.sync.error)
+  {
     $("sync-error").textContent = localize(state.sync.error);
+    if (state.sync.error == "sync_invalid_token")
+    {
+      let link = document.createElement("a");
+      link.textContent = i18n.getMessage("sync_reauthorize");
+      $("sync-error").appendChild(document.createTextNode(" "));
+
+      let {provider} = state.sync;
+      let isWebClient = document.documentElement.classList.contains("webclient");
+      if (isWebClient)
+      {
+        sync.getManualAuthURL(provider).then(url =>
+        {
+          link.href = url;
+          link.target = "_blank";
+          link.addEventListener("click", () =>
+          {
+            require("./syncAuthorize").show().then(code =>
+            {
+              return sync.manualAuthorization(provider, code).catch(showUnknownError);
+            }).catch(error =>
+            {
+              // User cancelled, ignore
+            });
+          });
+          $("sync-error").appendChild(link);
+        }).catch(showUnknownError);
+      }
+      else
+      {
+        link.href = "#";
+        link.addEventListener("click", event =>
+        {
+          event.preventDefault();
+          sync.authorize(provider);
+          window.close();
+        });
+        $("sync-error").appendChild(link);
+      }
+    }
+  }
   $("sync-error").hidden = !state.sync.error;
   $("sync-state-link").className = (state.sync.error && state.sync.error != "sync_connection_error" ? "failed" : "");
 }

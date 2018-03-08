@@ -61,6 +61,7 @@ function authorize(event)
   if (!target || !target.hasAttribute("data-provider"))
     return;
 
+  event.preventDefault();
   sync.authorize(target.getAttribute("data-provider"));
   window.close();
 }
