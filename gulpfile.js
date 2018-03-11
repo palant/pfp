@@ -69,7 +69,7 @@ function buildWorkers(targetdir)
 function buildCommon(targetdir)
 {
   return merge(
-    gulp.src("LICENSE.TXT")
+    gulp.src("LICENSE.txt")
         .pipe(gulp.dest(`${targetdir}`)),
     gulp.src(["data/**/*.html", "data/**/*.png", "data/**/*.svg"])
         .pipe(gulp.dest(`${targetdir}/data`)),
@@ -202,7 +202,7 @@ gulp.task("build-web", ["validate"], function()
 {
   let targetdir = "build-web";
   return merge(
-    gulp.src("LICENSE.TXT")
+    gulp.src("LICENSE.txt")
         .pipe(gulp.dest(`${targetdir}`)),
     gulp.src(["data/**/*.html", "data/**/*.png", "data/**/*.svg", "!data/options/options.html"])
         .pipe(gulp.dest(`${targetdir}`)),
