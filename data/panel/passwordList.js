@@ -43,6 +43,7 @@ setCommandHandler("menu-to-clipboard", () => copyToClipboard(menuPassword));
 setCommandHandler("menu-show-qrcode", () => showQRCode(menuPassword));
 setCommandHandler("menu-notes", () => showNotes(menuPassword));
 setCommandHandler("menu-upgrade-password", () => upgradePassword(menuPassword));
+setCommandHandler("menu-make-generated", () => makeGenerated(menuPassword));
 setCommandHandler("menu-bump-revision", () => bumpRevision(menuPassword));
 setCommandHandler("menu-password-remove", () => removePassword(menuPassword));
 $("password-menu").addEventListener("click", hideMenu);
@@ -257,6 +258,7 @@ function showMenu(password, element)
   menu.querySelector(".menu-notes-link").textContent = notes_link_msg;
 
   menu.querySelector("#menu-upgrade-password").hidden = (password.type != "generated");
+  menu.querySelector("#menu-make-generated").hidden = (password.type != "stored");
 
   menuPassword = password;
   element.parentNode.insertBefore(menu, element.nextSibling);
@@ -355,6 +357,24 @@ function upgradePassword(password)
         .catch(showPasswordMessage);
     }
   });
+}
+
+function makeGenerated(password)
+{
+  setActivePanel("generate-password");
+
+  $("replace-password-warning").hidden = false;
+  $("generate-password-user-name").value = password.name;
+  $("generate-password-user-name").setAttribute("readonly", "readonly");
+  if (password.revision && password.revision != "1")
+  {
+    $("generate-password-revision").value = password.revision || "1";
+    require("./generatePassword").showRevision();
+  }
+  else
+    $("generate-change-password-revision").hidden = true;
+  $("generate-password-revision").setAttribute("readonly", "readonly");
+  $("generate-legacy-container").hidden = true;
 }
 
 function bumpRevision(password)

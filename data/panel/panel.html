@@ -116,6 +116,10 @@
           <span class="upgrade-password-link iconic-link"></span>
           <span data-l10n-id="upgrade_password"></span>
         </a>
+        <a href="#" id="menu-make-generated" class="password-menu-entry">
+          <span class="make-generated-link iconic-link"></span>
+          <span data-l10n-id="make_generated"></span>
+        </a>
         <a href="#" id="menu-bump-revision" class="password-menu-entry">
           <span class="bump-revision-link iconic-link"></span>
           <span data-l10n-id="bump_revision"></span>
@@ -157,7 +161,8 @@
       </div>
     </form>
 
-    <form id="generate-password" class="slide" data-default-element="generate-password-user-name" data-custom-reset="generate-change-password-revision.hidden,generate-password-revision-container.hidden=true,generate-legacy-warning.hidden=true">
+    <form id="generate-password" class="slide" data-default-element="generate-password-user-name" data-custom-reset="replace-password-warning.hidden=true,generate-password-user-name.readonly,generate-change-password-revision.hidden,generate-password-revision-container.hidden=true,generate-password-revision.readonly,generate-legacy-container.hidden,generate-legacy-warning.hidden=true">
+      <div id="replace-password-warning" class="warning" data-l10n-id="replace_password_warning" hidden></div>
       <label data-l10n-id="site"></label>
       <div id="generate-password-site"></div>
       <label class="block-start" for="generate-password-user-name" data-l10n-id="user_name"></label>

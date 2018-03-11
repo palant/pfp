@@ -300,7 +300,8 @@ a:hover
   background-image: url(../images/ios-paper-outline.svg);
 }
 
-.upgrade-password-link
+.upgrade-password-link,
+.make-generated-link
 {
   background-image: url(../images/arrow-up-a.svg);
 }
@@ -397,6 +398,7 @@ a:hover
   justify-content: space-between;
 }
 
+#replace-password-warning,
 #generate-legacy-warning
 {
   font-size: $font-size-small;

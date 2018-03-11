@@ -80,7 +80,7 @@ function addGeneratedPassword()
     number: $("charset-number").checked,
     symbol: $("charset-symbol").checked,
     legacy: $("generate-legacy").checked
-  }).then(pwdList =>
+  }, $("generate-password-user-name").hasAttribute("readonly")).then(pwdList =>
   {
     state.set({pwdList});
     setActivePanel("password-list");
