@@ -20,6 +20,10 @@ function getActiveElement(doc)
 function fakeInput(field, value)
 {
   field.value = value;
+  field.dispatchEvent(new KeyboardEvent("keydown", {key: "v", ctrlKey: true}));
+  field.dispatchEvent(new KeyboardEvent("keypress", {key: "v", ctrlKey: true}));
+  field.dispatchEvent(new KeyboardEvent("keyup", {key: "v", ctrlKey: true}));
+  field.dispatchEvent(new UIEvent("input", {bubbles: true}));
   field.dispatchEvent(new Event("change", {bubbles: true}));
 }
 
