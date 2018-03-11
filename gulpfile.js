@@ -33,9 +33,7 @@ gulp.task("all", ["xpi", "crx", "appx", "web"], function()
 
 function buildWorkers(targetdir)
 {
-  let resolveConfig = {
-    modules: [path.resolve(__dirname, "third-party")]
-  };
+  let resolveConfig = {};
 
   if (targetdir == "build-test/data")
   {
@@ -59,6 +57,11 @@ function buildWorkers(targetdir)
           output: {
             filename: "scrypt.js",
             pathinfo: true
+          },
+          node: {
+            process: false,
+            global: false,
+            setImmediate: false
           },
           resolve: resolveConfig
         }))

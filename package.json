@@ -32,5 +32,7 @@
     "text-encoding": "^0.6.0",
     "webpack2-stream-watch": "^3.2.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@stablelib/scrypt": "^0.10.1"
+  }
 }
