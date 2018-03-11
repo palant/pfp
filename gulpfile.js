@@ -19,7 +19,7 @@ let stylelint = require("gulp-stylelint");
 let merge = require("merge-stream");
 let request = require("request");
 let zip = require("gulp-zip");
-let webpack = require("webpack2-stream-watch");
+let webpack = require("webpack-stream");
 
 let utils = require("./gulp-utils");
 
