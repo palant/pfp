@@ -9,7 +9,7 @@
 const path = require("path");
 
 const MemoryFS = require("memory-fs");
-const {webpack} = require("webpack2-stream-watch");
+const {webpack} = require("webpack-stream");
 
 module.exports = function(source)
 {
@@ -35,9 +35,6 @@ module.exports = function(source)
           }
         }
       ]
-    },
-    resolve: {
-      modules: [path.resolve(__dirname, "third-party")]
     }
   });
   compiler.outputFileSystem = fs;
