@@ -34,11 +34,11 @@ h1
 a
 {
   text-decoration: none;
-}
 
-a:hover
-{
-  text-decoration: underline;
+  &:hover
+  {
+    text-decoration: underline;
+  }
 }
 
 .slide
@@ -229,11 +229,11 @@ a:hover
   display: flex;
   flex-direction: row;
   align-items: center;
-}
 
-.password-container:hover
-{
-  background-color: $hover-background;
+  &:hover
+  {
+    background-color: $hover-background;
+  }
 }
 
 .user-name-container
@@ -353,24 +353,27 @@ a:hover
   border-color: transparent transparent $background-color transparent;
 }
 
-.password-menu-entry:not([hidden])
+.password-menu-entry
 {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  font-size: $font-size-small;
-  color: $text-color;
-  text-decoration: none;
-}
+  &:not([hidden])
+  {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: $font-size-small;
+    color: $text-color;
+    text-decoration: none;
+  }
 
-.password-menu-entry:hover
-{
-  background-color: $hover-background;
-}
+  &:hover
+  {
+    background-color: $hover-background;
+  }
 
-.password-menu-entry > .iconic-link
-{
-  @include margin-inline-end($inline-spacing);
+  & > .iconic-link
+  {
+    @include margin-inline-end($inline-spacing);
+  }
 }
 
 :root.webclient .to-document-link,
@@ -434,17 +437,17 @@ a:hover
   padding: $block-padding;
   max-height: 8 * $font-size;
   overflow: auto;
-}
 
-#site-autocomplete > [data-site]
-{
-  cursor: pointer;
-}
+  & > [data-site]
+  {
+    cursor: pointer;
 
-#site-autocomplete > .active[data-site],
-#site-autocomplete > [data-site]:hover
-{
-  background-color: $hover-background;
+    &.active,
+    &:hover
+    {
+      background-color: $hover-background;
+    }
+  }
 }
 
 #recovery-code-accepted-container
@@ -513,16 +516,16 @@ a:hover
 {
   display: flex;
   flex-direction: row;
-}
 
-#sync-lastTime-container:not(.succeeded) #sync-succeeded
-{
-  display: none;
-}
+  &:not(.succeeded) #sync-succeeded
+  {
+    display: none;
+  }
 
-#sync-lastTime-container:not(.failed) #sync-failed
-{
-  display: none;
+  &:not(.failed) #sync-failed
+  {
+    display: none;
+  }
 }
 
 #sync-failed
