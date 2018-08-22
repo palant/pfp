@@ -23,7 +23,7 @@
     "memory-fs": "^0.4.1",
     "merge-stream": "^1.0.0",
     "node-rsa": "^0.3.2",
-    "nodeunit": "^0.9.1",
+    "nodeunit": "^0.11.3",
     "properties-parser": "^0.3.1",
     "request": "^2.83.0",
     "sandboxed-module": "^2.0.3",
