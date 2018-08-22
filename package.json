@@ -15,7 +15,7 @@
     "del": "^2.2.0",
     "gulp": "^4.0.0",
     "gulp-eslint": "^2.0.0",
-    "gulp-htmlhint": "^0.3.1",
+    "gulp-htmlhint": "^2.1.1",
     "gulp-sass": "^2.3.2",
     "gulp-stylelint": "^7.0.0",
     "gulp-zip": "^3.2.0",
