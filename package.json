@@ -29,8 +29,7 @@
     "sandboxed-module": "^2.0.3",
     "stylelint": "^9.5.0",
     "stylelint-config-standard": "^18.2.0",
-    "subtle": "^0.1.8",
-    "text-encoding": "^0.6.0",
+    "text-encoding": "^0.7.0",
     "webpack-stream": "^4.0.2"
   },
   "dependencies": {
