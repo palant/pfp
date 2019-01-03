@@ -958,8 +958,8 @@ exports.testDecryptingImport = function(test)
     return masterPassword.changePassword(dummyMaster);
   }).then(() =>
   {
-    let atob = str => new Buffer(str, "base64").toString("binary");
-    let btoa = str => new Buffer(str, "binary").toString("base64");
+    let atob = str => Buffer.from(str, "base64").toString("binary");
+    let btoa = str => Buffer.from(str, "binary").toString("base64");
     let salt = "asdf";
     let hmacSecret = "fdsa";
     let key = "4MgE2P1PbjLyAz7JxczGjOPNtaaqNKofAmGSbNvRtUM=";
@@ -1048,8 +1048,8 @@ exports.testConvertingImport = function(test)
     return masterPassword.changePassword(dummyMaster);
   }).then(() =>
   {
-    let atob = str => new Buffer(str, "base64").toString("binary");
-    let btoa = str => new Buffer(str, "binary").toString("base64");
+    let atob = str => Buffer.from(str, "base64").toString("binary");
+    let btoa = str => Buffer.from(str, "binary").toString("base64");
     let salt = "asdf";
     let hmacSecret = "fdsa";
     let key = "gLrcDLgglH8KOr5bM3AhX5ARWD3ZvfKsqy76wpkDkLo=";
@@ -1155,7 +1155,7 @@ exports.testLegacyImport = function(test)
   }
 
   let iv = "abcdefgh";
-  let btoa = str => new Buffer(str, "binary").toString("base64");
+  let btoa = str => Buffer.from(str, "binary").toString("base64");
 
   Promise.resolve().then(() =>
   {
@@ -1675,7 +1675,7 @@ exports.testMigration = function(test)
   }
 
   let iv = "abcdefgh";
-  let btoa = str => new Buffer(str, "binary").toString("base64");
+  let btoa = str => Buffer.from(str, "binary").toString("base64");
 
   let {storageData} = require("../test-lib/browserAPI");
   storageData.masterPassword = {salt: "abcd"};
