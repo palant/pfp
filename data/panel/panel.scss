@@ -8,7 +8,8 @@
 
 $hover-background: #e2f4ff;
 
-$menu-arrow-height: 7px;
+$body-width: 600px;
+$body-padding: 10px;
 $menu-border-width: 1px;
 
 :root
@@ -19,8 +20,8 @@ $menu-border-width: 1px;
 body
 {
   margin: 0;
-  width: 600px;
-  padding: 10px;
+  width: $body-width;
+  padding: $body-padding;
 }
 
 h1
@@ -41,12 +42,7 @@ a
   }
 }
 
-.slide
-{
-  display: none;
-}
-
-.slide[data-active="true"]
+.page
 {
   display: flex;
   flex-direction: column;
@@ -153,25 +149,25 @@ a
   @include logo;
 }
 
-#migration > p,
-#migration > ul
+.migration > p,
+.migration > ul
 {
   font-size: $font-size-small;
 }
 
-#migration > p
+.migration > p
 {
   margin: $block-spacing / 2 0;
 }
 
-#migration-in-progress:not([hidden])
+.migration-in-progress
 {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-#migration-spinning-wheel
+.migration-spinning-wheel
 {
   @include margin-inline-end($inline-spacing);
   $image-size: $font-size;
@@ -275,7 +271,7 @@ a
   background-image: url("../images/android-menu.svg");
 }
 
-.password-menu-link[data-menuactive]
+.password-menu-link.menuactive
 {
   background-color: mix($background-color, $text-color, 70%);
 }
@@ -314,43 +310,6 @@ a
 .password-remove-link
 {
   background-image: url(../images/ios-close-outline.svg);
-}
-
-#password-menu
-{
-  display: flex;
-  flex-direction: column;
-  margin-top: $menu-arrow-height;
-  border: $menu-border-width solid $text-color;
-  border-radius: $border-radius;
-  padding: $block-padding;
-}
-
-.menu-arrow
-{
-  position: relative;
-  left: $icon-size / 2 - $menu-border-width - $block-padding - $menu-arrow-height;
-  top: -($menu-arrow-height + $block-padding);
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 0 $menu-arrow-height $menu-arrow-height $menu-arrow-height;
-  border-color: transparent transparent $text-color transparent;
-}
-
-.menu-arrow::after
-{
-  $menu-arrow-inner-height: $menu-arrow-height - 1;
-  content: "";
-  position: relative;
-  display: block;
-  left: -$menu-arrow-inner-height;
-  top: $menu-border-width;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 0 $menu-arrow-inner-height $menu-arrow-inner-height $menu-arrow-inner-height;
-  border-color: transparent transparent $background-color transparent;
 }
 
 .password-menu-entry
@@ -394,8 +353,8 @@ a
 
 #generate-password-site,
 #generate-password-user-name,
-#length-container,
-#charsets-container
+.length-container,
+.charsets-container
 {
   display: flex;
   justify-content: space-between;
@@ -407,18 +366,11 @@ a
   font-size: $font-size-small;
 }
 
-#generate-change-password-revision,
-#stored-change-password-revision,
-#stored-use-recovery
+.change-password-revision,
+.use-recovery,
+.cancel-recovery
 {
   font-size: $font-size-small;
-}
-
-#generate-password-revision-container:not([hidden]),
-#stored-password-revision-container:not([hidden])
-{
-  display: flex;
-  flex-direction: column;
 }
 
 #password-length
@@ -426,7 +378,7 @@ a
   flex-grow: 1;
 }
 
-#password-length-value
+.password-length-value
 {
   min-width: 3ch;
 }
@@ -438,7 +390,7 @@ a
   max-height: 8 * $font-size;
   overflow: auto;
 
-  & > [data-site]
+  & > .site-entry
   {
     cursor: pointer;
 
@@ -450,18 +402,13 @@ a
   }
 }
 
-#recovery-code-accepted-container
+.recovery-code-accepted
 {
   margin: 0;
   font-size: $font-size-small;
 }
 
-#recovery-code-accepted:empty + #recovery-code-strip
-{
-  display: none;
-}
-
-#recovery-code-strip
+.recovery-code-strip
 {
   display: inline-block;
   $icon-size: $font-size-small;
@@ -473,9 +420,17 @@ a
   background-image: url("../images/close-round.svg");
 }
 
-#qrcode-canvas
+.qrcode-canvas-container
 {
-  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-form
+{
+  display: flex;
+  flex-direction: column;
 }
 
 #notes-textarea
@@ -483,17 +438,17 @@ a
   min-height: 300px;
 }
 
-#sync-setup > label
+.sync-section
 {
   font-weight: bold;
 }
 
-#sync-setup > div
+.sync-explanation
 {
   font-size: $font-size-small;
 }
 
-#sync-provider-selection
+.sync-provider-selection
 {
   display: flex;
   flex-direction: row;
@@ -507,39 +462,96 @@ a
   cursor: pointer;
 }
 
-#sync-state-link.failed
+.sync-state-link.failed
 {
   color: $error-text;
 }
 
-#sync-lastTime-container
+.sync-lastTime-container
 {
   display: flex;
   flex-direction: row;
-
-  &:not(.succeeded) #sync-succeeded
-  {
-    display: none;
-  }
-
-  &:not(.failed) #sync-failed
-  {
-    display: none;
-  }
 }
 
-#sync-failed
+.sync-failed,
+.sync-succeeded
+{
+  margin: 0 $inline-spacing;
+}
+
+.sync-failed
 {
   color: $error-text;
 }
 
-#sync-status-container
+.sync-button-container
 {
   flex-grow: 1;
-  margin: 0 $inline-spacing;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
-#sync-error
+.sync-error
 {
   margin-top: $block-spacing;
+}
+
+.modalOverlay
+{
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  padding: $dialog-padding;
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modalOverlay-inner
+{
+  margin: auto;
+  background-color: $background-color;
+  border: 1px solid black;
+  border-radius: $border-radius;
+
+  &.stretch
+  {
+    width: 100%;
+  }
+
+  & > :last-child
+  {
+    display: flex;
+    flex-direction: column;
+    padding: $dialog-padding;
+    padding-top: max($dialog-padding - $font-size-small - $border-radius, 0);
+  }
+}
+
+.modalOverlay-cancel-container
+{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.modalOverlay-cancel
+{
+  margin: $border-radius;
+  $icon-size: $font-size-small;
+  min-width: $icon-size;
+  min-height: $icon-size;
+  background-size: $icon-size;
+  background-repeat: no-repeat;
+  background-image: url("../images/close-round.svg");
+
+  &:hover
+  {
+    background-color: $hover-background;
+  }
 }

@@ -14,9 +14,9 @@ let modal = require("./modal");
 let {passwords, passwordRetrieval, recoveryCodes} = require("../proxy");
 let {port} = require("../messaging");
 
-function copyToClipboard(site, password, passwordInfo)
+function copyToClipboard(passwordData, passwordInfo)
 {
-  passwords.getPassword(site, password.name, password.revision).then(password =>
+  passwords.getPassword(passwordData).then(password =>
   {
     let doCopy = () =>
     {
@@ -49,12 +49,12 @@ function copyToClipboard(site, password, passwordInfo)
   }).catch(showError);
 }
 
-function removePassword(site, password, passwordInfo)
+function removePassword(passwordData, passwordInfo)
 {
-  let message = i18n.getMessage("remove_password_confirmation").replace(/\{1\}/g, password.name).replace(/\{2\}/g, site);
+  let message = i18n.getMessage("remove_password_confirmation").replace(/\{1\}/g, passwordData.name).replace(/\{2\}/g, passwordData.site);
   if (confirm(message))
   {
-    passwords.removePassword(site, password.name, password.revision).then(() =>
+    passwords.removePassword(passwordData).then(() =>
     {
       let siteInfo = passwordInfo.parentNode;
       siteInfo.removeChild(passwordInfo);
@@ -187,7 +187,7 @@ function showPasswords(event)
       {
         let passwordInfo = elements[i];
         let [site, passwordData] = passwordInfo._data;
-        actions.push(passwords.getPassword(site, passwordData.name, passwordData.revision)
+        actions.push(passwords.getPassword(passwordData)
           .then(value =>
           {
             let element = passwordInfo.querySelector(".password-value");
@@ -313,8 +313,8 @@ window.addEventListener("DOMContentLoaded", function()
         revisionNode.hidden = !passwordData.revision;
         revisionNode.textContent = passwordData.revision;
 
-        setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, site, passwordData, passwordInfo));
-        setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, site, passwordData, passwordInfo));
+        setCommandHandler(passwordInfo.querySelector(".to-clipboard-link"), copyToClipboard.bind(null, passwordData, passwordInfo));
+        setCommandHandler(passwordInfo.querySelector(".password-remove-link"), removePassword.bind(null, passwordData, passwordInfo));
 
         if (passwordData.type == "generated2" || passwordData.type == "generated")
         {
@@ -338,7 +338,7 @@ window.addEventListener("DOMContentLoaded", function()
         else
         {
           passwordInfo.querySelector(".password-info.generated").hidden = true;
-          recoveryCodeOperations.push(recoveryCodes.getCode(site, passwordData.name, passwordData.revision).then(code =>
+          recoveryCodeOperations.push(recoveryCodes.getCode(passwordData).then(code =>
           {
             passwordInfo.querySelector(".password-recovery").textContent = code;
           }));

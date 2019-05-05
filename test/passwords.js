@@ -169,7 +169,7 @@ exports.testAddRemoveGenerated = function(test)
     test.equal(site, "sub." + generated1.site);
     test.deepEqual(pwdList2, []);
 
-    return passwords.removePassword(generated1.site, generated1.name, generated1.revision);
+    return passwords.removePassword(generated1);
   }).catch(unexpectedError.bind(test)).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
@@ -184,19 +184,19 @@ exports.testAddRemoveGenerated = function(test)
       symbol: generated2.symbol
     }]);
 
-    return passwords.removePassword(generated1.site, generated1.name, generated1.revision);
+    return passwords.removePassword(generated1);
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
   }).catch(expectedValue.bind(test, "no_such_password")).then(() =>
   {
-    return passwords.removePassword("sub." + generated2.site, generated2.name, "");
+    return passwords.removePassword({site: "sub." + generated2.site, name: generated2.name, revision: ""});
   }).then(() =>
   {
     test.ok(false, "Succeeded removing password with wrong revision number");
   }).catch(expectedValue.bind(test, "no_such_password")).then(() =>
   {
-    return passwords.removePassword("sub." + generated2.site, generated2.name, generated2.revision);
+    return passwords.removePassword({site: "sub." + generated2.site, name: generated2.name, revision: generated2.revision});
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
@@ -286,7 +286,7 @@ exports.testAddRemoveStored = function(test)
     test.equal(site, "sub." + stored1.site);
     test.deepEqual(pwdList2, []);
 
-    return passwords.removePassword(stored3.site, stored3.name, stored3.revision);
+    return passwords.removePassword(stored3);
   }).catch(unexpectedError.bind(test)).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
@@ -301,13 +301,13 @@ exports.testAddRemoveStored = function(test)
       password: stored1.password
     }]);
 
-    return passwords.removePassword(stored3.site, stored3.name, stored3.revision);
+    return passwords.removePassword(stored3);
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
   }).catch(expectedValue.bind(test, "no_such_password")).then(() =>
   {
-    return passwords.removePassword("sub." + stored2.site, stored2.name);
+    return passwords.removePassword({site: "sub." + stored2.site, name: stored2.name});
   }).then(() =>
   {
     test.ok(false, "Succeeded removing a non-existant password");
@@ -336,7 +336,7 @@ exports.testAddGeneratedExisting = function(test)
     return passwords.addGenerated(generated1, true);
   }).catch(unexpectedError.bind(test)).then(() =>
   {
-    return passwords.removePassword(generated1.site, generated1.name, generated1.revision);
+    return passwords.removePassword(generated1);
   }).then(() =>
   {
     return passwords.addStored(stored1);
@@ -353,28 +353,28 @@ exports.testRetrieval = function(test)
     return passwords.addGenerated(generated1);
   }).then(pwdList =>
   {
-    return passwords.getPassword(generated1.site, generated1.name, generated1.revision);
+    return passwords.getPassword(generated1);
   }).then(pwd =>
   {
     test.equal(pwd, generated1.password);
     return passwords.addGenerated(generated2);
   }).then(pwdList =>
   {
-    return passwords.getPassword(generated2.site, generated2.name, generated2.revision);
+    return passwords.getPassword(generated2);
   }).then(pwd =>
   {
     test.equal(pwd, generated2.password);
-    return passwords.removePassword(generated2.site, generated2.name, generated2.revision);
+    return passwords.removePassword(generated2);
   }).then(pwdList =>
   {
     return Promise.all([passwords.addStored(stored2), passwords.addStored(stored3)]);
   }).then(([pwdList1, pwdList2]) =>
   {
-    return passwords.getPassword(stored2.site, stored2.name);
+    return passwords.getPassword(stored2);
   }).then(pwd =>
   {
     test.equal(pwd, stored2.password);
-    return passwords.getPassword(stored3.site, stored3.name, stored3.revision);
+    return passwords.getPassword(stored3);
   }).then(pwd =>
   {
     test.equal(pwd, stored3.password);
@@ -501,24 +501,24 @@ exports.testNotes = function(test)
     return passwords.addGenerated(generated2);
   }).then(() =>
   {
-    return passwords.setNotes(generated1.site, generated1.name, "", notes1);
+    return passwords.setNotes(generated1, notes1);
   }).then(() =>
   {
     test.ok(false, "Successfully set notes on a non-existant password");
   }).catch(expectedValue.bind(test, "no_such_password")).then(() =>
   {
-    return passwords.setNotes("sub." + generated2.site, generated2.name, generated2.revision, notes1);
+    return passwords.setNotes({site: "sub." + generated2.site, name: generated2.name, revision: generated2.revision}, notes1);
   }).then(() =>
   {
     test.ok(false, "Successfully set notes on a non-existant password");
   }).catch(expectedValue.bind(test, "no_such_password")).then(() =>
   {
-    return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
+    return passwords.getNotes(generated2);
   }).then(notes =>
   {
     test.equal(notes, null);
 
-    return passwords.setNotes(generated2.site, generated2.name, generated2.revision, notes1);
+    return passwords.setNotes(generated2, notes1);
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
@@ -539,12 +539,12 @@ exports.testNotes = function(test)
   {
     test.deepEqual(pwdList2, pwdList);
 
-    return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
+    return passwords.getNotes(generated2);
   }).then(notes =>
   {
     test.equal(notes, notes1);
 
-    return passwords.setNotes(generated2.site, generated2.name, generated2.revision, notes2);
+    return passwords.setNotes(generated2, notes2);
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
@@ -560,12 +560,12 @@ exports.testNotes = function(test)
       notes: notes2
     }]);
 
-    return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
+    return passwords.getNotes(generated2);
   }).then(notes =>
   {
     test.equal(notes, notes2);
 
-    return passwords.setNotes(generated2.site, generated2.name, generated2.revision, null);
+    return passwords.setNotes(generated2, null);
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
@@ -585,7 +585,7 @@ exports.testNotes = function(test)
   {
     test.deepEqual(pwdList2, pwdList);
 
-    return passwords.setNotes(generated2.site, generated2.name, generated2.revision, null);
+    return passwords.setNotes(generated2, null);
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
@@ -599,7 +599,7 @@ exports.testNotes = function(test)
       number: generated2.number,
       symbol: generated2.symbol
     }]);
-    return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
+    return passwords.getNotes(generated2);
   }).then(notes =>
   {
     test.equal(notes, null);
@@ -717,7 +717,7 @@ exports.testAllPasswords = function(test)
       }
     });
 
-    return passwords.setNotes(stored2.site, stored2.name, "", "foobarnotes");
+    return passwords.setNotes(stored2, "foobarnotes");
   }).then(pwdList =>
   {
     return passwords.getAllPasswords();
@@ -761,7 +761,7 @@ exports.testAllPasswords = function(test)
       }
     });
 
-    return passwords.removePassword("sub." + generated2.site, generated2.name, generated2.revision);
+    return passwords.removePassword({site: "sub." + generated2.site, name: generated2.name, revision: generated2.revision});
   }).then(pwdList =>
   {
     return passwords.getAllPasswords();
@@ -935,7 +935,7 @@ exports.testExport = function(test)
       }
     });
 
-    return passwords.setNotes(generated2.site, generated2.name, generated2.revision, "foobarnotes");
+    return passwords.setNotes(generated2, "foobarnotes");
   }).then(() =>
   {
     return passwords.exportPasswordData();
@@ -944,7 +944,7 @@ exports.testExport = function(test)
     return checkExport(test, exportData);
   }).then(allPasswords =>
   {
-    return passwords.getNotes(generated2.site, generated2.name, generated2.revision);
+    return passwords.getNotes(generated2);
   }).then(notes =>
   {
     test.equal(notes, "foobarnotes");

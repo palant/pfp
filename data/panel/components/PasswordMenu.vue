@@ -1,0 +1,70 @@
+<!--
+ - This Source Code is subject to the terms of the Mozilla Public License
+ - version 2.0 (the "License"). You can obtain a copy of the License at
+ - http://mozilla.org/MPL/2.0/.
+ -->
+
+<template>
+  <modal-overlay @cancel="$emit('cancel')"
+                 @keydown.native.arrow-down="advanceFocus(true)"
+                 @keydown.native.arrow-up="advanceFocus(false)"
+  >
+    <a v-focus href="#" class="password-menu-entry" @click.prevent="$parent.fillIn">
+      <span class="to-document-link iconic-link" />
+      {{ $t("to_document") }}
+    </a>
+    <a href="#" class="password-menu-entry" @click.prevent="$parent.copy">
+      <span class="to-clipboard-link iconic-link" />
+      {{ $t("to_clipboard") }}
+    </a>
+    <a href="#" class="password-menu-entry" @click.prevent="$parent.showQRCode">
+      <span class="show-qrcode-link iconic-link" />
+      {{ $t("show_qrcode") }}
+    </a>
+    <a href="#" class="password-menu-entry" @click.prevent="$parent.showNotes">
+      <span class="notes-link iconic-link" />
+      {{ $t(password.notes ? "edit_notes" : "add_notes") }}
+    </a>
+    <a v-if="password.type == 'generated'" href="#" class="password-menu-entry" @click.prevent="$parent.upgradePassword">
+      <span class="upgrade-password-link iconic-link" />
+      {{ $t("upgrade_password") }}
+    </a>
+    <a v-if="password.type == 'stored'" href="#" class="password-menu-entry" @click.prevent="$parent.makeGenerated">
+      <span class="make-generated-link iconic-link" />
+      {{ $t("make_generated") }}
+    </a>
+    <a href="#" class="password-menu-entry" @click.prevent="$parent.bumpRevision">
+      <span class="bump-revision-link iconic-link" />
+      {{ $t("bump_revision") }}
+    </a>
+    <a href="#" class="password-menu-entry" @click.prevent="$parent.removePassword">
+      <span class="password-remove-link iconic-link" />
+      {{ $t("remove_password") }}
+    </a>
+  </modal-overlay>
+</template>
+
+<script>
+"use strict";
+
+export default {
+  props: {
+    password: {
+      type: Object,
+      required: true
+    }
+  },
+  methods: {
+    advanceFocus(forward)
+    {
+      let current = document.activeElement;
+      if (!current || !current.classList.contains("password-menu-entry"))
+        return;
+
+      let next = forward ? current.nextElementSibling : current.previousElementSibling;
+      if (next && next.classList.contains("password-menu-entry"))
+        next.focus();
+    }
+  }
+};
+</script>

@@ -52,7 +52,7 @@ exports.testRecoveryCodes = function(test)
     return passwords.addStored(stored);
   }).then(pwdList =>
   {
-    return recoveryCodes.getCode(stored.site, stored.name);
+    return recoveryCodes.getCode(stored);
   }).then(code =>
   {
     let lines = code.trim().split(/[\r\n]+/);

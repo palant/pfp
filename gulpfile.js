@@ -6,27 +6,28 @@
 
 "use strict";
 
-let fs = require("fs");
-let path = require("path");
-let url = require("url");
+const fs = require("fs");
+const path = require("path");
+const url = require("url");
 
-let del = require("del");
-let gulp = require("gulp");
-let eslint = require("gulp-eslint");
-let htmlhint = require("gulp-htmlhint");
-let sass = require("gulp-sass");
-let stylelint = require("gulp-stylelint");
-let merge = require("merge-stream");
-let request = require("request");
-let zip = require("gulp-zip");
-let webpack = require("webpack-stream");
+const del = require("del");
+const gulp = require("gulp");
+const eslint = require("gulp-eslint");
+const htmlhint = require("gulp-htmlhint");
+const sass = require("gulp-sass");
+const stylelint = require("gulp-stylelint");
+const merge = require("merge-stream");
+const request = require("request");
+const zip = require("gulp-zip");
+const webpack = require("webpack-stream");
+const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
-let utils = require("./gulp-utils");
+const utils = require("./gulp-utils");
 
 gulp.task("eslint", function()
 {
-  return gulp.src(["*.js", "data/**/*.js", "lib/**/*.js", "test/**/*.js",
-                   "test-lib/**/*.js", "web/**/*.js",
+  return gulp.src(["*.js", "data/**/*.js", "**/*.vue", "lib/**/*.js",
+                   "test/**/*.js", "test-lib/**/*.js", "web/**/*.js",
                    "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js",
                    "!data/panel/formatter.js"])
              .pipe(eslint())
@@ -76,6 +77,10 @@ function buildWorkers(targetdir)
             filename: "pbkdf2.js",
             pathinfo: true
           },
+          mode: "production",
+          optimization: {
+            minimize: false
+          },
           resolve: resolveConfig
         }))
         .pipe(gulp.dest(`${targetdir}`)),
@@ -84,6 +89,10 @@ function buildWorkers(targetdir)
           output: {
             filename: "scrypt.js",
             pathinfo: true
+          },
+          mode: "production",
+          optimization: {
+            minimize: false
           },
           node: {
             process: false,
@@ -108,6 +117,10 @@ function buildCommon(targetdir)
           output: {
             filename: "fillIn.js",
             pathinfo: true
+          },
+          mode: "production",
+          optimization: {
+            minimize: false
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data`)),
@@ -118,14 +131,34 @@ function buildCommon(targetdir)
             pathinfo: true,
             library: "__webpack_require__"
           },
+          mode: "production",
+          optimization: {
+            minimize: false
+          },
+          performance: {
+            hints: false
+          },
           module: {
             rules: [
               {
                 test: /\/jsqr-.*?\.js$/,
                 use: "imports-loader?window=>exports"
+              },
+              {
+                test: /\.vue$/,
+                use: {
+                  loader: "vue-loader",
+                  options: {
+                    transformAssetUrls: {img: []},
+                    compilerOptions: {
+                      whitespace: "condense"
+                    }
+                  }
+                }
               }
             ]
-          }
+          },
+          plugins: [new VueLoaderPlugin()]
         }))
         .pipe(gulp.dest(`${targetdir}/data/panel`)),
     gulp.src(["data/platform.js", "data/allpasswords/main.js"])
@@ -134,6 +167,10 @@ function buildCommon(targetdir)
             filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
+          },
+          mode: "production",
+          optimization: {
+            minimize: false
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data/allpasswords`)),
@@ -143,6 +180,10 @@ function buildCommon(targetdir)
             filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
+          },
+          mode: "production",
+          optimization: {
+            minimize: false
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data/options`)),
@@ -158,6 +199,10 @@ function buildCommon(targetdir)
             filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
+          },
+          mode: "production",
+          optimization: {
+            minimize: false
           }
         }))
         .pipe(gulp.dest(`${targetdir}`)),
@@ -243,6 +288,13 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
             pathinfo: true,
             library: "__webpack_require__"
           },
+          mode: "production",
+          optimization: {
+            minimize: false
+          },
+          performance: {
+            hints: false
+          },
           module: {
             rules: [
               {
@@ -250,12 +302,24 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
                 use: "imports-loader?window=>exports"
               },
               {
+                test: /\.vue$/,
+                use: {
+                  loader: "vue-loader",
+                  options: {
+                    transformAssetUrls: {img: []},
+                    compilerOptions: {
+                      whitespace: "condense"
+                    }
+                  }
+                }
+              },
+              {
                 test: /\.properties$/,
                 use: path.resolve(__dirname, "localeLoader.js")
               },
               {
                 test: /\.js$/,
-                exclude: /\/zxcvbn-.*\.js$/,
+                exclude: /\/(zxcvbn-.*|formatter)\.js$/,
                 use: {
                   loader: "babel-loader",
                   options: {
@@ -265,6 +329,7 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
               }
             ]
           },
+          plugins: [new VueLoaderPlugin()],
           resolve: {
             alias: {
               "./browserAPI$": path.resolve(__dirname, "web", "data", "browserAPI.js"),
@@ -280,6 +345,10 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
             filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
+          },
+          mode: "production",
+          optimization: {
+            minimize: false
           },
           module: {
             rules: [
@@ -317,6 +386,10 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
             pathinfo: true,
             library: "__webpack_require__"
           },
+          mode: "production",
+          optimization: {
+            minimize: false
+          },
           module: {
             rules: [
               {
@@ -348,6 +421,10 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
             filename: "index/index.js",
             pathinfo: true,
             library: "__webpack_require__"
+          },
+          mode: "production",
+          optimization: {
+            minimize: false
           },
           module: {
             rules: [

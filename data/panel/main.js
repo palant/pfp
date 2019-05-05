@@ -6,50 +6,59 @@
 
 "use strict";
 
-let {port} = require("../messaging");
-port.on("init", state =>
-{
-  require("./state").set(state);
+import Vue from "vue";
+import VueRouter from "vue-router";
+
+import I18n from "../i18n";
+import App from "./App.vue";
+import router from "./router";
+import ExternalLink from "./components/ExternalLink.vue";
+import ModalOverlay from "./components/ModalOverlay.vue";
+import ValidatedForm from "./components/ValidatedForm.vue";
+import ValidatedInput from "./components/ValidatedInput.vue";
+
+Vue.use(I18n);
+
+Vue.component("external-link", ExternalLink);
+Vue.component("modal-overlay", ModalOverlay);
+Vue.component("validated-form", ValidatedForm);
+Vue.component("validated-input", ValidatedInput);
+
+Vue.directive("focus", {
+  inserted(element, binding)
+  {
+    if (typeof binding.value == "undefined" || binding.value)
+      element.focus();
+  }
+});
+
+Vue.directive("select", {
+  inserted(element)
+  {
+    element.select();
+  }
+});
+
+Vue.directive("scroll-active", {
+  update(element)
+  {
+    if (element.classList.contains("active"))
+      element.scrollIntoView({block: "nearest"});
+  }
+});
+
+let app = new Vue({
+  router,
+  render: f => f(App)
 });
 
 function init()
 {
   window.removeEventListener("load", init);
-
-  let {ui} = require("../proxy");
-  let {setCommandHandler} = require("./events");
-  let {showUnknownError} = require("./utils");
-
-  let isWebClient = document.documentElement.classList.contains("webclient");
-  let links = document.querySelectorAll("a[data-type]");
-  for (let i = 0; i < links.length; i++)
-  {
-    let link = links[i];
-    link.target = "_blank";
-
-    let options = {
-      type: link.getAttribute("data-type"),
-      param: link.getAttribute("data-param")
-    };
-    if (isWebClient)
-      ui.getLink(options).then(url => link.href = url).catch(showUnknownError);
-    else
-      setCommandHandler(link, () => ui.openLink(options).catch(showUnknownError));
-  }
-
-
-  require("./enterMaster");
-  require("./changeMaster");
-  require("./migration");
-  require("./passwordList");
-  require("./generatePassword");
-  require("./storedPassword");
-  require("./syncSetup");
-  require("./syncState");
+  app.$mount("#app");
 }
-
 window.addEventListener("load", init);
 
 // Hack: expose __webpack_require__ for simpler debugging
 /* global __webpack_require__ */
-module.exports = __webpack_require__;
+export default __webpack_require__;
