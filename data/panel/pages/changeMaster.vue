@@ -6,15 +6,15 @@
 
 <template>
   <validated-form id="change-master" class="page" @validated="submit" @keydown.native.escape.prevent="$router.push('/enter-master')">
-    <div v-if="!hasPassword" class="description">
-      {{ $t("new_master_message") }}
-    </div>
-    <div v-else class="description warning">
-      {{ $t("reset_master_message") }}
-    </div>
-
     <div>
-      <span>{{ $t("master_security_message") }}</span>
+      <template v-if="!hasPassword">
+        {{ $t("new_master_message") }}
+      </template>
+      <div v-else class="warning">
+        {{ $t("reset_master_message") }}
+      </div>
+
+      {{ $t("master_security_message") }}
       <external-link type="documentation" param="choosing-master-password">
         {{ $t("learn_more") }}
       </external-link>
