@@ -45,7 +45,6 @@
 "use strict";
 
 import {passwords, masterPassword} from "../../proxy";
-import {app, confirm, showUnknownError} from "../App.vue";
 import PasswordScore from "../components/PasswordScore.vue";
 
 export function validateMasterPassword(val)
@@ -68,28 +67,28 @@ export default {
   computed: {
     hasPassword()
     {
-      return app.masterPasswordState != "unset";
+      return this.$app.masterPasswordState != "unset";
     }
   },
   methods: {
     submit()
     {
       let score = this.$refs.passwordScore.value;
-      let ask = score < 3 ? confirm(this.$t("weak_password")) : Promise.resolve(true);
+      let ask = score < 3 ? this.$app.confirm(this.$t("weak_password")) : Promise.resolve(true);
       ask.then(accepted =>
       {
         if (accepted)
         {
           masterPassword.changePassword(this.newMaster.value)
-            .then(() => passwords.getPasswords(app.origSite))
+            .then(() => passwords.getPasswords(this.$app.origSite))
             .then(([origSite, site, pwdList]) =>
             {
-              app.origSite = origSite;
-              app.site = site;
-              app.pwdList = pwdList;
-              app.masterPasswordState = "known";
+              this.$app.origSite = origSite;
+              this.$app.site = site;
+              this.$app.pwdList = pwdList;
+              this.$app.masterPasswordState = "known";
             })
-            .catch(showUnknownError);
+            .catch(this.$app.showUnknownError);
         }
       });
     },

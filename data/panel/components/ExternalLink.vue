@@ -17,7 +17,6 @@
 "use strict";
 
 import {ui} from "../../proxy";
-import {showUnknownError} from "../App.vue";
 
 export default {
   name: "ExternalLink",
@@ -42,7 +41,7 @@ export default {
     ui.getLink({
       type: this.type,
       param: this.param
-    }).then(url => this.url = url).catch(showUnknownError);
+    }).then(url => this.url = url).catch(this.$app.showUnknownError);
   },
   methods:
   {
@@ -51,7 +50,7 @@ export default {
       ui.openLink({
         type: this.type,
         param: this.param
-      }).catch(showUnknownError);
+      }).catch(this.$app.showUnknownError);
     }
   }
 };

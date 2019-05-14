@@ -26,7 +26,6 @@
 
 import {recoveryCodes} from "../../proxy";
 import Formatter from "formatter";
-import {showUnknownError} from "../App.vue";
 
 export default {
   data()
@@ -61,14 +60,14 @@ export default {
             callOriginal(result);
           }).catch(error =>
           {
-            showUnknownError(error);
+            this.$app.showUnknownError(error);
             callOriginal(null);
           });
         }
         else
           callOriginal(result);
       };
-    }).catch(showUnknownError);
+    }).catch(this.$app.showUnknownError);
   },
   methods: {
     processRecoveryCodeInput(formatter, validChars)
@@ -97,7 +96,7 @@ export default {
                 recoveryCodes.decodeCode(formatted).then(password =>
                 {
                   this.$emit("done", password);
-                }).catch(showUnknownError);
+                }).catch(this.$app.showUnknownError);
               }
               return null;
             });

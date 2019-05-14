@@ -59,7 +59,6 @@
 "use strict";
 
 import {passwords} from "../../proxy";
-import {app, showUnknownError} from "../App.vue";
 
 export default {
   name: "GeneratedPassword",
@@ -87,7 +86,7 @@ export default {
     let revision = getProp("revision");
     if (this.options.incRevision)
     {
-      let pwdList = app.pwdList;
+      let pwdList = this.$app.pwdList;
       revision = (parseInt(revision, 10) || 1) + 1;
       if (revision < 2)
         revision = 2;
@@ -168,7 +167,7 @@ export default {
       let revision = this.revision != "1" ? this.revision : "";
 
       passwords.addGenerated({
-        site: app.site,
+        site: this.$app.site,
         name: this.name.value,
         revision,
         length: this.length,
@@ -179,7 +178,7 @@ export default {
         legacy: this.legacy
       }, this.options.replacing).then(pwdList =>
       {
-        app.pwdList = pwdList;
+        this.$app.pwdList = pwdList;
         this.$emit("cancel");
       }).catch(error =>
       {
@@ -189,7 +188,7 @@ export default {
           this.revisionVisible = true;
         }
         else
-          showUnknownError(error);
+          this.$app.showUnknownError(error);
       });
     }
   }

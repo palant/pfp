@@ -12,17 +12,17 @@
         <a id="select-site" v-focus href="#" :title="$t('select_site_label')"
            @click.prevent="selectSite"
         />
-        <div id="password-list-site" :class="{ 'special-site': app.site != app.siteDisplayName }">
-          {{ app.siteDisplayName }}
+        <div id="password-list-site" :class="{ 'special-site': $app.site != $app.siteDisplayName }">
+          {{ $app.siteDisplayName }}
         </div>
       </div>
-      <span v-if="app.origSite != app.site" id="alias-container">
-        {{ $t("alias_description", app.origSite) }}
+      <span v-if="$app.origSite != $app.site" id="alias-container">
+        {{ $t("alias_description", $app.origSite) }}
         <a id="remove-alias" href="#" @click.prevent="removeAlias">
           {{ $t("remove_alias") }}
         </a>
       </span>
-      <a v-else-if="app.site && app.site != 'pfp.invalid' && !app.pwdList.length"
+      <a v-else-if="$app.site && $app.site != 'pfp.invalid' && !$app.pwdList.length"
          id="add-alias" href="#" @click.prevent="addAlias"
       >
         {{ $t("add_alias") }}
@@ -41,20 +41,20 @@
     />
 
     <div class="block-start">{{ $t("passwords_label") }}</div>
-    <div v-if="!app.pwdList.length">{{ $t("no_passwords_message") }}</div>
+    <div v-if="!$app.pwdList.length">{{ $t("no_passwords_message") }}</div>
     <div v-else id="password-list-container">
-      <password-entry v-for="password in app.pwdList"
+      <password-entry v-for="password in $app.pwdList"
                       :key="password.name + '\0' + password.revision"
                       :password="password"
       />
     </div>
 
-    <a v-if="app.site" id="generate-password-link" href="#" @click.prevent="modal = 'generated'">
+    <a v-if="$app.site" id="generate-password-link" href="#" @click.prevent="modal = 'generated'">
       {{ $t("generate_password_link") }}
     </a>
     <generated-password v-if="modal == 'generated'" @cancel="modal = null" />
 
-    <a v-if="app.site" id="stored-password-link" href="#" @click.prevent="modal = 'stored'">
+    <a v-if="$app.site" id="stored-password-link" href="#" @click.prevent="modal = 'stored'">
       {{ $t("stored_password_link") }}
     </a>
     <stored-password v-if="modal == 'stored'" @cancel="modal = null" />
@@ -63,8 +63,8 @@
       <a href="#" @click.prevent="showAll">
         {{ $t("show_all_passwords") }}
       </a>
-      <a href="#" class="sync-state-link" :class="{failed: app.sync.error && app.sync.error != 'sync_connection_error'}" @click.prevent="showSync">
-        <template v-if="app.sync.provider">
+      <a href="#" class="sync-state-link" :class="{failed: $app.sync.error && $app.sync.error != 'sync_connection_error'}" @click.prevent="showSync">
+        <template v-if="$app.sync.provider">
           {{ $t("sync_state") }}
         </template>
         <template v-else>
@@ -82,7 +82,6 @@
 "use strict";
 
 import {passwords, masterPassword, passwordRetrieval, ui} from "../../proxy";
-import {app, confirm, showUnknownError} from "../App.vue";
 import GeneratedPassword from "../components/GeneratedPassword.vue";
 import PasswordEntry from "../components/PasswordEntry.vue";
 import PasswordMessage from "../components/PasswordMessage.vue";
@@ -100,12 +99,6 @@ export default {
     return {
       modal: null
     };
-  },
-  computed: {
-    app()
-    {
-      return app;
-    }
   },
   methods: {
     showPasswordMessage(message)
@@ -127,20 +120,20 @@ export default {
     },
     removeAlias()
     {
-      let message = this.$t("remove_alias_confirmation", app.origSite, app.siteDisplayName);
-      confirm(message).then(response =>
+      let message = this.$t("remove_alias_confirmation", this.$app.origSite, this.$app.siteDisplayName);
+      this.$app.confirm(message).then(response =>
       {
         if (response)
         {
-          passwords.removeAlias(app.origSite)
-            .then(() => passwords.getPasswords(app.origSite))
+          passwords.removeAlias(this.$app.origSite)
+            .then(() => passwords.getPasswords(this.$app.origSite))
             .then(([origSite, site, pwdList]) =>
             {
-              app.origSite = origSite;
-              app.site = site;
-              app.pwdList = pwdList;
+              this.$app.origSite = origSite;
+              this.$app.site = site;
+              this.$app.pwdList = pwdList;
             })
-            .catch(showUnknownError);
+            .catch(this.$app.showUnknownError);
         }
       });
     },
@@ -148,7 +141,7 @@ export default {
     {
       ui.showAllPasswords()
         .then(() => window.close())
-        .catch(showUnknownError);
+        .catch(this.$app.showUnknownError);
     },
     showSync()
     {
@@ -157,8 +150,8 @@ export default {
     lockPasswords()
     {
       masterPassword.forgetPassword()
-        .then(() => app.masterPasswordState = "set")
-        .catch(showUnknownError);
+        .then(() => this.$app.masterPasswordState = "set")
+        .catch(this.$app.showUnknownError);
     }
   }
 };

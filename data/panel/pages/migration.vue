@@ -37,7 +37,6 @@
 "use strict";
 
 import {passwords} from "../../proxy";
-import {app, showUnknownError} from "../App.vue";
 
 export default {
   data()
@@ -54,7 +53,7 @@ export default {
   methods: {
     checkStatus()
     {
-      if (app.masterPasswordState != "migrating")
+      if (this.$app.masterPasswordState != "migrating")
       {
         this.migrated();
         return;
@@ -64,7 +63,7 @@ export default {
       {
         if (!migrating)
           this.migrated();
-      }).catch(showUnknownError);
+      }).catch(this.$app.showUnknownError);
     },
     migrated()
     {
@@ -74,14 +73,14 @@ export default {
     },
     done()
     {
-      passwords.getPasswords(app.origSite)
+      passwords.getPasswords(this.$app.origSite)
         .then(([origSite, site, pwdList]) =>
         {
-          app.origSite = origSite;
-          app.site = site;
-          app.pwdList = pwdList;
-          app.masterPasswordState = "known";
-        }).catch(showUnknownError);
+          this.$app.origSite = origSite;
+          this.$app.site = site;
+          this.$app.pwdList = pwdList;
+          this.$app.masterPasswordState = "known";
+        }).catch(this.$app.showUnknownError);
     }
   }
 };

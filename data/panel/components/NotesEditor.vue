@@ -26,7 +26,6 @@
 "use strict";
 
 import {passwords} from "../../proxy";
-import {app, showUnknownError} from "../App.vue";
 
 export default {
   props: {
@@ -47,9 +46,9 @@ export default {
     {
       passwords.setNotes(this.password, this.value).then(pwdList =>
       {
-        app.pwdList = pwdList;
+        this.$app.pwdList = pwdList;
         this.$emit("cancel");
-      }).catch(showUnknownError);
+      }).catch(this.$app.showUnknownError);
     }
   }
 };

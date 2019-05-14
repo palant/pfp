@@ -11,8 +11,6 @@
 <script>
 "use strict";
 
-import {showUnknownError} from "../App.vue";
-
 const messageHideDelay = 3000;
 
 export default {
@@ -49,7 +47,7 @@ export default {
         }, messageHideDelay);
       }
       else
-        showUnknownError(this.message);
+        this.$app.showUnknownError(this.message);
     }
   }
 };

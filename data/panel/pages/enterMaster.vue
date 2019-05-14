@@ -29,7 +29,6 @@
 "use strict";
 
 import {masterPassword, passwords} from "../../proxy";
-import {app, showUnknownError} from "../App.vue";
 import {validateMasterPassword} from "./changeMaster.vue";
 
 export default {
@@ -43,21 +42,21 @@ export default {
     submit()
     {
       masterPassword.checkPassword(this.masterPassword.value)
-        .then(() => passwords.getPasswords(app.origSite))
+        .then(() => passwords.getPasswords(this.$app.origSite))
         .then(([origSite, site, pwdList]) =>
         {
-          app.origSite = origSite;
-          app.site = site;
-          app.pwdList = pwdList;
-          app.masterPasswordState = "known";
+          this.$app.origSite = origSite;
+          this.$app.site = site;
+          this.$app.pwdList = pwdList;
+          this.$app.masterPasswordState = "known";
         }).catch(error =>
         {
           if (error == "declined")
             this.masterPassword.error = this.$t("password_declined");
           else if (error == "migrating")
-            app.masterPasswordState = "migrating";
+            this.$app.masterPasswordState = "migrating";
           else
-            showUnknownError(error);
+            this.$app.showUnknownError(error);
         });
     },
     validateMasterPassword

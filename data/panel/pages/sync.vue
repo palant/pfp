@@ -6,28 +6,28 @@
 
 <template>
   <div class="page">
-    <template v-if="app.sync.provider">
+    <template v-if="$app.sync.provider">
       <div>{{ $t("sync_provider") }}</div>
-      <div>{{ labelForProvider(app.sync.provider) }}</div>
+      <div>{{ labelForProvider($app.sync.provider) }}</div>
 
       <div class="block-start">{{ $t("sync_lastTime") }}</div>
       <div class="sync-lastTime-container">
-        <div v-if="app.sync.isSyncing">{{ $t("sync_lastTime_now") }}</div>
-        <div v-else-if="app.sync.lastSync">{{ new Date(app.sync.lastSync).toLocaleString() }}</div>
+        <div v-if="$app.sync.isSyncing">{{ $t("sync_lastTime_now") }}</div>
+        <div v-else-if="$app.sync.lastSync">{{ new Date($app.sync.lastSync).toLocaleString() }}</div>
         <div v-else>{{ $t("sync_lastTime_never") }}</div>
 
-        <template v-if="app.sync.lastSync && !app.sync.isSyncing">
-          <div v-if="app.sync.error" class="sync-failed">{{ $t("sync_failed") }}</div>
+        <template v-if="$app.sync.lastSync && !$app.sync.isSyncing">
+          <div v-if="$app.sync.error" class="sync-failed">{{ $t("sync_failed") }}</div>
           <div v-else class="sync-succeeded">{{ $t("sync_succeeded") }}</div>
         </template>
         <div class="sync-button-container">
-          <button v-focus :disabled="app.sync.isSyncing" @click="doSync">{{ $t("do_sync") }}</button>
+          <button v-focus :disabled="$app.sync.isSyncing" @click="doSync">{{ $t("do_sync") }}</button>
         </div>
       </div>
 
-      <div v-if="app.sync.error" class="warning sync-error">
-        {{ localize(app.sync.error) }}
-        <a v-if="app.sync.error == 'sync_invalid_token'" href="#" @click.prevent="authorize(app.sync.provider)">
+      <div v-if="$app.sync.error" class="warning sync-error">
+        {{ localize($app.sync.error) }}
+        <a v-if="$app.sync.error == 'sync_invalid_token'" href="#" @click.prevent="authorize($app.sync.provider)">
           {{ $t("sync_reauthorize") }}
         </a>
       </div>
@@ -73,7 +73,6 @@
 "use strict";
 
 import {sync} from "../../proxy";
-import {app, confirm, showUnknownError} from "../App.vue";
 import ManualAuth from "../components/ManualAuth.vue";
 
 export default {
@@ -99,13 +98,6 @@ export default {
       authActive: false
     };
   },
-  computed:
-  {
-    app()
-    {
-      return app;
-    }
-  },
   mounted()
   {
     if (this.$isWebClient)
@@ -115,7 +107,7 @@ export default {
         sync.getManualAuthURL(provider).then(url =>
         {
           this.urls[provider] = url;
-        }).catch(showUnknownError);
+        }).catch(this.$app.showUnknownError);
       }
     }
   },
@@ -149,7 +141,7 @@ export default {
     },
     disableSync()
     {
-      confirm(this.$t("sync_disable_confirmation")).then(disable =>
+      this.$app.confirm(this.$t("sync_disable_confirmation")).then(disable =>
       {
         if (disable)
         {
@@ -175,7 +167,7 @@ export default {
         {
           this.$refs.manualAuth.callback = code =>
           {
-            return sync.manualAuthorization(provider, code).catch(showUnknownError);
+            return sync.manualAuthorization(provider, code).catch(this.$app.showUnknownError);
           };
         });
       }

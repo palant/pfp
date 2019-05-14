@@ -67,17 +67,23 @@ Vue.directive("scroll-active", {
   }
 });
 
-Vue.prototype.$isWebClient = document.documentElement.classList.contains("webclient");
-
-let app = new Vue({
-  router,
-  render: f => f(App)
+Object.defineProperty(Vue.prototype, "$app", {
+  get()
+  {
+    return this.$root.$refs.app;
+  }
 });
+Vue.prototype.$isWebClient = document.documentElement.classList.contains("webclient");
 
 function init()
 {
   window.removeEventListener("load", init);
-  app.$mount("#app");
+
+  new Vue({
+    el: "#app",
+    router,
+    render: createElement => createElement(App, {ref: "app"})
+  });
 }
 window.addEventListener("load", init);
 

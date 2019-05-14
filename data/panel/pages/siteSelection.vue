@@ -40,13 +40,12 @@
 
 import {getSiteDisplayName} from "../../common";
 import {passwords} from "../../proxy";
-import {app, showUnknownError} from "../App.vue";
 
 export default {
   data()
   {
     return {
-      value: app.site && app.siteDisplayName,
+      value: this.$app.site && this.$app.siteDisplayName,
       allSites: null,
       sites: [],
       activeIndex: -1,
@@ -59,7 +58,7 @@ export default {
       if (!this.$route.query.alias)
         return this.$t("select_site");
       else
-        return this.$t("select_alias", app.origSite);
+        return this.$t("select_alias", this.$app.origSite);
     }
   },
   watch: {
@@ -86,8 +85,9 @@ export default {
           };
         });
         this.updateSites();
+        throw "test";
       })
-      .catch(showUnknownError);
+      .catch(this.$app.showUnknownError);
   },
   methods: {
     updateSites()
@@ -130,23 +130,23 @@ export default {
           passwords.getPasswords(site)
             .then(([origSite, site, pwdList]) =>
             {
-              app.origSite = origSite;
-              app.site = site;
-              app.pwdList = pwdList;
+              this.$app.origSite = origSite;
+              this.$app.site = site;
+              this.$app.pwdList = pwdList;
             })
-            .catch(showUnknownError);
+            .catch(this.$app.showUnknownError);
         }
-        else if (site != app.origSite)
+        else if (site != this.$app.origSite)
         {
-          passwords.addAlias(app.origSite, site)
-            .then(() => passwords.getPasswords(app.origSite))
+          passwords.addAlias(this.$app.origSite, site)
+            .then(() => passwords.getPasswords(this.$app.origSite))
             .then(([origSite, site, pwdList]) =>
             {
-              app.origSite = origSite;
-              app.site = site;
-              app.pwdList = pwdList;
+              this.$app.origSite = origSite;
+              this.$app.site = site;
+              this.$app.pwdList = pwdList;
             })
-            .catch(showUnknownError);
+            .catch(this.$app.showUnknownError);
         }
       }
       this.$router.push("/password-list");

@@ -35,7 +35,6 @@
 "use strict";
 
 import {port} from "../messaging";
-import router from "./router";
 import Confirm from "./components/Confirm.vue";
 
 const stateToRoute = {
@@ -45,37 +44,20 @@ const stateToRoute = {
   "known": ["/password-list", "/generate-password", "/stored-password", "/recovery-code", "/qrcode", "/sync-setup", "/sync-state", "/confirm"]
 };
 
-let data = {
+let initialData = {
   site: null,
   origSite: null,
   pwdList: null,
   masterPasswordState: null,
-  sync: null,
-  unknownError: null,
-  unknownErrorDetails: false
+  sync: null
 };
 
-export let app = null;
-
-export function confirm(message)
-{
-  return new Promise((resolve, reject) =>
-  {
-    let confirm = app.$refs.confirm;
-    confirm.message = message;
-    confirm.callback = resolve;
-  });
-}
-
-export function showUnknownError(error)
-{
-  app.unknownError = error;
-}
+let app = null;
 
 port.on("init", state =>
 {
-  let target = app || data;
-  for (let key of ["site", "origSite", "pwdList", "masterPasswordState", "sync"])
+  let target = app || initialData;
+  for (let key of Object.keys(initialData))
     if (key in state)
       target[key] = state[key];
 });
@@ -85,7 +67,13 @@ export default {
   components: {
     confirm: Confirm
   },
-  data: () => data,
+  data()
+  {
+    return Object.assign({
+      unknownError: null,
+      unknownErrorDetails: false
+    }, initialData);
+  },
   computed: {
     siteDisplayName()
     {
@@ -96,18 +84,34 @@ export default {
     masterPasswordState: function()
     {
       let routes = stateToRoute[this.masterPasswordState];
-      if (routes.indexOf(router.currentRoute.path) < 0)
+      if (routes.indexOf(this.$router.currentRoute.path) < 0)
       {
         let route = routes[0];
         if (route == "/password-list" && !this.site)
           route = "/site-selection";
-        router.push(route);
+        this.$router.push(route);
       }
     }
   },
   created: function()
   {
     app = this;
+  },
+  methods:
+  {
+    confirm(message)
+    {
+      return new Promise((resolve, reject) =>
+      {
+        let confirm = this.$refs.confirm;
+        confirm.message = message;
+        confirm.callback = resolve;
+      });
+    },
+    showUnknownError(error)
+    {
+      this.unknownError = error;
+    }
   }
 };
 </script>

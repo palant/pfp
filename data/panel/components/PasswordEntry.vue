@@ -35,7 +35,6 @@
 "use strict";
 
 import {passwords, passwordRetrieval} from "../../proxy";
-import {app, confirm} from "../App.vue";
 import GeneratedPassword from "./GeneratedPassword.vue";
 import NotesEditor from "./NotesEditor.vue";
 import QRCode from "./QRCode.vue";
@@ -171,8 +170,8 @@ export default {
       if (this.password.type != "generated")
         return;
 
-      let message = this.$t("upgrade_password_confirmation", this.password.name, app.siteDisplayName);
-      confirm(message).then(response =>
+      let message = this.$t("upgrade_password_confirmation", this.password.name, this.$app.siteDisplayName);
+      this.$app.confirm(message).then(response =>
       {
         if (response)
         {
@@ -187,7 +186,7 @@ export default {
             symbol: this.password.symbol,
             legacy: false
           }, true)
-            .then(pwdList => app.pwdList = pwdList)
+            .then(pwdList => this.$app.pwdList = pwdList)
             .catch(error => this.$parent.showPasswordMessage(error));
         }
       });
@@ -205,13 +204,13 @@ export default {
     removePassword()
     {
       this.modal = null;
-      let message = this.$t("remove_password_confirmation", this.password.name, app.siteDisplayName);
-      confirm(message).then(response =>
+      let message = this.$t("remove_password_confirmation", this.password.name, this.$app.siteDisplayName);
+      this.$app.confirm(message).then(response =>
       {
         if (response)
         {
           passwords.removePassword(this.password)
-            .then(pwdList => app.pwdList = pwdList)
+            .then(pwdList => this.$app.pwdList = pwdList)
             .catch(this.$parent.showPasswordMessage);
         }
       });

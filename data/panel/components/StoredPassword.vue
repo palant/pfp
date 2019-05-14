@@ -48,7 +48,6 @@
 "use strict";
 
 import {passwords} from "../../proxy";
-import {app, showUnknownError} from "../App.vue";
 import RecoveryCode from "./RecoveryCode.vue";
 
 export default {
@@ -98,13 +97,13 @@ export default {
       let revision = this.revision != "1" ? this.revision : "";
 
       passwords.addStored({
-        site: app.site,
+        site: this.$app.site,
         name: this.name.value,
         revision,
         password: this.password.value
       }).then(pwdList =>
       {
-        app.pwdList = pwdList;
+        this.$app.pwdList = pwdList;
         this.$emit("cancel");
       }).catch(error =>
       {
@@ -114,7 +113,7 @@ export default {
           this.revisionVisible = true;
         }
         else
-          showUnknownError(error);
+          this.$app.showUnknownError(error);
       });
     }
   }
