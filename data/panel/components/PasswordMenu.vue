@@ -13,7 +13,7 @@
       <span class="to-document-link iconic-link" />
       {{ $t("to_document") }}
     </a>
-    <a href="#" class="password-menu-entry" @click.prevent="$parent.copy">
+    <a v-focus="$isWebClient" href="#" class="password-menu-entry" @click.prevent="$parent.copy">
       <span class="to-clipboard-link iconic-link" />
       {{ $t("to_clipboard") }}
     </a>
