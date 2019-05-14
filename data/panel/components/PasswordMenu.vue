@@ -9,7 +9,7 @@
                  @keydown.native.arrow-down="advanceFocus(true)"
                  @keydown.native.arrow-up="advanceFocus(false)"
   >
-    <a v-if="!isWebClient" v-focus href="#" class="password-menu-entry" @click.prevent="$parent.fillIn">
+    <a v-if="!$isWebClient" v-focus href="#" class="password-menu-entry" @click.prevent="$parent.fillIn">
       <span class="to-document-link iconic-link" />
       {{ $t("to_document") }}
     </a>

@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <a v-if="isWebClient" :href="url" target="_blank">
+  <a v-if="$isWebClient" :href="url" target="_blank">
     <slot />
   </a>
   <a v-else href="#" @click.prevent="click">

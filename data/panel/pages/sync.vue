@@ -108,7 +108,7 @@ export default {
   },
   mounted()
   {
-    if (this.isWebClient)
+    if (this.$isWebClient)
     {
       for (let {name: provider} of this.providers)
       {
@@ -162,7 +162,7 @@ export default {
     },
     authorize(provider)
     {
-      if (this.isWebClient)
+      if (this.$isWebClient)
       {
         let url = this.urls.hasOwnProperty(provider) && this.urls[provider];
         if (!url)
