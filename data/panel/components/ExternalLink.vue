@@ -31,13 +31,6 @@ export default {
       required: true
     }
   },
-  computed:
-  {
-    isWebClient()
-    {
-      return document.documentElement.classList.contains("webclient");
-    }
-  },
   mounted()
   {
     ui.getLink({

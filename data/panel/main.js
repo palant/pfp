@@ -47,6 +47,8 @@ Vue.directive("scroll-active", {
   }
 });
 
+Vue.prototype.isWebClient = document.documentElement.classList.contains("webclient");
+
 let app = new Vue({
   router,
   render: f => f(App)

@@ -8,7 +8,7 @@
   <div>
     <div class="password-container">
       <a href="#" class="password-menu-link iconic-link" :class="{menuactive: modal == 'menu'}" :title="$t('password_menu')" @click.prevent="modal = 'menu'" />
-      <a href="#" class="to-document-link iconic-link" :title="$t('to_document')" @click.prevent="fillIn" />
+      <a v-if="!isWebClient" href="#" class="to-document-link iconic-link" :title="$t('to_document')" @click.prevent="fillIn" />
       <a href="#" class="to-clipboard-link iconic-link" :title="$t('to_clipboard')" @click.prevent="copy" />
       <span class="user-name-container" :class="{'legacy-warning': password.type == 'generated'}" :title="tooltip" @click.self="upgradePassword">
         <span class="user-name">{{ password.name }}</span>
@@ -136,8 +136,7 @@ export default {
       {
         this.ensureValue().then(() =>
         {
-          let isWebClient = document.documentElement.classList.contains("webclient");
-          if (!isWebClient)
+          if (!this.isWebClient)
             doCopy();
           else
           {

@@ -104,10 +104,6 @@ export default {
     app()
     {
       return app;
-    },
-    isWebClient()
-    {
-      return document.documentElement.classList.contains("webclient");
     }
   },
   mounted()
