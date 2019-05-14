@@ -32,6 +32,26 @@ Vue.directive("focus", {
   }
 });
 
+Vue.directive("cancel", {
+  inserted(element, binding, vnode)
+  {
+    if (typeof binding.value == "undefined" || binding.value)
+    {
+      vnode.context.$el.addEventListener("keydown", event =>
+      {
+        if (event.defaultPrevented || event.key != "Escape" ||
+            event.shiftKey || event.ctrlKey || event.altKey || event.metaKey)
+        {
+          return;
+        }
+
+        event.preventDefault();
+        element.click();
+      });
+    }
+  }
+});
+
 Vue.directive("select", {
   inserted(element)
   {

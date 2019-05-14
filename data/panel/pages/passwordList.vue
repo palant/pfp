@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <div class="page" @keydown.escape.prevent="lockPasswords">
+  <div class="page">
     <div id="password-list-header">
       <label for="password-list-site">{{ $t("site") }}</label>
       <div id="password-list-site-container">
@@ -71,7 +71,7 @@
           {{ $t("sync_setup") }}
         </template>
       </a>
-      <a id="lock-passwords" href="#" @click.prevent="lockPasswords">
+      <a id="lock-passwords" v-cancel href="#" @click.prevent="lockPasswords">
         {{ $t("lock_passwords") }}
       </a>
     </div>

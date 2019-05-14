@@ -5,10 +5,10 @@
  -->
 
 <template>
-  <div class="modalOverlay" @click.self="$emit('cancel')" @keydown.escape.prevent.stop="$emit('cancel')">
+  <div class="modalOverlay" @click.self="$emit('cancel')">
     <div ref="inner" class="modalOverlay-inner" :class="{stretch: stretch}">
       <div class="modalOverlay-cancel-container">
-        <a ref="cancel" href="#" class="modalOverlay-cancel" :title="$t('cancel')" @click.prevent="$emit('cancel')" />
+        <a ref="cancel" v-cancel href="#" class="modalOverlay-cancel" :title="$t('cancel')" @click.prevent="$emit('cancel')" />
       </div>
       <div>
         <slot />

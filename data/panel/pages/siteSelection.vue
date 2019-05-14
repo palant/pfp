@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <form class="page" @submit.prevent="submit" @reset.prevent="reset" @keydown.escape.prevent="reset">
+  <form class="page" @submit.prevent="submit" @reset.prevent="reset">
     <label for="site-selection-site">{{ message }}</label>
     <input id="site-selection-site" v-model.trim="value" v-focus v-select
            type="text" placeholder="example.com" autocomplete="off"
@@ -30,7 +30,7 @@
     </div>
     <div class="button-container">
       <button type="submit">{{ $t("ok") }}</button>
-      <button type="reset">{{ $t("cancel") }}</button>
+      <button v-cancel type="reset">{{ $t("cancel") }}</button>
     </div>
   </form>
 </template>

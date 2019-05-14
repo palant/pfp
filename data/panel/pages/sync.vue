@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <div class="page" @keydown.escape.prevent="$router.back()">
+  <div class="page">
     <template v-if="app.sync.provider">
       <div>{{ $t("sync_provider") }}</div>
       <div>{{ labelForProvider(app.sync.provider) }}</div>
@@ -33,7 +33,7 @@
       </div>
       <div class="button-container">
         <button @click="disableSync">{{ $t("sync_disable") }}</button>
-        <button @click="$router.back()">{{ $t("cancel") }}</button>
+        <button v-cancel @click="$router.back()">{{ $t("cancel") }}</button>
       </div>
     </template>
     <template v-else>
@@ -61,7 +61,7 @@
       <div class="sync-explanation">{{ $t("sync_no_account_explanation") }}</div>
 
       <div class="button-container">
-        <button @click="$router.back()">{{ $t("cancel") }}</button>
+        <button v-cancel @click="$router.back()">{{ $t("cancel") }}</button>
       </div>
     </template>
 
