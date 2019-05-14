@@ -85,12 +85,7 @@ export default {
     {
       let routes = stateToRoute[this.masterPasswordState];
       if (routes.indexOf(this.$router.currentRoute.path) < 0)
-      {
-        let route = routes[0];
-        if (route == "/password-list" && !this.site)
-          route = "/site-selection";
-        this.$router.push(route);
-      }
+        this.$router.push(routes[0]);
     }
   },
   created: function()

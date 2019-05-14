@@ -29,10 +29,6 @@ const routes = [
     component: require("./pages/passwordList.vue").default
   },
   {
-    path: "/site-selection",
-    component: require("./pages/siteSelection.vue").default
-  },
-  {
     path: "/sync",
     component: require("./pages/sync.vue").default
   }

@@ -28,6 +28,10 @@
         {{ $t("add_alias") }}
       </a>
     </div>
+    <site-selection v-if="modal == 'site-selection'"
+                    :message="selectionMessage" :callback="selectionCallback"
+                    @cancel="modal = null"
+    />
 
     <password-message ref="password-message"
                       :messages="{
@@ -85,6 +89,7 @@ import {passwords, masterPassword, passwordRetrieval, ui} from "../../proxy";
 import GeneratedPassword from "../components/GeneratedPassword.vue";
 import PasswordEntry from "../components/PasswordEntry.vue";
 import PasswordMessage from "../components/PasswordMessage.vue";
+import SiteSelection from "../components/SiteSelection.vue";
 import StoredPassword from "../components/StoredPassword.vue";
 
 export default {
@@ -92,13 +97,21 @@ export default {
     "generated-password": GeneratedPassword,
     "password-entry": PasswordEntry,
     "password-message": PasswordMessage,
+    "site-selection": SiteSelection,
     "stored-password": StoredPassword
   },
   data: () =>
   {
     return {
-      modal: null
+      modal: null,
+      selectionMessage: null,
+      selectionCallback: null
     };
+  },
+  mounted()
+  {
+    if (!this.$app.site)
+      this.selectSite();
   },
   methods: {
     showPasswordMessage(message)
@@ -107,16 +120,39 @@ export default {
     },
     selectSite()
     {
-      this.$router.push("/site-selection");
+      this.selectionMessage = this.$t("select_site");
+      this.selectionCallback = site =>
+      {
+        passwords.getPasswords(site)
+          .then(([origSite, site, pwdList]) =>
+          {
+            this.$app.origSite = origSite;
+            this.$app.site = site;
+            this.$app.pwdList = pwdList;
+          })
+          .catch(this.$app.showUnknownError);
+      };
+      this.modal = "site-selection";
     },
     addAlias()
     {
-      this.$router.push({
-        path: "/site-selection",
-        query: {
-          alias: 1
-        }
-      });
+      this.selectionMessage = this.$t("select_alias", this.$app.origSite);
+      this.selectionCallback = site =>
+      {
+        if (site == this.$app.origSite)
+          return;
+
+        passwords.addAlias(this.$app.origSite, site)
+          .then(() => passwords.getPasswords(this.$app.origSite))
+          .then(([origSite, site, pwdList]) =>
+          {
+            this.$app.origSite = origSite;
+            this.$app.site = site;
+            this.$app.pwdList = pwdList;
+          })
+          .catch(this.$app.showUnknownError);
+      };
+      this.modal = "site-selection";
     },
     removeAlias()
     {
