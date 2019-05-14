@@ -30,9 +30,7 @@
     "stylelint": "^9.5.0",
     "stylelint-config-standard": "^18.2.0",
     "text-encoding": "^0.7.0",
-    "vue": "^2.6.10",
     "vue-loader": "^15.7.0",
-    "vue-router": "^3.0.6",
     "vue-template-compiler": "^2.6.10",
     "webpack-merge": "^4.2.1",
     "webpack-stream": "~5.0.0"

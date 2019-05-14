@@ -30,9 +30,6 @@ const webpackBaseConfig = {
   optimization: {
     minimize: false
   },
-  performance: {
-    hints: false
-  },
   node: {
     process: false,
     global: false,
@@ -56,6 +53,8 @@ const webpackBaseConfig = {
   },
   plugins: [new VueLoaderPlugin()],
   externals: {
+    "vue": "Vue",
+    "vue-router": "VueRouter",
     "jsqr": "JSQR",
     "zxcvbn": "zxcvbn",
     "formatter": "Formatter"
