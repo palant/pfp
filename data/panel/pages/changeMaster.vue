@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <validated-form id="change-master" class="page" @validated="submit" @keydown.native.escape.prevent="$router.push('/enter-master')">
+  <validated-form id="change-master" class="page" @validated="submit" @keydown.native.escape.prevent="hasPassword && $router.push('/enter-master')">
     <div>
       <template v-if="!hasPassword">
         {{ $t("new_master_message") }}
