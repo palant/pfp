@@ -31,6 +31,12 @@ export default {
       required: true
     }
   },
+  data()
+  {
+    return {
+      url: "#"
+    };
+  },
   mounted()
   {
     ui.getLink({
