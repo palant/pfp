@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <div class="page">
+  <div class="page" @keydown.escape.prevent="lockPasswords">
     <div id="password-list-header">
       <label for="password-list-site">{{ $t("site") }}</label>
       <div id="password-list-site-container">
