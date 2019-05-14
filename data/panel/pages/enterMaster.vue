@@ -30,7 +30,7 @@
 
 import {masterPassword, passwords} from "../../proxy";
 import {app, showUnknownError} from "../App.vue";
-let {validateMasterPassword} = require("./changeMaster.vue");
+import {validateMasterPassword} from "./changeMaster.vue";
 
 export default {
   data()
