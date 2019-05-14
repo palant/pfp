@@ -20,7 +20,7 @@
 <script>
 "use strict";
 
-import {JSQR} from "../jsqr-1.0.2";
+import JSQR from "jsqr";
 
 export default {
   name: "QRCode",

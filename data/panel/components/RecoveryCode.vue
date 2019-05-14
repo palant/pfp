@@ -25,7 +25,7 @@
 "use strict";
 
 import {recoveryCodes} from "../../proxy";
-import Formatter from "../formatter";
+import Formatter from "formatter";
 import {showUnknownError} from "../App.vue";
 
 export default {

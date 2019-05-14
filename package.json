@@ -20,7 +20,6 @@
     "gulp-sass": "^4.0.2",
     "gulp-stylelint": "^7.0.0",
     "gulp-zip": "^4.2.0",
-    "imports-loader": "^0.7.1",
     "memory-fs": "^0.4.1",
     "merge-stream": "^1.0.0",
     "node-rsa": "^0.3.2",
@@ -35,6 +34,7 @@
     "vue-loader": "^15.7.0",
     "vue-router": "^3.0.6",
     "vue-template-compiler": "^2.6.10",
+    "webpack-merge": "^4.2.1",
     "webpack-stream": "~5.0.0"
   },
   "dependencies": {

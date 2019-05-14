@@ -17,7 +17,7 @@
 <script>
 "use strict";
 
-import zxcvbn from "../zxcvbn-4.4.2";
+import zxcvbn from "zxcvbn";
 
 export default {
   name: "PasswordScore",

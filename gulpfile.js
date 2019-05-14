@@ -19,17 +19,59 @@ const stylelint = require("gulp-stylelint");
 const merge = require("merge-stream");
 const request = require("request");
 const zip = require("gulp-zip");
-const webpack = require("webpack-stream");
+const webpackStream = require("webpack-stream");
+const mergeConfig = require("webpack-merge");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 const utils = require("./gulp-utils");
+
+const webpackBaseConfig = {
+  mode: "production",
+  optimization: {
+    minimize: false
+  },
+  performance: {
+    hints: false
+  },
+  node: {
+    process: false,
+    global: false,
+    setImmediate: false
+  },
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        use: {
+          loader: "vue-loader",
+          options: {
+            transformAssetUrls: {img: []},
+            compilerOptions: {
+              whitespace: "condense"
+            }
+          }
+        }
+      }
+    ]
+  },
+  plugins: [new VueLoaderPlugin()],
+  externals: {
+    "jsqr": "JSQR",
+    "zxcvbn": "zxcvbn",
+    "formatter": "Formatter"
+  }
+};
+
+function webpack(config)
+{
+  return webpackStream(mergeConfig(webpackBaseConfig, config));
+}
 
 gulp.task("eslint", function()
 {
   return gulp.src(["*.js", "data/**/*.js", "**/*.vue", "lib/**/*.js",
                    "test/**/*.js", "test-lib/**/*.js", "web/**/*.js",
-                   "!data/panel/zxcvbn-*.js", "!data/panel/jsqr-*.js",
-                   "!data/panel/formatter.js"])
+                   "!data/third-party/**"])
              .pipe(eslint())
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());
@@ -77,10 +119,6 @@ function buildWorkers(targetdir)
             filename: "pbkdf2.js",
             pathinfo: true
           },
-          mode: "production",
-          optimization: {
-            minimize: false
-          },
           resolve: resolveConfig
         }))
         .pipe(gulp.dest(`${targetdir}`)),
@@ -89,15 +127,6 @@ function buildWorkers(targetdir)
           output: {
             filename: "scrypt.js",
             pathinfo: true
-          },
-          mode: "production",
-          optimization: {
-            minimize: false
-          },
-          node: {
-            process: false,
-            global: false,
-            setImmediate: false
           },
           resolve: resolveConfig
         }))
@@ -112,15 +141,13 @@ function buildCommon(targetdir)
         .pipe(gulp.dest(`${targetdir}`)),
     gulp.src(["data/**/*.html", "data/**/*.png", "data/**/*.svg"])
         .pipe(gulp.dest(`${targetdir}/data`)),
+    gulp.src("data/third-party/**")
+        .pipe(gulp.dest(`${targetdir}/data/third-party`)),
     gulp.src(["data/fillIn.js"])
         .pipe(webpack({
           output: {
             filename: "fillIn.js",
             pathinfo: true
-          },
-          mode: "production",
-          optimization: {
-            minimize: false
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data`)),
@@ -130,35 +157,7 @@ function buildCommon(targetdir)
             filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
-          },
-          mode: "production",
-          optimization: {
-            minimize: false
-          },
-          performance: {
-            hints: false
-          },
-          module: {
-            rules: [
-              {
-                test: /\/jsqr-.*?\.js$/,
-                use: "imports-loader?window=>exports"
-              },
-              {
-                test: /\.vue$/,
-                use: {
-                  loader: "vue-loader",
-                  options: {
-                    transformAssetUrls: {img: []},
-                    compilerOptions: {
-                      whitespace: "condense"
-                    }
-                  }
-                }
-              }
-            ]
-          },
-          plugins: [new VueLoaderPlugin()]
+          }
         }))
         .pipe(gulp.dest(`${targetdir}/data/panel`)),
     gulp.src(["data/platform.js", "data/allpasswords/main.js"])
@@ -167,10 +166,6 @@ function buildCommon(targetdir)
             filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
-          },
-          mode: "production",
-          optimization: {
-            minimize: false
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data/allpasswords`)),
@@ -180,10 +175,6 @@ function buildCommon(targetdir)
             filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
-          },
-          mode: "production",
-          optimization: {
-            minimize: false
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data/options`)),
@@ -199,10 +190,6 @@ function buildCommon(targetdir)
             filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
-          },
-          mode: "production",
-          optimization: {
-            minimize: false
           }
         }))
         .pipe(gulp.dest(`${targetdir}`)),
@@ -281,6 +268,8 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
         .pipe(gulp.dest(`${targetdir}`)),
     gulp.src(["data/**/*.html", "data/**/*.png", "data/**/*.svg", "!data/options/options.html"])
         .pipe(gulp.dest(`${targetdir}`)),
+    gulp.src("data/third-party/**")
+        .pipe(gulp.dest(`${targetdir}/third-party`)),
     gulp.src(["data/platform.js", "data/panel/main.js"])
         .pipe(webpack({
           output: {
@@ -288,38 +277,14 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
             pathinfo: true,
             library: "__webpack_require__"
           },
-          mode: "production",
-          optimization: {
-            minimize: false
-          },
-          performance: {
-            hints: false
-          },
           module: {
             rules: [
-              {
-                test: /\/jsqr-.*?\.js$/,
-                use: "imports-loader?window=>exports"
-              },
-              {
-                test: /\.vue$/,
-                use: {
-                  loader: "vue-loader",
-                  options: {
-                    transformAssetUrls: {img: []},
-                    compilerOptions: {
-                      whitespace: "condense"
-                    }
-                  }
-                }
-              },
               {
                 test: /\.properties$/,
                 use: path.resolve(__dirname, "localeLoader.js")
               },
               {
                 test: /\.js$/,
-                exclude: /\/(zxcvbn-.*|formatter)\.js$/,
                 use: {
                   loader: "babel-loader",
                   options: {
@@ -329,7 +294,6 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
               }
             ]
           },
-          plugins: [new VueLoaderPlugin()],
           resolve: {
             alias: {
               "./browserAPI$": path.resolve(__dirname, "web", "data", "browserAPI.js"),
@@ -345,10 +309,6 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
             filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
-          },
-          mode: "production",
-          optimization: {
-            minimize: false
           },
           module: {
             rules: [
@@ -386,10 +346,6 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
             pathinfo: true,
             library: "__webpack_require__"
           },
-          mode: "production",
-          optimization: {
-            minimize: false
-          },
           module: {
             rules: [
               {
@@ -421,10 +377,6 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
             filename: "index/index.js",
             pathinfo: true,
             library: "__webpack_require__"
-          },
-          mode: "production",
-          optimization: {
-            minimize: false
           },
           module: {
             rules: [
