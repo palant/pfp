@@ -10,7 +10,7 @@
 
 let clipboardDummy = null;
 
-exports.set = function(data)
+export function set(data)
 {
   if (!clipboardDummy)
   {
@@ -25,4 +25,4 @@ exports.set = function(data)
   clipboardDummy.value = data;
   clipboardDummy.select();
   document.execCommand("copy", false, null);
-};
+}

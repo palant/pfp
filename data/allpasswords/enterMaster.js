@@ -6,16 +6,15 @@
 
 "use strict";
 
-let {i18n} = require("../browserAPI");
-let {$, showError} = require("./utils");
-let modal = require("./modal");
-let proxy = require("../proxy");
-let {masterPassword} = proxy;
+import {i18n} from "../browserAPI";
+import {$, showError} from "./utils";
+import {show as showModal, hide as hideModal, active as activeModal} from "./modal";
+import {setErrorHandler, masterPassword} from "../proxy";
 
 let currentAction = null;
 let previousModal = null;
 
-function enterMaster(warning, noValidate)
+export function enterMaster(warning, noValidate)
 {
   let warningElement = $("master-password-warning");
   warningElement.hidden = !warning;
@@ -25,12 +24,11 @@ function enterMaster(warning, noValidate)
   return new Promise((resolve, reject) =>
   {
     currentAction = {resolve, reject, noValidate};
-    previousModal = modal.active();
-    modal.show("enter-master");
+    previousModal = activeModal();
+    showModal("enter-master");
     $("master-password").focus();
   });
 }
-exports.enterMaster = enterMaster;
 
 window.addEventListener("DOMContentLoaded", function()
 {
@@ -56,9 +54,9 @@ window.addEventListener("DOMContentLoaded", function()
     masterPassword.checkPassword(value).then(() =>
     {
       if (previousModal)
-        modal.show(previousModal);
+        showModal(previousModal);
       else
-        modal.hide();
+        hideModal();
       previousModal = null;
 
       currentAction.resolve(value);
@@ -75,7 +73,7 @@ window.addEventListener("DOMContentLoaded", function()
     if (!currentAction)
       return;
 
-    modal.hide();
+    hideModal();
     currentAction.reject("canceled");
     currentAction = null;
 
@@ -89,4 +87,4 @@ window.addEventListener("DOMContentLoaded", function()
   });
 });
 
-proxy.setErrorHandler("master_password_required", () => enterMaster());
+setErrorHandler("master_password_required", () => enterMaster());

@@ -6,15 +6,14 @@
 
 "use strict";
 
-let {i18n} = require("../browserAPI");
+import {i18n} from "../browserAPI";
 
-function $(id)
+export function $(id)
 {
   return document.getElementById(id);
 }
-exports.$ = $;
 
-function setCommandHandler(element, handler)
+export function setCommandHandler(element, handler)
 {
   if (typeof element == "string")
     element = $(element);
@@ -25,7 +24,6 @@ function setCommandHandler(element, handler)
   };
   element.addEventListener("click", wrapper);
 }
-exports.setCommandHandler = setCommandHandler;
 
 function localize(error)
 {
@@ -43,11 +41,10 @@ function localize(error)
   }
 }
 
-function showError(error)
+export function showError(error)
 {
   if (error == "canceled")
     return;
 
   alert(localize(error));
 }
-exports.showError = showError;

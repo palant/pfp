@@ -34,6 +34,7 @@
 <script>
 "use strict";
 
+import {set as clipboardSet} from "../../clipboard";
 import {passwords, passwordRetrieval} from "../../proxy";
 import GeneratedPassword from "./GeneratedPassword.vue";
 import NotesEditor from "./NotesEditor.vue";
@@ -125,7 +126,7 @@ export default {
 
       let doCopy = () =>
       {
-        require("../../clipboard").set(this.value);
+        clipboardSet(this.value);
         this.$parent.showPasswordMessage("password_copied_message");
       };
 

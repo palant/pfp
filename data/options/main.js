@@ -6,7 +6,7 @@
 
 "use strict";
 
-let {prefs} = require("../proxy");
+import {prefs} from "../proxy";
 
 function $(id)
 {

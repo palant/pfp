@@ -6,7 +6,7 @@
 
 "use strict";
 
-let browser = require("./browserAPI");
+import {i18n} from "./browserAPI";
 
 // i18n
 
@@ -17,6 +17,6 @@ window.addEventListener("DOMContentLoaded", function()
   {
     let element = elements[i];
     let id = element.getAttribute("data-l10n-id");
-    element.textContent = browser.i18n.getMessage(id);
+    element.textContent = i18n.getMessage(id);
   }
 });

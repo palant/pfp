@@ -6,9 +6,9 @@
 
 "use strict";
 
-let {$} = require("./utils");
+import {$} from "./utils";
 
-function show(id)
+export function show(id)
 {
   hide();
 
@@ -19,20 +19,17 @@ function show(id)
   element.setAttribute("active", "true");
   element.parentNode.hidden = false;
 }
-exports.show = show;
 
-function hide()
+export function hide()
 {
   let active = document.querySelector("#modalOverlay > [active='true']");
   if (active)
     active.removeAttribute("active");
   $("modalOverlay").hidden = true;
 }
-exports.hide = hide;
 
-function active()
+export function active()
 {
   let active = document.querySelector("#modalOverlay > [active='true']");
   return active ? active.id : null;
 }
-exports.active = active;

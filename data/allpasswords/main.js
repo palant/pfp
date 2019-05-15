@@ -6,13 +6,14 @@
 
 "use strict";
 
-let {i18n} = require("../browserAPI");
-let {getSiteDisplayName} = require("../common");
-let {enterMaster} = require("./enterMaster");
-let {$, setCommandHandler, showError} = require("./utils");
-let modal = require("./modal");
-let {passwords, passwordRetrieval, recoveryCodes} = require("../proxy");
-let {port} = require("../messaging");
+import {i18n} from "../browserAPI";
+import {getSiteDisplayName} from "../common";
+import {set as clipboardSet} from "../clipboard";
+import {enterMaster} from "./enterMaster";
+import {$, setCommandHandler, showError} from "./utils";
+import {show as showModal, hide as hideModal} from "./modal";
+import {passwords, passwordRetrieval, recoveryCodes} from "../proxy";
+import {port} from "../messaging";
 
 function copyToClipboard(passwordData, passwordInfo)
 {
@@ -20,7 +21,7 @@ function copyToClipboard(passwordData, passwordInfo)
   {
     let doCopy = () =>
     {
-      require("../clipboard").set(password);
+      clipboardSet(password);
       let message = passwordInfo.querySelector(".password-copied-message");
       message.hidden = false;
       setTimeout(() =>
@@ -115,15 +116,15 @@ function importDataFromFile(file)
 
 function doImport(data, masterPass)
 {
-  modal.show("in-progress");
+  showModal("in-progress");
   passwords.importPasswordData(data, masterPass).then(() =>
   {
-    modal.hide();
+    hideModal();
     alert(i18n.getMessage("allpasswords_import_success"));
     window.location.reload();
   }).catch(error =>
   {
-    modal.hide();
+    hideModal();
     if (error == "wrong_master_password")
     {
       enterMaster("allpasswords_import_with_master", true).then(newMaster =>
@@ -214,7 +215,7 @@ function goToSite(site, event)
   event.preventDefault();
   passwords.getPasswords(site).then(([origSite, site, pwdList]) =>
   {
-    require("../messaging").port.emit("forward-to-panel", {
+    port.emit("forward-to-panel", {
       name: "init",
       args: [{origSite, site, pwdList}]
     });
@@ -384,4 +385,4 @@ window.addEventListener("DOMContentLoaded", function()
 
 // Hack: expose __webpack_require__ for simpler debugging
 /* global __webpack_require__ */
-module.exports = __webpack_require__;
+export default __webpack_require__;

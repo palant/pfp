@@ -9,28 +9,34 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 
+import EnterMaster from "./pages/enterMaster.vue";
+import ChangeMaster from "./pages/changeMaster.vue";
+import Migration from "./pages/migration.vue";
+import PasswordList from "./pages/passwordList.vue";
+import Sync from "./pages/sync.vue";
+
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/enter-master",
-    component: require("./pages/enterMaster.vue").default
+    component: EnterMaster
   },
   {
     path: "/change-master",
-    component: require("./pages/changeMaster.vue").default
+    component: ChangeMaster
   },
   {
     path: "/migration",
-    component: require("./pages/migration.vue").default
+    component: Migration
   },
   {
     path: "/password-list",
-    component: require("./pages/passwordList.vue").default
+    component: PasswordList
   },
   {
     path: "/sync",
-    component: require("./pages/sync.vue").default
+    component: Sync
   }
 ];
 

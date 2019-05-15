@@ -6,13 +6,14 @@
 
 "use strict";
 
-function getSiteDisplayName(site)
+import {i18n} from "./browserAPI";
+
+export function getSiteDisplayName(site)
 {
   if (site == "pfp.invalid")
-    return require("./browserAPI").i18n.getMessage("no_site_placeholder");
+    return i18n.getMessage("no_site_placeholder");
   else if (site)
     return site;
   else
     return "???";
 }
-exports.getSiteDisplayName = getSiteDisplayName;

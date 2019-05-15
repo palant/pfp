@@ -33,6 +33,7 @@
 <script>
 "use strict";
 
+import {getSiteDisplayName} from "../common";
 import {port} from "../messaging";
 import Confirm from "./components/Confirm.vue";
 
@@ -76,7 +77,7 @@ export default {
   computed: {
     siteDisplayName()
     {
-      return require("../common").getSiteDisplayName(this.site);
+      return getSiteDisplayName(this.site);
     }
   },
   watch: {

@@ -6,14 +6,14 @@
 
 "use strict";
 
-const browser = require("./browserAPI");
+import {i18n} from "./browserAPI";
 
 export default {
   install: function(Vue)
   {
     Vue.prototype.$t = function(id, ...params)
     {
-      let message = browser.i18n.getMessage(id);
+      let message = i18n.getMessage(id);
       for (let i = 0; i < params.length; i++)
         message = message.replace(new RegExp(`\\{${i + 1}\\}`, "g"), params[i]);
       return message;

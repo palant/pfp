@@ -6,7 +6,7 @@
 
 "use strict";
 
-let {port} = require("./messaging");
+import {port} from "./messaging";
 
 let errorHandlers = new Map();
 let currentHandlers = new Map();
@@ -64,30 +64,33 @@ function Proxy(moduleName, methods)
   return proxy;
 }
 
-exports.setErrorHandler = (error, handler) => errorHandlers.set(error, handler);
+export function setErrorHandler(error, handler)
+{
+  errorHandlers.set(error, handler);
+}
 
-exports.passwords = Proxy("passwords", [
+export const passwords = Proxy("passwords", [
   "exportPasswordData", "importPasswordData", "getPasswords", "addAlias",
   "removeAlias", "addGenerated", "addStored", "removePassword", "getPassword",
   "setNotes", "getAllPasswords", "getAllSites", "isMigrating"
 ]);
 
-exports.masterPassword = Proxy("masterPassword", [
+export const masterPassword = Proxy("masterPassword", [
   "changePassword", "checkPassword", "forgetPassword"
 ]);
 
-exports.passwordRetrieval = Proxy("passwordRetrieval", [
+export const passwordRetrieval = Proxy("passwordRetrieval", [
   "fillIn", "copyToClipboard"
 ]);
 
-exports.prefs = Proxy("prefs", ["get", "set"]);
+export const prefs = Proxy("prefs", ["get", "set"]);
 
-exports.recoveryCodes = Proxy("recoveryCodes", [
+export const recoveryCodes = Proxy("recoveryCodes", [
   "getValidChars", "getCode", "formatCode", "isValid", "decodeCode"
 ]);
 
-exports.sync = Proxy("sync", [
+export const sync = Proxy("sync", [
   "authorize", "getManualAuthURL", "manualAuthorization", "disable", "sync"
 ]);
 
-exports.ui = Proxy("ui", ["showAllPasswords", "getLink", "openLink"]);
+export const ui = Proxy("ui", ["showAllPasswords", "getLink", "openLink"]);
