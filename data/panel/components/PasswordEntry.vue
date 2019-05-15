@@ -11,7 +11,7 @@
       <a v-if="!$isWebClient" href="#" class="to-document-link iconic-link" :title="$t('to_document')" @click.prevent="fillIn" />
       <a href="#" class="to-clipboard-link iconic-link" :title="$t('to_clipboard')" @click.prevent="copy" />
       <span class="user-name-container" :class="{'legacy-warning': password.type == 'generated'}" :title="tooltip" @click.self="upgradePassword">
-        <span class="user-name">{{ password.name }}</span>
+        <span>{{ password.name }}</span>
         <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
       </span>
     </div>

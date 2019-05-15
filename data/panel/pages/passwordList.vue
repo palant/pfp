@@ -16,14 +16,14 @@
           {{ $app.siteDisplayName }}
         </div>
       </div>
-      <span v-if="$app.origSite != $app.site" id="alias-container">
+      <span v-if="$app.origSite != $app.site" class="alias-container">
         {{ $t("alias_description", $app.origSite) }}
-        <a id="remove-alias" href="#" @click.prevent="removeAlias">
+        <a href="#" @click.prevent="removeAlias">
           {{ $t("remove_alias") }}
         </a>
       </span>
       <a v-else-if="$app.site && $app.site != 'pfp.invalid' && !$app.pwdList.length"
-         id="add-alias" href="#" @click.prevent="addAlias"
+         class="alias-container" href="#" @click.prevent="addAlias"
       >
         {{ $t("add_alias") }}
       </a>
@@ -75,7 +75,7 @@
           {{ $t("sync_setup") }}
         </template>
       </a>
-      <a id="lock-passwords" v-cancel href="#" @click.prevent="lockPasswords">
+      <a v-cancel href="#" @click.prevent="lockPasswords">
         {{ $t("lock_passwords") }}
       </a>
     </div>

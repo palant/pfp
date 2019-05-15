@@ -6,7 +6,7 @@
 
 <template>
   <modal-overlay v-if="message" @cancel="reject">
-    <div id="confirm-message">{{ message }}</div>
+    <div>{{ message }}</div>
     <div class="button-container">
       <button v-focus @click="accept">{{ $t("yes") }}</button>
       <button @click="reject">{{ $t("no") }}</button>

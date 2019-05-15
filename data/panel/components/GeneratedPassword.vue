@@ -7,7 +7,7 @@
 <template>
   <modal-overlay :stretch="true" @cancel="$emit('cancel')">
     <validated-form class="modal-form" @validated="submit" @reset.native="$emit('cancel')">
-      <div v-if="options.replacing" class="warning">{{ $t("replace_password_warning") }}</div>
+      <div v-if="options.replacing" class="warning replacing">{{ $t("replace_password_warning") }}</div>
 
       <label for="user-name" :class="{'block-start': options.replacing}">{{ $t("user_name") }}</label>
       <validated-input id="user-name" v-model.trim="name" v-focus v-bind="{readonly: options.replacing}" type="text" @validate="validateName" />
@@ -42,10 +42,10 @@
       <div v-if="charsets.error" class="error">{{ charsets.error }}</div>
 
       <label v-if="!options.replacing && !options.incRevision" class="block-start">
-        <input id="generate-legacy" v-model="legacy" type="checkbox">
+        <input v-model="legacy" type="checkbox">
         {{ $t("generate_legacy") }}
       </label>
-      <div v-if="legacy" class="warning">{{ $t("generate_legacy_warning") }}</div>
+      <div v-if="legacy" class="warning legacy">{{ $t("generate_legacy_warning") }}</div>
 
       <div class="button-container">
         <button type="submit">{{ $t("generate_password") }}</button>

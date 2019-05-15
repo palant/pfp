@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <validated-form id="change-master" class="page" @validated="submit">
+  <validated-form class="page" @validated="submit">
     <div>
       <template v-if="!hasPassword">
         {{ $t("new_master_message") }}

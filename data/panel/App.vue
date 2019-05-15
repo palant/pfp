@@ -5,12 +5,11 @@
  -->
 
 <template>
-  <div id="app">
+  <div>
     <confirm ref="confirm" />
 
     <div
       v-if="unknownError"
-      id="unknown-error"
       class="warning"
     >
       <span>{{ $t("unknown_error") }}</span>
@@ -23,7 +22,7 @@
       </a>
       <div
         v-else
-        id="unknown-error-details"
+        class="unknown-error-details"
       >{{ unknownError }}</div>
     </div>
 

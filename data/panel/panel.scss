@@ -73,7 +73,7 @@ a
   font-size: $font-size-small;
 }
 
-#unknown-error-details
+.unknown-error-details
 {
   font-size: $font-size-small;
   white-space: pre-wrap;
@@ -205,8 +205,7 @@ a
   @include margin-inline-end($inline-spacing);
 }
 
-#add-alias,
-#alias-container
+.alias-container
 {
   font-size: $font-size-small;
 }
@@ -345,8 +344,6 @@ a
   background-repeat: no-repeat;
 }
 
-#generate-password-site,
-#generate-password-user-name,
 .length-container,
 .charsets-container
 {
@@ -354,8 +351,8 @@ a
   justify-content: space-between;
 }
 
-#replace-password-warning,
-#generate-legacy-warning
+.warning.replacing,
+.warning.legacy
 {
   font-size: $font-size-small;
 }
