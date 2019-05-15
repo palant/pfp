@@ -22,8 +22,6 @@ $dialog-padding: 20px;
 
 $icon-size: 32px;
 $large-icon-size: 48px;
-$logo-size: 128px;
-$logo-spacing: 16px;
 
 @mixin padding-inline-start($length)
 {
@@ -75,16 +73,6 @@ $logo-spacing: 16px;
   {
     margin-left: $length;
   }
-}
-
-@mixin logo
-{
-  @include padding-inline-start($logo-size + 2 * $logo-spacing);
-  background-size: $logo-size;
-  background-repeat: no-repeat;
-  background-position: $logo-spacing $logo-spacing;
-  background-image: url(../images/icon.svg);
-  min-height: $logo-size + 2 * $logo-spacing;
 }
 
 body
