@@ -6,8 +6,8 @@
 
 "use strict";
 
-let locale = require("locale");
-let {EventTarget} = require("../eventTarget");
+import locale from "locale";
+import {EventTarget} from "../eventTarget";
 
 document.documentElement.classList.add("webclient");
 
@@ -29,72 +29,71 @@ function getPortId()
   });
 }
 
-module.exports = {
-  runtime: {
-    connect: function(params)
-    {
-      let id = null;
-      let queue = [];
+export const runtime = {
+  connect: function(params)
+  {
+    let id = null;
+    let queue = [];
 
-      let port = {
-        postMessage: payload =>
-        {
-          if (id === null)
-          {
-            queue.push(payload);
-            return;
-          }
-
-          parent.postMessage({
-            type: "message",
-            payload,
-            id,
-            target: "background"
-          }, targetOrigin);
-        },
-
-        disconnect: message =>
-        {
-          delete ports[id];
-          parent.postMessage({
-            type: "disconnect",
-            id,
-            target: "background"
-          }, targetOrigin);
-        },
-
-        onMessage: new EventTarget()
-      };
-
-      getPortId().then(response =>
+    let port = {
+      postMessage: payload =>
       {
-        id = response;
-        ports[id] = port;
+        if (id === null)
+        {
+          queue.push(payload);
+          return;
+        }
+
         parent.postMessage({
-          type: "connect",
-          name: params.name,
+          type: "message",
+          payload,
           id,
           target: "background"
         }, targetOrigin);
+      },
 
-        for (let payload of queue)
-          port.postMessage(payload);
-        queue = null;
-      });
+      disconnect: message =>
+      {
+        delete ports[id];
+        parent.postMessage({
+          type: "disconnect",
+          id,
+          target: "background"
+        }, targetOrigin);
+      },
 
-      return port;
-    },
+      onMessage: new EventTarget()
+    };
 
-    getBackgroundPage: function()
+    getPortId().then(response =>
     {
-      return Promise.reject(new Error("Not implemented"));
-    }
+      id = response;
+      ports[id] = port;
+      parent.postMessage({
+        type: "connect",
+        name: params.name,
+        id,
+        target: "background"
+      }, targetOrigin);
+
+      for (let payload of queue)
+        port.postMessage(payload);
+      queue = null;
+    });
+
+    return port;
   },
-  i18n: {
-    getMessage: function(id)
-    {
-      return locale[id];
-    }
+
+  getBackgroundPage: function()
+  {
+    return Promise.reject(new Error("Not implemented"));
+  }
+};
+
+export const i18n = {
+  getMessage: function(id)
+  {
+    return locale[id];
   }
 };
 

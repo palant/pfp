@@ -6,7 +6,7 @@
 
 "use strict";
 
-function EventTarget()
+export function EventTarget()
 {
   this._listeners = [];
 }
@@ -30,5 +30,3 @@ EventTarget.prototype =
       listener(...args);
   }
 };
-
-exports.EventTarget = EventTarget;

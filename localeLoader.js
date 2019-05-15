@@ -9,5 +9,5 @@
 module.exports = function(source)
 {
   let data = require("properties-parser").parse(source);
-  return "module.exports = " + JSON.stringify(data) + ";";
+  return "export default " + JSON.stringify(data) + ";";
 };
