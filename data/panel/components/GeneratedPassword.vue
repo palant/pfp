@@ -31,7 +31,7 @@
 
       <label class="block-start" for="charset-lower">{{ $t("allowed_characters") }}</label>
       <div class="charsets-container">
-        <label><input v-model="lower" type="checkbox">abc</label>
+        <label><input id="charset-lower" v-model="lower" type="checkbox">abc</label>
         <label><input v-model="upper" type="checkbox">XYZ</label>
         <label><input v-model="number" type="checkbox">789</label>
         <label><input v-model="symbol" type="checkbox">+^;</label>

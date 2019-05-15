@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <validated-form id="enter-master" class="page" @validated="submit">
+  <validated-form class="page enter-master" @validated="submit">
     <label for="master-password">{{ $t("master_password") }}</label>
     <validated-input id="master-password" ref="masterPassword"
                      v-model="masterPassword" v-focus

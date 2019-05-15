@@ -79,7 +79,7 @@ a
   white-space: pre-wrap;
 }
 
-#password-score
+.password-score
 {
   display: flex;
   flex-direction: row;
@@ -94,57 +94,57 @@ a
   }
 }
 
-#password-score[data-score="0"]
+.password-score[data-score="0"]
 {
-  #password-score-0
+  .password-score-0
   {
     background-color: #f00;
   }
 }
 
-#password-score[data-score="1"]
+.password-score[data-score="1"]
 {
-  #password-score-0,
-  #password-score-1
+  .password-score-0,
+  .password-score-1
   {
     background-color: #f80;
   }
 }
 
-#password-score[data-score="2"]
+.password-score[data-score="2"]
 {
-  #password-score-0,
-  #password-score-1,
-  #password-score-2
+  .password-score-0,
+  .password-score-1,
+  .password-score-2
   {
     background-color: #ee0;
   }
 }
 
-#password-score[data-score="3"]
+.password-score[data-score="3"]
 {
-  #password-score-0,
-  #password-score-1,
-  #password-score-2,
-  #password-score-3
+  .password-score-0,
+  .password-score-1,
+  .password-score-2,
+  .password-score-3
   {
     background-color: #cf0;
   }
 }
 
-#password-score[data-score="4"]
+.password-score[data-score="4"]
 {
-  #password-score-0,
-  #password-score-1,
-  #password-score-2,
-  #password-score-3,
-  #password-score-4
+  .password-score-0,
+  .password-score-1,
+  .password-score-2,
+  .password-score-3,
+  .password-score-4
   {
     background-color: #0f0;
   }
 }
 
-#enter-master
+.enter-master
 {
   @include logo;
 }
@@ -178,12 +178,12 @@ a
   background-image: url(../images/circles.svg);
 }
 
-#password-list-header
+.password-list-header
 {
   margin-bottom: $block-spacing;
 }
 
-#password-list-site-container
+.password-list-site-container
 {
   display: flex;
   flex-direction: row;
@@ -195,7 +195,7 @@ a
   flex-grow: 1;
 }
 
-#select-site
+.select-site
 {
   min-width: $icon-size;
   min-height: $icon-size;
@@ -210,7 +210,7 @@ a
   font-size: $font-size-small;
 }
 
-#password-list-container
+.password-list-container
 {
   display: flex;
   flex-direction: column;
@@ -334,8 +334,7 @@ a
   }
 }
 
-#generate-password-link,
-#stored-password-link
+.add-password-link
 {
   min-height: $icon-size;
   @include padding-inline-start($icon-size + $inline-spacing);
@@ -374,7 +373,7 @@ a
   min-width: 3ch;
 }
 
-#site-autocomplete
+.site-autocomplete
 {
   border: $menu-border-width solid $text-color;
   padding: $block-padding;

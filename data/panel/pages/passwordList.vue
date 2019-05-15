@@ -6,10 +6,10 @@
 
 <template>
   <div class="page">
-    <div id="password-list-header">
+    <div class="password-list-header">
       <label for="password-list-site">{{ $t("site") }}</label>
-      <div id="password-list-site-container">
-        <a id="select-site" v-focus href="#" :title="$t('select_site_label')"
+      <div class="password-list-site-container">
+        <a v-focus class="select-site" href="#" :title="$t('select_site_label')"
            @click.prevent="selectSite"
         />
         <div id="password-list-site" :class="{ 'special-site': $app.site != $app.siteDisplayName }">
@@ -46,19 +46,19 @@
 
     <div class="block-start">{{ $t("passwords_label") }}</div>
     <div v-if="!$app.pwdList.length">{{ $t("no_passwords_message") }}</div>
-    <div v-else id="password-list-container">
+    <div v-else class="password-list-container">
       <password-entry v-for="password in $app.pwdList"
                       :key="password.name + '\0' + password.revision"
                       :password="password"
       />
     </div>
 
-    <a v-if="$app.site" id="generate-password-link" href="#" @click.prevent="modal = 'generated'">
+    <a v-if="$app.site" class="add-password-link" href="#" @click.prevent="modal = 'generated'">
       {{ $t("generate_password_link") }}
     </a>
     <generated-password v-if="modal == 'generated'" @cancel="modal = null" />
 
-    <a v-if="$app.site" id="stored-password-link" href="#" @click.prevent="modal = 'stored'">
+    <a v-if="$app.site" class="add-password-link" href="#" @click.prevent="modal = 'stored'">
       {{ $t("stored_password_link") }}
     </a>
     <stored-password v-if="modal == 'stored'" @cancel="modal = null" />

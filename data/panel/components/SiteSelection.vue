@@ -14,7 +14,7 @@
              @keydown.arrow-up.prevent="activeIndex = Math.max(activeIndex - 1, -1)"
              @keydown.enter="enter"
       >
-      <div id="site-autocomplete">
+      <div class="site-autocomplete">
         <div v-for="(site, index) in sites" :key="site.name" v-scroll-active
              :class="{
                'site-entry': true,

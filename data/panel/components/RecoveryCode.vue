@@ -6,7 +6,7 @@
 
 <template>
   <form class="modal-form">
-    <label class="block-start" for="recovery-code-value">{{ $t("recovery_code") }}</label>
+    <label class="block-start" for="currentLine">{{ $t("recovery_code") }}</label>
     <div class="recovery-code-accepted">
       <div v-for="(line, index) in accepted" :key="line">
         {{ line }}
@@ -16,7 +16,7 @@
         />
       </div>
     </div>
-    <input ref="currentLine" v-focus type="text">
+    <input id="currentLine" ref="currentLine" v-focus type="text">
     <div v-if="currentError" class="error">{{ currentError }}</div>
   </form>
 </template>

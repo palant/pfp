@@ -5,12 +5,12 @@
  -->
 
 <template>
-  <div id="password-score" :data-score="value">
-    <div id="password-score-0" />
-    <div id="password-score-1" />
-    <div id="password-score-2" />
-    <div id="password-score-3" />
-    <div id="password-score-4" />
+  <div class="password-score" :data-score="value">
+    <div class="password-score-0" />
+    <div class="password-score-1" />
+    <div class="password-score-2" />
+    <div class="password-score-3" />
+    <div class="password-score-4" />
   </div>
 </template>
 
