@@ -234,7 +234,7 @@ exports.runTests = function()
   let nodeunit = require("sandboxed-module").require("nodeunit", {
     sourceTransformers: {rewriteRequires},
     globals: {
-      TextEncoder, TextDecoder, crypto, atob, btoa, URL,
+      console, process, Buffer, TextEncoder, TextDecoder, crypto, atob, btoa, URL,
       Worker: FakeWorker,
       navigator: {
         onLine: true
