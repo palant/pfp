@@ -39,6 +39,7 @@
 import {passwords} from "../../proxy";
 
 export default {
+  name: "Migration",
   data()
   {
     return {

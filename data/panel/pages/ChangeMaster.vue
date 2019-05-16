@@ -5,7 +5,9 @@
  -->
 
 <template>
-  <validated-form class="page" @validated="submit">
+  <validated-form class="page" @validated="submit"
+                  @reset.native.prevent="hasPassword && ($app.resettingMaster = false)"
+  >
     <div>
       <template v-if="!hasPassword">
         {{ $t("new_master_message") }}
@@ -36,7 +38,7 @@
     </div>
     <div class="button-container">
       <button type="submit">{{ $t("change_master_submit") }}</button>
-      <router-link v-if="hasPassword" v-cancel tag="button" to="/enter-master">{{ $t("cancel") }}</router-link>
+      <button v-if="hasPassword" v-cancel type="reset">{{ $t("cancel") }}</button>
     </div>
   </validated-form>
 </template>
@@ -54,6 +56,7 @@ export function validateMasterPassword(val)
 }
 
 export default {
+  name: "ChangeMaster",
   components: {
     "password-score": PasswordScore
   },
@@ -87,6 +90,7 @@ export default {
               this.$app.site = site;
               this.$app.pwdList = pwdList;
               this.$app.masterPasswordState = "known";
+              this.$app.resettingMaster = false;
             })
             .catch(this.$app.showUnknownError);
         }

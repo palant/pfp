@@ -93,6 +93,7 @@ import SiteSelection from "../components/SiteSelection.vue";
 import StoredPassword from "../components/StoredPassword.vue";
 
 export default {
+  name: "PasswordList",
   components: {
     "generated-password": GeneratedPassword,
     "password-entry": PasswordEntry,
@@ -181,7 +182,7 @@ export default {
     },
     showSync()
     {
-      this.$router.push("/sync");
+      this.$app.currentPage = "sync";
     },
     lockPasswords()
     {

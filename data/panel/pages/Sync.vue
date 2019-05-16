@@ -33,7 +33,7 @@
       </div>
       <div class="button-container">
         <button @click="disableSync">{{ $t("sync_disable") }}</button>
-        <button v-cancel @click="$router.back()">{{ $t("cancel") }}</button>
+        <button v-cancel @click="$app.currentPage = 'password-list'">{{ $t("cancel") }}</button>
       </div>
     </template>
     <template v-else>
@@ -61,7 +61,7 @@
       <div class="sync-explanation">{{ $t("sync_no_account_explanation") }}</div>
 
       <div class="button-container">
-        <button v-cancel @click="$router.back()">{{ $t("cancel") }}</button>
+        <button v-cancel @click="$app.currentPage = 'password-list'">{{ $t("cancel") }}</button>
       </div>
     </template>
 
@@ -76,6 +76,7 @@ import {sync} from "../../proxy";
 import ManualAuth from "../components/ManualAuth.vue";
 
 export default {
+  name: "Sync",
   components: {
     "manual-auth": ManualAuth
   },
@@ -147,7 +148,7 @@ export default {
         {
           sync.disable().then(() =>
           {
-            this.$router.back();
+            this.$app.currentPage = "password-list";
           });
         }
       });

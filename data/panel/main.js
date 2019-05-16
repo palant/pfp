@@ -7,11 +7,9 @@
 "use strict";
 
 import Vue from "vue";
-import VueRouter from "vue-router";
 
 import I18n from "../i18n";
 import App from "./App.vue";
-import router from "./router";
 import ExternalLink from "./components/ExternalLink.vue";
 import ModalOverlay from "./components/ModalOverlay.vue";
 import ValidatedForm from "./components/ValidatedForm.vue";
@@ -67,12 +65,16 @@ Vue.directive("scroll-active", {
   }
 });
 
-Object.defineProperty(Vue.prototype, "$app", {
-  get()
+Vue.mixin({
+  beforeCreate()
   {
-    return this.$root.$refs.app;
+    if (this.$options.name == "App")
+      this.$app = this;
+    else if (this.$parent)
+      this.$app = this.$parent.$app;
   }
 });
+
 Vue.prototype.$isWebClient = document.documentElement.classList.contains("webclient");
 
 function init()
@@ -81,7 +83,6 @@ function init()
 
   new Vue({
     el: "#app",
-    router,
     render: createElement => createElement(App, {ref: "app"})
   });
 }

@@ -18,9 +18,9 @@
       <button>{{ $t("enter_master_submit") }}</button>
     </div>
     <div class="link-container">
-      <router-link to="/change-master">
+      <a href="#" @click.prevent="$app.resettingMaster = true">
         {{ $t("reset_master_link") }}
-      </router-link>
+      </a>
     </div>
   </validated-form>
 </template>
@@ -29,9 +29,10 @@
 "use strict";
 
 import {masterPassword, passwords} from "../../proxy";
-import {validateMasterPassword} from "./changeMaster.vue";
+import {validateMasterPassword} from "./ChangeMaster.vue";
 
 export default {
+  name: "EnterMaster",
   data()
   {
     return {

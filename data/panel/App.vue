@@ -8,25 +8,21 @@
   <div>
     <confirm ref="confirm" />
 
-    <div
-      v-if="unknownError"
-      class="warning"
-    >
+    <div v-if="unknownError" class="warning">
       <span>{{ $t("unknown_error") }}</span>
-      <a
-        v-if="!unknownErrorDetails"
-        href="#"
-        @click.prevent="unknownErrorDetails = true"
-      >
+      <a v-if="!unknownErrorDetails" href="#" @click.prevent="unknownErrorDetails = true">
         {{ $t("unknown_error_more") }}
       </a>
-      <div
-        v-else
-        class="unknown-error-details"
-      >{{ unknownError }}</div>
+      <div v-else class="unknown-error-details">{{ unknownError }}</div>
     </div>
 
-    <router-view />
+    <change-master v-if="masterPasswordState == 'unset' || (masterPasswordState == 'set' && resettingMaster)" />
+    <enter-master v-else-if="masterPasswordState == 'set'" />
+    <migration v-else-if="masterPasswordState == 'migrating'" />
+    <template v-else-if="masterPasswordState == 'known'">
+      <password-list v-if="currentPage == 'password-list'" />
+      <sync v-else-if="currentPage == 'sync'" />
+    </template>
   </div>
 </template>
 
@@ -35,14 +31,12 @@
 
 import {getSiteDisplayName} from "../common";
 import {port} from "../messaging";
+import EnterMaster from "./pages/EnterMaster.vue";
+import ChangeMaster from "./pages/ChangeMaster.vue";
+import Migration from "./pages/Migration.vue";
+import PasswordList from "./pages/PasswordList.vue";
+import Sync from "./pages/Sync.vue";
 import Confirm from "./components/Confirm.vue";
-
-const stateToRoute = {
-  "unset": ["/change-master"],
-  "set": ["/enter-master", "/change-master"],
-  "migrating": ["/migration"],
-  "known": ["/password-list", "/generate-password", "/stored-password", "/recovery-code", "/qrcode", "/sync-setup", "/sync-state", "/confirm"]
-};
 
 let initialData = {
   site: null,
@@ -65,27 +59,26 @@ port.on("init", state =>
 export default {
   name: "App",
   components: {
-    confirm: Confirm
+    "change-master": ChangeMaster,
+    "enter-master": EnterMaster,
+    "migration": Migration,
+    "password-list": PasswordList,
+    "sync": Sync,
+    "confirm": Confirm
   },
   data()
   {
     return Object.assign({
       unknownError: null,
-      unknownErrorDetails: false
+      unknownErrorDetails: false,
+      resettingMaster: false,
+      currentPage: "password-list"
     }, initialData);
   },
   computed: {
     siteDisplayName()
     {
       return getSiteDisplayName(this.site);
-    }
-  },
-  watch: {
-    masterPasswordState: function()
-    {
-      let routes = stateToRoute[this.masterPasswordState];
-      if (routes.indexOf(this.$router.currentRoute.path) < 0)
-        this.$router.push(routes[0]);
     }
   },
   created: function()
