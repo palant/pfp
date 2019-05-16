@@ -287,7 +287,7 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
                 use: {
                   loader: "babel-loader",
                   options: {
-                    presets: ["babel-preset-env"]
+                    presets: ["@babel/preset-env"]
                   }
                 }
               }
@@ -320,7 +320,7 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
                 use: {
                   loader: "babel-loader",
                   options: {
-                    presets: ["babel-preset-env"]
+                    presets: ["@babel/preset-env"]
                   }
                 }
               }
@@ -356,7 +356,7 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
                 use: {
                   loader: "babel-loader",
                   options: {
-                    presets: ["babel-preset-env"]
+                    presets: ["@babel/preset-env"]
                   }
                 }
               }
@@ -384,7 +384,7 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
                 use: {
                   loader: "babel-loader",
                   options: {
-                    presets: ["babel-preset-env"]
+                    presets: ["@babel/preset-env"]
                   }
                 }
               }
