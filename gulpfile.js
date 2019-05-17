@@ -400,18 +400,14 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
 gulp.task("crx", gulp.series("build-chrome", function buildCRX()
 {
   let manifest = require("./manifest.json");
-  let result = merge(
+  return merge(
     gulp.src([
       "build-chrome/**",
       "!build-chrome/manifest.json", "!build-chrome/data/reloader.js", "!build-chrome/random.json",
       "!build-chrome/**/.*", "!build-chrome/**/*.zip", "!build-chrome/**/*.crx"
     ]),
     gulp.src("build-chrome/manifest.json").pipe(utils.jsonModify(removeReloader))
-  ).pipe(zip("pfp-" + manifest.version + ".zip"));
-  let keyFile = utils.readArg("--private-key=");
-  if (keyFile)
-    result = result.pipe(utils.signCRX(keyFile));
-  return result.pipe(gulp.dest("build-chrome"));
+  ).pipe(zip("pfp-" + manifest.version + ".zip")).pipe(gulp.dest("build-chrome"));
 }));
 
 gulp.task("xpi", gulp.series("build-firefox", function buildXPI()

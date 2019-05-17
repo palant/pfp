@@ -27,11 +27,11 @@ The following command with produce a file with a name like `build-firefox/pfp-n.
 
 ### Chrome and Opera
 
-The following command with produce a file with a name like `build-chrome/pfp-n.n.n.crx`:
+The following command with produce a file with a name like `build-chrome/pfp-n.n.n.zip`:
 
-    gulp crx --private-key=key.pem
+    gulp crx
 
-You can also omit the `--private-key` parameter, an unsigned ZIP file will be created then which can be uploaded to Chrome Web Store or Opera Add-ons.
+This ZIP file can be uploaded to Chrome Web Store or Opera Add-ons and will be converted into a signed CRX there.
 
 ### Web client
 
