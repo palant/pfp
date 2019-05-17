@@ -69,32 +69,20 @@ function exportData()
 {
   passwords.exportPasswordData().then(data =>
   {
-    if (window.navigator.userAgent.indexOf(" Edge/") >= 0)
+    // See https://bugzil.la/1379960, in Firefox this will only work with a
+    // link inside a frame.
+    let frameDoc = $("exportDataFrame").contentDocument;
+    let link = frameDoc.body.lastChild;
+    if (!link || link.localName != "a")
     {
-      // Edge won't let extensions download blobs (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/9551771/)
-      // and it would ignore the file name anyway (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/6594876/).
-      // data: URIs don't work either (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/4282810/).
-      // Let the user copy the text manually, that's the only way.
-      if (confirm(i18n.getMessage("allpasswords_export_edge")))
-        document.body.textContent = data;
+      link = frameDoc.createElement("a");
+      frameDoc.body.appendChild(link);
     }
-    else
-    {
-      // See https://bugzil.la/1379960, in Firefox this will only work with a
-      // link inside a frame.
-      let frameDoc = $("exportDataFrame").contentDocument;
-      let link = frameDoc.body.lastChild;
-      if (!link || link.localName != "a")
-      {
-        link = frameDoc.createElement("a");
-        frameDoc.body.appendChild(link);
-      }
 
-      let blob = new Blob([data], {type: "application/json"});
-      link.href = URL.createObjectURL(blob);
-      link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
-      link.click();
-    }
+    let blob = new Blob([data], {type: "application/json"});
+    link.href = URL.createObjectURL(blob);
+    link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
+    link.click();
   }).catch(showError);
 }
 

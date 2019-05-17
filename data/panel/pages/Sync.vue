@@ -126,15 +126,7 @@ export default {
       if (/\s/.test(error))
         return error;
 
-      try
-      {
-        return this.$t(error) || error;
-      }
-      catch (e)
-      {
-        // Edge will throw for unknown messages
-        return error;
-      }
+      return this.$t(error) || error;
     },
     doSync()
     {

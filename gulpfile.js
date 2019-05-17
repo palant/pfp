@@ -17,7 +17,6 @@ const htmlhint = require("gulp-htmlhint");
 const sass = require("gulp-sass");
 const stylelint = require("gulp-stylelint");
 const merge = require("merge-stream");
-const request = require("request");
 const zip = require("gulp-zip");
 const webpackStream = require("webpack-stream");
 const mergeConfig = require("webpack-merge");
@@ -181,7 +180,7 @@ function buildCommon(targetdir)
     gulp.src("locale/**/*.properties")
         .pipe(utils.toChromeLocale())
         .pipe(gulp.dest(`${targetdir}/_locales`)),
-    gulp.src(["lib/platform.js", "lib/main.js"])
+    gulp.src("lib/main.js")
         .pipe(webpack({
           output: {
             filename: "index.js",
@@ -336,7 +335,7 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
     gulp.src(["data/**/*.scss", "!data/options/options.scss"])
         .pipe(sass())
         .pipe(gulp.dest(`${targetdir}`)),
-    gulp.src(["lib/platform.js", "lib/main.js"])
+    gulp.src("lib/main.js")
         .pipe(webpack({
           output: {
             filename: "index.js",
@@ -428,82 +427,6 @@ gulp.task("xpi", gulp.series("build-firefox", function buildXPI()
   ).pipe(zip("pfp-" + manifest.version + ".xpi")).pipe(gulp.dest("build-firefox"));
 }));
 
-gulp.task("build-edge", gulp.series("build-chrome", function buildEdge()
-{
-  let version = require("./manifest.json").version;
-  while (version.split(".").length < 4)
-    version += ".0";
-
-  return merge(
-    gulp.src([
-      "build-chrome/**",
-      "!build-chrome/manifest.json", "!build-chrome/data/reloader.js", "!build-chrome/random.json",
-      "!build-chrome/**/.*", "!build-chrome/**/*.zip", "!build-chrome/**/*.crx"
-    ]).pipe(gulp.dest("build-edge/extension/Extension")),
-    gulp.src("build-chrome/manifest.json")
-        .pipe(utils.jsonModify(removeReloader))
-        .pipe(utils.jsonModify(data =>
-        {
-          data.browser_specific_settings = {
-            edge: {
-              browser_action_next_to_addressbar: true
-            }
-          };
-        }))
-        .pipe(gulp.dest("build-edge/extension/Extension")),
-    gulp.src(["edge/**/*.xml", "edge/**/*.png"])
-        .pipe(utils.transform((filepath, contents) =>
-        {
-          return [filepath, contents.replace(/{{version}}/g, version)];
-        }), {files: ["appxmanifest.xml"]})
-        .pipe(gulp.dest("build-edge/extension")),
-    gulp.src("package.json")
-        .pipe(utils.jsonModify(data =>
-        {
-          return {
-            "DisplayName": data.title,
-            "_DisplayName.comment": "",
-            "Description": data.description,
-            "_Description.comment": ""
-          };
-        }, "resources.resjson"))
-        .pipe(gulp.dest("build-edge/extension/Resources/en-us"))
-  );
-}));
-
-gulp.task("appx", gulp.series("build-edge", function zipExtension()
-{
-  return gulp.src([
-    "build-edge/**",
-    "!build-edge/**/*.zip", "!build-edge/**/*.appx"
-  ]).pipe(zip("extension.zip")).pipe(gulp.dest("build-edge"));
-}, function buildAPPX(callback)
-{
-  const endpoint = "https://cloudappx.azurewebsites.net/v3/build";
-  let req = request.post({
-    url: endpoint,
-    encoding: null
-  }, (err, response, responseBody) =>
-  {
-    if (err)
-    {
-      callback(err);
-      return;
-    }
-
-    if (response.statusCode != 200)
-    {
-      callback(new Error(`Calling CloudAppX service failed: ${response.statusCode} ${response.statusMessage} (${responseBody})`));
-      return;
-    }
-
-    let manifest = require("./manifest.json");
-    fs.writeFile("build-edge/pfp-" + manifest.version  + ".appx", responseBody, callback);
-  });
-
-  req.form().append("xml", fs.createReadStream("build-edge/extension.zip"));
-}));
-
 gulp.task("web", gulp.series("build-web", function zipWeb()
 {
   let manifest = require("./manifest.json");
@@ -527,8 +450,8 @@ gulp.task("test", gulp.series("validate", "build-test", function doTest()
 
 gulp.task("clean", function()
 {
-  return del(["build-chrome", "build-firefox", "build-edge", "build-test", "build-web"]);
+  return del(["build-chrome", "build-firefox", "build-test", "build-web"]);
 });
 
-gulp.task("all", gulp.parallel("xpi", "crx", "appx", "web"));
+gulp.task("all", gulp.parallel("xpi", "crx", "web"));
 gulp.task("default", gulp.parallel("all"));

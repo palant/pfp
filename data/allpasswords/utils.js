@@ -30,15 +30,7 @@ function localize(error)
   if (/\s/.test(error))
     return error;
 
-  try
-  {
-    return i18n.getMessage(error) || error;
-  }
-  catch (e)
-  {
-    // Edge will throw for unknown messages
-    return error;
-  }
+  return i18n.getMessage(error) || error;
 }
 
 export function showError(error)
