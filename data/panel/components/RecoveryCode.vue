@@ -19,6 +19,7 @@
     <textarea id="recoveryInput" ref="recoveryInput" v-focus
               autocomplete="off" autocorrect="off" spellcheck="false"
               @input="processInput" @change="processInput"
+              @keydown.delete="onDelete" @keydown.backspace="onBackspace"
     />
     <div v-if="currentError" class="error">{{ currentError }}</div>
   </form>
@@ -70,8 +71,8 @@ export default {
       value = value.toUpperCase();
       value = value.replace(new RegExp(`[^${this.validChars}\0]`, "gi"), "");
       value = value.replace(/(?:\w\0*){23}\w/g, "$&\n");
-      value = value.replace(/(?:\w\0*){11}\w(?=[\w\0])/g, "$&:");
-      value = value.replace(/(?:\w\0*){3}\w(?=[\w\0])/g, "$&-");
+      value = value.replace(/(?:\w\0*){11}\w(?=\0*\w)/g, "$&:");
+      value = value.replace(/(?:\w\0*){3}\w(?=\0*\w)/g, "$&-");
       return value;
     },
     processInput()
@@ -98,7 +99,7 @@ export default {
         {
           if (result == "ok" || result == "unterminated")
           {
-            this.accepted = this.formatValue(code).trim().split("\n");
+            this.accepted = this.formatValue(code).trim().replace(/\0/g, "").split("\n");
             this.setValue([value.substr(index + 1), selectionDirection]);
             if (result == "ok")
             {
@@ -127,6 +128,24 @@ export default {
       {
         this.currentError = error;
       });
+    },
+    onDelete()
+    {
+      let input = this.$refs.recoveryInput;
+      if (input.selectionStart != input.selectionEnd)
+        return;
+
+      while (input.selectionStart < input.value.length - 1 && !/\w/.test(input.value[input.selectionStart]))
+        input.selectionStart++;
+    },
+    onBackspace()
+    {
+      let input = this.$refs.recoveryInput;
+      if (input.selectionStart != input.selectionEnd)
+        return;
+
+      while (input.selectionEnd > 0 && !/\w/.test(input.value[input.selectionEnd - 1]))
+        input.selectionEnd--;
     }
   }
 };
