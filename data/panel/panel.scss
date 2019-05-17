@@ -405,6 +405,11 @@ a
   background-image: url("../images/close-round.svg");
 }
 
+#recoveryInput
+{
+  min-height: 100px;
+}
+
 .qrcode-canvas-container
 {
   display: flex;

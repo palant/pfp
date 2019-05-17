@@ -53,11 +53,9 @@ const webpackBaseConfig = {
   },
   plugins: [new VueLoaderPlugin()],
   externals: {
-    "vue": "Vue",
-    "vue-router": "VueRouter",
-    "jsqr": "JSQR",
-    "zxcvbn": "zxcvbn",
-    "formatter": "Formatter"
+    vue: "Vue",
+    jsqr: "JSQR",
+    zxcvbn: "zxcvbn"
   }
 };
 
