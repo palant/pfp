@@ -59,6 +59,10 @@ export default {
       type: Object,
       required: true
     },
+    siteDisplayName: {
+      type: String,
+      required: true
+    },
     showNotes: {
       type: Boolean,
       required: true
@@ -156,7 +160,7 @@ export default {
     },
     removePassword()
     {
-      let message = this.$t("remove_password_confirmation", this.password.name, this.$app.siteDisplayName);
+      let message = this.$t("remove_password_confirmation", this.password.name, this.siteDisplayName);
       if (this.password.notes)
         message += " " + this.$t("remove_password_confirmation_notes", this.password.notes);
       if (confirm(message))

@@ -17,8 +17,8 @@
     </div>
 
     <password-info v-for="password in site.passwords" :key="password.name"
-                   :password="password" :show-notes="showNotes"
-                   :show-passwords="showPasswords"
+                   :password="password" :site-display-name="displayName"
+                   :show-notes="showNotes" :show-passwords="showPasswords"
                    @removed="removePassword(password)"
     />
   </div>
