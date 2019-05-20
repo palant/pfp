@@ -207,6 +207,8 @@ export default {
     {
       this.modal = null;
       let message = this.$t("remove_password_confirmation", this.password.name, this.$app.siteDisplayName);
+      if (this.password.notes)
+        message += " " + this.$t("remove_password_confirmation_notes", this.password.notes);
       this.$app.confirm(message).then(response =>
       {
         if (response)
