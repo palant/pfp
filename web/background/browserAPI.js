@@ -11,26 +11,10 @@ let {EventTarget} = require("../eventTarget");
 // Posting messages to proper origin isn't possible on file://
 let targetOrigin = location.protocol != "file:" ? location.origin : "*";
 
-let OrigWorker = window.Worker;
-window.Worker = function(url, options)
+function textToURL(text)
 {
-  function getURL(text)
-  {
-    return URL.createObjectURL(new Blob([text], {type: "text/javascript"}));
-  }
-
-  if (url == "../scrypt.js")
-  {
-    url = getURL(require("../../data/scrypt"));
-  }
-  else if (url == "../pbkdf2.js")
-  {
-    url = getURL(require("../../data/pbkdf2"));
-  }
-
-  return new OrigWorker(url, options);
-};
-window.Worker.prototype = OrigWorker.prototype;
+  return URL.createObjectURL(new Blob([text], {type: "text/javascript"}));
+}
 
 module.exports = {
   storage: {
@@ -96,7 +80,12 @@ module.exports = {
   runtime: {
     getURL: path =>
     {
-      return "../" + path.replace(/^data\//, "");
+      if (path == "worker/scrypt.js")
+        return textToURL(require("../../worker/scrypt.js"));
+      else if (path == "worker/pbkdf2.js")
+        return textToURL(require("../../worker/pbkdf2.js"));
+      else
+        return "../" + path.replace(/^ui\//, "");
     },
     onConnect: new EventTarget()
   }

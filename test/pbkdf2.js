@@ -6,7 +6,7 @@
 
 "use strict";
 
-let {pbkdf2} = require("../data/pbkdf2");
+let {pbkdf2} = require("../worker/pbkdf2");
 
 function compare(test, password, salt, iterations, length, expected)
 {

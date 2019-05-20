@@ -6,7 +6,7 @@
 
 "use strict";
 
-let scrypt = require("../data/scrypt");
+let scrypt = require("../worker/scrypt");
 
 function compare(test, password, salt, length, expected)
 {

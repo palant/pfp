@@ -176,7 +176,7 @@ function fillIn(wnd, name, password, noFocus)
   else if (!fillIn(window, name, password))
     result = "no_password_fields";
 
-  let {port} = require("./messaging");
+  let {port} = require("../ui/messaging");
   port.emit("done", {
     scriptID,
     result
