@@ -8,6 +8,12 @@
 
 import {i18n} from "./browserAPI";
 
+export function validateMasterPassword(val)
+{
+  if (val.value.length < 6)
+    val.error = this.$t("password_too_short");
+}
+
 export function getSiteDisplayName(site)
 {
   if (site == "pfp.invalid")

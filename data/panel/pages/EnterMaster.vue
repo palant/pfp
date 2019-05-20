@@ -7,8 +7,7 @@
 <template>
   <validated-form class="page" @validated="submit">
     <label for="master-password">{{ $t("master_password") }}</label>
-    <validated-input id="master-password" ref="masterPassword"
-                     v-model="masterPassword" v-focus
+    <validated-input id="master-password" v-model="masterPassword" v-focus
                      type="password" @validate="validateMasterPassword"
     />
     <div v-if="masterPassword.error" class="error">
@@ -29,7 +28,7 @@
 "use strict";
 
 import {masterPassword, passwords} from "../../proxy";
-import {validateMasterPassword} from "./ChangeMaster.vue";
+import {validateMasterPassword} from "../../common";
 
 export default {
   name: "EnterMaster",

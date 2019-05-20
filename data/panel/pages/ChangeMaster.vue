@@ -46,14 +46,9 @@
 <script>
 "use strict";
 
+import {validateMasterPassword} from "../../common";
 import {passwords, masterPassword} from "../../proxy";
 import PasswordScore from "../components/PasswordScore.vue";
-
-export function validateMasterPassword(val)
-{
-  if (val.value.length < 6)
-    val.error = this.$t("password_too_short");
-}
 
 export default {
   name: "ChangeMaster",

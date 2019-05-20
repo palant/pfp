@@ -6,8 +6,8 @@
 
 <template>
   <div class="modalOverlay" @click.self="$emit('cancel')">
-    <div ref="inner" class="modalOverlay-inner" :class="{stretch: stretch}">
-      <div class="modalOverlay-cancel-container">
+    <div ref="inner" class="modalOverlay-inner" :class="{stretch: stretch, cancelable: cancelable}">
+      <div v-if="cancelable" class="modalOverlay-cancel-container">
         <a ref="cancel" v-cancel href="#" class="modalOverlay-cancel" :title="$t('cancel')" @click.prevent="$emit('cancel')" />
       </div>
       <div>
@@ -24,6 +24,10 @@ let activeModal = null;
 export default {
   name: "ModalOverlay",
   props: {
+    cancelable: {
+      type: Boolean,
+      default: true
+    },
     focusCancel: {
       type: Boolean,
       default: false

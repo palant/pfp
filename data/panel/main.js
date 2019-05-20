@@ -83,7 +83,7 @@ function init()
 
   new Vue({
     el: "#app",
-    render: createElement => createElement(App, {ref: "app"})
+    render: createElement => createElement(App)
   });
 }
 window.addEventListener("load", init);

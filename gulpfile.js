@@ -147,7 +147,7 @@ function buildCommon(targetdir)
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data`)),
-    gulp.src(["data/platform.js", "data/panel/main.js"])
+    gulp.src("data/panel/main.js")
         .pipe(webpack({
           output: {
             filename: "index.js",
@@ -156,7 +156,7 @@ function buildCommon(targetdir)
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data/panel`)),
-    gulp.src(["data/platform.js", "data/allpasswords/main.js"])
+    gulp.src("data/allpasswords/main.js")
         .pipe(webpack({
           output: {
             filename: "index.js",
@@ -266,7 +266,7 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
         .pipe(gulp.dest(`${targetdir}`)),
     gulp.src("data/third-party/**")
         .pipe(gulp.dest(`${targetdir}/third-party`)),
-    gulp.src(["data/platform.js", "data/panel/main.js"])
+    gulp.src("data/panel/main.js")
         .pipe(webpack({
           output: {
             filename: "index.js",
@@ -299,7 +299,7 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
           }
         }))
         .pipe(gulp.dest(`${targetdir}/panel`)),
-    gulp.src(["data/platform.js", "data/allpasswords/main.js"])
+    gulp.src("data/allpasswords/main.js")
         .pipe(webpack({
           output: {
             filename: "index.js",

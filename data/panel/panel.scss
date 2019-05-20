@@ -6,8 +6,6 @@
 
 @import "../_shared.scss";
 
-$hover-background: #e2f4ff;
-
 $body-width: 600px;
 $body-padding: 10px;
 $menu-border-width: 1px;
@@ -417,12 +415,6 @@ a
   align-items: center;
 }
 
-.modal-form
-{
-  display: flex;
-  flex-direction: column;
-}
-
 #notes-textarea
 {
   min-height: 300px;
@@ -485,63 +477,4 @@ a
 .sync-error
 {
   margin-top: $block-spacing;
-}
-
-.modalOverlay
-{
-  display: flex;
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  padding: $dialog-padding;
-  z-index: 10000;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-.modalOverlay-inner
-{
-  margin: auto;
-  background-color: $background-color;
-  border: 1px solid black;
-  border-radius: $border-radius;
-
-  &.stretch
-  {
-    width: 100%;
-  }
-
-  & > :last-child
-  {
-    display: flex;
-    flex-direction: column;
-    padding: $dialog-padding;
-    padding-top: max($dialog-padding - $font-size-small - $border-radius, 0);
-  }
-}
-
-.modalOverlay-cancel-container
-{
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.modalOverlay-cancel
-{
-  margin: $border-radius;
-  $icon-size: $font-size-small;
-  min-width: $icon-size;
-  min-height: $icon-size;
-  background-size: $icon-size;
-  background-repeat: no-repeat;
-  background-image: url("../images/close-round.svg");
-
-  &:hover
-  {
-    background-color: $hover-background;
-  }
 }

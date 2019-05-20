@@ -37,6 +37,9 @@ export default {
   watch: {
     message()
     {
+      if (!this.message)
+        return;
+
       if (this.messages.hasOwnProperty(this.message))
       {
         if (this.resetTimeout)
