@@ -7,7 +7,7 @@
 <template>
   <modal-overlay :stretch="true" @cancel="$emit('cancel')">
     <validated-form class="modal-form" @validated="submit" @reset.native="$emit('cancel')">
-      <div class="warning" data-l10n-id="">{{ $t("stored_password_warning") }}</div>
+      <div class="warning">{{ $t("stored_password_warning") }}</div>
 
       <label class="block-start" for="user-name">{{ $t("user_name") }}</label>
       <validated-input id="user-name" v-model.trim="name" v-focus type="text" @validate="validateName" />

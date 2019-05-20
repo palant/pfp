@@ -165,7 +165,7 @@ function buildCommon(targetdir)
           }
         }))
         .pipe(gulp.dest(`${targetdir}/data/allpasswords`)),
-    gulp.src(["data/platform.js", "data/options/main.js"])
+    gulp.src("data/options/main.js")
         .pipe(webpack({
           output: {
             filename: "index.js",

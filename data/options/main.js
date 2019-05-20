@@ -6,32 +6,28 @@
 
 "use strict";
 
-import {prefs} from "../proxy";
+import Vue from "vue";
 
-function $(id)
-{
-  return document.getElementById(id);
-}
+import I18n from "../i18n";
+import App from "./App.vue";
 
-window.addEventListener("DOMContentLoaded", function()
-{
-  Promise.all([
-    prefs.get("autolock", true),
-    prefs.get("autolock_delay", 10)
-  ]).then(([autolock, autolock_delay]) =>
+Vue.directive("focus", {
+  inserted(element, binding)
   {
-    let autolockElement = $("autolock");
-    autolockElement.checked = autolock;
-    autolockElement.addEventListener("click", function()
-    {
-      prefs.set("autolock", autolockElement.checked);
-    });
-
-    let autolockDelayElement = $("autolock_delay");
-    autolockDelayElement.value = autolock_delay;
-    autolockDelayElement.addEventListener("input", function()
-    {
-      prefs.set("autolock_delay", autolockDelayElement.value);
-    });
-  });
+    if (typeof binding.value == "undefined" || binding.value)
+      element.focus();
+  }
 });
+
+Vue.use(I18n);
+
+function init()
+{
+  window.removeEventListener("load", init);
+
+  new Vue({
+    el: "#app",
+    render: createElement => createElement(App)
+  });
+}
+window.addEventListener("load", init);

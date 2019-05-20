@@ -10,23 +10,10 @@
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="options.css">
+    <script src="../third-party/vue-2.6.10.min.js"></script>
     <script src="index.js"></script>
   </head>
   <body>
-    <div class="setting">
-      <div class="setting-label">
-        <label for="autolock" data-l10n-id="autolock_title"></label>
-        <span class="description" data-l10n-id="autolock_description"></span>
-      </div>
-      <input type="checkbox" id="autolock">
-    </div>
-
-    <div class="setting">
-      <div class="setting-label">
-        <label for="autolock_delay" data-l10n-id="autolock_delay_title"></label>
-        <span class="description" data-l10n-id="autolock_delay_description"></span>
-      </div>
-      <input type="number" id="autolock_delay" min="0">
-    </div>
+    <div id="app"></div>
   </body>
 </html>
