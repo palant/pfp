@@ -34,6 +34,7 @@ let generated2 = {
   upper: true,
   number: false,
   symbol: true,
+  notes: "some notes",
   password: "$X*RR~V}?;FY[T|~"
 };
 
@@ -46,7 +47,8 @@ let stored1 = {
 let stored2 = {
   site: "example.com",
   name: "bar",
-  password: "foo"
+  password: "foo",
+  notes: "some more notes"
 };
 
 let stored3 = {
@@ -131,7 +133,8 @@ exports.testAddRemoveGenerated = function(test)
       lower: generated2.lower,
       upper: generated2.upper,
       number: generated2.number,
-      symbol: generated2.symbol
+      symbol: generated2.symbol,
+      notes: generated2.notes
     },
     {
       type: "generated",
@@ -181,7 +184,8 @@ exports.testAddRemoveGenerated = function(test)
       lower: generated2.lower,
       upper: generated2.upper,
       number: generated2.number,
-      symbol: generated2.symbol
+      symbol: generated2.symbol,
+      notes: generated2.notes
     }]);
 
     return passwords.removePassword(generated1);
@@ -232,7 +236,8 @@ exports.testAddRemoveStored = function(test)
       type: "stored",
       site: stored2.site,
       name: stored2.name,
-      password: stored2.password
+      password: stored2.password,
+      notes: stored2.notes
     }, {
       type: "stored",
       site: stored1.site,
@@ -247,7 +252,8 @@ exports.testAddRemoveStored = function(test)
       type: "stored",
       site: stored2.site,
       name: stored2.name,
-      password: stored2.password
+      password: stored2.password,
+      notes: stored2.notes
     }, {
       type: "stored",
       site: stored3.site,
@@ -293,7 +299,8 @@ exports.testAddRemoveStored = function(test)
       type: "stored",
       site: stored2.site,
       name: stored2.name,
-      password: stored2.password
+      password: stored2.password,
+      notes: stored2.notes
     }, {
       type: "stored",
       site: stored1.site,
@@ -516,7 +523,7 @@ exports.testNotes = function(test)
     return passwords.getNotes(generated2);
   }).then(notes =>
   {
-    test.equal(notes, null);
+    test.equal(notes, generated2.notes);
 
     return passwords.setNotes(generated2, notes1);
   }).then(pwdList =>
@@ -654,7 +661,8 @@ exports.testAllPasswords = function(test)
           type: "stored",
           site: stored2.site,
           name: stored2.name,
-          password: stored2.password
+          password: stored2.password,
+          notes: stored2.notes
         }, {
           type: "generated",
           site: generated1.site,
@@ -687,7 +695,8 @@ exports.testAllPasswords = function(test)
           type: "stored",
           site: stored2.site,
           name: stored2.name,
-          password: stored2.password
+          password: stored2.password,
+          notes: stored2.notes
         }, {
           type: "generated",
           site: generated1.site,
@@ -711,7 +720,8 @@ exports.testAllPasswords = function(test)
           lower: generated2.lower,
           upper: generated2.upper,
           number: generated2.number,
-          symbol: generated2.symbol
+          symbol: generated2.symbol,
+          notes: generated2.notes
         }],
         aliases: ["sub2.example.info"]
       }
@@ -755,7 +765,8 @@ exports.testAllPasswords = function(test)
           lower: generated2.lower,
           upper: generated2.upper,
           number: generated2.number,
-          symbol: generated2.symbol
+          symbol: generated2.symbol,
+          notes: generated2.notes
         }],
         aliases: ["sub2.example.info"]
       }
@@ -875,7 +886,8 @@ exports.testExport = function(test)
           lower: generated2.lower,
           upper: generated2.upper,
           number: generated2.number,
-          symbol: generated2.symbol
+          symbol: generated2.symbol,
+          notes: generated2.notes
         },
         {
           type: "generated",
@@ -910,7 +922,8 @@ exports.testExport = function(test)
           type: "stored",
           site: stored2.site,
           name: stored2.name,
-          password: stored2.password
+          password: stored2.password,
+          notes: stored2.notes
         }, {
           type: "generated2",
           site: generated2.site,
@@ -920,7 +933,8 @@ exports.testExport = function(test)
           lower: generated2.lower,
           upper: generated2.upper,
           number: generated2.number,
-          symbol: generated2.symbol
+          symbol: generated2.symbol,
+          notes: generated2.notes
         }, {
           type: "generated",
           site: generated1.site,
@@ -997,7 +1011,8 @@ exports.testDecryptingImport = function(test)
           lower: generated2.lower,
           upper: generated2.upper,
           number: generated2.number,
-          symbol: generated2.symbol
+          symbol: generated2.symbol,
+          notes: generated2.notes
         }),
         [`site:${digest("sub." + generated1.site)}`]: encrypt({
           site: "sub." + generated1.site,
@@ -1022,7 +1037,8 @@ exports.testDecryptingImport = function(test)
           lower: generated2.lower,
           upper: generated2.upper,
           number: generated2.number,
-          symbol: generated2.symbol
+          symbol: generated2.symbol,
+          notes: generated2.notes
         },
         {
           type: "generated",
@@ -1094,7 +1110,8 @@ exports.testConvertingImport = function(test)
           site: stored2.site,
           name: stored2.name,
           revision: "rev2",
-          password: stored2.password
+          password: stored2.password,
+          notes: stored2.notes
         }),
         [`site:${digest("sub." + generated1.site)}`]: encrypt({
           site: "sub." + generated1.site,
@@ -1132,7 +1149,8 @@ exports.testConvertingImport = function(test)
           site: stored2.site,
           name: stored2.name,
           revision: "rev2",
-          password: stored2.password
+          password: stored2.password,
+          notes: stored2.notes
         },
         {
           type: "stored",

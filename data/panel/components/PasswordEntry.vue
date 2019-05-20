@@ -185,6 +185,7 @@ export default {
             upper: this.password.upper,
             number: this.password.number,
             symbol: this.password.symbol,
+            notes: this.password.notes,
             legacy: false
           }, true)
             .then(pwdList => this.$app.pwdList = pwdList)
