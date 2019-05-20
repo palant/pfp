@@ -30,6 +30,7 @@
       "reloader.js"
     ]
   },
+  "incognito": "spanning",
   "options_ui": {
     "page": "ui/options/options.html"
   },
