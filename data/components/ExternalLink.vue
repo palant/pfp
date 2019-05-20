@@ -16,7 +16,7 @@
 <script>
 "use strict";
 
-import {ui} from "../../proxy";
+import {ui} from "../proxy";
 
 export default {
   name: "ExternalLink",

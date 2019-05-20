@@ -86,18 +86,18 @@
 "use strict";
 
 import {passwords, masterPassword, passwordRetrieval, ui} from "../../proxy";
+import PasswordMessage from "../../components/PasswordMessage.vue";
 import GeneratedPassword from "../components/GeneratedPassword.vue";
 import PasswordEntry from "../components/PasswordEntry.vue";
-import PasswordMessage from "../components/PasswordMessage.vue";
 import SiteSelection from "../components/SiteSelection.vue";
 import StoredPassword from "../components/StoredPassword.vue";
 
 export default {
   name: "PasswordList",
   components: {
+    "password-message": PasswordMessage,
     "generated-password": GeneratedPassword,
     "password-entry": PasswordEntry,
-    "password-message": PasswordMessage,
     "site-selection": SiteSelection,
     "stored-password": StoredPassword
   },

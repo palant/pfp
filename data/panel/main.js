@@ -10,10 +10,10 @@ import Vue from "vue";
 
 import I18n from "../i18n";
 import App from "./App.vue";
-import ExternalLink from "./components/ExternalLink.vue";
-import ModalOverlay from "./components/ModalOverlay.vue";
-import ValidatedForm from "./components/ValidatedForm.vue";
-import ValidatedInput from "./components/ValidatedInput.vue";
+import ExternalLink from "../components/ExternalLink.vue";
+import ModalOverlay from "../components/ModalOverlay.vue";
+import ValidatedForm from "../components/ValidatedForm.vue";
+import ValidatedInput from "../components/ValidatedInput.vue";
 
 Vue.use(I18n);
 

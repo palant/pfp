@@ -47,7 +47,7 @@
 
 import {set as clipboardSet} from "../../clipboard";
 import {passwords, recoveryCodes} from "../../proxy";
-import PasswordMessage from "../../panel/components/PasswordMessage.vue";
+import PasswordMessage from "../../components/PasswordMessage.vue";
 
 export default {
   name: "PasswordInfo",

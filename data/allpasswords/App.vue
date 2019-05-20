@@ -40,9 +40,9 @@
 "use strict";
 
 import {setErrorHandler} from "../proxy";
-import Confirm from "../panel/components/Confirm.vue";
-import PasswordMessage from "../panel/components/PasswordMessage.vue";
-import UnknownError from "../panel/components/UnknownError.vue";
+import Confirm from "../components/Confirm.vue";
+import PasswordMessage from "../components/PasswordMessage.vue";
+import UnknownError from "../components/UnknownError.vue";
 import GlobalActions from "./components/GlobalActions.vue";
 import SiteList from "./components/SiteList.vue";
 import EnterMaster from "./modals/EnterMaster.vue";

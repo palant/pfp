@@ -29,8 +29,8 @@ import ChangeMaster from "./pages/ChangeMaster.vue";
 import Migration from "./pages/Migration.vue";
 import PasswordList from "./pages/PasswordList.vue";
 import Sync from "./pages/Sync.vue";
-import Confirm from "./components/Confirm.vue";
-import UnknownError from "./components/UnknownError.vue";
+import Confirm from "../components/Confirm.vue";
+import UnknownError from "../components/UnknownError.vue";
 
 let initialData = {
   site: null,
