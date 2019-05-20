@@ -66,8 +66,11 @@ export default {
       let reader = new FileReader();
       reader.onload = () =>
       {
-        if (confirm(this.$t("allpasswords_import_confirm")))
-          this.doImport(reader.result);
+        this.$app.confirm(this.$t("allpasswords_import_confirm")).then(accepted =>
+        {
+          if (accepted)
+            this.doImport(reader.result);
+        });
       };
       reader.readAsText(event.target.files[0]);
       event.target.value = "";
@@ -78,7 +81,7 @@ export default {
       passwords.importPasswordData(data, masterPass).then(() =>
       {
         this.$app.inProgress = false;
-        alert(this.$t("allpasswords_import_success"));
+        this.$app.showGlobalMessage("allpasswords_import_success");
         this.$app.updateData();
       }).catch(error =>
       {

@@ -8,6 +8,13 @@
   <div>
     <in-progress v-if="inProgress" />
     <enter-master v-if="masterPromise" @cancel="enterMasterDone" />
+    <confirm ref="confirm" />
+    <unknown-error v-if="unknownError" :error="unknownError" />
+    <password-message ref="global-message"
+                      :messages="{
+                        allpasswords_import_success: true
+                      }"
+    />
 
     <div class="title-container">
       <h1 class="title">{{ $t("allpasswords_title") }}</h1>
@@ -33,6 +40,9 @@
 "use strict";
 
 import {setErrorHandler} from "../proxy";
+import Confirm from "../panel/components/Confirm.vue";
+import PasswordMessage from "../panel/components/PasswordMessage.vue";
+import UnknownError from "../panel/components/UnknownError.vue";
 import GlobalActions from "./components/GlobalActions.vue";
 import SiteList from "./components/SiteList.vue";
 import EnterMaster from "./modals/EnterMaster.vue";
@@ -41,6 +51,9 @@ import InProgress from "./modals/InProgress.vue";
 export default {
   name: "App",
   components: {
+    "confirm": Confirm,
+    "password-message": PasswordMessage,
+    "unknown-error": UnknownError,
     "global-actions": GlobalActions,
     "site-list": SiteList,
     "enter-master": EnterMaster,
@@ -51,6 +64,7 @@ export default {
     return {
       inProgress: false,
       masterPromise: null,
+      unknownError: null,
       showNotes: !("hideNotes" in window.localStorage),
       showPasswords: false,
       confirmedPasswords: false
@@ -69,10 +83,13 @@ export default {
     {
       if (this.showPasswords && !this.confirmedPasswords)
       {
-        if (confirm(this.$t("allpasswords_show_confirm")))
-          this.confirmedPasswords = true;
-        else
-          this.$nextTick(() => this.showPasswords = false);
+        this.confirm(this.$t("allpasswords_show_confirm")).then(accepted =>
+        {
+          if (accepted)
+            this.confirmedPasswords = true;
+          else
+            this.showPasswords = false;
+        });
       }
     }
   },
@@ -88,6 +105,15 @@ export default {
     });
   },
   methods: {
+    confirm(message)
+    {
+      return new Promise((resolve, reject) =>
+      {
+        let confirm = this.$refs.confirm;
+        confirm.message = message;
+        confirm.callback = resolve;
+      });
+    },
     enterMasterDone(success)
     {
       let {resolve, reject} = this.masterPromise;
@@ -96,6 +122,10 @@ export default {
         resolve();
       else
         reject("canceled");
+    },
+    showGlobalMessage(message)
+    {
+      this.$refs["global-message"].message = message;
     },
     localize(error)
     {
@@ -109,7 +139,7 @@ export default {
       if (error == "canceled")
         return;
 
-      alert(this.localize(error));
+      this.unknownError = this.localize(error);
     },
     updateData()
     {

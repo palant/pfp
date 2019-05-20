@@ -7,14 +7,7 @@
 <template>
   <div>
     <confirm ref="confirm" />
-
-    <div v-if="unknownError" class="warning">
-      <span>{{ $t("unknown_error") }}</span>
-      <a v-if="!unknownErrorDetails" href="#" @click.prevent="unknownErrorDetails = true">
-        {{ $t("unknown_error_more") }}
-      </a>
-      <div v-else class="unknown-error-details">{{ unknownError }}</div>
-    </div>
+    <unknown-error v-if="unknownError" :error="unknownError" />
 
     <change-master v-if="masterPasswordState == 'unset' || (masterPasswordState == 'set' && resettingMaster)" />
     <enter-master v-else-if="masterPasswordState == 'set'" />
@@ -37,6 +30,7 @@ import Migration from "./pages/Migration.vue";
 import PasswordList from "./pages/PasswordList.vue";
 import Sync from "./pages/Sync.vue";
 import Confirm from "./components/Confirm.vue";
+import UnknownError from "./components/UnknownError.vue";
 
 let initialData = {
   site: null,
@@ -64,13 +58,13 @@ export default {
     "migration": Migration,
     "password-list": PasswordList,
     "sync": Sync,
-    "confirm": Confirm
+    "confirm": Confirm,
+    "unknown-error": UnknownError
   },
   data()
   {
     return Object.assign({
       unknownError: null,
-      unknownErrorDetails: false,
       resettingMaster: false,
       currentPage: "password-list"
     }, initialData);

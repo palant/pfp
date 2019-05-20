@@ -163,13 +163,16 @@ export default {
       let message = this.$t("remove_password_confirmation", this.password.name, this.siteDisplayName);
       if (this.password.notes)
         message += " " + this.$t("remove_password_confirmation_notes", this.password.notes);
-      if (confirm(message))
+      this.$app.confirm(message).then(accepted =>
       {
+        if (!accepted)
+          return;
+
         passwords.removePassword(this.password).then(() =>
         {
           this.$emit("removed");
         }).catch(this.showPasswordMessage);
-      }
+      });
     }
   }
 };

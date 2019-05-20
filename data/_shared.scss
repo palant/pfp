@@ -115,6 +115,12 @@ button
   color: $error-text;
 }
 
+.unknown-error-details
+{
+  font-size: $font-size-small;
+  white-space: pre-wrap;
+}
+
 input[type="checkbox"]
 {
   width: $font-size;
