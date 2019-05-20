@@ -23,6 +23,11 @@
         <input id="password-revision" ref="revision" v-model.trim="revision" v-bind="{readonly: options.replacing}" type="text">
       </template>
 
+      <label v-if="password && password.notes" class="block-start">
+        <input v-model="keepNotes" type="checkbox">
+        {{ $t("keep_notes") }}
+      </label>
+
       <label class="block-start" for="password-length">{{ $t("password_length") }}</label>
       <div class="length-container">
         <input id="password-length" v-model.number="length" type="range" min="4" max="24" step="1">
@@ -107,6 +112,7 @@ export default {
       number: getProp("number", true),
       symbol: getProp("symbol", true),
       charsets: {value: "", error: null},
+      keepNotes: !!this.password,
       legacy: false
     };
   },
@@ -175,6 +181,7 @@ export default {
         upper: this.upper,
         number: this.number,
         symbol: this.symbol,
+        notes: this.keepNotes ? this.password.notes : null,
         legacy: this.legacy
       }, this.options.replacing).then(pwdList =>
       {
