@@ -73,7 +73,7 @@ export default {
     });
     this.currentPage = "panel";
 
-    document.getElementById("inProgressOverlay").hidden = true;
+    document.getElementById("loading").remove();
   }
 };
 </script>
