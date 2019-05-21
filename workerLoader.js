@@ -17,11 +17,11 @@ module.exports = function(source)
   let filename = path.basename(this.resourcePath);
 
   let compiler = webpack({
+    mode: "production",
     entry: this.resourcePath,
     output: {
       filename,
       path: "/",
-      pathinfo: true
     },
     module: {
       rules: [
