@@ -180,7 +180,7 @@ input[type="checkbox"]:checked
 .modalOverlay
 {
   display: flex;
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   right: 0;
