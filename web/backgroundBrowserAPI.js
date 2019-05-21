@@ -70,7 +70,7 @@ module.exports = {
     },
     create: params =>
     {
-      if (params.url != "../allpasswords/allpasswords.html")
+      if (params.url != "ui/allpasswords/allpasswords.html")
         return Promise.reject(new Error("Not implemented"));
 
       window.dispatchEvent(new Event("show-allpasswords"));
@@ -85,7 +85,7 @@ module.exports = {
       else if (path == "worker/pbkdf2.js")
         return textToURL(require("../worker/pbkdf2.js"));
       else
-        return "../" + path.replace(/^ui\//, "");
+        return path;
     },
     onConnect: new EventTarget()
   }
