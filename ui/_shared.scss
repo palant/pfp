@@ -78,6 +78,19 @@ $large-icon-size: 48px;
   }
 }
 
+@mixin float-end
+{
+  :root:not([dir="rtl"]) &
+  {
+    float: right;
+  }
+
+  :root[dir="rtl"] &
+  {
+    float: left;
+  }
+}
+
 body
 {
   background-color: $background-color;
@@ -115,6 +128,11 @@ button
 {
   font-size: $font-size-small;
   color: $error-text;
+}
+
+.unknown-error-cancel
+{
+  @include float-end;
 }
 
 .unknown-error-details
@@ -206,9 +224,9 @@ input[type="checkbox"]:checked
   align-items: flex-end;
 }
 
-.modalOverlay-cancel
+.cancel
 {
-  margin: $border-radius;
+  display: inline-block;
   min-width: $small-icon-size;
   min-height: $small-icon-size;
   background-size: $small-icon-size;
@@ -219,6 +237,11 @@ input[type="checkbox"]:checked
   {
     background-color: $hover-background;
   }
+}
+
+.modalOverlay-cancel-container > .cancel
+{
+  margin: $border-radius;
 }
 
 .modal-form

@@ -5,9 +5,9 @@
  -->
 
 <template>
-  <div>
+  <div @keydown.ctrl.69.prevent="testUnknownError">
     <confirm ref="confirm" />
-    <unknown-error v-if="unknownError" :error="unknownError" />
+    <unknown-error v-if="unknownError" :error="unknownError" @close="unknownError = null" />
 
     <change-master v-if="masterPasswordState == 'unset' || (masterPasswordState == 'set' && resettingMaster)" />
     <enter-master v-else-if="masterPasswordState == 'set'" />
@@ -81,6 +81,10 @@ export default {
   },
   methods:
   {
+    testUnknownError()
+    {
+      this.showUnknownError(new Error("Unexpected error triggered via Ctrl+E"));
+    },
     confirm(message)
     {
       return new Promise((resolve, reject) =>

@@ -5,11 +5,11 @@
  -->
 
 <template>
-  <div>
+  <div @keydown.ctrl.69.prevent="testUnknownError">
     <in-progress v-if="inProgress" />
     <enter-master v-if="masterPromise" @cancel="enterMasterDone" />
     <confirm ref="confirm" />
-    <unknown-error v-if="unknownError" :error="unknownError" />
+    <unknown-error v-if="unknownError" :error="unknownError" @close="unknownError = null" />
     <password-message ref="global-message"
                       :messages="{
                         allpasswords_import_success: true
@@ -105,6 +105,10 @@ export default {
     });
   },
   methods: {
+    testUnknownError()
+    {
+      this.showUnknownError(new Error("Unexpected error triggered via Ctrl+E"));
+    },
     confirm(message)
     {
       return new Promise((resolve, reject) =>

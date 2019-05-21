@@ -10,7 +10,8 @@
     <div class="recovery-code-accepted">
       <div v-for="(line, index) in accepted" :key="line">
         {{ line }}
-        <a v-if="index == accepted.length - 1" class="recovery-code-strip"
+        <a v-if="index == accepted.length - 1"
+           class="recovery-code-strip cancel"
            href="#" :title="$t('recovery_remove_line')"
            @click.prevent="accepted.pop()"
         />
