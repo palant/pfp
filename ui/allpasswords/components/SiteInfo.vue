@@ -11,9 +11,9 @@
       <template v-else>{{ displayName }}</template>
     </div>
 
-    <div v-if="site.aliases.length" class="site-aliases">
+    <div v-if="site.aliases.length">
       <span>{{ $t("allpasswords_aliases") }}</span>
-      <span class="site-aliases-value">{{ site.aliases.slice().sort().join(", ") }}</span>
+      <span>{{ site.aliases.slice().sort().join(", ") }}</span>
     </div>
 
     <password-info v-for="password in site.passwords" :key="password.name"
