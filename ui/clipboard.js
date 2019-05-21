@@ -6,8 +6,6 @@
 
 "use strict";
 
-/* global document */
-
 let clipboardDummy = null;
 
 export function set(data)

@@ -6,7 +6,5 @@
 
 "use strict";
 
-/* global chrome */
-
 export let i18n = window.browser ? window.browser.i18n : chrome.i18n;
 export let runtime = window.browser ? window.browser.runtime : chrome.runtime;
