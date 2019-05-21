@@ -21,6 +21,8 @@ $inline-spacing: 5px;
 $border-radius: $block-padding;
 $dialog-padding: 20px;
 
+$small-icon-size: $font-size-small;
+$text-icon-size: $font-size;
 $icon-size: 32px;
 $large-icon-size: 48px;
 
@@ -121,6 +123,22 @@ button
   white-space: pre-wrap;
 }
 
+.help-icon
+{
+  display: inline-block;
+  cursor: help;
+  width: $text-icon-size;
+  height: $text-icon-size;
+  background-size: $text-icon-size;
+  background-repeat: no-repeat;
+  background-image: url("../images/ios-help-circle-outline.svg");
+
+  @media print
+  {
+    display: none;
+  }
+}
+
 input[type="checkbox"]
 {
   width: $font-size;
@@ -177,7 +195,7 @@ input[type="checkbox"]:checked
 
   &.cancelable > :last-child
   {
-    padding-top: max($dialog-padding - $font-size-small - $border-radius, 0);
+    padding-top: max($dialog-padding - $small-icon-size - $border-radius, 0);
   }
 }
 
@@ -191,10 +209,9 @@ input[type="checkbox"]:checked
 .modalOverlay-cancel
 {
   margin: $border-radius;
-  $icon-size: $font-size-small;
-  min-width: $icon-size;
-  min-height: $icon-size;
-  background-size: $icon-size;
+  min-width: $small-icon-size;
+  min-height: $small-icon-size;
+  background-size: $small-icon-size;
   background-repeat: no-repeat;
   background-image: url("../images/close-round.svg");
 

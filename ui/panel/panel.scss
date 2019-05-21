@@ -394,11 +394,10 @@ a
 .recovery-code-strip
 {
   display: inline-block;
-  $icon-size: $font-size-small;
-  min-width: $icon-size;
-  min-height: $icon-size;
+  min-width: $small-icon-size;
+  min-height: $small-icon-size;
   margin: -2px $inline-spacing;
-  background-size: $icon-size;
+  background-size: $small-icon-size;
   background-repeat: no-repeat;
   background-image: url("../images/close-round.svg");
 }

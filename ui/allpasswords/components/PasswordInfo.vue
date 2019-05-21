@@ -34,7 +34,7 @@
         <div>{{ $t("allowed_characters") }}  {{ allowedChars }}</div>
       </template>
       <template v-else-if="password.type == 'stored'">
-        <div class="password-type">{{ $t("password_type_stored_with_recovery") }}</div>
+        <div class="password-type">{{ $t("password_type_stored_with_recovery") }} <span class="help-icon" :title="$t('recovery_code_explanation')" /></div>
         <pre v-if="recoveryCode" class="password-recovery">{{ recoveryCode }}</pre>
       </template>
       <div v-if="showNotes && password.notes">{{ $t("password_info_notes") }} {{ password.notes }}</div>
