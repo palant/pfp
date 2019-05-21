@@ -17,8 +17,8 @@ $menu-border-width: 1px;
 
 body
 {
-  margin: 0;
   width: $body-width;
+  margin: 0 auto;
   padding: $body-padding;
 }
 
@@ -436,11 +436,26 @@ a
   justify-content: space-around;
 }
 
-.sync-storage-provider
+.sync-provider-link
 {
-  height: 32px;
+  $height: 32px;
+  display: inline-block;
   margin-top: $block-spacing;
-  cursor: pointer;
+  height: $height;
+  background-size: auto $height;
+  background-repeat: no-repeat;
+}
+
+.sync-provider-link.dropbox
+{
+  width: 162.5px;
+  background-image: url(../images/dropbox.svg);
+}
+
+.sync-provider-link.gdrive
+{
+  width: 176.5px;
+  background-image: url(../images/gdrive.png);
 }
 
 .sync-state-link.failed
@@ -476,4 +491,10 @@ a
 .sync-error
 {
   margin-top: $block-spacing;
+}
+
+.modalOverlay-inner
+{
+  box-sizing: border-box;
+  max-width: $body-width;
 }

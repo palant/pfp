@@ -6,15 +6,14 @@
 
 "use strict";
 
-let {EventTarget} = require("../eventTarget");
-
-// Posting messages to proper origin isn't possible on file://
-let targetOrigin = location.protocol != "file:" ? location.origin : "*";
+let {EventTarget} = require("./eventTarget");
 
 function textToURL(text)
 {
   return URL.createObjectURL(new Blob([text], {type: "text/javascript"}));
 }
+
+let currentURL = null;
 
 module.exports = {
   storage: {
@@ -64,16 +63,17 @@ module.exports = {
   tabs: {
     query: params =>
     {
-      return Promise.resolve([]);
+      if (params.active && currentURL)
+        return Promise.resolve([{url: currentURL}]);
+      else
+        return Promise.resolve([]);
     },
     create: params =>
     {
       if (params.url != "../allpasswords/allpasswords.html")
         return Promise.reject(new Error("Not implemented"));
 
-      parent.postMessage({
-        type: "show-allpasswords"
-      }, targetOrigin);
+      window.dispatchEvent(new Event("show-allpasswords"));
       return Promise.resolve();
     }
   },
@@ -81,9 +81,9 @@ module.exports = {
     getURL: path =>
     {
       if (path == "worker/scrypt.js")
-        return textToURL(require("../../worker/scrypt.js"));
+        return textToURL(require("../worker/scrypt.js"));
       else if (path == "worker/pbkdf2.js")
-        return textToURL(require("../../worker/pbkdf2.js"));
+        return textToURL(require("../worker/pbkdf2.js"));
       else
         return "../" + path.replace(/^ui\//, "");
     },
@@ -91,46 +91,29 @@ module.exports = {
   }
 };
 
-let ports = [];
+let port = {
+  postMessage(payload)
+  {
+    window.dispatchEvent(new CustomEvent("fromBackground", {
+      detail: payload
+    }));
+  },
+  onMessage: new EventTarget(),
+  onDisconnect: new EventTarget()
+};
 
-window.addEventListener("message", event =>
+window.addEventListener("toBackground", event =>
 {
-  // On Chrome, file:// is used as document origin yet messages get origin null
-  if (event.origin != location.origin && !(event.origin == "null" && location.origin == "file://"))
-    return;
+  port.onMessage._emit(event.detail);
+});
 
-  let message = event.data;
-  if (message.type == "connect")
-  {
-    let port = ports[message.id] = {
-      name: message.name,
-      postMessage: payload =>
-      {
-        event.source.postMessage({
-          type: "message",
-          id: message.id,
-          target: message.name,
-          payload
-        }, targetOrigin);
-      },
-      onMessage: new EventTarget(),
-      onDisconnect: new EventTarget()
-    };
-    module.exports.runtime.onConnect._emit(port);
-  }
-  else if (message.type == "disconnect")
-  {
-    let port = ports[message.id];
-    if (port)
-    {
-      delete ports[message.id];
-      port.onDisconnect._emit();
-    }
-  }
-  else if (message.type == "message")
-  {
-    let port = ports[message.id];
-    if (port)
-      port.onMessage._emit(message.payload);
-  }
+window.addEventListener("port-connected", event =>
+{
+  port.name = event.detail;
+  module.exports.runtime.onConnect._emit(port);
+});
+
+window.addEventListener("show-panel", event =>
+{
+  currentURL = "https://" + event.detail;
 });

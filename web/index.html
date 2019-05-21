@@ -4,11 +4,10 @@
  - http://mozilla.org/MPL/2.0/.
  -->
 
-<html>
+<html data-portname="index">
   <head>
     <meta charset="utf-8">
-    <script src="index/index.js"></script>
-    <link rel="stylesheet" href="index/index.css">
+    <link rel="stylesheet" href="index.css">
   </head>
   <body>
     <noscript>
@@ -17,16 +16,18 @@
       </div>
     </noscript>
 
-    <div id="no-webcrypto" class="warning" hidden>
-      Your browser lacks the required functionality for this application.
-      At least Mozilla Firefox 35, Google Chrome 37, Opera 24, Apple Safari 11
-      or Microsoft Edge 12 is required.
-    </div>
-
-    <div id="inProgressOverlay" hidden>
+    <div id="inProgressOverlay">
       <div id="in-progress">
         <div id="spinning-wheel"></div>
       </div>
     </div>
+
+    <div id="app"></div>
+
+    <script src="third-party/vue-2.6.10.min.js"></script>
+    <script src="third-party/zxcvbn-4.4.2.js"></script>
+    <script src="third-party/jsqr-1.0.2.js"></script>
+    <script src="background.js"></script>
+    <script src="index.js"></script>
   </body>
 </html>

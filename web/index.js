@@ -6,7 +6,7 @@
 
 "use strict";
 
-import {runApp} from "../vue";
+import {runApp} from "../ui/vue";
 import App from "./App.vue";
 
-runApp(App);
+runApp(App, true);

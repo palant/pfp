@@ -26,7 +26,7 @@
   "background": {
     "persistent": true,
     "scripts": [
-      "index.js",
+      "background.js",
       "reloader.js"
     ]
   },

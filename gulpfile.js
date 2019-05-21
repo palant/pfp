@@ -184,7 +184,7 @@ function buildCommon(targetdir)
     gulp.src("lib/main.js")
         .pipe(webpack({
           output: {
-            filename: "index.js",
+            filename: "background.js",
             pathinfo: true,
             library: "__webpack_require__"
           }
@@ -262,84 +262,18 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
   let targetdir = "build-web";
   return merge(
     gulp.src("LICENSE.txt")
-        .pipe(gulp.dest(`${targetdir}`)),
-    gulp.src(["ui/**/*.html", "ui/**/*.png", "ui/**/*.svg", "!ui/options/options.html"])
-        .pipe(gulp.dest(`${targetdir}`)),
+        .pipe(gulp.dest(targetdir)),
+    gulp.src(["ui/images/**"])
+        .pipe(gulp.dest(`${targetdir}/images`)),
     gulp.src("ui/third-party/**")
         .pipe(gulp.dest(`${targetdir}/third-party`)),
-    gulp.src("ui/panel/main.js")
-        .pipe(webpack({
-          output: {
-            filename: "panel.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          },
-          module: {
-            rules: [
-              {
-                test: /\.properties$/,
-                use: path.resolve(__dirname, "localeLoader.js")
-              },
-              {
-                test: /\.js$/,
-                use: {
-                  loader: "babel-loader",
-                  options: {
-                    presets: ["@babel/preset-env"]
-                  }
-                }
-              }
-            ]
-          },
-          resolve: {
-            alias: {
-              "./browserAPI$": path.resolve(__dirname, "web", "ui", "browserAPI.js"),
-              "../browserAPI$": path.resolve(__dirname, "web", "ui", "browserAPI.js"),
-              "locale$": path.resolve(__dirname, "locale", "en-US.properties")
-            }
-          }
-        }))
-        .pipe(gulp.dest(`${targetdir}/panel`)),
-    gulp.src("ui/allpasswords/main.js")
-        .pipe(webpack({
-          output: {
-            filename: "allpasswords.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          },
-          module: {
-            rules: [
-              {
-                test: /\.properties$/,
-                use: path.resolve(__dirname, "localeLoader.js")
-              },
-              {
-                test: /\.js$/,
-                use: {
-                  loader: "babel-loader",
-                  options: {
-                    presets: ["@babel/preset-env"]
-                  }
-                }
-              }
-            ]
-          },
-          resolve: {
-            alias: {
-              "./browserAPI$": path.resolve(__dirname, "web", "ui", "browserAPI.js"),
-              "../browserAPI$": path.resolve(__dirname, "web", "ui", "browserAPI.js"),
-              "locale$": path.resolve(__dirname, "locale", "en-US.properties")
-            }
-          }
-        }))
-        .pipe(gulp.dest(`${targetdir}/allpasswords`)),
     gulp.src(["ui/**/*.scss", "!ui/options/options.scss"])
         .pipe(sass())
-        .pipe(gulp.dest(`${targetdir}`)),
+        .pipe(gulp.dest(targetdir)),
     gulp.src("lib/main.js")
         .pipe(webpack({
           output: {
-            filename: "index.js",
+            filename: "background.js",
             pathinfo: true,
             library: "__webpack_require__"
           },
@@ -362,21 +296,25 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
           },
           resolve: {
             alias: {
-              "./browserAPI$": path.resolve(__dirname, "web", "background", "browserAPI.js"),
-              "../browserAPI$": path.resolve(__dirname, "web", "background", "browserAPI.js")
+              "./browserAPI$": path.resolve(__dirname, "web", "backgroundBrowserAPI.js"),
+              "../browserAPI$": path.resolve(__dirname, "web", "backgroundBrowserAPI.js")
             }
           }
         }))
-        .pipe(gulp.dest(`${targetdir}/background`)),
-    gulp.src("web/index/index.js")
+        .pipe(gulp.dest(targetdir)),
+    gulp.src("web/index.js")
         .pipe(webpack({
           output: {
-            filename: "index/index.js",
+            filename: "index.js",
             pathinfo: true,
             library: "__webpack_require__"
           },
           module: {
             rules: [
+              {
+                test: /\.properties$/,
+                use: path.resolve(__dirname, "localeLoader.js")
+              },
               {
                 test: /\.js$/,
                 use: {
@@ -387,6 +325,13 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
                 }
               }
             ]
+          },
+          resolve: {
+            alias: {
+              "./browserAPI$": path.resolve(__dirname, "web", "contentBrowserAPI.js"),
+              "../browserAPI$": path.resolve(__dirname, "web", "contentBrowserAPI.js"),
+              "locale$": path.resolve(__dirname, "locale", "en-US.properties")
+            }
           }
         }))
         .pipe(gulp.dest(targetdir)),

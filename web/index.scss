@@ -4,36 +4,7 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
-@import "../../ui/_shared.scss";
-
-$panel-padding: 10px;
-$panel-width: 600px + $panel-padding * 2;
-
-iframe
-{
-  display: none;
-  position: fixed;
-  top: 0;
-  height: 100%;
-  border-width: 0;
-}
-
-iframe[data-active="true"]
-{
-  display: block;
-}
-
-#allpasswords
-{
-  left: 0;
-  width: 100%;
-}
-
-#panel
-{
-  width: $panel-width;
-  left: calc((100% - #{$panel-width}) / 2);
-}
+@import "../ui/_shared.scss";
 
 #inProgressOverlay:not([hidden])
 {
@@ -72,5 +43,5 @@ iframe[data-active="true"]
   min-height: $image-size;
   background-size: $image-size;
   background-repeat: no-repeat;
-  background-image: url(../images/circles.svg);
+  background-image: url(images/circles.svg);
 }

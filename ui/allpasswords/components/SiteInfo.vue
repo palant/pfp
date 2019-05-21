@@ -61,14 +61,9 @@ export default {
   {
     goToSite()
     {
-      passwords.getPasswords(this.site.site).then(([origSite, site, pwdList]) =>
-      {
-        port.emit("forward-to-panel", {
-          name: "init",
-          args: [{origSite, site, pwdList}]
-        });
-      });
-      window.dispatchEvent(new Event("show-panel"));
+      window.dispatchEvent(new CustomEvent("show-panel", {
+        detail: this.site.site
+      }));
     },
     removePassword(password)
     {

@@ -40,10 +40,10 @@
       <div class="sync-section">{{ $t("sync_selection_label") }}</div>
       <div class="sync-provider-selection">
         <a v-for="(provider, index) in providers" :key="provider.name"
-           v-focus="index == 0" href="#" @click.prevent="authorize(provider.name)"
-        >
-          <img class="sync-storage-provider" :src="provider.image" :alt="provider.label">
-        </a>
+           v-focus="index == 0" class="sync-provider-link" :class="provider.name"
+           href="#" :title="provider.label"
+           @click.prevent="authorize(provider.name)"
+        />
       </div>
 
       <div class="block-start sync-section">{{ $t("sync_how_label") }}</div>
@@ -86,13 +86,11 @@ export default {
       providers: [
         {
           name: "dropbox",
-          label: "Dropbox",
-          image: "../images/dropbox.svg"
+          label: "Dropbox"
         },
         {
           name: "gdrive",
-          label: "Google Drive",
-          image: "../images/gdrive.png"
+          label: "Google Drive"
         }
       ],
       urls: {},
