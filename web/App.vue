@@ -6,7 +6,7 @@
 
 <template>
   <div>
-    <div v-if="!webCryptoSupported" class="warning">{{ $t("web_compat_message") }}</div>
+    <div v-if="!browserSupported" class="warning">{{ $t("web_compat_message") }}</div>
 
     <template v-if="currentPage == 'panel'">
       <link rel="stylesheet" href="panel/panel.css">
@@ -34,7 +34,7 @@ export default {
   data()
   {
     return {
-      webCryptoSupported: true,
+      browserSupported: true,
       currentPage: ""
     };
   },
@@ -50,6 +50,9 @@ export default {
   {
     Promise.resolve().then(() =>
     {
+      if (!"asdf".includes("d"))
+        throw new Error("String.includes() returned unexpected result");
+
       return crypto.subtle.importKey(
         "raw",
         new Uint8Array(16),
@@ -59,7 +62,7 @@ export default {
       );
     }).catch(error =>
     {
-      this.webCryptoSupported = false;
+      this.browserSupported = false;
       console.log(error);
     });
 
