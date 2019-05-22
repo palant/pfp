@@ -432,23 +432,31 @@ a
 
 .sync-provider-link
 {
+  font-size: 150%;
+  font-weight: bold;
+  margin-top: $block-spacing;
+  color: $text-color;
+}
+
+.sync-provider-icon
+{
   $height: 32px;
   display: inline-block;
-  margin-top: $block-spacing;
+  margin: 0 $inline-spacing;
   height: $height;
   background-size: auto $height;
   background-repeat: no-repeat;
 }
 
-.sync-provider-link.dropbox
+.sync-provider-icon.dropbox
 {
-  width: 162.5px;
+  width: 37.672px;
   background-image: url(../images/dropbox.svg);
 }
 
-.sync-provider-link.gdrive
+.sync-provider-icon.gdrive
 {
-  width: 176.5px;
+  width: 36.944px;
   background-image: url(../images/gdrive.png);
 }
 

@@ -40,10 +40,12 @@
       <div class="sync-section">{{ $t("sync_selection_label") }}</div>
       <div class="sync-provider-selection">
         <a v-for="(provider, index) in providers" :key="provider.name"
-           v-focus="index == 0" class="sync-provider-link" :class="provider.name"
-           href="#" :title="provider.label"
-           @click.prevent="authorize(provider.name)"
-        />
+           v-focus="index == 0" class="sync-provider-link"
+           href="#" @click.prevent="authorize(provider.name)"
+        >
+          <span class="sync-provider-icon" :class="provider.name" />
+          <span>{{ provider.label }}</span>
+        </a>
       </div>
 
       <div class="block-start sync-section">{{ $t("sync_how_label") }}</div>
