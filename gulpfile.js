@@ -76,7 +76,7 @@ gulp.task("eslint", function()
 
 gulp.task("htmlhint", function()
 {
-  return gulp.src(["ui/**/*.html"])
+  return gulp.src(["ui/**/*.html", "web/**/*.html"])
              .pipe(htmlhint(".htmlhintrc"))
              .pipe(htmlhint.failReporter());
 });
