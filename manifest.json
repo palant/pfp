@@ -5,7 +5,7 @@
   "applications": {
     "gecko": {
       "id": "easypasswords@palant.de",
-      "strict_min_version": "51.0"
+      "strict_min_version": "57.0"
     }
   },
   "default_locale": "en_US",
