@@ -38,10 +38,15 @@ export default {
   },
   mounted()
   {
-    ui.getLink({
-      type: this.type,
-      param: this.param
-    }).then(url => this.url = url).catch(this.$app.showUnknownError);
+    if (this.type == "url")
+      this.url = this.param;
+    else
+    {
+      ui.getLink({
+        type: this.type,
+        param: this.param
+      }).then(url => this.url = url).catch(this.$app.showUnknownError);
+    }
   },
   methods:
   {

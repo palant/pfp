@@ -418,7 +418,8 @@ a
   font-weight: bold;
 }
 
-.sync-explanation
+.sync-explanation,
+.remoteStorage-hosting-link
 {
   font-size: $font-size-small;
 }
@@ -426,8 +427,8 @@ a
 .sync-provider-selection
 {
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
+  flex-direction: column;
+  align-self: center;
 }
 
 .sync-provider-link
@@ -457,7 +458,13 @@ a
 .sync-provider-icon.gdrive
 {
   width: 36.944px;
-  background-image: url(../images/gdrive.png);
+  background-image: url(../images/gdrive.svg);
+}
+
+.sync-provider-icon.remotestorage
+{
+  width: 27.723px;
+  background-image: url(../images/remotestorage.svg);
 }
 
 .sync-state-link.failed

@@ -8,7 +8,12 @@
   <div class="page">
     <template v-if="$app.sync.provider">
       <div>{{ $t("sync_provider") }}</div>
-      <div>{{ labelForProvider($app.sync.provider) }}</div>
+      <div>
+        {{ labelForProvider($app.sync.provider) }}
+        <template v-if="$app.sync.username">
+          ({{ $app.sync.username }})
+        </template>
+      </div>
 
       <div class="block-start">{{ $t("sync_lastTime") }}</div>
       <div class="sync-lastTime-container">
@@ -68,6 +73,11 @@
     </template>
 
     <manual-auth v-if="authActive" ref="manualAuth" @cancel="authActive = false" />
+
+    <remoteStorage-username-input v-if="remoteStorageUsernameCallback"
+                                  :callback="remoteStorageUsernameCallback"
+                                  @cancel="remoteStorageUsernameCallback = null"
+    />
   </div>
 </template>
 
@@ -76,11 +86,13 @@
 
 import {sync} from "../../proxy";
 import ManualAuth from "../components/ManualAuth.vue";
+import RemoteStorageUsernameInput from "../components/RemoteStorageUsernameInput.vue";
 
 export default {
   name: "Sync",
   components: {
-    "manual-auth": ManualAuth
+    "manual-auth": ManualAuth,
+    "remoteStorage-username-input": RemoteStorageUsernameInput
   },
   data()
   {
@@ -93,24 +105,15 @@ export default {
         {
           name: "gdrive",
           label: "Google Drive"
+        },
+        {
+          name: "remotestorage",
+          label: "remoteStorage"
         }
       ],
-      urls: {},
-      authActive: false
+      authActive: false,
+      remoteStorageUsernameCallback: null
     };
-  },
-  mounted()
-  {
-    if (this.$isWebClient)
-    {
-      for (let {name: provider} of this.providers)
-      {
-        sync.getManualAuthURL(provider).then(url =>
-        {
-          this.urls[provider] = url;
-        }).catch(this.$app.showUnknownError);
-      }
-    }
   },
   methods:
   {
@@ -145,28 +148,44 @@ export default {
         }
       });
     },
-    authorize(provider)
+    authorize(provider, username)
     {
+      if (provider == "remotestorage" && !username)
+      {
+        this.remoteStorageUsernameCallback = username => this.authorize(provider, username);
+        return;
+      }
+
       if (this.$isWebClient)
       {
-        let url = this.urls.hasOwnProperty(provider) && this.urls[provider];
-        if (!url)
-          return;
+        let wnd = window.open("about:blank", "_blank");
+        wnd.onload = function()
+        {
+          wnd.document.body.textContent = "You will be redirected to the authorization page of your sync provider shortly.";
+        };
 
-        window.open(url, "_blank");
+        sync.getManualAuthURL(provider, username).then(url =>
+        {
+          wnd.location.href = url;
+        }).catch(error =>
+        {
+          this.authActive = false;
+          wnd.close();
+          this.$app.showUnknownError(error);
+        });
 
         this.authActive = true;
         this.$nextTick(() =>
         {
           this.$refs.manualAuth.callback = code =>
           {
-            return sync.manualAuthorization(provider, code).catch(this.$app.showUnknownError);
+            return sync.manualAuthorization(provider, username, code).catch(this.$app.showUnknownError);
           };
         });
       }
       else
       {
-        sync.authorize(provider);
+        sync.authorize(provider, username);
         window.close();
       }
     }
