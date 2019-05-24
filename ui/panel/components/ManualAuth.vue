@@ -21,18 +21,23 @@
 
 export default {
   name: "ManualAuth",
+  props: {
+    callback: {
+      type: Function,
+      required: true
+    }
+  },
   data()
   {
     return {
-      token: "",
-      callback: null
+      token: ""
     };
   },
   methods: {
     done()
     {
       this.$emit("cancel");
-      if (this.callback && this.token)
+      if (this.token)
         this.callback(this.token);
     }
   }

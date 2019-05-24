@@ -72,7 +72,10 @@
       </div>
     </template>
 
-    <manual-auth v-if="authActive" ref="manualAuth" @cancel="authActive = false" />
+    <manual-auth v-if="manualAuthCallback"
+                 :callback="manualAuthCallback"
+                 @cancel="manualAuthCallback = null"
+    />
 
     <remoteStorage-username-input v-if="remoteStorageUsernameCallback"
                                   :callback="remoteStorageUsernameCallback"
@@ -111,7 +114,7 @@ export default {
           label: "remoteStorage"
         }
       ],
-      authActive: false,
+      manualAuthCallback: null,
       remoteStorageUsernameCallback: null
     };
   },
@@ -164,23 +167,19 @@ export default {
           wnd.document.body.textContent = "You will be redirected to the authorization page of your sync provider shortly.";
         };
 
+        this.manualAuthCallback = code =>
+        {
+          return sync.manualAuthorization(provider, username, code).catch(this.$app.showUnknownError);
+        };
+
         sync.getManualAuthURL(provider, username).then(url =>
         {
           wnd.location.href = url;
         }).catch(error =>
         {
-          this.authActive = false;
+          this.manualAuthCallback = null;
           wnd.close();
           this.$app.showUnknownError(error);
-        });
-
-        this.authActive = true;
-        this.$nextTick(() =>
-        {
-          this.$refs.manualAuth.callback = code =>
-          {
-            return sync.manualAuthorization(provider, username, code).catch(this.$app.showUnknownError);
-          };
         });
       }
       else
