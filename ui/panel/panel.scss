@@ -7,7 +7,7 @@
 @import "../_shared.scss";
 
 $body-width: 600px;
-$body-padding: 10px;
+$page-padding: 10px;
 $menu-border-width: 1px;
 
 :root
@@ -19,7 +19,6 @@ body
 {
   width: $body-width;
   margin: 0 auto;
-  padding: $body-padding;
 }
 
 h1
@@ -44,6 +43,7 @@ a
 {
   display: flex;
   flex-direction: column;
+  padding: $page-padding;
 }
 
 .special-site
@@ -183,6 +183,90 @@ a
   align-items: center;
 }
 
+.tabs
+{
+  display: flex;
+  flex-direction: row;
+
+  & > :not(.tablist)
+  {
+    flex-grow: 1;
+  }
+}
+
+.tablist
+{
+  display: flex;
+  flex-direction: column;
+  background-color: #eee;
+  @include padding-inline-start($inline-spacing);
+
+  & > :first-child
+  {
+    height: $inline-spacing;
+  }
+
+  & > :not(.active)
+  {
+    @include border-end(1px solid #ccc);
+  }
+}
+
+.tab
+{
+  min-width: $icon-size + 2 * $inline-spacing;
+  min-height: $icon-size + 2 * $inline-spacing;
+  background-size: $icon-size;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  border: 1px solid #eee;
+
+  &.active
+  {
+    background-color: $background-color;
+    border-color: #ccc;
+
+    border-radius: $border-radius 0 0 $border-radius;
+    border-right-color: $background-color;
+
+    :root[dir="rtl"] &
+    {
+      border-radius: 0 $border-radius $border-radius 0;
+      border-left-color: $background-color;
+    }
+  }
+
+  &:not(.active):hover
+  {
+    background-color: #f8f8f8;
+  }
+}
+
+.spacer
+{
+  flex-grow: 1;
+}
+
+.password-list
+{
+  background-image: url(../images/md-list.svg);
+}
+
+.sync
+{
+  background-image: url(../images/md-sync.svg);
+
+  &.failed:not(.active)
+  {
+    background-color: #fcc;
+  }
+}
+
+.lock
+{
+  background-image: url(../images/md-exit.svg);
+}
+
 #password-list-site
 {
   flex-grow: 1;
@@ -248,6 +332,11 @@ a
   background-repeat: no-repeat;
 }
 
+a.iconic-link:hover
+{
+  outline: 1px solid #888;
+}
+
 .user-name-container.legacy-warning
 {
   min-width: $icon-size;
@@ -255,12 +344,12 @@ a
   background-size: $icon-size;
   background-repeat: no-repeat;
   background-position: right;
-  background-image: url("../images/android-warning.svg");
+  background-image: url("../images/md-warning.svg");
 }
 
 .password-menu-link
 {
-  background-image: url("../images/android-menu.svg");
+  background-image: url("../images/md-more.svg");
 }
 
 .password-menu-link.menuactive
@@ -465,11 +554,6 @@ a
 {
   width: 27.723px;
   background-image: url(../images/remotestorage.svg);
-}
-
-.sync-state-link.failed
-{
-  color: $error-text;
 }
 
 .sync-lastTime-container

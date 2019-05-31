@@ -78,6 +78,19 @@ $large-icon-size: 48px;
   }
 }
 
+@mixin border-end($spec)
+{
+  :root:not([dir="rtl"]) &
+  {
+    border-right: $spec;
+  }
+
+  :root[dir="rtl"] &
+  {
+    border-left: $spec;
+  }
+}
+
 @mixin float-end
 {
   :root:not([dir="rtl"]) &
@@ -112,7 +125,7 @@ button
 
   padding: $block-padding;
   @include padding-inline-start($icon-size + $block-padding + $inline-spacing);
-  background-image: url(../images/android-warning.svg);
+  background-image: url(../images/md-warning.svg);
   background-size: $icon-size;
   background-position: $block-padding $block-padding;
   background-repeat: no-repeat;

@@ -67,17 +67,6 @@
       <a href="#" @click.prevent="showAll">
         {{ $t("show_all_passwords") }}
       </a>
-      <a href="#" class="sync-state-link" :class="{failed: $app.sync.error && $app.sync.error != 'sync_connection_error'}" @click.prevent="showSync">
-        <template v-if="$app.sync.provider">
-          {{ $t("sync_state") }}
-        </template>
-        <template v-else>
-          {{ $t("sync_setup") }}
-        </template>
-      </a>
-      <a v-cancel href="#" @click.prevent="lockPasswords">
-        {{ $t("lock_passwords") }}
-      </a>
     </div>
   </div>
 </template>
@@ -85,7 +74,7 @@
 <script>
 "use strict";
 
-import {passwords, masterPassword, passwordRetrieval, ui} from "../../proxy";
+import {passwords, passwordRetrieval, ui} from "../../proxy";
 import PasswordMessage from "../../components/PasswordMessage.vue";
 import GeneratedPassword from "../components/GeneratedPassword.vue";
 import PasswordEntry from "../components/PasswordEntry.vue";
@@ -178,16 +167,6 @@ export default {
     {
       ui.showAllPasswords()
         .then(() => window.close())
-        .catch(this.$app.showUnknownError);
-    },
-    showSync()
-    {
-      this.$app.currentPage = "sync";
-    },
-    lockPasswords()
-    {
-      masterPassword.forgetPassword()
-        .then(() => this.$app.masterPasswordState = "set")
         .catch(this.$app.showUnknownError);
     }
   }

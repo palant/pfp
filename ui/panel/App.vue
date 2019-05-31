@@ -12,10 +12,31 @@
     <change-master v-if="masterPasswordState == 'unset' || (masterPasswordState == 'set' && resettingMaster)" />
     <enter-master v-else-if="masterPasswordState == 'set'" />
     <migration v-else-if="masterPasswordState == 'migrating'" />
-    <template v-else-if="masterPasswordState == 'known'">
+    <div v-else-if="masterPasswordState == 'known'" class="tabs">
+      <div class="tablist">
+        <div />
+
+        <a href="#" class="tab password-list"
+           :class="{active: currentPage == 'password-list'}"
+           :title="$t('password_list')"
+           @click.prevent="currentPage = 'password-list'"
+        />
+
+        <a href="#" class="tab sync"
+           :class="{active: currentPage == 'sync', failed: $app.sync.error && $app.sync.error != 'sync_connection_error'}"
+           :title="$t($app.sync.provider ? 'sync_state' : 'sync_setup')"
+           @click.prevent="currentPage = 'sync'"
+        />
+
+        <div class="spacer" />
+
+        <a href="#" class="tab lock" :title="$t('lock_passwords')"
+           @click.prevent="lockPasswords"
+        />
+      </div>
       <password-list v-if="currentPage == 'password-list'" />
       <sync v-else-if="currentPage == 'sync'" />
-    </template>
+    </div>
   </div>
 </template>
 
@@ -24,6 +45,7 @@
 
 import {getSiteDisplayName} from "../common";
 import {port} from "../messaging";
+import {masterPassword} from "../proxy";
 import EnterMaster from "./pages/EnterMaster.vue";
 import ChangeMaster from "./pages/ChangeMaster.vue";
 import Migration from "./pages/Migration.vue";
@@ -97,6 +119,12 @@ export default {
     showUnknownError(error)
     {
       this.unknownError = error;
+    },
+    lockPasswords()
+    {
+      masterPassword.forgetPassword()
+        .then(() => this.masterPasswordState = "set")
+        .catch(this.showUnknownError);
     }
   }
 };
