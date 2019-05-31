@@ -16,6 +16,12 @@
       <div class="tablist">
         <div />
 
+        <a href="#" class="tab select-site"
+           :class="{active: currentPage == 'select-site'}"
+           :title="$t('select_site_label')"
+           @click.prevent="currentPage = 'select-site'"
+        />
+
         <a href="#" class="tab password-list"
            :class="{active: currentPage == 'password-list'}"
            :title="$t('password_list')"
@@ -34,6 +40,7 @@
            @click.prevent="lockPasswords"
         />
       </div>
+      <select-site v-if="currentPage == 'select-site'" @selected="currentPage = 'password-list'" />
       <password-list v-if="currentPage == 'password-list'" />
       <sync v-else-if="currentPage == 'sync'" />
     </div>
@@ -50,6 +57,7 @@ import EnterMaster from "./pages/EnterMaster.vue";
 import ChangeMaster from "./pages/ChangeMaster.vue";
 import Migration from "./pages/Migration.vue";
 import PasswordList from "./pages/PasswordList.vue";
+import SelectSite from "./pages/SelectSite.vue";
 import Sync from "./pages/Sync.vue";
 import Confirm from "../components/Confirm.vue";
 import UnknownError from "../components/UnknownError.vue";
@@ -79,6 +87,7 @@ export default {
     "enter-master": EnterMaster,
     "migration": Migration,
     "password-list": PasswordList,
+    "select-site": SelectSite,
     "sync": Sync,
     "confirm": Confirm,
     "unknown-error": UnknownError
@@ -88,13 +97,20 @@ export default {
     return Object.assign({
       unknownError: null,
       resettingMaster: false,
-      currentPage: "password-list"
+      currentPage: initialData.site === "" ? "select-site" : "password-list"
     }, initialData);
   },
   computed: {
     siteDisplayName()
     {
       return getSiteDisplayName(this.site);
+    }
+  },
+  watch: {
+    site()
+    {
+      if (this.currentPage == "password-list" && this.site === "")
+        this.currentPage = "select-site";
     }
   },
   created: function()

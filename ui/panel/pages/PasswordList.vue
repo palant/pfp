@@ -8,14 +8,11 @@
   <div class="page">
     <div class="password-list-header">
       <label for="password-list-site">{{ $t("site") }}</label>
-      <div class="password-list-site-container">
-        <a v-focus class="select-site" href="#" :title="$t('select_site_label')"
-           @click.prevent="selectSite"
-        />
-        <div id="password-list-site" :class="{ 'special-site': $app.site != $app.siteDisplayName }">
-          {{ $app.siteDisplayName }}
-        </div>
-      </div>
+      <input id="password-list-site" v-focus v-select
+             :class="{ 'special-site': $app.site != $app.siteDisplayName }"
+             type="text" :value="$app.siteDisplayName" readonly
+      >
+
       <span v-if="$app.origSite != $app.site" class="alias-container">
         {{ $t("alias_description", $app.origSite) }}
         <a href="#" @click.prevent="removeAlias">
@@ -28,10 +25,10 @@
         {{ $t("add_alias") }}
       </a>
     </div>
-    <site-selection v-if="modal == 'site-selection'"
-                    :message="selectionMessage" :callback="selectionCallback"
-                    @cancel="modal = null"
-    />
+
+    <modal-overlay v-if="modal == 'site-selection'" :stretch="true" @cancel="modal = null">
+      <site-selection :message="$t('select_alias', $app.origSite)" :callback="selectionCallback" />
+    </modal-overlay>
 
     <password-message ref="password-message"
                       :messages="{
@@ -94,41 +91,19 @@ export default {
   {
     return {
       modal: null,
-      selectionMessage: null,
       selectionCallback: null
     };
-  },
-  mounted()
-  {
-    if (!this.$app.site)
-      this.selectSite();
   },
   methods: {
     showPasswordMessage(message)
     {
       this.$refs["password-message"].message = message;
     },
-    selectSite()
-    {
-      this.selectionMessage = this.$t("select_site");
-      this.selectionCallback = site =>
-      {
-        passwords.getPasswords(site)
-          .then(([origSite, site, pwdList]) =>
-          {
-            this.$app.origSite = origSite;
-            this.$app.site = site;
-            this.$app.pwdList = pwdList;
-          })
-          .catch(this.$app.showUnknownError);
-      };
-      this.modal = "site-selection";
-    },
     addAlias()
     {
-      this.selectionMessage = this.$t("select_alias", this.$app.origSite);
       this.selectionCallback = site =>
       {
+        this.modal = null;
         if (site == this.$app.origSite)
           return;
 

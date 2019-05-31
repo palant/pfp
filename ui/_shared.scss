@@ -26,6 +26,12 @@ $text-icon-size: $font-size;
 $icon-size: 32px;
 $large-icon-size: 48px;
 
+@mixin no-appearance
+{
+  -moz-appearance: none;
+  -webkit-appearance: none;
+}
+
 @mixin padding-inline-start($length)
 {
   :root:not([dir="rtl"]) &
@@ -174,12 +180,11 @@ input[type="checkbox"]
 {
   width: $font-size;
   height: $font-size;
-  -moz-appearance: none;
-  -webkit-appearance: none;
   border: 1px solid black;
   border-radius: 2px;
   margin: 0;
   @include margin-inline-end($inline-spacing);
+  @include no-appearance;
 }
 
 input[type="checkbox"]:checked

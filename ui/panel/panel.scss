@@ -173,14 +173,9 @@ a
 
 .password-list-header
 {
-  margin-bottom: $block-spacing;
-}
-
-.password-list-site-container
-{
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
+  margin-bottom: $block-spacing;
 }
 
 .tabs
@@ -247,6 +242,11 @@ a
   flex-grow: 1;
 }
 
+.select-site
+{
+  background-image: url(../images/search.svg);
+}
+
 .password-list
 {
   background-image: url(../images/md-list.svg);
@@ -269,17 +269,9 @@ a
 
 #password-list-site
 {
-  flex-grow: 1;
-}
-
-.select-site
-{
-  min-width: $icon-size;
-  min-height: $icon-size;
-  background-image: url(../images/search.svg);
-  background-size: $icon-size;
-  background-repeat: no-repeat;
-  @include margin-inline-end($inline-spacing);
+  border-width: 0;
+  background-color: transparent;
+  @include no-appearance;
 }
 
 .alias-container

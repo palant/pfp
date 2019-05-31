@@ -5,35 +5,33 @@
  -->
 
 <template>
-  <modal-overlay :stretch="true" @cancel="$emit('cancel')">
-    <form class="modal-form" @submit.prevent="done(value)">
-      <label for="site-selection-site">{{ message }}</label>
-      <input id="site-selection-site" v-model.trim="value" v-focus v-select
-             type="text" placeholder="example.com" autocomplete="off"
-             @keydown.arrow-down.prevent="activeIndex = Math.min(activeIndex + 1, sites.length - 1)"
-             @keydown.arrow-up.prevent="activeIndex = Math.max(activeIndex - 1, -1)"
-             @keydown.enter="enter"
+  <form class="modal-form" @submit.prevent="done(value)">
+    <label for="site-selection-site">{{ message }}</label>
+    <input id="site-selection-site" v-model.trim="value" v-focus v-select
+           type="text" placeholder="example.com" autocomplete="off"
+           @keydown.arrow-down.prevent="activeIndex = Math.min(activeIndex + 1, sites.length - 1)"
+           @keydown.arrow-up.prevent="activeIndex = Math.max(activeIndex - 1, -1)"
+           @keydown.enter="enter"
+    >
+    <div class="site-autocomplete">
+      <div v-for="(site, index) in sites" :key="site.name" v-scroll-active
+           :class="{
+             'site-entry': true,
+             'active': activeIndex == index,
+             'special-site': site.name != site.displayName
+           }"
+           @click="done(site.name)"
       >
-      <div class="site-autocomplete">
-        <div v-for="(site, index) in sites" :key="site.name" v-scroll-active
-             :class="{
-               'site-entry': true,
-               'active': activeIndex == index,
-               'special-site': site.name != site.displayName
-             }"
-             @click="done(site.name)"
-        >
-          {{ site.prefix }}<strong>{{ site.match }}</strong>{{ site.suffix }}
-        </div>
-        <div v-if="!sites.length">
-          {{ $t("autocomplete_no_sites") }}
-        </div>
+        {{ site.prefix }}<strong>{{ site.match }}</strong>{{ site.suffix }}
       </div>
-      <div class="button-container">
-        <button type="submit">{{ $t("ok") }}</button>
+      <div v-if="!sites.length">
+        {{ $t("autocomplete_no_sites") }}
       </div>
-    </form>
-  </modal-overlay>
+    </div>
+    <div class="button-container">
+      <button type="submit">{{ $t("ok") }}</button>
+    </div>
+  </form>
 </template>
 
 <script>
@@ -90,6 +88,12 @@ export default {
       })
       .catch(this.$app.showUnknownError);
   },
+  updated()
+  {
+    // If our parent is ModalOverlay, make sure to notify it about updates.
+    if (this.$parent.ensureDocHeight)
+      this.$parent.ensureDocHeight();
+  },
   methods: {
     updateSites()
     {
@@ -116,7 +120,6 @@ export default {
     },
     done(site)
     {
-      this.$emit("cancel");
       if (site)
         this.callback(site);
     }
