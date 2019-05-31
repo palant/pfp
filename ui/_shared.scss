@@ -14,6 +14,7 @@ $warning-background: #faa;
 $success-background: #cfc;
 $error-text: #f44;
 $hover-background: #e2f4ff;
+$greyed-color: #ccc;
 
 $block-spacing: 15px;
 $block-padding: 5px;
@@ -267,4 +268,39 @@ input[type="checkbox"]:checked
   display: flex;
   flex-direction: column;
   margin: 0;
+}
+
+.setting
+{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: $block-spacing 0;
+}
+
+.setting:not(:last-child)
+{
+  border-bottom: 1px solid $greyed-color;
+}
+
+.setting-label
+{
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  width: 70%;
+  margin-right: $block-spacing;
+}
+
+.description
+{
+  font-size: 80%;
+  opacity: 0.5;
+  padding-left: $block-spacing;
+}
+
+.setting input:not([type="checkbox"])
+{
+  flex-grow: 1;
+  width: $font-size;
 }

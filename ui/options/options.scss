@@ -6,8 +6,6 @@
 
 @import "../_shared.scss";
 
-$greyed-color: #ccc;
-
 :root
 {
   margin: 0;
@@ -23,39 +21,4 @@ body
 h1
 {
   font-size: 160%;
-}
-
-.setting
-{
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  padding: $block-spacing 0;
-}
-
-.setting:not(:last-child)
-{
-  border-bottom: 1px solid $greyed-color;
-}
-
-.setting-label
-{
-  display: flex;
-  flex-direction: column;
-  flex-grow: 0;
-  width: 70%;
-  margin-right: $block-spacing;
-}
-
-.description
-{
-  font-size: 80%;
-  opacity: 0.5;
-  padding-left: $block-spacing;
-}
-
-.setting input:not([type="checkbox"])
-{
-  flex-grow: 1;
-  width: $font-size;
 }

@@ -18,7 +18,7 @@
 <script>
 "use strict";
 
-import {prefs} from "../../proxy";
+import {prefs} from "../proxy";
 
 export default {
   name: "Setting",

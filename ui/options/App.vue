@@ -14,7 +14,7 @@
 <script>
 "use strict";
 
-import Setting from "./components/Setting.vue";
+import Setting from "../components/Setting.vue";
 
 export default {
   name: "App",

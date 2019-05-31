@@ -39,6 +39,12 @@
            @click.prevent="currentPage = 'sync'"
         />
 
+        <a href="#" class="tab settings"
+           :class="{active: currentPage == 'settings'}"
+           :title="$t('settings')"
+           @click.prevent="currentPage = 'settings'"
+        />
+
         <div class="spacer" />
 
         <a href="#" class="tab lock" :title="$t('lock_passwords')"
@@ -48,6 +54,7 @@
       <select-site v-if="currentPage == 'select-site'" @selected="currentPage = 'password-list'" />
       <password-list v-if="currentPage == 'password-list'" />
       <sync v-else-if="currentPage == 'sync'" />
+      <settings v-else-if="currentPage == 'settings'" />
     </div>
   </div>
 </template>
@@ -63,6 +70,7 @@ import ChangeMaster from "./pages/ChangeMaster.vue";
 import Migration from "./pages/Migration.vue";
 import PasswordList from "./pages/PasswordList.vue";
 import SelectSite from "./pages/SelectSite.vue";
+import Settings from "./pages/Settings.vue";
 import Sync from "./pages/Sync.vue";
 import Confirm from "../components/Confirm.vue";
 import UnknownError from "../components/UnknownError.vue";
@@ -70,7 +78,8 @@ import UnknownError from "../components/UnknownError.vue";
 const pages = [
   "select-site",
   "password-list",
-  "sync"
+  "sync",
+  "settings"
 ];
 
 let initialData = {
@@ -99,6 +108,7 @@ export default {
     "migration": Migration,
     "password-list": PasswordList,
     "select-site": SelectSite,
+    "settings": Settings,
     "sync": Sync,
     "confirm": Confirm,
     "unknown-error": UnknownError
