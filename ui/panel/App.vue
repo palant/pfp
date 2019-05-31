@@ -5,7 +5,12 @@
  -->
 
 <template>
-  <div @keydown.ctrl.69.prevent="testUnknownError">
+  <div @keydown.ctrl.69.prevent="testUnknownError"
+       @keydown.ctrl.arrow-up.prevent="prevTab"
+       @keydown.meta.arrow-up.prevent="prevTab"
+       @keydown.ctrl.arrow-down.prevent="nextTab"
+       @keydown.meta.arrow-down.prevent="nextTab"
+  >
     <confirm ref="confirm" />
     <unknown-error v-if="unknownError" :error="unknownError" @close="unknownError = null" />
 
@@ -61,6 +66,12 @@ import SelectSite from "./pages/SelectSite.vue";
 import Sync from "./pages/Sync.vue";
 import Confirm from "../components/Confirm.vue";
 import UnknownError from "../components/UnknownError.vue";
+
+const pages = [
+  "select-site",
+  "password-list",
+  "sync"
+];
 
 let initialData = {
   site: null,
@@ -122,6 +133,18 @@ export default {
     testUnknownError()
     {
       this.showUnknownError(new Error("Unexpected error triggered via Ctrl+E"));
+    },
+    prevTab()
+    {
+      let index = pages.indexOf(this.currentPage);
+      if (index - 1 >= 0)
+        this.currentPage = pages[index - 1];
+    },
+    nextTab()
+    {
+      let index = pages.indexOf(this.currentPage);
+      if (index >= 0 && index + 1 < pages.length)
+        this.currentPage = pages[index + 1];
     },
     confirm(message)
     {
