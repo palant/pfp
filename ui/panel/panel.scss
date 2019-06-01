@@ -406,6 +406,29 @@ a.iconic-link:hover
   }
 }
 
+.password-menu-entry-container
+{
+  display: flex;
+  flex-direction: row;
+
+  & > .password-menu-entry
+  {
+    flex-grow: 1;
+
+    &:first-child
+    {
+      @include padding-inline-end($inline-spacing);
+      @include border-end(1px solid #ccc);
+    }
+
+    &:last-child
+    {
+      justify-content: flex-end;
+      @include padding-inline-start($inline-spacing);
+    }
+  }
+}
+
 .add-password-link
 {
   min-height: $icon-size;

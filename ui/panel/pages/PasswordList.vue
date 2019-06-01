@@ -36,6 +36,7 @@
                       :messages="{
                         password_ready_message: false,
                         password_copied_message: true,
+                        username_copied_message: true,
                         no_such_password: false,
                         unknown_generation_method: false,
                         wrong_site_message: false,

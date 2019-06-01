@@ -8,15 +8,22 @@
   <modal-overlay @cancel="$emit('cancel')"
                  @keydown.native.arrow-down="advanceFocus(true)"
                  @keydown.native.arrow-up="advanceFocus(false)"
+                 @keydown.native.arrow-left="selectAdjacentItem(false)"
+                 @keydown.native.arrow-right="selectAdjacentItem(true)"
   >
     <a v-if="!$isWebClient" v-focus href="#" class="password-menu-entry" @click.prevent="$parent.fillIn">
       <span class="to-document-link iconic-link" />
       {{ $t("to_document") }}
     </a>
-    <a v-focus="$isWebClient" href="#" class="password-menu-entry" @click.prevent="$parent.copy">
-      <span class="to-clipboard-link iconic-link" />
-      {{ $t("to_clipboard") }}
-    </a>
+    <div class="password-menu-entry-container">
+      <a v-focus="$isWebClient" href="#" class="password-menu-entry" @click.prevent="$parent.copy">
+        <span class="to-clipboard-link iconic-link" />
+        {{ $t("to_clipboard") }}
+      </a>
+      <a href="#" class="password-menu-entry" @click.prevent="$parent.copyUsername">
+        {{ $t("to_clipboard_username") }}
+      </a>
+    </div>
     <a href="#" class="password-menu-entry" @click.prevent="$parent.showQRCode">
       <span class="show-qrcode-link iconic-link" />
       {{ $t("show_qrcode") }}
@@ -61,7 +68,24 @@ export default {
       if (!current || !current.classList.contains("password-menu-entry"))
         return;
 
+      if (current.parentNode && current.parentNode.classList.contains("password-menu-entry-container"))
+        current = current.parentNode;
       let next = forward ? current.nextElementSibling : current.previousElementSibling;
+      if (next && next.classList.contains("password-menu-entry-container"))
+        next = next.firstElementChild;
+      if (next && next.classList.contains("password-menu-entry"))
+        next.focus();
+    },
+    selectAdjacentItem(right)
+    {
+      let current = document.activeElement;
+      if (!current || !current.classList.contains("password-menu-entry"))
+        return;
+
+      if (!current.parentNode || !current.parentNode.classList.contains("password-menu-entry-container"))
+        return;
+
+      let next = right ? current.nextElementSibling : current.previousElementSibling;
       if (next && next.classList.contains("password-menu-entry"))
         next.focus();
     }

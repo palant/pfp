@@ -153,6 +153,12 @@ export default {
         }).catch(error => this.$parent.showPasswordMessage(error));
       }
     },
+    copyUsername()
+    {
+      this.modal = null;
+      clipboardSet(this.password.name);
+      this.$parent.showPasswordMessage("username_copied_message");
+    },
     showQRCode()
     {
       this.modal = null;
