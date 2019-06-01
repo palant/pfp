@@ -29,7 +29,7 @@
       </div>
     </div>
     <div class="button-container">
-      <button type="submit">{{ $t("ok") }}</button>
+      <button type="submit">{{ $t("select") }}</button>
     </div>
   </form>
 </template>
