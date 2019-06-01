@@ -272,13 +272,6 @@ a
   background-image: url(../images/md-exit.svg);
 }
 
-#password-list-site
-{
-  border-width: 0;
-  background-color: transparent;
-  @include no-appearance;
-}
-
 .alias-container
 {
   font-size: $font-size-small;

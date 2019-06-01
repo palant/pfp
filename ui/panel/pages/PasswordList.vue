@@ -7,11 +7,13 @@
 <template>
   <div class="page">
     <div class="password-list-header">
-      <label for="password-list-site">{{ $t("site") }}</label>
-      <input id="password-list-site" v-focus v-select
-             :class="{ 'special-site': $app.site != $app.siteDisplayName }"
-             type="text" :value="$app.siteDisplayName" readonly
+      <label for="site">{{ $t("site") }}</label>
+      <external-link id="site" v-focus
+                     :class="{ 'special-site': $app.site != $app.siteDisplayName }"
+                     type="url" :param="'https://' + $app.siteDisplayName"
       >
+        {{ $app.siteDisplayName }}
+      </external-link>
 
       <span v-if="$app.origSite != $app.site" class="alias-container">
         {{ $t("alias_description", $app.origSite) }}
