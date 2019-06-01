@@ -25,9 +25,6 @@
           <div v-if="$app.sync.error" class="sync-failed">{{ $t("sync_failed") }}</div>
           <div v-else class="sync-succeeded">{{ $t("sync_succeeded") }}</div>
         </template>
-        <div class="sync-button-container">
-          <button v-focus :disabled="$app.sync.isSyncing" @click="doSync">{{ $t("do_sync") }}</button>
-        </div>
       </div>
 
       <div v-if="$app.sync.error" class="warning sync-error">
@@ -37,6 +34,7 @@
         </a>
       </div>
       <div class="button-container">
+        <button v-focus :disabled="$app.sync.isSyncing" @click="doSync">{{ $t("do_sync") }}</button>
         <button @click="disableSync">{{ $t("sync_disable") }}</button>
       </div>
     </template>
