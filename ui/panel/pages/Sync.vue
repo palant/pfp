@@ -16,14 +16,14 @@
       </div>
 
       <div class="block-start">{{ $t("sync_lastTime") }}</div>
-      <div class="sync-lastTime-container">
-        <div v-if="$app.sync.isSyncing">{{ $t("sync_lastTime_now") }}</div>
-        <div v-else-if="$app.sync.lastSync">{{ new Date($app.sync.lastSync).toLocaleString() }}</div>
-        <div v-else>{{ $t("sync_lastTime_never") }}</div>
+      <div>
+        <template v-if="$app.sync.isSyncing">{{ $t("sync_lastTime_now") }}</template>
+        <template v-else-if="$app.sync.lastSync">{{ new Date($app.sync.lastSync).toLocaleString() }}</template>
+        <template v-else>{{ $t("sync_lastTime_never") }}</template>
 
         <template v-if="$app.sync.lastSync && !$app.sync.isSyncing">
-          <div v-if="$app.sync.error" class="sync-failed">{{ $t("sync_failed") }}</div>
-          <div v-else class="sync-succeeded">{{ $t("sync_succeeded") }}</div>
+          <span v-if="$app.sync.error" class="sync-failed">{{ " " + $t("sync_failed") }}</span>
+          <template v-else>{{ " " + $t("sync_succeeded") }}</template>
         </template>
       </div>
 

@@ -546,18 +546,6 @@ a.iconic-link:hover
   background-image: url(../images/remotestorage.svg);
 }
 
-.sync-lastTime-container
-{
-  display: flex;
-  flex-direction: row;
-}
-
-.sync-failed,
-.sync-succeeded
-{
-  margin: 0 $inline-spacing;
-}
-
 .sync-failed
 {
   color: $error-text;
