@@ -8,6 +8,7 @@
 
 import Vue from "vue";
 
+import {keyboardNavigationType} from "./common";
 import I18n from "./i18n";
 import ExternalLink from "./components/ExternalLink.vue";
 import ModalOverlay from "./components/ModalOverlay.vue";
@@ -72,28 +73,9 @@ Vue.directive("keyboard-navigation", {
       if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey)
         return;
 
-      let type;
-      switch (event.key)
-      {
-        case "ArrowUp":
-        case "ArrowLeft":
-          type = "back";
-          break;
-        case "ArrowDown":
-        case "ArrowRight":
-          type = "forward";
-          break;
-        case "Home":
-        case "PageUp":
-          type = "start";
-          break;
-        case "End":
-        case "PageDown":
-          type = "end";
-          break;
-        default:
-          return;
-      }
+      let type = keyboardNavigationType(event);
+      if (!type)
+        return;
 
       let current = document.activeElement;
       let elements = document.getElementsByClassName(binding.expression);

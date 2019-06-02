@@ -23,3 +23,23 @@ export function getSiteDisplayName(site)
   else
     return "???";
 }
+
+export function keyboardNavigationType(event)
+{
+  switch (event.key)
+  {
+    case "ArrowUp":
+    case "ArrowLeft":
+      return "back";
+    case "ArrowDown":
+    case "ArrowRight":
+      return "forward";
+    case "Home":
+    case "PageUp":
+      return "start";
+    case "End":
+    case "PageDown":
+      return "end";
+  }
+  return null;
+}

@@ -6,10 +6,8 @@
 
 <template>
   <div @keydown.ctrl.69.prevent="testUnknownError"
-       @keydown.ctrl.arrow-up.prevent="prevTab"
-       @keydown.meta.arrow-up.prevent="prevTab"
-       @keydown.ctrl.arrow-down.prevent="nextTab"
-       @keydown.meta.arrow-down.prevent="nextTab"
+       @keydown.ctrl="tabNavigation"
+       @keydown.meta="tabNavigation"
   >
     <confirm ref="confirm" />
     <unknown-error v-if="unknownError" :error="unknownError" @close="unknownError = null" />
@@ -62,7 +60,7 @@
 <script>
 "use strict";
 
-import {getSiteDisplayName} from "../common";
+import {getSiteDisplayName, keyboardNavigationType} from "../common";
 import {port} from "../messaging";
 import {masterPassword} from "../proxy";
 import EnterMaster from "./pages/EnterMaster.vue";
@@ -144,17 +142,22 @@ export default {
     {
       this.showUnknownError(new Error("Unexpected error triggered via Ctrl+E"));
     },
-    prevTab()
+    tabNavigation(event)
     {
+      let type = keyboardNavigationType(event);
       let index = pages.indexOf(this.currentPage);
-      if (index - 1 >= 0)
+      if (!type || index < 0)
+        return;
+
+      event.preventDefault();
+      if (type == "back" && index - 1 >= 0)
         this.currentPage = pages[index - 1];
-    },
-    nextTab()
-    {
-      let index = pages.indexOf(this.currentPage);
-      if (index >= 0 && index + 1 < pages.length)
+      else if (type == "forward" && index + 1 < pages.length)
         this.currentPage = pages[index + 1];
+      else if (type == "start")
+        this.currentPage = pages[0];
+      else if (type == "end")
+        this.currentPage = pages[pages.length - 1];
     },
     confirm(message)
     {
