@@ -6,21 +6,17 @@
 
 "use strict";
 
-let clipboardDummy = null;
-
 export function set(data)
 {
-  if (!clipboardDummy)
-  {
-    clipboardDummy = document.createElement("textarea");
-    clipboardDummy.style.position = "absolute";
-    clipboardDummy.style.width = "0px";
-    clipboardDummy.style.height = "0px";
-    clipboardDummy.style.left = "-1000px";
-    document.body.appendChild(clipboardDummy);
-  }
+  let dummy = document.createElement("textarea");
+  dummy.style.position = "absolute";
+  dummy.style.width = "0px";
+  dummy.style.height = "0px";
+  dummy.style.left = "-1000px";
+  document.body.appendChild(dummy);
 
-  clipboardDummy.value = data;
-  clipboardDummy.select();
+  dummy.value = data;
+  dummy.select();
   document.execCommand("copy", false, null);
+  document.body.removeChild(dummy);
 }
