@@ -129,8 +129,8 @@ button
 {
   background-color: $warning-background;
   border-radius: $border-radius;
-
   padding: $block-padding;
+
   @include padding-inline-start($icon-size + $block-padding + $inline-spacing);
   background-image: url(../images/md-warning.svg);
   background-size: $icon-size;
@@ -142,6 +142,7 @@ button
 {
   background-color: $success-background;
   border-radius: $border-radius;
+  padding: $block-padding;
 }
 
 .error
