@@ -8,8 +8,6 @@
   <modal-overlay @cancel="$emit('cancel')"
                  @keydown.native.arrow-down="advanceFocus(true)"
                  @keydown.native.arrow-up="advanceFocus(false)"
-                 @keydown.native.arrow-left="selectAdjacentItem(false)"
-                 @keydown.native.arrow-right="selectAdjacentItem(true)"
   >
     <a v-if="!$isWebClient" v-focus href="#" class="password-menu-entry" @click.prevent="$parent.fillIn">
       <span class="to-document-link iconic-link" />
@@ -65,29 +63,15 @@ export default {
     advanceFocus(forward)
     {
       let current = document.activeElement;
-      if (!current || !current.classList.contains("password-menu-entry"))
+      let elements = document.getElementsByClassName("password-menu-entry");
+      let index = [].indexOf.call(elements, current);
+      if (index < 0)
         return;
 
-      if (current.parentNode && current.parentNode.classList.contains("password-menu-entry-container"))
-        current = current.parentNode;
-      let next = forward ? current.nextElementSibling : current.previousElementSibling;
-      if (next && next.classList.contains("password-menu-entry-container"))
-        next = next.firstElementChild;
-      if (next && next.classList.contains("password-menu-entry"))
-        next.focus();
-    },
-    selectAdjacentItem(right)
-    {
-      let current = document.activeElement;
-      if (!current || !current.classList.contains("password-menu-entry"))
-        return;
-
-      if (!current.parentNode || !current.parentNode.classList.contains("password-menu-entry-container"))
-        return;
-
-      let next = right ? current.nextElementSibling : current.previousElementSibling;
-      if (next && next.classList.contains("password-menu-entry"))
-        next.focus();
+      if (forward && index + 1 < elements.length)
+        elements[index + 1].focus();
+      else if (!forward && index - 1 >= 0)
+        elements[index - 1].focus();
     }
   }
 };
