@@ -535,15 +535,14 @@ a.iconic-link:hover
 
 .sync-provider-link
 {
-  font-size: 150%;
+  font-size: 120%;
   font-weight: bold;
-  margin-top: $block-spacing;
   color: $text-color;
 }
 
 .sync-provider-icon
 {
-  $height: 32px;
+  $height: 24px;
   display: inline-block;
   margin: 0 $inline-spacing;
   height: $height;
@@ -553,19 +552,19 @@ a.iconic-link:hover
 
 .sync-provider-icon.dropbox
 {
-  width: 37.672px;
+  width: 28.254px;
   background-image: url(../images/dropbox.svg);
 }
 
 .sync-provider-icon.gdrive
 {
-  width: 36.944px;
+  width: 27.707px;
   background-image: url(../images/gdrive.svg);
 }
 
 .sync-provider-icon.remotestorage
 {
-  width: 27.723px;
+  width: 20.792px;
   background-image: url(../images/remotestorage.svg);
 }
 
