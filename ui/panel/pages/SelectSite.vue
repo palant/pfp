@@ -6,7 +6,7 @@
 
 <template>
   <div class="page">
-    <site-selection :message="$t('select-site')" :callback="selected" />
+    <site-selection :message="$t('select_site')" :callback="selected" />
   </div>
 </template>
 
