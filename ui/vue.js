@@ -64,6 +64,56 @@ Vue.directive("scroll-active", {
   }
 });
 
+Vue.directive("keyboard-navigation", {
+  inserted(element, binding)
+  {
+    element.addEventListener("keydown", event =>
+    {
+      if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey)
+        return;
+
+      let type;
+      switch (event.key)
+      {
+        case "ArrowUp":
+        case "ArrowLeft":
+          type = "back";
+          break;
+        case "ArrowDown":
+        case "ArrowRight":
+          type = "forward";
+          break;
+        case "Home":
+        case "PageUp":
+          type = "start";
+          break;
+        case "End":
+        case "PageDown":
+          type = "end";
+          break;
+        default:
+          return;
+      }
+
+      let current = document.activeElement;
+      let elements = document.getElementsByClassName(binding.expression);
+      let index = [].indexOf.call(elements, current);
+      if (index < 0)
+        return;
+
+      event.preventDefault();
+      if (type == "back" && index - 1 >= 0)
+        elements[index - 1].focus();
+      else if (type == "forward" && index + 1 < elements.length)
+        elements[index + 1].focus();
+      else if (type == "start")
+        elements[0].focus();
+      else if (type == "end")
+        elements[elements.length - 1].focus();
+    });
+  }
+});
+
 Vue.mixin({
   beforeCreate()
   {

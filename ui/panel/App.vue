@@ -18,10 +18,7 @@
     <enter-master v-else-if="masterPasswordState == 'set'" />
     <migration v-else-if="masterPasswordState == 'migrating'" />
     <div v-else-if="masterPasswordState == 'known'" class="tabs">
-      <div class="tablist"
-           @keydown.arrow-down="advanceFocus(true)"
-           @keydown.arrow-up="advanceFocus(false)"
-      >
+      <div v-keyboard-navigation="tab" class="tablist">
         <div />
 
         <a href="#" class="tab select-site"
@@ -65,7 +62,7 @@
 <script>
 "use strict";
 
-import {getSiteDisplayName, advanceFocus} from "../common";
+import {getSiteDisplayName} from "../common";
 import {port} from "../messaging";
 import {masterPassword} from "../proxy";
 import EnterMaster from "./pages/EnterMaster.vue";
@@ -143,7 +140,6 @@ export default {
   },
   methods:
   {
-    advanceFocus: advanceFocus.bind(null, "tab"),
     testUnknownError()
     {
       this.showUnknownError(new Error("Unexpected error triggered via Ctrl+E"));

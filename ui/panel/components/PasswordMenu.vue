@@ -5,10 +5,7 @@
  -->
 
 <template>
-  <modal-overlay @cancel="$emit('cancel')"
-                 @keydown.native.arrow-down="advanceFocus(true)"
-                 @keydown.native.arrow-up="advanceFocus(false)"
-  >
+  <modal-overlay v-keyboard-navigation="password-menu-entry" @cancel="$emit('cancel')">
     <a v-if="!$isWebClient" v-focus href="#" class="password-menu-entry" @click.prevent="$parent.fillIn">
       <span class="to-document-link iconic-link" />
       {{ $t("to_document") }}
@@ -52,17 +49,12 @@
 <script>
 "use strict";
 
-import {advanceFocus} from "../../common";
-
 export default {
   props: {
     password: {
       type: Object,
       required: true
     }
-  },
-  methods: {
-    advanceFocus: advanceFocus.bind(null, "password-menu-entry")
   }
 };
 </script>

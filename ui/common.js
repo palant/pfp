@@ -23,17 +23,3 @@ export function getSiteDisplayName(site)
   else
     return "???";
 }
-
-export function advanceFocus(className, forward)
-{
-  let current = document.activeElement;
-  let elements = document.getElementsByClassName(className);
-  let index = [].indexOf.call(elements, current);
-  if (index < 0)
-    return;
-
-  if (forward && index + 1 < elements.length)
-    elements[index + 1].focus();
-  else if (!forward && index - 1 >= 0)
-    elements[index - 1].focus();
-}

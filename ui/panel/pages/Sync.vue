@@ -40,11 +40,7 @@
     </template>
     <template v-else>
       <div class="sync-section">{{ $t("sync_selection_label") }}</div>
-      <div
-        class="sync-provider-selection"
-        @keydown.arrow-down="advanceFocus(true)"
-        @keydown.arrow-up="advanceFocus(false)"
-      >
+      <div v-keyboard-navigation="sync-provider-link" class="sync-provider-selection">
         <a v-for="(provider, index) in providers" :key="provider.name"
            v-focus="index == 0" class="sync-provider-link"
            href="#" @click.prevent="authorize(provider.name)"
@@ -84,7 +80,6 @@
 <script>
 "use strict";
 
-import {advanceFocus} from "../../common";
 import {sync} from "../../proxy";
 import ManualAuth from "../components/ManualAuth.vue";
 import RemoteStorageUsernameInput from "../components/RemoteStorageUsernameInput.vue";
@@ -118,7 +113,6 @@ export default {
   },
   methods:
   {
-    advanceFocus: advanceFocus.bind(null, "sync-provider-link"),
     labelForProvider(name)
     {
       for (let provider of this.providers)
