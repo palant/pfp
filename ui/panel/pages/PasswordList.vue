@@ -6,35 +6,33 @@
 
 <template>
   <div class="page">
-    <div class="password-list-header">
-      <label for="site">{{ $t("site") }}</label>
-      <external-link v-if="$app.site == $app.siteDisplayName" id="site" v-focus
-                     type="url" :param="'https://' + $app.site"
-      >
-        {{ $app.siteDisplayName }}
-      </external-link>
-      <span v-else v-focus class="special-site" tabindex="0">
-        {{ $app.siteDisplayName }}
-      </span>
+    <label for="site">{{ $t("site") }}</label>
+    <external-link v-if="$app.site == $app.siteDisplayName" id="site" v-focus
+                   type="url" :param="'https://' + $app.site"
+    >
+      {{ $app.siteDisplayName }}
+    </external-link>
+    <span v-else v-focus class="special-site" tabindex="0">
+      {{ $app.siteDisplayName }}
+    </span>
 
-      <span v-if="$app.origSite != $app.site" class="alias-container">
-        {{ $t("alias_description", $app.origSite) }}
-        <a href="#" @click.prevent="removeAlias">
-          {{ $t("remove_alias") }}
-        </a>
-      </span>
-      <a v-else-if="$app.site && $app.site != 'pfp.invalid' && !$app.pwdList.length"
-         class="alias-container" href="#" @click.prevent="addAlias"
-      >
-        {{ $t("add_alias") }}
+    <span v-if="$app.origSite != $app.site" class="alias-container">
+      {{ $t("alias_description", $app.origSite) }}
+      <a href="#" @click.prevent="removeAlias">
+        {{ $t("remove_alias") }}
       </a>
-    </div>
+    </span>
+    <a v-else-if="$app.site && $app.site != 'pfp.invalid' && !$app.pwdList.length"
+       class="alias-container" href="#" @click.prevent="addAlias"
+    >
+      {{ $t("add_alias") }}
+    </a>
 
     <modal-overlay v-if="modal == 'site-selection'" :stretch="true" @cancel="modal = null">
       <site-selection :message="$t('select_alias', $app.origSite)" :callback="selectionCallback" />
     </modal-overlay>
 
-    <password-message ref="password-message"
+    <password-message ref="password-message" class="block-start"
                       :messages="{
                         password_ready_message: false,
                         password_copied_message: true,
