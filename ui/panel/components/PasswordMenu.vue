@@ -52,6 +52,8 @@
 <script>
 "use strict";
 
+import {advanceFocus} from "../../common";
+
 export default {
   props: {
     password: {
@@ -60,19 +62,7 @@ export default {
     }
   },
   methods: {
-    advanceFocus(forward)
-    {
-      let current = document.activeElement;
-      let elements = document.getElementsByClassName("password-menu-entry");
-      let index = [].indexOf.call(elements, current);
-      if (index < 0)
-        return;
-
-      if (forward && index + 1 < elements.length)
-        elements[index + 1].focus();
-      else if (!forward && index - 1 >= 0)
-        elements[index - 1].focus();
-    }
+    advanceFocus: advanceFocus.bind(null, "password-menu-entry")
   }
 };
 </script>
