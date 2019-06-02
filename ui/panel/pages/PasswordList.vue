@@ -8,12 +8,14 @@
   <div class="page">
     <div class="password-list-header">
       <label for="site">{{ $t("site") }}</label>
-      <external-link id="site" v-focus
-                     :class="{ 'special-site': $app.site != $app.siteDisplayName }"
-                     type="url" :param="'https://' + $app.siteDisplayName"
+      <external-link v-if="$app.site == $app.siteDisplayName" id="site" v-focus
+                     type="url" :param="'https://' + $app.site"
       >
         {{ $app.siteDisplayName }}
       </external-link>
+      <span v-else v-focus class="special-site" tabindex="0">
+        {{ $app.siteDisplayName }}
+      </span>
 
       <span v-if="$app.origSite != $app.site" class="alias-container">
         {{ $t("alias_description", $app.origSite) }}
