@@ -26,13 +26,14 @@ export function getSiteDisplayName(site)
 
 export function keyboardNavigationType(event)
 {
+  let rtl = document.documentElement.getAttribute("dir") == "rtl";
   switch (event.key)
   {
     case "ArrowUp":
-    case "ArrowLeft":
+    case rtl ? "ArrowRight" : "ArrowLeft":
       return "back";
     case "ArrowDown":
-    case "ArrowRight":
+    case rtl ? "ArrowLeft" : "ArrowRight":
       return "forward";
     case "Home":
     case "PageUp":
