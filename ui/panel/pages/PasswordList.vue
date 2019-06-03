@@ -7,12 +7,13 @@
 <template>
   <div class="page">
     <label for="site">{{ $t("site") }}</label>
-    <external-link v-if="$app.site == $app.siteDisplayName" id="site" v-focus
+    <external-link v-if="$app.site == $app.siteDisplayName" id="site"
+                   v-focus="!$app.pwdList.length"
                    type="url" :param="'https://' + $app.site"
     >
       {{ $app.siteDisplayName }}
     </external-link>
-    <span v-else v-focus class="special-site" tabindex="0">
+    <span v-else v-focus="!$app.pwdList.length" class="special-site" tabindex="0">
       {{ $app.siteDisplayName }}
     </span>
 
@@ -47,9 +48,9 @@
     <div class="block-start">{{ $t("passwords_label") }}</div>
     <div v-if="!$app.pwdList.length">{{ $t("no_passwords_message") }}</div>
     <div v-else class="password-list-container">
-      <password-entry v-for="password in $app.pwdList"
+      <password-entry v-for="(password, index) in $app.pwdList"
                       :key="password.name + '\0' + password.revision"
-                      :password="password"
+                      :password="password" :focus="index == 0"
       />
     </div>
 
