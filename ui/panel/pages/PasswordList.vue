@@ -47,7 +47,7 @@
 
     <div class="block-start">{{ $t("passwords_label") }}</div>
     <div v-if="!$app.pwdList.length">{{ $t("no_passwords_message") }}</div>
-    <div v-else class="password-list-container">
+    <div v-else class="password-list-container" @keydown="keyboardNavigation">
       <password-entry v-for="(password, index) in $app.pwdList"
                       :key="password.name + '\0' + password.revision"
                       :password="password" :focus="index == 0"
@@ -75,6 +75,7 @@
 <script>
 "use strict";
 
+import {keyboardNavigationType} from "../../common";
 import {passwords, passwordRetrieval, ui} from "../../proxy";
 import PasswordMessage from "../../components/PasswordMessage.vue";
 import GeneratedPassword from "../components/GeneratedPassword.vue";
@@ -99,6 +100,51 @@ export default {
     };
   },
   methods: {
+    keyboardNavigation(event)
+    {
+      if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey)
+        return;
+
+      let type = keyboardNavigationType(event);
+      if (!type)
+        return;
+
+      let current = document.activeElement;
+      if (!current.parentNode.classList.contains("password-container"))
+        return;
+
+      let container = current.parentNode;
+      let elements = container.getElementsByClassName("iconic-link");
+      let index = [].indexOf.call(elements, current);
+      if (index < 0)
+        return;
+
+      event.preventDefault();
+      if (type.endsWith("inrow"))
+      {
+        if (type == "backinrow" && index - 1 >= 0)
+          elements[index - 1].focus();
+        else if (type == "forwardinrow" && index + 1 < elements.length)
+          elements[index + 1].focus();
+        else if (type == "startinrow")
+          elements[0].focus();
+        else if (type == "endinrow")
+          elements[elements.length - 1].focus();
+      }
+      else
+      {
+        let containers = this.$el.getElementsByClassName("password-container");
+        let containerIndex = [].indexOf.call(containers, container);
+        if (type == "back" && containerIndex - 1 >= 0)
+          containers[containerIndex - 1].getElementsByClassName("iconic-link")[index].focus();
+        else if (type == "forward" && containerIndex + 1 < containers.length)
+          containers[containerIndex + 1].getElementsByClassName("iconic-link")[index].focus();
+        else if (type == "start")
+          containers[0].getElementsByClassName("iconic-link")[index].focus();
+        else if (type == "end")
+          containers[containers.length - 1].getElementsByClassName("iconic-link")[index].focus();
+      }
+    },
     showPasswordMessage(message)
     {
       this.$refs["password-message"].message = message;

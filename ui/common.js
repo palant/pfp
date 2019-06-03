@@ -30,15 +30,19 @@ export function keyboardNavigationType(event)
   switch (event.key)
   {
     case "ArrowUp":
-    case rtl ? "ArrowRight" : "ArrowLeft":
       return "back";
+    case rtl ? "ArrowRight" : "ArrowLeft":
+      return "backinrow";
     case "ArrowDown":
-    case rtl ? "ArrowLeft" : "ArrowRight":
       return "forward";
+    case rtl ? "ArrowLeft" : "ArrowRight":
+      return "forwardinrow";
     case "Home":
+      return "startinrow";
     case "PageUp":
       return "start";
     case "End":
+      return "endinrow";
     case "PageDown":
       return "end";
   }

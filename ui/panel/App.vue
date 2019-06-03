@@ -150,13 +150,13 @@ export default {
         return;
 
       event.preventDefault();
-      if (type == "back" && index - 1 >= 0)
+      if (type.startsWith("back") && index - 1 >= 0)
         this.currentPage = pages[index - 1];
-      else if (type == "forward" && index + 1 < pages.length)
+      else if (type.startsWith("forward") && index + 1 < pages.length)
         this.currentPage = pages[index + 1];
-      else if (type == "start")
+      else if (type.startsWith("start"))
         this.currentPage = pages[0];
-      else if (type == "end")
+      else if (type.startsWith("end"))
         this.currentPage = pages[pages.length - 1];
     },
     confirm(message)

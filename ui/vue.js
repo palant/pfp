@@ -84,13 +84,13 @@ Vue.directive("keyboard-navigation", {
         return;
 
       event.preventDefault();
-      if (type == "back" && index - 1 >= 0)
+      if (type.startsWith("back") && index - 1 >= 0)
         elements[index - 1].focus();
-      else if (type == "forward" && index + 1 < elements.length)
+      else if (type.startsWith("forward") && index + 1 < elements.length)
         elements[index + 1].focus();
-      else if (type == "start")
+      else if (type.startsWith("start"))
         elements[0].focus();
-      else if (type == "end")
+      else if (type.startsWith("end"))
         elements[elements.length - 1].focus();
     });
   }
