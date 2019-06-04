@@ -9,6 +9,7 @@
 let crypto = require("crypto");
 
 let fakeEncryption = true;
+let randomByte = null;
 
 exports.enableFakeEncryption = () =>
 {
@@ -18,6 +19,16 @@ exports.enableFakeEncryption = () =>
 exports.disableFakeEncryption = () =>
 {
   fakeEncryption = false;
+};
+
+exports.enableFakeRandom = value =>
+{
+  randomByte = value;
+};
+
+exports.disableFakeRandom = () =>
+{
+  randomByte = null;
 };
 
 function Key(keyData, algo, usages)
@@ -44,8 +55,11 @@ exports.getRandomValues = function(buf)
 {
   if (buf.BYTES_PER_ELEMENT != 1)
     throw new Error("Parameter doesn't appear to be an Uint8Array.");
-  let bytes = require("crypto").randomBytes(buf.length);
-  buf.set(bytes);
+
+  if (randomByte === null)
+    buf.set(require("crypto").randomBytes(buf.length));
+  else
+    buf.fill(randomByte);
 };
 
 function getEncryptionPrefix(algoName, key, iv)

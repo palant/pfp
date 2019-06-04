@@ -26,12 +26,14 @@ function done()
 exports.setUp = function(callback)
 {
   crypto.disableFakeEncryption();
+  crypto.enableFakeRandom(2);
   callback();
 };
 
 exports.tearDown = function(callback)
 {
   crypto.enableFakeEncryption();
+  crypto.disableFakeRandom();
   callback();
 };
 
