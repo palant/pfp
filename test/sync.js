@@ -482,8 +482,7 @@ exports.testRekey = function(test)
         lower: true,
         upper: false,
         number: true,
-        symbol: false,
-        legacy: true
+        symbol: false
       }),
       passwords.addGenerated({
         site: "example.info",
@@ -492,8 +491,7 @@ exports.testRekey = function(test)
         lower: false,
         upper: true,
         number: false,
-        symbol: true,
-        legacy: false
+        symbol: true
       }),
       passwords.addStored({
         site: "example.com",
@@ -525,7 +523,7 @@ exports.testRekey = function(test)
         site: "example.com",
         passwords: [
           {
-            type: "generated",
+            type: "generated2",
             site: "example.com",
             name: "foo",
             length: 8,
@@ -586,7 +584,7 @@ exports.testRekey = function(test)
         site: "example.com",
         passwords: [
           {
-            type: "generated",
+            type: "generated2",
             site: "example.com",
             name: "foo",
             length: 8,

@@ -27,10 +27,6 @@
       <span class="notes-link iconic-link" />
       {{ $t(password.notes ? "edit_notes" : "add_notes") }}
     </a>
-    <a v-if="password.type == 'generated'" href="#" class="password-menu-entry" @click.prevent="$parent.upgradePassword">
-      <span class="upgrade-password-link iconic-link" />
-      {{ $t("upgrade_password") }}
-    </a>
     <a v-if="password.type == 'stored'" href="#" class="password-menu-entry" @click.prevent="$parent.makeGenerated">
       <span class="make-generated-link iconic-link" />
       {{ $t("make_generated") }}

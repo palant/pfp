@@ -10,7 +10,7 @@
       <a href="#" class="password-menu-link iconic-link" :class="{menuactive: modal == 'menu'}" :title="$t('password_menu')" @click.prevent="modal = 'menu'" />
       <a v-if="!$isWebClient" v-focus="focus" href="#" class="to-document-link iconic-link" :title="$t('to_document')" @click.prevent="fillIn" />
       <a v-focus="$isWebClient && focus" href="#" class="to-clipboard-link iconic-link" :title="$t('to_clipboard')" @click.prevent="copy" />
-      <span class="user-name-container" :class="{'legacy-warning': password.type == 'generated'}" :title="tooltip" @click.self="upgradePassword">
+      <span class="user-name-container" :title="tooltip">
         <span>{{ password.name }}</span>
         <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
       </span>
@@ -71,11 +71,9 @@ export default {
     {
       let tooltip = "";
       let password = this.password;
-      if (password.type == "generated2" || password.type == "generated")
+      if (password.type == "generated2")
       {
-        tooltip = this.$t("password_type_" + password.type);
-        if (password.type == "generated")
-          tooltip += "\n" + this.$t("password_type_generated_replace");
+        tooltip = this.$t("password_type_generated2");
 
         tooltip += "\n" + this.$t("password_length");
         tooltip += " " + password.length;
@@ -174,34 +172,6 @@ export default {
     showNotes()
     {
       this.modal = "notes";
-    },
-    upgradePassword()
-    {
-      this.modal = null;
-      if (this.password.type != "generated")
-        return;
-
-      let message = this.$t("upgrade_password_confirmation", this.password.name, this.$app.siteDisplayName);
-      this.$app.confirm(message).then(response =>
-      {
-        if (response)
-        {
-          passwords.addGenerated({
-            site: this.password.site,
-            name: this.password.name,
-            revision: this.password.revision,
-            length: this.password.length,
-            lower: this.password.lower,
-            upper: this.password.upper,
-            number: this.password.number,
-            symbol: this.password.symbol,
-            notes: this.password.notes,
-            legacy: false
-          }, true)
-            .then(pwdList => this.$app.pwdList = pwdList)
-            .catch(error => this.$parent.showPasswordMessage(error));
-        }
-      });
     },
     makeGenerated()
     {

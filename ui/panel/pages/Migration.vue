@@ -11,19 +11,14 @@
       <div class="migration-spinning-wheel" />
       <div>{{ $t("migration_in_progress") }}</div>
     </div>
-    <p>{{ $t("migration_features_intro") }}</p>
+    <p>{{ $t("migration_intro") }}</p>
     <ul>
-      <li>{{ $t("migration_feature1") }}</li>
-      <li>{{ $t("migration_feature2") }}</li>
-      <li>{{ $t("migration_feature3") }}</li>
+      <li>{{ $t("migration_change1") }}</li>
+      <li>{{ $t("migration_change2") }}</li>
     </ul>
-    <p>{{ $t("migration_todos_intro") }}</p>
-    <ul>
-      <li>{{ $t("migration_todo1") }}</li>
-      <li>{{ $t("migration_todo2") }}</li>
-    </ul>
+    <p>{{ $t("migration_conclusion") }}</p>
     <p>
-      <external-link type="relnotes" param="2.0.0">
+      <external-link type="relnotes" param="2.2.0">
         {{ $t("learn_more") }}
       </external-link>
     </p>

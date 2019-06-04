@@ -23,13 +23,8 @@
       <a href="#" class="password-remove-link" :title="$t('remove_password')" @click.prevent="removePassword" />
     </div>
     <div class="password-info">
-      <template v-if="password.type == 'generated2' || password.type == 'generated'">
-        <template v-if="password.type == 'generated'">
-          <div class="password-type generated">{{ $t("password_type_generated") }}</div>
-          <div class="password-type generated-print">{{ $t("password_type_generated_print") }}</div>
-        </template>
-        <div v-else-if="password.type == 'generated2'" class="password-type">{{ $t("password_type_generated2") }} </div>
-
+      <template v-if="password.type == 'generated2'">
+        <div class="password-type">{{ $t("password_type_generated2") }} </div>
         <div>{{ $t("password_length") }} {{ password.length }}</div>
         <div>{{ $t("allowed_characters") }}  {{ allowedChars }}</div>
       </template>

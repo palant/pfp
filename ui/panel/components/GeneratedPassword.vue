@@ -46,12 +46,6 @@
       <validated-input ref="charsets" v-model="charsets" hidden @validate="validateCharsets" />
       <div v-if="charsets.error" class="error">{{ charsets.error }}</div>
 
-      <label v-if="!options.replacing && !options.incRevision" class="block-start">
-        <input v-model="legacy" type="checkbox">
-        {{ $t("generate_legacy") }}
-      </label>
-      <div v-if="legacy" class="warning legacy">{{ $t("generate_legacy_warning") }}</div>
-
       <div class="button-container">
         <button type="submit">{{ $t("generate_password") }}</button>
         <button type="reset">{{ $t("cancel") }}</button>
@@ -112,8 +106,7 @@ export default {
       number: getProp("number", true),
       symbol: getProp("symbol", true),
       charsets: {value: "", error: null},
-      keepNotes: !!this.password,
-      legacy: false
+      keepNotes: !!this.password
     };
   },
   watch: {
@@ -181,8 +174,7 @@ export default {
         upper: this.upper,
         number: this.number,
         symbol: this.symbol,
-        notes: this.keepNotes ? this.password.notes : null,
-        legacy: this.legacy
+        notes: this.keepNotes ? this.password.notes : null
       }, this.options.replacing).then(pwdList =>
       {
         this.$app.pwdList = pwdList;

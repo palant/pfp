@@ -21,8 +21,7 @@ let generated1 = {
   upper: false,
   number: true,
   symbol: false,
-  legacy: true,
-  password: "r8hx8be6"
+  password: "jmkg5jd4"
 };
 
 let generated2 = {
@@ -36,6 +35,32 @@ let generated2 = {
   symbol: true,
   notes: "some notes",
   password: "$X*RR~V}?;FY[T|~"
+};
+
+let generated3 = {
+  site: "example.com",
+  name: "foo",
+  type: "generated",
+  revision: "2",
+  length: 16,
+  lower: true,
+  upper: true,
+  number: false,
+  symbol: false,
+  notes: "more notes",
+  password: "ZfrQyEEavZqtjzcr"
+};
+
+let generated4 = {
+  site: "example.info",
+  name: "bar",
+  type: "generated",
+  length: 8,
+  lower: false,
+  upper: false,
+  number: true,
+  symbol: true,
+  password: "6;!!|7/{"
 };
 
 let stored1 = {
@@ -111,7 +136,7 @@ exports.testAddRemoveGenerated = function(test)
   }).then(pwdList =>
   {
     test.deepEqual(pwdList, [{
-      type: "generated",
+      type: "generated2",
       site: generated1.site,
       name: generated1.name,
       length: generated1.length,
@@ -137,7 +162,7 @@ exports.testAddRemoveGenerated = function(test)
       notes: generated2.notes
     },
     {
-      type: "generated",
+      type: "generated2",
       site: generated1.site,
       name: generated1.name,
       length: generated1.length,
@@ -448,7 +473,7 @@ exports.testAliases = function(test)
   }).then(() =>
   {
     return expectData(generated1.site, [{
-      type: "generated",
+      type: "generated2",
       site: generated1.site,
       name: generated1.name,
       length: generated1.length,
@@ -635,7 +660,7 @@ exports.testAllPasswords = function(test)
       [generated1.site]: {
         site: generated1.site,
         passwords: [{
-          type: "generated",
+          type: "generated2",
           site: generated1.site,
           name: generated1.name,
           length: generated1.length,
@@ -664,7 +689,7 @@ exports.testAllPasswords = function(test)
           password: stored2.password,
           notes: stored2.notes
         }, {
-          type: "generated",
+          type: "generated2",
           site: generated1.site,
           name: generated1.name,
           length: generated1.length,
@@ -698,7 +723,7 @@ exports.testAllPasswords = function(test)
           password: stored2.password,
           notes: stored2.notes
         }, {
-          type: "generated",
+          type: "generated2",
           site: generated1.site,
           name: generated1.name,
           length: generated1.length,
@@ -743,7 +768,7 @@ exports.testAllPasswords = function(test)
           password: stored2.password,
           notes: "foobarnotes"
         }, {
-          type: "generated",
+          type: "generated2",
           site: generated1.site,
           name: generated1.name,
           length: generated1.length,
@@ -788,7 +813,7 @@ exports.testAllPasswords = function(test)
           password: stored2.password,
           notes: "foobarnotes"
         }, {
-          type: "generated",
+          type: "generated2",
           site: generated1.site,
           name: generated1.name,
           length: generated1.length,
@@ -852,7 +877,7 @@ exports.testExport = function(test)
       [generated1.site]: {
         site: generated1.site,
         passwords: [{
-          type: "generated",
+          type: "generated2",
           site: generated1.site,
           name: generated1.name,
           length: generated1.length,
@@ -890,7 +915,7 @@ exports.testExport = function(test)
           notes: generated2.notes
         },
         {
-          type: "generated",
+          type: "generated2",
           site: generated1.site,
           name: generated1.name,
           length: generated1.length,
@@ -936,7 +961,7 @@ exports.testExport = function(test)
           symbol: generated2.symbol,
           notes: generated2.notes
         }, {
-          type: "generated",
+          type: "generated2",
           site: generated1.site,
           name: generated1.name,
           length: generated1.length,
@@ -988,12 +1013,12 @@ exports.testDecryptingImport = function(test)
       format: 2,
       data: {
         salt: btoa(salt),
-        "hmac-secret": encrypt(hmacSecret),
+        "hmac-secret": encrypt(btoa(hmacSecret)),
         [`site:${digest(generated1.site)}`]: encrypt({
           site: generated1.site
         }),
         [`site:${digest(generated1.site)}:${digest(generated1.site + "\0" + generated1.name + "\0")}`]: encrypt({
-          type: "generated",
+          type: "generated2",
           site: generated1.site,
           name: generated1.name,
           length: generated1.length,
@@ -1041,7 +1066,7 @@ exports.testDecryptingImport = function(test)
           notes: generated2.notes
         },
         {
-          type: "generated",
+          type: "generated2",
           site: generated1.site,
           name: generated1.name,
           length: generated1.length,
@@ -1080,7 +1105,7 @@ exports.testConvertingImport = function(test)
       format: 2,
       data: {
         salt: btoa(salt),
-        "hmac-secret": encrypt(hmacSecret),
+        "hmac-secret": encrypt(btoa(hmacSecret)),
         [`site:${digest(generated1.site)}`]: encrypt({
           site: generated1.site
         }),
@@ -1095,7 +1120,7 @@ exports.testConvertingImport = function(test)
           symbol: generated1.symbol
         }),
         [`site:${digest(generated2.site)}:${digest(generated2.site + "\0" + generated2.name + "\0" + generated2.revision)}`]: encrypt({
-          type: "generated",
+          type: "generated2",
           site: generated2.site,
           name: generated2.name,
           revision: generated2.revision,
@@ -1127,7 +1152,7 @@ exports.testConvertingImport = function(test)
         masterPassword: backupMaster,
         domain: generated1.site
       }, generated1)),
-      crypto.derivePasswordLegacy(Object.assign({
+      crypto.derivePassword(Object.assign({
         masterPassword: backupMaster,
         domain: generated2.site
       }, generated2))
@@ -1159,190 +1184,6 @@ exports.testConvertingImport = function(test)
           password: generated1result
         }],
         aliases: ["sub." + generated1.site]
-      }
-    });
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
-};
-
-exports.testLegacyImport = function(test)
-{
-  let nodeCrypto = require("crypto");
-  function getKey(salt)
-  {
-    return nodeCrypto.pbkdf2Sync(dummyMaster, salt, 256 * 1024, 32, "sha1").toString("binary");
-  }
-
-  let iv = "abcdefgh";
-  let btoa = str => Buffer.from(str, "binary").toString("base64");
-
-  Promise.resolve().then(() =>
-  {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    return passwords.importPasswordData(JSON.stringify({
-      application: "easypasswords",
-      format: 1,
-      sites: {
-        [generated1.site]: {
-          passwords: {
-            [generated1.name]: {
-              type: "pbkdf2-sha1-generated",
-              length: generated1.length,
-              lower: generated1.lower,
-              upper: generated1.upper,
-              number: generated1.number,
-              symbol: generated1.symbol
-            }
-          },
-          aliases: []
-        }
-      }
-    }));
-  }).then(() =>
-  {
-    return passwords.getAllPasswords();
-  }).then(allPasswords =>
-  {
-    test.deepEqual(allPasswords, {
-      [generated1.site]: {
-        site: generated1.site,
-        passwords: [{
-          type: "generated",
-          site: generated1.site,
-          name: generated1.name,
-          revision: "",
-          length: generated1.length,
-          lower: generated1.lower,
-          upper: generated1.upper,
-          number: generated1.number,
-          symbol: generated1.symbol
-        }],
-        aliases: []
-      }
-    });
-  }).then(() =>
-  {
-    return passwords.importPasswordData(JSON.stringify({
-      application: "easypasswords",
-      format: 1,
-      sites: {
-        [generated1.site]: {
-          passwords: {
-            [generated1.name]: {
-              type: "pbkdf2-sha1-generated",
-              length: generated1.length,
-              lower: generated1.lower,
-              upper: generated1.upper,
-              number: generated1.number,
-              symbol: generated1.symbol
-            },
-            [generated2.name + "\n" + generated2.revision]: {
-              type: "generated",
-              length: generated2.length,
-              lower: generated2.lower,
-              upper: generated2.upper,
-              number: generated2.number,
-              symbol: generated2.symbol,
-              notes: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${generated2.site}\0${generated2.name}\0${generated2.revision}\0notes`) + `!${iv}!some notes here`)
-            },
-            [stored2.name]: {
-              type: "pbkdf2-sha1-aes256-encrypted",
-              password: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored2.site}\0${stored2.name}`) + `!${iv}!${stored2.password}`)
-            }
-          },
-          aliases: ["example.info"]
-        }
-      }
-    }));
-  }).then(() =>
-  {
-    return passwords.getAllPasswords();
-  }).then(allPasswords =>
-  {
-    test.deepEqual(allPasswords, {
-      [generated1.site]: {
-        site: generated1.site,
-        passwords: [{
-          type: "stored",
-          site: stored2.site,
-          name: stored2.name,
-          revision: "",
-          password: stored2.password
-        }, {
-          type: "generated",
-          site: generated2.site,
-          name: generated2.name,
-          revision: generated2.revision,
-          length: generated2.length,
-          lower: generated2.lower,
-          upper: generated2.upper,
-          number: generated2.number,
-          symbol: generated2.symbol,
-          notes: "some notes here"
-        }, {
-          type: "generated",
-          site: generated1.site,
-          name: generated1.name,
-          revision: "",
-          length: generated1.length,
-          lower: generated1.lower,
-          upper: generated1.upper,
-          number: generated1.number,
-          symbol: generated1.symbol
-        }],
-        aliases: ["example.info"]
-      }
-    });
-  }).then(() =>
-  {
-    return passwords.importPasswordData(JSON.stringify({
-      application: "easypasswords",
-      format: 1,
-      sites: {
-        [stored1.site]: {
-          passwords: {
-            [stored1.name]: {
-              type: "stored",
-              password: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored1.site}\0${stored1.name}`) + `!${iv}!${stored1.password}`)
-            }
-          }
-        }
-      }
-    }));
-  }).then(() =>
-  {
-    return passwords.getAllPasswords();
-  }).then(allPasswords =>
-  {
-    test.deepEqual(allPasswords, {
-      [generated1.site]: {
-        site: generated1.site,
-        passwords: [{
-          type: "stored",
-          site: stored2.site,
-          name: stored2.name,
-          revision: "",
-          password: stored2.password
-        }, {
-          type: "generated",
-          site: generated2.site,
-          name: generated2.name,
-          revision: generated2.revision,
-          length: generated2.length,
-          lower: generated2.lower,
-          upper: generated2.upper,
-          number: generated2.number,
-          symbol: generated2.symbol,
-          notes: "some notes here"
-        }, {
-          type: "stored",
-          site: stored1.site,
-          name: stored1.name,
-          revision: "",
-          password: stored1.password
-        }],
-        aliases: ["example.info"]
       }
     });
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
@@ -1650,26 +1491,6 @@ exports.testImportErrors = function(test)
     test.ok(false, "Imported data without salt");
   }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
   {
-    return passwords.importPasswordData(JSON.stringify({
-      application: "easypasswords",
-      format: 1,
-      sites: null
-    }));
-  }).then(() =>
-  {
-    test.ok(false, "Imported legacy null data");
-  }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
-  {
-    return passwords.importPasswordData(JSON.stringify({
-      application: "easypasswords",
-      format: 1,
-      sites: 12
-    }));
-  }).then(() =>
-  {
-    test.ok(false, "Imported legacy non-object data");
-  }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
-  {
     return passwords.importPasswordData("url,username,password\n");
   }).then(() =>
   {
@@ -1679,58 +1500,86 @@ exports.testImportErrors = function(test)
 
 exports.testMigration = function(test)
 {
-  let nodeCrypto = require("crypto");
-  function getKey(salt)
-  {
-    return nodeCrypto.pbkdf2Sync(dummyMaster, salt, 256 * 1024, 32, "sha1").toString("binary");
-  }
-
-  function getPasswordHash(salt)
-  {
-    let chars = "abcdefghjkmnpqrstuvwxyz";
-    let key = getKey("\0" + salt);
-    return chars[key.charCodeAt(0) % chars.length] + chars[key.charCodeAt(1) % chars.length];
-  }
-
-  let iv = "abcdefgh";
+  let atob = str => Buffer.from(str, "base64").toString("binary");
   let btoa = str => Buffer.from(str, "binary").toString("base64");
+  let salt = "asdf";
+  let hmacSecret = "fdsa";
+  let key = "4MgE2P1PbjLyAz7JxczGjOPNtaaqNKofAmGSbNvRtUM=";
+  let iv = "fakeivwhatever";
+  let cryptoPrefix = "AES-GCM!" + atob(key) + "!" + iv + "!";
+  let hmacPrefix = "HMAC!" + hmacSecret + "!";
+  let encrypt = data => btoa(iv) + "_" + btoa(cryptoPrefix + JSON.stringify(data));
+  let digest = data => btoa(hmacPrefix + data);
 
   let {storageData} = require("../test-lib/browserAPI");
-  storageData.masterPassword = {salt: "abcd"};
-  storageData.masterPassword.hash = getPasswordHash(storageData.masterPassword.salt);
+  storageData.salt = btoa(salt);
+  storageData["hmac-secret"] = encrypt(btoa(hmacSecret));
 
-  storageData[`site:${generated1.site}`] = {
-    passwords: {
-      [generated1.name]: {
-        type: "generated",
-        length: generated1.length,
-        lower: generated1.lower,
-        upper: generated1.upper,
-        number: generated1.number,
-        symbol: generated1.symbol
-      },
-      [generated2.name + "\n" + generated2.revision]: {
-        type: "generated",
-        length: generated2.length,
-        lower: generated2.lower,
-        upper: generated2.upper,
-        number: generated2.number,
-        symbol: generated2.symbol,
-        notes: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${generated2.site}\0${generated2.name}\0${generated2.revision}\0notes`) + `!${iv}!some notes here`)
-      },
-      [stored2.name]: {
-        type: "stored",
-        password: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored2.site}\0${stored2.name}`) + `!${iv}!${stored2.password}`),
-        notes: `${btoa(iv)}_` + btoa("AES-CBC!" + getKey(`${stored2.site}\0${stored2.name}\0\0notes`) + `!${iv}!some more notes here`)
-      }
-    }
-  };
+  function setPassword(passwordData)
+  {
+    storageData[`site:${digest(passwordData.site)}`] = encrypt({site: passwordData.site});
+    storageData[`site:${digest(passwordData.site)}:${digest(passwordData.site + "\0" + passwordData.name + "\0" + (passwordData.revision || ""))}`] = encrypt(passwordData);
+  }
 
-  storageData["site:example.info"] = {
-    alias: generated1.site
-  };
+  setPassword({
+    site: generated1.site,
+    name: generated1.name,
+    revision: "",
+    type: "generated2",
+    length: generated1.length,
+    lower: generated1.lower,
+    upper: generated1.upper,
+    number: generated1.number,
+    symbol: generated1.symbol
+  });
+  setPassword({
+    site: generated2.site,
+    name: generated2.name,
+    revision: generated2.revision,
+    type: "generated2",
+    length: generated2.length,
+    lower: generated2.lower,
+    upper: generated2.upper,
+    number: generated2.number,
+    symbol: generated2.symbol,
+    notes: generated2.notes
+  });
+  setPassword({
+    site: generated3.site,
+    name: generated3.name,
+    revision: generated3.revision,
+    type: "generated",
+    length: generated3.length,
+    lower: generated3.lower,
+    upper: generated3.upper,
+    number: generated3.number,
+    symbol: generated3.symbol,
+    notes: generated3.notes
+  });
+  setPassword({
+    site: generated4.site,
+    name: generated4.name,
+    revision: "",
+    type: "generated",
+    length: generated4.length,
+    lower: generated4.lower,
+    upper: generated4.upper,
+    number: generated4.number,
+    symbol: generated4.symbol
+  });
+  setPassword({
+    site: stored2.site,
+    name: stored2.name,
+    revision: "",
+    type: "stored",
+    password: stored2.password,
+    notes: stored2.notes
+  });
 
-  let origKeys = Object.keys(storageData);
+  storageData[`site:${digest("sub." + generated4.site)}`] = encrypt({
+    site: "sub." + generated4.site,
+    alias: generated4.site
+  });
 
   Promise.resolve().then(() =>
   {
@@ -1760,9 +1609,6 @@ exports.testMigration = function(test)
     return checkState();
   }).then(expectedValue.bind(test, "known")).then(() =>
   {
-    for (let key of origKeys)
-      test.ok(!(key in storageData), `Key ${key} removed from storage`);
-
     return passwords.getAllPasswords();
   }).then(allPasswords =>
   {
@@ -1775,9 +1621,9 @@ exports.testMigration = function(test)
           name: stored2.name,
           revision: "",
           password: stored2.password,
-          notes: "some more notes here"
+          notes: stored2.notes
         }, {
-          type: "generated",
+          type: "generated2",
           site: generated2.site,
           name: generated2.name,
           revision: generated2.revision,
@@ -1786,9 +1632,9 @@ exports.testMigration = function(test)
           upper: generated2.upper,
           number: generated2.number,
           symbol: generated2.symbol,
-          notes: "some notes here"
+          notes: generated2.notes
         }, {
-          type: "generated",
+          type: "generated2",
           site: generated1.site,
           name: generated1.name,
           revision: "",
@@ -1797,9 +1643,37 @@ exports.testMigration = function(test)
           upper: generated1.upper,
           number: generated1.number,
           symbol: generated1.symbol
+        }, {
+          type: "stored",
+          site: generated3.site,
+          name: generated3.name,
+          revision: generated3.revision,
+          password: generated3.password,
+          notes: generated3.notes
         }],
-        aliases: ["example.info"]
+        aliases: []
+      },
+      [generated4.site]: {
+        site: generated4.site,
+        passwords: [{
+          type: "stored",
+          site: generated4.site,
+          name: generated4.name,
+          revision: "",
+          password: generated4.password
+        }],
+        aliases: ["sub." + generated4.site]
       }
     });
+    return masterPassword.forgetPassword();
+  }).then(() =>
+  {
+    return masterPassword.checkPassword(dummyMaster);
+  }).then(() =>
+  {
+    return masterPassword.state;
+  }).then(state =>
+  {
+    test.equal(state, "known", "No repeated migration on next login");
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };

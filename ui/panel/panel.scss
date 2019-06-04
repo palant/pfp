@@ -320,16 +320,6 @@ a.iconic-link:hover
   outline: 1px solid #888;
 }
 
-.user-name-container.legacy-warning
-{
-  min-width: $icon-size;
-  min-height: $icon-size;
-  background-size: $icon-size;
-  background-repeat: no-repeat;
-  background-position: right;
-  background-image: url("../images/md-warning.svg");
-}
-
 .password-menu-link
 {
   background-image: url("../images/md-more.svg");
@@ -360,7 +350,6 @@ a.iconic-link:hover
   background-image: url(../images/ios-paper-outline.svg);
 }
 
-.upgrade-password-link,
 .make-generated-link
 {
   background-image: url(../images/arrow-up-a.svg);
@@ -438,8 +427,7 @@ a.iconic-link:hover
   justify-content: space-between;
 }
 
-.warning.replacing,
-.warning.legacy
+.warning.replacing
 {
   font-size: $font-size-small;
 }
