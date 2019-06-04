@@ -6,8 +6,8 @@
 
 <template>
   <div @keydown.ctrl.69.prevent="testUnknownError"
-       @keydown.ctrl="tabNavigation"
-       @keydown.meta="tabNavigation"
+       @keydown.ctrl.exact="tabNavigation"
+       @keydown.meta.exact="tabNavigation"
   >
     <confirm ref="confirm" />
     <unknown-error v-if="unknownError" :error="unknownError" @close="unknownError = null" />
