@@ -165,6 +165,25 @@ function fillIn(wnd, name, password, noFocus)
       result = true;
   }
 
+  if (!result && wnd == wnd.top)
+  {
+    // Try finding user name
+    let field = getActiveElement(wnd.document);
+    if (field instanceof HTMLInputElement && userNameFieldTypes.has(field.type) && field.form)
+    {
+      fakeInput(field, name);
+
+      let button = field.form.querySelector("input[type=submit], button[type=submit]");
+      if (button)
+        button.click();
+      else
+        field.form.dispatchEvent(new Event("submit", {bubbles: true}));
+      result = true;
+
+      window.setTimeout(() => fillIn(wnd, name, password, noFocus), 100);
+    }
+  }
+
   return result;
 }
 
