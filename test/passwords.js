@@ -834,7 +834,7 @@ exports.testExport = function(test)
   {
     let parsed = JSON.parse(exportData);
     test.equal(parsed.application, "pfp");
-    test.equal(parsed.format, 2);
+    test.equal(parsed.format, 3);
     test.ok(typeof parsed.data == "object");
     test.ok(parsed.data["salt"]);
     test.ok(parsed.data["hmac-secret"]);
@@ -1102,7 +1102,7 @@ exports.testConvertingImport = function(test)
 
     return passwords.importPasswordData(JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {
         salt: btoa(salt),
         "hmac-secret": encrypt(btoa(hmacSecret)),
@@ -1423,7 +1423,7 @@ exports.testImportErrors = function(test)
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "foobar",
-      format: 2,
+      format: 3,
       data: {
         salt: "asdf",
         "hmac-secret": "fdsa"
@@ -1449,7 +1449,7 @@ exports.testImportErrors = function(test)
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: null
     }));
   }).then(() =>
@@ -1459,7 +1459,7 @@ exports.testImportErrors = function(test)
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {}
     }));
   }).then(() =>
@@ -1469,7 +1469,7 @@ exports.testImportErrors = function(test)
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {
         salt: "asdf"
       }
@@ -1481,7 +1481,7 @@ exports.testImportErrors = function(test)
   {
     return passwords.importPasswordData(JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {
         "hmac-secret": "fdsa"
       }

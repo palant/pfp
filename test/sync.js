@@ -101,14 +101,18 @@ exports.testMerge = function(test)
     let {revision, contents} = provider._get("/passwords.json");
     test.equal(revision, 1, "Revision after initial sync");
 
-    test.deepEqual(JSON.parse(contents), {
+    let parsed = JSON.parse(contents);
+    test.deepEqual(parsed, {
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {
         salt,
         "hmac-secret": hmac
       }
     }, "Remote contents after initial sync");
+
+    parsed.format = 2;
+    provider._get("/passwords.json").contents = JSON.stringify(parsed);
 
     return sync.sync();
   }).then(() =>
@@ -137,7 +141,7 @@ exports.testMerge = function(test)
 
     test.deepEqual(JSON.parse(contents), {
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {
         salt,
         "hmac-secret": hmac,
@@ -148,7 +152,7 @@ exports.testMerge = function(test)
 
     provider._set("/passwords.json", 3, JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {
         salt,
         "hmac-secret": hmac,
@@ -171,7 +175,7 @@ exports.testMerge = function(test)
 
     provider._set("/passwords.json", 4, JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {
         salt,
         "hmac-secret": hmac,
@@ -200,7 +204,7 @@ exports.testMerge = function(test)
 
     test.deepEqual(JSON.parse(contents), {
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {
         salt,
         "hmac-secret": hmac,
@@ -218,7 +222,7 @@ exports.testMerge = function(test)
 
     provider._set("/passwords.json", 6, JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {
         salt,
         "hmac-secret": hmac,
@@ -246,7 +250,7 @@ exports.testMerge = function(test)
 
     test.deepEqual(JSON.parse(contents), {
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {
         salt,
         "hmac-secret": hmac,
@@ -266,7 +270,7 @@ exports.testMerge = function(test)
 
     provider._set("/passwords.json", 8, JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {
         salt,
         "hmac-secret": hmac,
@@ -345,7 +349,7 @@ exports.testErrors = function(test)
 
     provider._set("/passwords.json", 6, JSON.stringify({
       application: "foobar",
-      format: 2
+      format: 3
     }));
     return sync.sync();
   }).then(() =>
@@ -363,7 +367,7 @@ exports.testErrors = function(test)
 
     provider._set("/passwords.json", 8, JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: null
     }));
     return sync.sync();
@@ -373,7 +377,7 @@ exports.testErrors = function(test)
 
     provider._set("/passwords.json", 9, JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: 456
     }));
     return sync.sync();
@@ -383,7 +387,7 @@ exports.testErrors = function(test)
 
     provider._set("/passwords.json", 9, JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {}
     }));
     return Promise.all([
@@ -397,7 +401,7 @@ exports.testErrors = function(test)
 
     provider._set("/passwords.json", 8, JSON.stringify({
       application: "pfp",
-      format: 2,
+      format: 3,
       data: {
         salt,
         "hmac-secret": hmac
