@@ -53,6 +53,9 @@ export default {
       if (!"asdf".includes("d"))
         throw new Error("String.includes() returned unexpected result");
 
+      if (new KeyboardEvent("keydown", {key: "Escape"}).key != "Escape")
+        throw new Error("KeyboardEvent() returned unexpected result");
+
       return crypto.subtle.importKey(
         "raw",
         new Uint8Array(16),
