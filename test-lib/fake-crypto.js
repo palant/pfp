@@ -74,8 +74,11 @@ function getEncryptionPrefix(algoName, key, iv)
   ]);
 }
 
+const AES_KEY_LENGTH = 32;
+const AES_IV_LENGTH = 12;
+
 exports.subtle = {
-  importKey: function(format, keyData, algo, extractable, usages)
+  importKey(format, keyData, algo, extractable, usages)
   {
     return Promise.resolve().then(() =>
     {
@@ -90,7 +93,7 @@ exports.subtle = {
     });
   },
 
-  encrypt: function(algo, key, cleartext)
+  encrypt(algo, key, cleartext)
   {
     return Promise.resolve().then(() =>
     {
@@ -103,7 +106,7 @@ exports.subtle = {
         return Buffer.concat([getEncryptionPrefix(algo.name, key, algo.iv), Buffer.from(cleartext)]);
       else
       {
-        if (algo.name != "AES-GCM" || key._data.length != 32)
+        if (algo.name != "AES-GCM" || key._data.length != AES_KEY_LENGTH)
           throw new Error("Only AES256-GCM is supported");
 
         let cipher = crypto.createCipheriv("aes-256-gcm", key._data, algo.iv);
@@ -114,7 +117,7 @@ exports.subtle = {
     });
   },
 
-  decrypt: function(algo, key, ciphertext)
+  decrypt(algo, key, ciphertext)
   {
     return Promise.resolve().then(() =>
     {
@@ -137,7 +140,7 @@ exports.subtle = {
       }
       else
       {
-        if (algo.name != "AES-GCM" || key._data.length != 32)
+        if (algo.name != "AES-GCM" || key._data.length != AES_KEY_LENGTH)
           throw new Error("Only AES256-GCM is supported");
 
         let decipher = crypto.createDecipheriv("aes-256-gcm", key._data, algo.iv);
@@ -148,7 +151,15 @@ exports.subtle = {
     });
   },
 
-  sign: function(algo, key, cleartext)
+  _fakeDecrypt(text)
+  {
+    if (!text.startsWith("AES-GCM!"))
+      throw new Error("Unexpected encryption algorithm");
+
+    return text.substr("AES-GCM!".length + AES_KEY_LENGTH + "!".length + AES_IV_LENGTH + "!".length);
+  },
+
+  sign(algo, key, cleartext)
   {
     return Promise.resolve().then(() =>
     {

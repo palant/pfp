@@ -53,6 +53,9 @@ export default {
       if (!"asdf".includes("d"))
         throw new Error("String.includes() returned unexpected result");
 
+      if (![1,2,3,4].includes(3))
+        throw new Error("Array.includes() returned unexpected result");
+
       if (new KeyboardEvent("keydown", {key: "Escape"}).key != "Escape")
         throw new Error("KeyboardEvent() returned unexpected result");
 

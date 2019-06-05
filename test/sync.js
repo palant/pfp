@@ -41,6 +41,20 @@ function checkSyncError(test)
     test.ok(false, `Unexpected error: ${sync.syncData.error}`);
 }
 
+function sign(data)
+{
+  let ciphertext = atob(data.data["sync-secret"].split("_")[1]);
+  let secret = atob(JSON.parse(crypto.subtle._fakeDecrypt(ciphertext)));
+
+  let values = [data.revision];
+  let keys = Object.keys(data.data);
+  keys.sort();
+  for (let key of keys)
+    values.push([key, data.data[key]]);
+  data.signature = btoa("HMAC!" + secret + "!" + JSON.stringify(values));
+  return data;
+}
+
 exports.setUp = function(callback)
 {
   let {storageData: storage} = require("../test-lib/browserAPI");
@@ -83,44 +97,46 @@ exports.testMerge = function(test)
     return masterPassword.changePassword(dummyMaster);
   }).then(() =>
   {
-    return masterPassword.forgetPassword();
-  }).then(() =>
-  {
     return sync.authorize("dropbox");
   }).then(() =>
   {
-    return Promise.all([
-      storage.get("salt", null),
-      storage.get("hmac-secret", null),
-      sync.sync()
-    ]);
-  }).then(([salt, hmac, _]) =>
+    return sync.sync();
+  }).then(() =>
   {
     checkSyncError(test);
 
+    return Promise.all([
+      storage.get("salt", null),
+      storage.get("hmac-secret", null),
+      storage.get("sync-secret", null),
+      masterPassword.forgetPassword()
+    ]);
+  }).then(([salt, hmac, secret, _]) =>
+  {
     let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 1, "Revision after initial sync");
+    test.equal(revision, 1, "File revision after initial sync");
 
     let parsed = JSON.parse(contents);
-    test.deepEqual(parsed, {
+    test.deepEqual(parsed, sign({
       application: "pfp",
       format: 3,
+      revision: 1,
       data: {
         salt,
-        "hmac-secret": hmac
+        "hmac-secret": hmac,
+        "sync-secret": secret
       }
-    }, "Remote contents after initial sync");
+    }), "Remote contents after initial sync");
 
     parsed.format = 2;
     provider._get("/passwords.json").contents = JSON.stringify(parsed);
-
     return sync.sync();
   }).then(() =>
   {
     checkSyncError(test);
 
     let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 1, "No revision change without changes");
+    test.equal(revision, 1, "No file revision change without changes");
     return Promise.all([
       storage.set("site:foo", "bar", null),
       storage.set("site:foo:blubber", "blabber", null)
@@ -130,59 +146,66 @@ exports.testMerge = function(test)
     return Promise.all([
       storage.get("salt", null),
       storage.get("hmac-secret", null),
+      storage.get("sync-secret", null),
       sync.sync()
     ]);
-  }).then(([salt, hmac, _]) =>
+  }).then(([salt, hmac, secret, _]) =>
   {
     checkSyncError(test);
 
     let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 2, "Revision after local-only update");
+    test.equal(revision, 2, "File revision after local-only update");
 
-    test.deepEqual(JSON.parse(contents), {
+    test.deepEqual(JSON.parse(contents), sign({
       application: "pfp",
       format: 3,
+      revision: 2,
       data: {
         salt,
         "hmac-secret": hmac,
+        "sync-secret": secret,
         "site:foo": "bar",
         "site:foo:blubber": "blabber"
       }
-    }, "Remote contents after local-only update");
+    }), "Remote contents after local-only update");
 
-    provider._set("/passwords.json", 3, JSON.stringify({
+    provider._set("/passwords.json", 3, JSON.stringify(sign({
       application: "pfp",
       format: 3,
+      revision: 8,
       data: {
         salt,
         "hmac-secret": hmac,
+        "sync-secret": secret,
         "site:foo": "bas",
         "site:example.com:blub": "blab"
       }
-    }));
-    return Promise.all([salt, hmac, sync.sync()]);
-  }).then(([salt, hmac, _]) =>
+    })));
+    return Promise.all([salt, hmac, secret, sync.sync()]);
+  }).then(([salt, hmac, secret, _]) =>
   {
     checkSyncError(test);
 
     let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 3, "No revision change after remote-only update");
+    test.equal(revision, 3, "No file revision change after remote-only update");
 
     test.deepEqual(getLocalData(), {
       "site:foo": "bas",
       "site:example.com:blub": "blab"
     }, "Local contents after remote-only update");
 
-    provider._set("/passwords.json", 4, JSON.stringify({
+    provider._set("/passwords.json", 4, JSON.stringify(sign({
       application: "pfp",
       format: 3,
+      revision: 9,
       data: {
         salt,
         "hmac-secret": hmac,
+        "sync-secret": secret,
         "site:foo": "bar",
         "site:foo:x": "y"
       }
-    }));
+    })));
 
     return Promise.all([
       storage.set("site:foo", "foo", null),
@@ -193,26 +216,29 @@ exports.testMerge = function(test)
     return Promise.all([
       storage.get("salt", null),
       storage.get("hmac-secret", null),
+      storage.get("sync-secret", null),
       sync.sync()
     ]);
-  }).then(([salt, hmac, _]) =>
+  }).then(([salt, hmac, secret, _]) =>
   {
     checkSyncError(test);
 
     let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 5, "Revision after conflict resolution");
+    test.equal(revision, 5, "File revision after conflict resolution");
 
-    test.deepEqual(JSON.parse(contents), {
+    test.deepEqual(JSON.parse(contents), sign({
       application: "pfp",
       format: 3,
+      revision: 10,
       data: {
         salt,
         "hmac-secret": hmac,
+        "sync-secret": secret,
         "site:foo": "foo",
         "site:foo:x": "y",
         "site:example.com:blub": "blub"
       }
-    }, "Remote contents after conflict resolution");
+    }), "Remote contents after conflict resolution");
 
     test.deepEqual(getLocalData(), {
       "site:foo": "foo",
@@ -220,46 +246,57 @@ exports.testMerge = function(test)
       "site:example.com:blub": "blub"
     }, "Local contents after conflict resolution");
 
-    provider._set("/passwords.json", 6, JSON.stringify({
+    provider._set("/passwords.json", 6, JSON.stringify(sign({
       application: "pfp",
       format: 3,
+      revision: 14,
       data: {
         salt,
         "hmac-secret": hmac,
+        "sync-secret": secret,
         "site:foo:blubber": "blabber",
         "site:example.com:blub": "blab"
       }
-    }));
+    })));
     return sync.disable();
   }).then(() =>
   {
-    return sync.authorize("dropbox");
+    return Promise.all([
+      sync.authorize("dropbox"),
+      masterPassword.checkPassword(dummyMaster)
+    ]);
+  }).then(() =>
+  {
+    return sync.sync();
   }).then(() =>
   {
     return Promise.all([
       storage.get("salt", null),
       storage.get("hmac-secret", null),
-      sync.sync()
+      storage.get("sync-secret", null),
+      masterPassword.forgetPassword()
     ]);
-  }).then(([salt, hmac, _]) =>
+  }).then(([salt, hmac, secret, _]) =>
   {
     checkSyncError(test);
 
     let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 7, "Revision after reconnecting client");
+    test.equal(revision, 7, "File revision after reconnecting client");
 
-    test.deepEqual(JSON.parse(contents), {
+    test.deepEqual(JSON.parse(contents), sign({
       application: "pfp",
       format: 3,
+      revision: 15,
       data: {
         salt,
         "hmac-secret": hmac,
+        "sync-secret": secret,
         "site:foo": "foo",
         "site:foo:blubber": "blabber",
         "site:foo:x": "y",
         "site:example.com:blub": "blub"
       }
-    }, "Remote contents after reconnecting client");
+    }), "Remote contents after reconnecting client");
 
     test.deepEqual(getLocalData(), {
       "site:foo": "foo",
@@ -268,31 +305,126 @@ exports.testMerge = function(test)
       "site:example.com:blub": "blub"
     }, "Local contents after reconnecting client");
 
-    provider._set("/passwords.json", 8, JSON.stringify({
+    provider._set("/passwords.json", 8, JSON.stringify(sign({
       application: "pfp",
       format: 3,
+      revision: 18,
       data: {
         salt,
         "hmac-secret": hmac,
+        "sync-secret": secret,
         "site:foo": "foo",
         "site:foo:x": "y",
         "site:example.com:blub": "blub"
       }
-    }));
+    })));
 
-    return Promise.all([salt, hmac, sync.sync()]);
-  }).then(([salt, hmac, _]) =>
+    return Promise.all([salt, hmac, secret, sync.sync()]);
+  }).then(([salt, hmac, secret, _]) =>
   {
     checkSyncError(test);
 
     let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 8, "No revision change after remote removal of a previously synced key");
+    test.equal(revision, 8, "No file revision change after remote removal of a previously synced key");
 
     test.deepEqual(getLocalData(), {
       "site:foo": "foo",
       "site:foo:x": "y",
       "site:example.com:blub": "blub"
     }, "Local contents after remote removal of a previously synced key");
+  }).catch(unexpectedError.bind(test)).then(done.bind(test));
+};
+
+exports.testUnrelated = function(test)
+{
+  Promise.resolve().then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return sync.authorize("dropbox");
+  }).then(() =>
+  {
+    return sync.sync();
+  }).then(() =>
+  {
+    checkSyncError(test);
+
+    return Promise.all([
+      storage.get("salt", null),
+      storage.get("hmac-secret", null),
+      storage.get("sync-secret", null)
+    ]);
+  }).then(([salt, hmac, secret]) =>
+  {
+    provider._set("/passwords.json", 8, JSON.stringify(sign({
+      application: "pfp",
+      format: 3,
+      revision: 20,
+      data: {
+        salt,
+        "hmac-secret": hmac,
+        "sync-secret": secret,
+        "site:foo": "foo",
+      }
+    })));
+    return Promise.all([salt, hmac, sync.sync()]);
+  }).then(([salt, hmac, _]) =>
+  {
+    checkSyncError(test);
+
+    test.deepEqual(getLocalData(), {
+      "site:foo": "foo"
+    }, "Local contents after update");
+
+    return Promise.all([salt, hmac, masterPassword.encrypt(require("../lib/crypto").generateRandom(32))]);
+  }).then(([salt, hmac, secret]) =>
+  {
+    provider._set("/passwords.json", 8, JSON.stringify(sign({
+      application: "pfp",
+      format: 3,
+      revision: 2,
+      data: {
+        salt,
+        "hmac-secret": hmac,
+        "sync-secret": secret,
+        "site:foo": "bar",
+        "site:bar": "foo"
+      }
+    })));
+    return Promise.all([salt, hmac, secret, sync.sync()]);
+  }).then(([salt, hmac, secret, _]) =>
+  {
+    test.equal(sync.syncData.error, "sync_unrelated_client", "Attempting to sync with a different sync secret");
+    return Promise.all([salt, hmac, secret, sync.disable()]);
+  }).then(([salt, hmac, secret, _]) =>
+  {
+    return Promise.all([salt, hmac, secret, sync.authorize("dropbox")]);
+  }).then(([salt, hmac, secret, _]) =>
+  {
+    return Promise.all([salt, hmac, secret, sync.sync()]);
+  }).then(([salt, hmac, secret, _]) =>
+  {
+    checkSyncError(test);
+
+    test.deepEqual(getLocalData(), {
+      "site:foo": "foo",
+      "site:bar": "foo"
+    }, "Local contents after reconnect");
+
+    let parsed = JSON.parse(provider._get("/passwords.json").contents);
+    test.deepEqual(parsed, sign({
+      application: "pfp",
+      format: 3,
+      revision: 3,
+      data: {
+        salt,
+        "hmac-secret": hmac,
+        "sync-secret": secret,
+        "site:foo": "foo",
+        "site:bar": "foo"
+      }
+    }), "Remote contents after reconnect");
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
@@ -303,9 +435,6 @@ exports.testErrors = function(test)
     return masterPassword.changePassword(dummyMaster);
   }).then(() =>
   {
-    return masterPassword.forgetPassword();
-  }).then(() =>
-  {
     return sync.authorize("dropbox");
   }).then(() =>
   {
@@ -313,7 +442,10 @@ exports.testErrors = function(test)
   }).then(() =>
   {
     test.ok(!sync.syncData.error, "No error after initial sync");
-    return storage.set("site:foo", "bar", null);
+    return Promise.all([
+      masterPassword.forgetPassword(),
+      storage.set("site:foo", "bar", null)
+    ]);
   }).then(() =>
   {
     sync.syncData.token += "0";
@@ -393,20 +525,115 @@ exports.testErrors = function(test)
     return Promise.all([
       storage.get("salt", null),
       storage.get("hmac-secret", null),
+      storage.get("sync-secret", null),
       sync.sync()
     ]);
-  }).then(([salt, hmac, _]) =>
+  }).then(([salt, hmac, secret, _]) =>
   {
     test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with empty data");
 
-    provider._set("/passwords.json", 8, JSON.stringify({
+    provider._set("/passwords.json", 8, JSON.stringify(sign({
       application: "pfp",
       format: 3,
       data: {
         salt,
-        "hmac-secret": hmac
+        "hmac-secret": hmac,
+        "sync-secret": secret
+      }
+    })));
+    return Promise.all([salt, hmac, secret, sync.sync()]);
+  }).then(([salt, hmac, secret, _]) =>
+  {
+    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with signature but no revision number");
+
+    provider._set("/passwords.json", 8, JSON.stringify({
+      application: "pfp",
+      format: 3,
+      revision: 2,
+      data: {
+        salt,
+        "hmac-secret": hmac,
+        "sync-secret": secret
       }
     }));
+    return Promise.all([salt, hmac, secret, sync.sync()]);
+  }).then(([salt, hmac, secret, _]) =>
+  {
+    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync without signature");
+
+    provider._set("/passwords.json", 8, JSON.stringify({
+      application: "pfp",
+      format: 3,
+      revision: 2,
+      signature: "invalid",
+      data: {
+        salt,
+        "hmac-secret": hmac,
+        "sync-secret": "unrelated"
+      }
+    }));
+    return Promise.all([salt, hmac, secret, sync.sync()]);
+  }).then(([salt, hmac, secret, _]) =>
+  {
+    test.equal(sync.syncData.error, "sync_unrelated_client", "Attempting to sync with different sync secret");
+
+    provider._set("/passwords.json", 8, JSON.stringify({
+      application: "pfp",
+      format: 3,
+      revision: 2,
+      signature: "invalid",
+      data: {
+        salt,
+        "hmac-secret": hmac,
+        "sync-secret": secret
+      }
+    }));
+    return Promise.all([salt, hmac, secret, sync.sync()]);
+  }).then(([salt, hmac, secret, _]) =>
+  {
+    test.equal(sync.syncData.error, "sync_tampered_data", "Attempting to sync with invalid signature");
+
+    provider._set("/passwords.json", 8, JSON.stringify({
+      application: "pfp",
+      format: 3,
+      revision: 2,
+      signature: 123,
+      data: {
+        salt,
+        "hmac-secret": hmac,
+        "sync-secret": secret
+      }
+    }));
+    return Promise.all([salt, hmac, secret, sync.sync()]);
+  }).then(([salt, hmac, secret, _]) =>
+  {
+    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with numerical signature");
+
+    provider._set("/passwords.json", 8, JSON.stringify(sign({
+      application: "pfp",
+      format: 3,
+      revision: 0.5,
+      data: {
+        salt,
+        "hmac-secret": hmac,
+        "sync-secret": secret
+      }
+    })));
+    return Promise.all([salt, hmac, secret, sync.sync()]);
+  }).then(([salt, hmac, secret, _]) =>
+  {
+    test.equal(sync.syncData.error, "sync_tampered_data", "Attempting to downgrade revision");
+
+    provider._set("/passwords.json", 8, JSON.stringify(sign({
+      application: "pfp",
+      format: 3,
+      revision: 2,
+      data: {
+        salt,
+        "hmac-secret": hmac,
+        "sync-secret": secret
+      }
+    })));
     return sync.sync();
   }).then(() =>
   {
@@ -421,9 +648,6 @@ exports.testNesting = function(test)
     return masterPassword.changePassword(dummyMaster);
   }).then(() =>
   {
-    return masterPassword.forgetPassword();
-  }).then(() =>
-  {
     return sync.authorize("dropbox");
   }).then(() =>
   {
@@ -432,7 +656,10 @@ exports.testNesting = function(test)
   {
     test.ok(!sync.syncData.error, "No error after initial sync");
 
-    return storage.set("site:foo", "bar", null);
+    return Promise.all([
+      masterPassword.forgetPassword(),
+      storage.set("site:foo", "bar", null)
+    ]);
   }).then(() =>
   {
     provider.changeRevisionOnGet = 1;
