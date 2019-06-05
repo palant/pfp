@@ -112,7 +112,7 @@ exports.setUp = function(callback)
   origConsoleError = console.error;
   console.error = function(...args)
   {
-    if (!String(args[0]).includes("Syntax error"))
+    if (!String(args[0]).includes("Syntax error") && !String(args[0]).includes("encrypted with wrong algorithm"))
       origConsoleError.call(this, ...args);
   };
 
@@ -1534,6 +1534,35 @@ exports.testImportErrors = function(test)
   {
     test.ok(false, "Imported data without salt");
   }).catch(expectedValue.bind(test, "unknown_data_format")).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "pfp",
+      format: 3,
+      data: {
+        salt: "asdf",
+        "hmac-secret": "fdsa"
+      }
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported data without knowing master password");
+  }).catch(expectedValue.bind(test, "master_password_required")).then(() =>
+  {
+    return masterPassword.changePassword(dummyMaster);
+  }).then(() =>
+  {
+    return passwords.importPasswordData(JSON.stringify({
+      application: "pfp",
+      format: 3,
+      data: {
+        salt: "asdf",
+        "hmac-secret": "fakeiv_" + btoa("AES-GCM!fakekey!fakeiv!\"fdsa\"")
+      }
+    }));
+  }).then(() =>
+  {
+    test.ok(false, "Imported data not matching master password");
+  }).catch(expectedValue.bind(test, "wrong_master_password")).then(() =>
   {
     return passwords.importPasswordData("url,username,password\n");
   }).then(() =>
