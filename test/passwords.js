@@ -1039,6 +1039,18 @@ exports.testDecryptingImport = function(test)
           symbol: generated2.symbol,
           notes: generated2.notes
         }),
+        [`site:${digest(generated3.site)}:${digest(generated3.site + "\0" + generated3.name + "\0" + generated3.revision)}`]: encrypt({
+          type: generated3.type,
+          site: generated3.site,
+          name: generated3.name,
+          revision: generated3.revision,
+          length: generated3.length,
+          lower: generated3.lower,
+          upper: generated3.upper,
+          number: generated3.number,
+          symbol: generated3.symbol,
+          notes: generated3.notes
+        }),
         [`site:${digest("sub." + generated1.site)}`]: encrypt({
           site: "sub." + generated1.site,
           alias: generated1.site
@@ -1074,6 +1086,14 @@ exports.testDecryptingImport = function(test)
           upper: generated1.upper,
           number: generated1.number,
           symbol: generated1.symbol
+        },
+        {
+          type: "stored",
+          site: generated3.site,
+          name: generated3.name,
+          revision: generated3.revision,
+          password: generated3.password,
+          notes: generated3.notes
         }],
         aliases: ["sub." + generated1.site]
       }
@@ -1138,6 +1158,18 @@ exports.testConvertingImport = function(test)
           password: stored2.password,
           notes: stored2.notes
         }),
+        [`site:${digest(generated3.site)}:${digest(generated3.site + "\0" + generated3.name + "\0" + generated3.revision)}`]: encrypt({
+          type: generated3.type,
+          site: generated3.site,
+          name: generated3.name,
+          revision: generated3.revision,
+          length: generated3.length,
+          lower: generated3.lower,
+          upper: generated3.upper,
+          number: generated3.number,
+          symbol: generated3.symbol,
+          notes: generated3.notes
+        }),
         [`site:${digest("sub." + generated1.site)}`]: encrypt({
           site: "sub." + generated1.site,
           alias: generated1.site
@@ -1155,9 +1187,13 @@ exports.testConvertingImport = function(test)
       crypto.derivePassword(Object.assign({
         masterPassword: backupMaster,
         domain: generated2.site
-      }, generated2))
+      }, generated2)),
+      crypto.derivePasswordLegacy(Object.assign({
+        masterPassword: backupMaster,
+        domain: generated3.site
+      }, generated3))
     ]);
-  }).then(([allPasswords, generated1result, generated2result]) =>
+  }).then(([allPasswords, generated1result, generated2result, generated3result]) =>
   {
     test.deepEqual(allPasswords, {
       [generated1.site]: {
@@ -1182,6 +1218,14 @@ exports.testConvertingImport = function(test)
           site: generated1.site,
           name: generated1.name,
           password: generated1result
+        },
+        {
+          type: "stored",
+          site: generated3.site,
+          name: generated3.name,
+          revision: generated3.revision,
+          password: generated3result,
+          notes: generated3.notes
         }],
         aliases: ["sub." + generated1.site]
       }
