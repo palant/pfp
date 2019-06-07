@@ -15,6 +15,17 @@ import ModalOverlay from "./components/ModalOverlay.vue";
 import ValidatedForm from "./components/ValidatedForm.vue";
 import ValidatedInput from "./components/ValidatedInput.vue";
 
+if (!("isConnected" in Node.prototype))
+{
+  // Edge and Firefox <53 don't have Node.isConnected
+  Object.defineProperty(Node.prototype, "isConnected", {
+    get()
+    {
+      return document.contains(this);
+    }
+  });
+}
+
 Vue.use(I18n);
 
 Vue.component("external-link", ExternalLink);
@@ -33,20 +44,19 @@ Vue.directive("focus", {
 Vue.directive("cancel", {
   inserted(element, binding, vnode)
   {
-    if (typeof binding.value == "undefined" || binding.value)
+    vnode.context.$el.addEventListener("keydown", event =>
     {
-      vnode.context.$el.addEventListener("keydown", event =>
+      if (event.defaultPrevented || event.key != "Escape" ||
+          event.shiftKey || event.ctrlKey || event.altKey || event.metaKey)
       {
-        if (event.defaultPrevented || event.key != "Escape" ||
-            event.shiftKey || event.ctrlKey || event.altKey || event.metaKey)
-        {
-          return;
-        }
+        return;
+      }
+      if (!element.isConnected)
+        return;
 
-        event.preventDefault();
-        element.click();
-      });
-    }
+      event.preventDefault();
+      element.click();
+    });
   }
 });
 
