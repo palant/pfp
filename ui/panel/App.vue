@@ -45,7 +45,7 @@
 
         <div class="spacer" />
 
-        <a href="#" class="tab lock" :title="$t('lock_passwords')"
+        <a v-cancel href="#" class="tab lock" :title="$t('lock_passwords')"
            @click.prevent="lockPasswords"
         />
       </div>
