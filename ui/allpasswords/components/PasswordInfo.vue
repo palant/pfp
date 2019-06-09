@@ -14,7 +14,7 @@
     />
 
     <div class="password-container">
-      <a href="#" class="to-clipboard-link" :title="$t('to_clipboard')" @click.prevent="copy" />
+      <a ref="to-clipboard" href="#" class="to-clipboard-link" :title="$t('to_clipboard')" @click.prevent="copy" />
       <span class="user-name-container">
         <span class="user-name">{{ password.name }}</span>
         <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
@@ -168,6 +168,10 @@ export default {
           this.$emit("removed");
         }).catch(this.showPasswordMessage);
       });
+    },
+    activate()
+    {
+      this.$refs["to-clipboard"].focus();
     }
   }
 };

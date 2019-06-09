@@ -17,8 +17,9 @@
     </div>
 
     <password-info v-for="password in site.passwords" :key="password.name"
-                   :password="password" :site-display-name="displayName"
-                   :show-notes="showNotes" :show-passwords="showPasswords"
+                   ref="password" :password="password"
+                   :site-display-name="displayName" :show-notes="showNotes"
+                   :show-passwords="showPasswords"
                    @removed="removePassword(password)"
     />
   </div>
@@ -73,6 +74,11 @@ export default {
         passwords.splice(index, 1);
       if (!passwords.length)
         this.$emit("removed");
+    },
+    activate()
+    {
+      this.$el.scrollIntoView(true);
+      this.$refs.password[0].activate();
     }
   }
 };

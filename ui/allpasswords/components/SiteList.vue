@@ -88,7 +88,7 @@ export default {
     },
     scrollToSite(site)
     {
-      this.$refs["site." + site][0].$el.scrollIntoView(true);
+      this.$refs["site." + site][0].activate();
     },
     removeSite(site)
     {
