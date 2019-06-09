@@ -8,6 +8,8 @@
 
 export function set(data)
 {
+  let prevActiveElement = document.activeElement;
+
   let dummy = document.createElement("textarea");
   dummy.style.position = "absolute";
   dummy.style.width = "0px";
@@ -19,4 +21,7 @@ export function set(data)
   dummy.select();
   document.execCommand("copy", false, null);
   document.body.removeChild(dummy);
+
+  if (prevActiveElement)
+    prevActiveElement.focus();
 }
