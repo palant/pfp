@@ -14,11 +14,11 @@
       {{ masterPassword.error }}
     </div>
     <div class="button-container">
-      <button>{{ $t("enter_master_submit") }}</button>
+      <button>{{ $t("submit") }}</button>
     </div>
     <div class="link-container">
       <a href="#" @click.prevent="$app.resettingMaster = true">
-        {{ $t("reset_master_link") }}
+        {{ $t("reset") }}
       </a>
     </div>
   </validated-form>
@@ -32,6 +32,7 @@ import {validateMasterPassword} from "../../common";
 
 export default {
   name: "EnterMaster",
+  localePath: "panel/pages/EnterMaster",
   data()
   {
     return {

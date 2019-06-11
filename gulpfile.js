@@ -178,7 +178,8 @@ function buildCommon(targetdir)
     gulp.src(["ui/**/*.scss"])
         .pipe(sass())
         .pipe(gulp.dest(`${targetdir}/ui`)),
-    gulp.src("locale/**/*.properties")
+    gulp.src("locale/**/*.json")
+        .pipe(utils.combineLocales())
         .pipe(utils.toChromeLocale())
         .pipe(gulp.dest(`${targetdir}/_locales`)),
     gulp.src("lib/main.js")
@@ -257,7 +258,14 @@ gulp.task("watch-firefox", gulp.series("build-firefox", function watchFirefox()
   gulp.watch(["*.js", "*.json", "ui/**/*", "lib/**/*", "contentScript/**/*", "worker/**/*", "locale/**/*"], ["build-firefox"]);
 }));
 
-gulp.task("build-web", gulp.series("validate", function buildWeb()
+gulp.task("build-web-locales", function buildWebLocales()
+{
+  return gulp.src("locale/**/*.json")
+      .pipe(utils.combineLocales())
+      .pipe(gulp.dest("build-web/locale"));
+});
+
+gulp.task("build-web", gulp.series("validate", "build-web-locales", function buildWeb()
 {
   let targetdir = "build-web";
   return merge(
@@ -312,10 +320,6 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
           module: {
             rules: [
               {
-                test: /\.properties$/,
-                use: path.resolve(__dirname, "localeLoader.js")
-              },
-              {
                 test: /\.js$/,
                 use: {
                   loader: "babel-loader",
@@ -330,7 +334,7 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
             alias: {
               "./browserAPI$": path.resolve(__dirname, "web", "contentBrowserAPI.js"),
               "../browserAPI$": path.resolve(__dirname, "web", "contentBrowserAPI.js"),
-              "locale$": path.resolve(__dirname, "locale", "en-US.properties")
+              "locale$": path.resolve(__dirname, "build-web", "locale", "en_US.json")
             }
           }
         }))
@@ -374,7 +378,7 @@ gulp.task("web", gulp.series("build-web", function zipWeb()
   let manifest = require("./manifest.json");
   return gulp.src([
     "build-web/**",
-    "!build-web/**/.*", "!build-web/**/*.zip"
+    "!build-web/**/.*", "!build-web/**/*.zip", "!build-web/locale/**"
   ]).pipe(zip("pfp-web-" + manifest.version + ".zip")).pipe(gulp.dest("build-web"));
 }));
 

@@ -7,7 +7,7 @@
 <template>
   <div class="page">
     <template v-if="$app.sync.provider">
-      <div>{{ $t("sync_provider") }}</div>
+      <div>{{ $t("provider_label") }}</div>
       <div>
         {{ labelForProvider($app.sync.provider) }}
         <template v-if="$app.sync.username">
@@ -15,31 +15,31 @@
         </template>
       </div>
 
-      <div class="block-start">{{ $t("sync_lastTime") }}</div>
+      <div class="block-start">{{ $t("lastTime_label") }}</div>
       <div>
-        <template v-if="$app.sync.isSyncing">{{ $t("sync_lastTime_now") }}</template>
+        <template v-if="$app.sync.isSyncing">{{ $t("lastTime_now") }}</template>
         <template v-else-if="$app.sync.lastSync">{{ new Date($app.sync.lastSync).toLocaleString() }}</template>
-        <template v-else>{{ $t("sync_lastTime_never") }}</template>
+        <template v-else>{{ $t("lastTime_never") }}</template>
 
         <template v-if="$app.sync.lastSync && !$app.sync.isSyncing">
-          <span v-if="$app.sync.error" class="sync-failed">{{ " " + $t("sync_failed") }}</span>
-          <template v-else>{{ " " + $t("sync_succeeded") }}</template>
+          <span v-if="$app.sync.error" class="sync-failed">{{ " " + $t("failed") }}</span>
+          <template v-else>{{ " " + $t("succeeded") }}</template>
         </template>
       </div>
 
       <div v-if="$app.sync.error" class="warning sync-error">
         {{ localize($app.sync.error) }}
         <a v-if="$app.sync.error == 'sync_invalid_token'" href="#" @click.prevent="authorize($app.sync.provider)">
-          {{ $t("sync_reauthorize") }}
+          {{ $t("reauthorize") }}
         </a>
       </div>
       <div class="button-container">
         <button v-focus :disabled="$app.sync.isSyncing" @click="doSync">{{ $t("do_sync") }}</button>
-        <button @click="disableSync">{{ $t("sync_disable") }}</button>
+        <button @click="disableSync">{{ $t("disable") }}</button>
       </div>
     </template>
     <template v-else>
-      <div class="sync-section">{{ $t("sync_selection_label") }}</div>
+      <div class="sync-section">{{ $t("selection_label") }}</div>
       <div v-keyboard-navigation="sync-provider-link" class="sync-provider-selection">
         <a v-for="(provider, index) in providers" :key="provider.name"
            v-focus="index == 0" class="sync-provider-link"
@@ -50,19 +50,19 @@
         </a>
       </div>
 
-      <div class="block-start sync-section">{{ $t("sync_how_label") }}</div>
+      <div class="block-start sync-section">{{ $t("how_heading") }}</div>
       <div class="sync-explanation">
-        {{ $t("sync_how_explanation") }}
+        {{ $t("how_text") }}
         <external-link type="documentation" param="sync">
-          {{ $t("learn_more") }}
+          {{ $t(".learn_more") }}
         </external-link>
       </div>
 
-      <div class="block-start sync-section">{{ $t("sync_safe_label") }}</div>
-      <div class="sync-explanation">{{ $t("sync_safe_explanation") }}</div>
+      <div class="block-start sync-section">{{ $t("security_heading") }}</div>
+      <div class="sync-explanation">{{ $t("security_text") }}</div>
 
-      <div class="block-start sync-section">{{ $t("sync_no_account_label") }}</div>
-      <div class="sync-explanation">{{ $t("sync_no_account_explanation") }}</div>
+      <div class="block-start sync-section">{{ $t("no_account_heading") }}</div>
+      <div class="sync-explanation">{{ $t("no_account_text") }}</div>
     </template>
 
     <manual-auth v-if="manualAuthCallback"
@@ -86,6 +86,7 @@ import RemoteStorageUsernameInput from "../components/RemoteStorageUsernameInput
 
 export default {
   name: "Sync",
+  localePath: "panel/pages/Sync",
   components: {
     "manual-auth": ManualAuth,
     "remoteStorage-username-input": RemoteStorageUsernameInput
@@ -133,7 +134,7 @@ export default {
     },
     disableSync()
     {
-      this.$app.confirm(this.$t("sync_disable_confirmation")).then(disable =>
+      this.$app.confirm(this.$t("disable_confirmation")).then(disable =>
       {
         if (disable)
         {

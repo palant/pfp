@@ -1,0 +1,5 @@
+{
+  "username_label": "Please enter your remoteStorage user address:",
+  "get_account": "Don't have remoteStorage? Learn where to get an account or how to host your own.",
+  "invalid_username": "This doesn't seem to be a valid remoteStorage user address."
+}

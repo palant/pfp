@@ -35,12 +35,12 @@
 
     <password-message ref="password-message" class="block-start"
                       :messages="{
-                        password_ready_message: false,
-                        password_copied_message: true,
-                        username_copied_message: true,
+                        password_ready: false,
+                        password_copied: true,
+                        username_copied: true,
                         no_such_password: false,
                         unknown_generation_method: false,
-                        wrong_site_message: false,
+                        wrong_site: false,
                         no_password_fields: false
                       }"
     />
@@ -85,6 +85,7 @@ import StoredPassword from "../components/StoredPassword.vue";
 
 export default {
   name: "PasswordList",
+  localePath: "panel/pages/PasswordList",
   components: {
     "password-message": PasswordMessage,
     "generated-password": GeneratedPassword,

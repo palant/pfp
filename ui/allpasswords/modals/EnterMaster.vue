@@ -16,8 +16,8 @@
         {{ masterPassword.error }}
       </div>
       <div class="button-container">
-        <button type="submit">{{ $t("enter_master_submit") }}</button>
-        <button type="reset">{{ $t("cancel") }}</button>
+        <button type="submit">{{ $t("submit") }}</button>
+        <button type="reset">{{ $t("/cancel") }}</button>
       </div>
     </validated-form>
   </modal-overlay>
@@ -31,6 +31,7 @@ import {masterPassword} from "../../proxy";
 
 export default {
   name: "EnterMaster",
+  localePath: "panel/pages/EnterMaster",
   props: {
     callback: {
       type: Function,

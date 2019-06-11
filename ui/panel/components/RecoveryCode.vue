@@ -6,13 +6,13 @@
 
 <template>
   <form class="modal-form">
-    <label class="block-start" for="recoveryInput">{{ $t("recovery_code") }}</label>
+    <label class="block-start" for="recoveryInput">{{ $t("label") }}</label>
     <div class="recovery-code-accepted">
       <div v-for="(line, index) in accepted" :key="line">
         {{ line }}
         <a v-if="index == accepted.length - 1"
            class="recovery-code-strip cancel"
-           href="#" :title="$t('recovery_remove_line')"
+           href="#" :title="$t('remove_line')"
            @click.prevent="accepted.pop()"
         />
       </div>
@@ -32,6 +32,8 @@
 import {recoveryCodes} from "../../proxy";
 
 export default {
+  name: "RecoveryCode",
+  localePath: "panel/components/RecoveryCode",
   data()
   {
     return {
@@ -114,7 +116,7 @@ export default {
           else
           {
             if (result == "checksum-mismatch")
-              error = this.$t("recovery_checksum_mismatch");
+              error = this.$t("checksum_mismatch");
             else
               error = result;
             return checkSubstr(index - 1);

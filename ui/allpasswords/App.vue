@@ -12,25 +12,27 @@
     <unknown-error v-if="unknownError" :error="unknownError" @close="unknownError = null" />
     <password-message ref="global-message"
                       :messages="{
-                        allpasswords_import_success: true
+                        import_success: true,
+                        unknown_data_format: false,
+                        syntax_error: false
                       }"
     />
 
     <div class="title-container">
-      <h1 class="title">{{ $t("allpasswords_title") }}</h1>
+      <h1 class="title">{{ $t("title") }}</h1>
       <global-actions />
     </div>
 
     <div class="options">
       <div>
-        <label><input v-model="showNotes" type="checkbox">{{ $t("allpasswords_show_notes") }}</label>
+        <label><input v-model="showNotes" type="checkbox">{{ $t("show_notes") }}</label>
       </div>
       <div>
-        <label><input v-model="showPasswords" type="checkbox">{{ $t("allpasswords_show_passwords") }}</label>
+        <label><input v-model="showPasswords" type="checkbox">{{ $t("show_passwords") }}</label>
       </div>
     </div>
 
-    <div class="intro">{{ $t("allpasswords_intro") }}</div>
+    <div class="intro">{{ $t("intro") }}</div>
 
     <site-list ref="siteList" :show-notes="showNotes" :show-passwords="confirmedPasswords && showPasswords" />
   </div>
@@ -50,6 +52,7 @@ import InProgress from "./modals/InProgress.vue";
 
 export default {
   name: "App",
+  localePath: "allpasswords/App",
   components: {
     "confirm": Confirm,
     "password-message": PasswordMessage,
@@ -83,7 +86,7 @@ export default {
     {
       if (this.showPasswords && !this.confirmedPasswords)
       {
-        this.confirm(this.$t("allpasswords_show_confirm")).then(accepted =>
+        this.confirm(this.$t("show_passwords_confirm")).then(accepted =>
         {
           if (accepted)
             this.confirmedPasswords = true;
@@ -95,7 +98,7 @@ export default {
   },
   mounted()
   {
-    document.title = this.$t("allpasswords_title");
+    document.title = this.$t("title");
     setErrorHandler("master_password_required", () =>
     {
       return new Promise((resolve, reject) =>
@@ -131,19 +134,12 @@ export default {
     {
       this.$refs["global-message"].message = message;
     },
-    localize(error)
-    {
-      if (/\s/.test(error))
-        return error;
-
-      return this.$t(error) || error;
-    },
     showUnknownError(error)
     {
       if (error == "canceled")
         return;
 
-      this.unknownError = this.localize(error);
+      this.unknownError = error;
     },
     updateData()
     {

@@ -6,18 +6,18 @@
 
 "use strict";
 
-import {i18n} from "./browserAPI";
+import {$t} from "./i18n";
 
 export function validateMasterPassword(val)
 {
   if (val.value.length < 6)
-    val.error = this.$t("password_too_short");
+    val.error = $t("/password_too_short");
 }
 
 export function getSiteDisplayName(site)
 {
   if (site == "pfp.invalid")
-    return i18n.getMessage("no_site_placeholder");
+    return $t("/no_site_placeholder");
   else if (site)
     return site;
   else

@@ -191,7 +191,7 @@ function fillIn(wnd, name, password, noFocus)
 {
   let result = null;
   if (window.location.hostname != host)
-    result = "wrong_site_message";
+    result = "wrong_site";
   else if (!fillIn(window, name, password))
     result = "no_password_fields";
 

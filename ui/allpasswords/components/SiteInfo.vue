@@ -12,8 +12,8 @@
     </div>
 
     <div v-if="site.aliases.length">
-      <span>{{ $t("allpasswords_aliases") }}</span>
-      <span>{{ site.aliases.slice().sort().join(", ") }}</span>
+      {{ $t("aliases_label") }}
+      {{ site.aliases.slice().sort().join(", ") }}
     </div>
 
     <password-info v-for="password in site.passwords" :key="password.name"
@@ -35,6 +35,7 @@ import PasswordInfo from "./PasswordInfo.vue";
 
 export default {
   name: "SiteInfo",
+  localePath: "allpasswords/components/SiteInfo",
   components: {
     "password-info": PasswordInfo
   },

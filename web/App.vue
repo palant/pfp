@@ -6,7 +6,7 @@
 
 <template>
   <div>
-    <div v-if="!browserSupported" class="warning">{{ $t("web_compat_message") }}</div>
+    <div v-if="!browserSupported" class="warning">{{ $t("compat_message") }}</div>
 
     <template v-if="currentPage == 'panel'">
       <link rel="stylesheet" href="panel/panel.css">
@@ -27,6 +27,7 @@ import AllPasswordsApp from "../ui/allpasswords/App.vue";
 
 export default {
   name: "App",
+  localePath: "web/App",
   components: {
     "panel-app": PanelApp,
     "allpasswords-app": AllPasswordsApp

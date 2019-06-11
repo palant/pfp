@@ -7,24 +7,24 @@
 <template>
   <modal-overlay :stretch="true" @cancel="$emit('cancel')">
     <validated-form class="modal-form" @validated="submit" @reset.native="$emit('cancel')">
-      <div class="warning">{{ $t("stored_password_warning") }}</div>
+      <div class="warning">{{ $t("warning") }}</div>
 
-      <label class="block-start" for="user-name">{{ $t("user_name") }}</label>
+      <label class="block-start" for="user-name">{{ $t(".username_label") }}</label>
       <validated-input id="user-name" v-model.trim="name" v-focus type="text" @validate="validateName" />
       <div v-if="name.error" class="error">
         {{ name.error }}
       </div>
 
       <a v-if="!revisionVisible" href="#" class="change-password-revision" @click.prevent="revisionVisible = true">
-        {{ $t("change_password_revision") }}
+        {{ $t(".change_password_revision") }}
       </a>
       <template v-else>
-        <label class="block-start" for="password-revision">{{ $t("password_revision") }}</label>
+        <label class="block-start" for="password-revision">{{ $t(".revision_label") }}</label>
         <input id="password-revision" v-model.trim="revision" type="text">
       </template>
 
       <template v-if="!recoveryActive">
-        <label class="block-start" for="password-value">{{ $t("password_value") }}</label>
+        <label class="block-start" for="password-value">{{ $t("password_label") }}</label>
         <validated-input id="password-value" v-model.trim="password" type="password" @validate="validatePassword" />
         <div v-if="password.error" class="error">
           {{ password.error }}
@@ -37,8 +37,8 @@
       </template>
 
       <div class="button-container">
-        <button type="submit">{{ $t("save_password") }}</button>
-        <button type="reset">{{ $t("cancel") }}</button>
+        <button type="submit">{{ $t("submit") }}</button>
+        <button type="reset">{{ $t("/cancel") }}</button>
       </div>
     </validated-form>
   </modal-overlay>
@@ -52,6 +52,7 @@ import RecoveryCode from "./RecoveryCode.vue";
 
 export default {
   name: "StoredPassword",
+  localePath: "panel/components/StoredPassword",
   components: {
     "recovery-code": RecoveryCode
   },
@@ -71,7 +72,7 @@ export default {
   watch: {
     revision()
     {
-      if (this.name.error == this.$t("user_name_exists"))
+      if (this.name.error == this.$t(".username_exists"))
         this.name.error = null;
     }
   },
@@ -80,7 +81,7 @@ export default {
     validateName(newData)
     {
       if (!newData.value)
-        newData.error = this.$t("user_name_required");
+        newData.error = this.$t(".username_required");
     },
     validatePassword(newData)
     {
@@ -109,7 +110,7 @@ export default {
       {
         if (error == "alreadyExists")
         {
-          this.name.error = this.$t("user_name_exists");
+          this.name.error = this.$t(".username_exists");
           this.revisionVisible = true;
         }
         else

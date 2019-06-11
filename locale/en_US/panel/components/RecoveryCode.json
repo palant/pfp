@@ -1,0 +1,5 @@
+{
+  "label": "Recovery code:",
+  "remove_line": "Remove line",
+  "checksum_mismatch": "Row is mistyped or not the next row."
+}

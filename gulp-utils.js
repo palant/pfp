@@ -8,8 +8,8 @@
 
 let fs = require("fs");
 let path = require("path");
-let spawn = require("child_process").spawn;
-let Transform = require("stream").Transform;
+let {spawn} = require("child_process");
+let {Duplex, Transform} = require("stream");
 
 exports.readArg = function(prefix, defaultValue)
 {
@@ -67,17 +67,71 @@ exports.jsonModify = function(modifier, newName)
   });
 };
 
+exports.combineLocales = function()
+{
+  let rootDir = path.join(process.cwd(), "locale");
+  let locales = {};
+  let files = {};
+
+  let stream = new Duplex({objectMode: true});
+
+  stream._write = (file, encoding, callback) =>
+  {
+    if (!file.isBuffer())
+      throw new Error("Unexpected file type");
+
+    let parts = path.relative(rootDir, file.path).split(path.sep);
+    let locale = parts.shift();
+    if (!locales.hasOwnProperty(locale))
+    {
+      locales[locale] = {};
+      files[locale] = file;
+    }
+
+    let fileName = parts.pop();
+    if (!fileName.startsWith("_"))
+      parts.push(path.basename(fileName, ".json"));
+
+    let prefix = "";
+    if (parts.length)
+      prefix = parts.join("@") + "@";
+
+    let data = JSON.parse(file.contents.toString("utf-8"));
+    for (let name of Object.keys(data))
+      locales[locale][prefix + name] = data[name];
+
+    callback(null);
+  };
+
+  stream._read = (...params) =>
+  {
+  };
+
+  stream.on("finish", () =>
+  {
+    for (let locale of Object.keys(locales))
+    {
+      let file = files[locale];
+      file.contents = Buffer.from(JSON.stringify(locales[locale], null, 2), "utf-8");
+      file.path = path.join(process.cwd(), "locale", locale + ".json");
+      stream.push(file);
+    }
+    stream.push(null);
+  });
+
+  return stream;
+};
+
 exports.toChromeLocale = function()
 {
-  let parser = require("properties-parser");
   return transform((filepath, contents) =>
   {
-    let properties = parser.parse(contents);
+    let strings = JSON.parse(contents);
     let data = {};
-    for (let key of Object.keys(properties))
-      data[key] = {message: properties[key]};
+    for (let key of Object.keys(strings))
+      data[key] = {message: strings[key]};
 
-    let locale = path.basename(filepath, ".properties");
+    let locale = path.basename(filepath, ".json");
     let manifest = require("./package.json");
     data.name = {"message": manifest.title};
     data.description = {"message": manifest.description};
@@ -91,7 +145,7 @@ exports.toChromeLocale = function()
     }
 
     return [
-      path.join(path.dirname(filepath), locale.replace(/-/g, "_"), "messages.json"),
+      path.join(path.dirname(filepath), locale, "messages.json"),
       JSON.stringify(data, null, 2)
     ];
   });

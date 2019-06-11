@@ -8,8 +8,8 @@
   <div>
     <div class="password-container">
       <a href="#" class="password-menu-link iconic-link" :class="{menuactive: modal == 'menu'}" :title="$t('password_menu')" @click.prevent="modal = 'menu'" />
-      <a v-if="!$isWebClient" v-focus="focus" href="#" class="to-document-link iconic-link" :title="$t('to_document')" @click.prevent="fillIn" />
-      <a v-focus="$isWebClient && focus" href="#" class="to-clipboard-link iconic-link" :title="$t('to_clipboard')" @click.prevent="copy" />
+      <a v-if="!$isWebClient" v-focus="focus" href="#" class="to-document-link iconic-link" :title="$t('.(PasswordMenu)to_document')" @click.prevent="fillIn" />
+      <a v-focus="$isWebClient && focus" href="#" class="to-clipboard-link iconic-link" :title="$t('.(PasswordMenu)to_clipboard')" @click.prevent="copy" />
       <span class="user-name-container" :title="tooltip">
         <span>{{ password.name }}</span>
         <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
@@ -42,6 +42,8 @@ import QRCode from "./QRCode.vue";
 import PasswordMenu from "./PasswordMenu.vue";
 
 export default {
+  name: "PasswordEntry",
+  localePath: "panel/components/PasswordEntry",
   components: {
     "generated-password": GeneratedPassword,
     "notes-editor": NotesEditor,
@@ -92,7 +94,7 @@ export default {
         tooltip = this.$t("password_type_stored");
 
       if (password.notes)
-        tooltip += "\n" + this.$t("password_info_notes") + " " + password.notes;
+        tooltip += "\n" + this.$t("notes") + " " + password.notes;
 
       return tooltip;
     }
@@ -129,7 +131,7 @@ export default {
       let doCopy = () =>
       {
         clipboardSet(this.value);
-        this.$parent.showPasswordMessage("password_copied_message");
+        this.$parent.showPasswordMessage("password_copied");
       };
 
       if (this.value)
@@ -142,7 +144,7 @@ export default {
             doCopy();
           else
           {
-            this.$parent.showPasswordMessage("password_ready_message");
+            this.$parent.showPasswordMessage("password_ready");
             let handler = event =>
             {
               window.removeEventListener("click", handler, true);
@@ -159,7 +161,7 @@ export default {
     {
       this.modal = null;
       clipboardSet(this.password.name);
-      this.$parent.showPasswordMessage("username_copied_message");
+      this.$parent.showPasswordMessage("username_copied");
     },
     showQRCode()
     {
@@ -186,9 +188,9 @@ export default {
     removePassword()
     {
       this.modal = null;
-      let message = this.$t("remove_password_confirmation", this.password.name, this.$app.siteDisplayName);
+      let message = this.$t("remove_confirmation", this.password.name, this.$app.siteDisplayName);
       if (this.password.notes)
-        message += " " + this.$t("remove_password_confirmation_notes", this.password.notes);
+        message += " " + this.$t("remove_confirmation_notes", this.password.notes);
       this.$app.confirm(message).then(response =>
       {
         if (response)

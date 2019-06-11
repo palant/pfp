@@ -6,7 +6,7 @@
 
 <template>
   <modal-overlay :focus-cancel="true" @cancel="$emit('cancel')">
-    <label>{{ $t("user_name") }}</label>
+    <label>{{ $t(".username_label") }}</label>
     <div>
       <span>{{ password.name }}</span>
       <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
@@ -24,6 +24,7 @@ import JSQR from "jsqr";
 
 export default {
   name: "QRCode",
+  localePath: "panel/components/QRCode",
   props: {
     password: {
       type: Object,

@@ -6,24 +6,24 @@
 
 <template>
   <div class="migration page">
-    <h1>{{ $t("migration_title") }}</h1>
+    <h1>{{ $t("title") }}</h1>
     <div v-if="inProgress" class="migration-in-progress">
       <div class="migration-spinning-wheel" />
-      <div>{{ $t("migration_in_progress") }}</div>
+      <div>{{ $t("in_progress") }}</div>
     </div>
-    <p>{{ $t("migration_intro") }}</p>
+    <p>{{ $t("intro") }}</p>
     <ul>
-      <li>{{ $t("migration_change1") }}</li>
-      <li>{{ $t("migration_change2") }}</li>
+      <li>{{ $t("change1") }}</li>
+      <li>{{ $t("change2") }}</li>
     </ul>
-    <p>{{ $t("migration_conclusion") }}</p>
+    <p>{{ $t("conclusion") }}</p>
     <p>
       <external-link type="relnotes" param="2.2.0">
-        {{ $t("learn_more") }}
+        {{ $t(".learn_more") }}
       </external-link>
     </p>
     <div v-if="!inProgress" class="button-container">
-      <button v-focus @click="done">{{ $t("migration_continue") }}</button>
+      <button v-focus @click="done">{{ $t("continue") }}</button>
     </div>
   </div>
 </template>
@@ -35,6 +35,7 @@ import {passwords} from "../../proxy";
 
 export default {
   name: "Migration",
+  localePath: "panel/pages/Migration",
   data()
   {
     return {

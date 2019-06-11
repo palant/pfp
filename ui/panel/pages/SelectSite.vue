@@ -6,7 +6,7 @@
 
 <template>
   <div class="page">
-    <site-selection :message="$t('select_site')" :callback="selected" />
+    <site-selection :message="$t('label')" :callback="selected" />
   </div>
 </template>
 
@@ -18,6 +18,7 @@ import SiteSelection from "../components/SiteSelection.vue";
 
 export default {
   name: "SelectSite",
+  localePath: "panel/pages/SelectSite",
   components: {
     "site-selection": SiteSelection
   },

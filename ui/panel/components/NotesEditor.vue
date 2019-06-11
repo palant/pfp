@@ -7,16 +7,16 @@
 <template>
   <modal-overlay :stretch="true" @cancel="$emit('cancel')">
     <form class="modal-form" @submit.prevent="saveNotes" @reset.prevent="$emit('cancel')">
-      <label>{{ $t("user_name") }}</label>
+      <label>{{ $t(".username_label") }}</label>
       <div>
         {{ password.name }}
         <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
       </div>
-      <label class="block-start" for="notes-textarea">{{ $t("password_notes") }}</label>
+      <label class="block-start" for="notes-textarea">{{ $t("notes_label") }}</label>
       <textarea id="notes-textarea" v-model.trim="value" v-focus />
       <div class="button-container">
-        <button type="submit">{{ $t("save_notes") }}</button>
-        <button type="reset">{{ $t("cancel") }}</button>
+        <button type="submit">{{ $t("submit") }}</button>
+        <button type="reset">{{ $t("/cancel") }}</button>
       </div>
     </form>
   </modal-overlay>
@@ -28,6 +28,8 @@
 import {passwords} from "../../proxy";
 
 export default {
+  name: "NotesEditor",
+  localePath: "panel/components/NotesEditor",
   props: {
     password: {
       type: Object,

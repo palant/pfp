@@ -6,13 +6,13 @@
 
 <template>
   <div class="global-actions">
-    <a class="export" href="#" :title="$t('allpasswords_export')" @click.prevent="exportData" />
-    <a class="import" href="#" :title="$t('allpasswords_import')" @click.prevent="selectImportFile" />
-    <a class="print" href="#" :title="$t('allpasswords_print')" @click.prevent="printPage" />
+    <a class="export" href="#" :title="$t('export')" @click.prevent="exportData" />
+    <a class="import" href="#" :title="$t('import')" @click.prevent="selectImportFile" />
+    <a class="print" href="#" :title="$t('print')" @click.prevent="printPage" />
     <input ref="importFile" type="file" accept="application/json,text/csv" hidden @change="importFileSelected">
     <iframe ref="frame" class="exportDataFrame" />
     <enter-master v-if="enterMasterCallback"
-                  :warning="$t('allpasswords_import_with_master')"
+                  :warning="$t('import_with_master')"
                   :callback="enterMasterCallback"
                   @cancel="enterMasterCallback = null"
     />
@@ -27,6 +27,7 @@ import EnterMaster from "../modals/EnterMaster.vue";
 
 export default {
   name: "GlobalActions",
+  localePath: "allpasswords/components/GlobalActions",
   components: {
     "enter-master": EnterMaster
   },
@@ -55,7 +56,7 @@ export default {
         link.href = URL.createObjectURL(blob);
         link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
         link.click();
-      }).catch(this.$app.showUnknownError);
+      }).catch(this.$app.showGlobalMessage);
     },
     selectImportFile()
     {
@@ -66,7 +67,7 @@ export default {
       let reader = new FileReader();
       reader.onload = () =>
       {
-        this.$app.confirm(this.$t("allpasswords_import_confirm")).then(accepted =>
+        this.$app.confirm(this.$t("import_confirm")).then(accepted =>
         {
           if (accepted)
             this.doImport(reader.result);
@@ -81,7 +82,7 @@ export default {
       passwords.importPasswordData(data, masterPass).then(() =>
       {
         this.$app.inProgress = false;
-        this.$app.showGlobalMessage("allpasswords_import_success");
+        this.$app.showGlobalMessage("import_success");
         this.$app.updateData();
       }).catch(error =>
       {
@@ -89,7 +90,7 @@ export default {
         if (error == "wrong_master_password")
           this.enterMasterCallback = newMaster => this.doImport(data, newMaster);
         else
-          this.$app.showUnknownError(error);
+          this.$app.showGlobalMessage(error);
       });
     },
     printPage()

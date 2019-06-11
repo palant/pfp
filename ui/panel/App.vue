@@ -21,7 +21,7 @@
 
         <a href="#" class="tab select-site"
            :class="{active: currentPage == 'select-site'}"
-           :title="$t('select_site_label')"
+           :title="$t('select_site')"
            @click.prevent="currentPage = 'select-site'"
         />
 
@@ -100,6 +100,7 @@ port.on("init", state =>
 
 export default {
   name: "App",
+  localePath: "panel/App",
   components: {
     "change-master": ChangeMaster,
     "enter-master": EnterMaster,

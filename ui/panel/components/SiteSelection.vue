@@ -25,11 +25,11 @@
         {{ site.prefix }}<strong>{{ site.match }}</strong>{{ site.suffix }}
       </div>
       <div v-if="!sites.length">
-        {{ $t("autocomplete_no_sites") }}
+        {{ $t("no_sites") }}
       </div>
     </div>
     <div class="button-container">
-      <button type="submit">{{ $t("select") }}</button>
+      <button type="submit">{{ $t("submit") }}</button>
     </div>
   </form>
 </template>
@@ -41,6 +41,8 @@ import {getSiteDisplayName} from "../../common";
 import {passwords} from "../../proxy";
 
 export default {
+  name: "SiteSelection",
+  localePath: "panel/components/SiteSelection",
   props: {
     message: {
       type: String,

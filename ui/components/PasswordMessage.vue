@@ -15,6 +15,7 @@ const messageHideDelay = 3000;
 
 export default {
   name: "PasswordMessage",
+  localePath: "components/PasswordMessage",
   props: {
     messages: {
       type: Object,

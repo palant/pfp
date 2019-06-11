@@ -1,0 +1,6 @@
+{
+  "autolock_title": "Enable auto-lock",
+  "autolock_description": "Lock passwords automatically when the panel is closed",
+  "autolock_delay_title": "Auto-lock delay",
+  "autolock_delay_description": "Interval in minutes after which the passwords should be locked"
+}

@@ -7,7 +7,7 @@
 <template>
   <modal-overlay @cancel="$emit('cancel')">
     <validated-form class="modal-form" @validated="done">
-      <label for="username">{{ $t("remoteStorage_username_label") }}</label>
+      <label for="username">{{ $t("username_label") }}</label>
       <validated-input id="username" v-model.trim="username" v-focus placeholder="me@example.com" @validate="validateUsername" />
       <div v-if="username.error" class="error">
         {{ username.error }}
@@ -15,12 +15,12 @@
 
       <div class="remoteStorage-hosting-link">
         <external-link type="url" param="https://wiki.remotestorage.io/Servers">
-          {{ $t("remoteStorage_get_account") }}
+          {{ $t("get_account") }}
         </external-link>
       </div>
 
       <div class="button-container">
-        <button type="submit">{{ $t("ok") }}</button>
+        <button type="submit">{{ $t("/ok") }}</button>
       </div>
     </validated-form>
   </modal-overlay>
@@ -30,7 +30,8 @@
 "use strict";
 
 export default {
-  name: "ManualAuth",
+  name: "RemoteStorageUsernameInput",
+  localePath: "panel/components/RemoteStorageUsernameInput",
   props: {
     target: {
       type: String,
@@ -58,7 +59,7 @@ export default {
     {
       let index = newData.value.indexOf("@");
       if (index <= 0 || /\s/.test(newData.value))
-        newData.error = this.$t("remoteStorage_invalid_username");
+        newData.error = this.$t("invalid_username");
       else
       {
         let host = newData.value.substr(index + 1).toLowerCase();
@@ -73,7 +74,7 @@ export default {
         }
         catch (e)
         {
-          newData.error = this.$t("remoteStorage_invalid_username");
+          newData.error = this.$t("invalid_username");
         }
       }
     }

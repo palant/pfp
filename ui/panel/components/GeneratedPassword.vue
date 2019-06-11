@@ -7,19 +7,19 @@
 <template>
   <modal-overlay :stretch="true" @cancel="$emit('cancel')">
     <validated-form class="modal-form" @validated="submit" @reset.native="$emit('cancel')">
-      <div v-if="options.replacing" class="warning replacing">{{ $t("replace_password_warning") }}</div>
+      <div v-if="options.replacing" class="warning replacing">{{ $t("replace_warning") }}</div>
 
-      <label for="user-name" :class="{'block-start': options.replacing}">{{ $t("user_name") }}</label>
+      <label for="user-name" :class="{'block-start': options.replacing}">{{ $t(".username_label") }}</label>
       <validated-input id="user-name" v-model.trim="name" v-focus v-bind="{readonly: options.replacing}" type="text" @validate="validateName" />
       <div v-if="name.error" class="error">
         {{ name.error }}
       </div>
 
       <a v-if="!revisionVisible && !options.replacing" href="#" class="change-password-revision" @click.prevent="revisionVisible = true">
-        {{ $t("change_password_revision") }}
+        {{ $t(".change_password_revision") }}
       </a>
       <template v-else-if="revisionVisible">
-        <label class="block-start" for="password-revision">{{ $t("password_revision") }}</label>
+        <label class="block-start" for="password-revision">{{ $t(".revision_label") }}</label>
         <input id="password-revision" ref="revision" v-model.trim="revision" v-bind="{readonly: options.replacing}" type="text">
       </template>
 
@@ -28,13 +28,13 @@
         {{ $t("keep_notes") }}
       </label>
 
-      <label class="block-start" for="password-length">{{ $t("password_length") }}</label>
+      <label class="block-start" for="password-length">{{ $t("length_label") }}</label>
       <div class="length-container">
         <input id="password-length" v-model.number="length" type="range" min="4" max="24" step="1">
         <span class="password-length-value">{{ length }}</span>
       </div>
 
-      <label class="block-start" for="charset-lower">{{ $t("allowed_characters") }}</label>
+      <label class="block-start" for="charset-lower">{{ $t("allowed_characters_label") }}</label>
       <div class="charsets-container">
         <label><input id="charset-lower" v-model="lower" type="checkbox">abc</label>
         <label><input v-model="upper" type="checkbox">XYZ</label>
@@ -47,8 +47,8 @@
       <div v-if="charsets.error" class="error">{{ charsets.error }}</div>
 
       <div class="button-container">
-        <button type="submit">{{ $t("generate_password") }}</button>
-        <button type="reset">{{ $t("cancel") }}</button>
+        <button type="submit">{{ $t("submit") }}</button>
+        <button type="reset">{{ $t("/cancel") }}</button>
       </div>
     </validated-form>
   </modal-overlay>
@@ -61,6 +61,7 @@ import {passwords} from "../../proxy";
 
 export default {
   name: "GeneratedPassword",
+  localePath: "panel/components/GeneratedPassword",
   props: {
     password: {
       type: Object,
@@ -112,7 +113,7 @@ export default {
   watch: {
     revision()
     {
-      if (this.name.error == this.$t("user_name_exists"))
+      if (this.name.error == this.$t(".username_exists"))
         this.name.error = null;
     },
     revisionVisible()
@@ -150,7 +151,7 @@ export default {
     validateName(newData)
     {
       if (!newData.value)
-        newData.error = this.$t("user_name_required");
+        newData.error = this.$t(".username_required");
     },
     updateCharsets()
     {
@@ -183,7 +184,7 @@ export default {
       {
         if (error == "alreadyExists")
         {
-          this.name.error = this.$t("user_name_exists");
+          this.name.error = this.$t(".username_exists");
           this.revisionVisible = true;
         }
         else

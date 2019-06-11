@@ -18,7 +18,7 @@
 
       {{ $t("master_security_message") }}
       <external-link type="documentation" param="choosing-master-password">
-        {{ $t("learn_more") }}
+        {{ $t(".learn_more") }}
       </external-link>
     </div>
     <label class="block-start" for="new-master">{{ $t("new_master") }}</label>
@@ -37,8 +37,8 @@
       {{ newMasterRepeat.error }}
     </div>
     <div class="button-container">
-      <button type="submit">{{ $t("change_master_submit") }}</button>
-      <button v-if="hasPassword" v-cancel type="reset">{{ $t("cancel") }}</button>
+      <button type="submit">{{ $t("submit") }}</button>
+      <button v-if="hasPassword" v-cancel type="reset">{{ $t("/cancel") }}</button>
     </div>
   </validated-form>
 </template>
@@ -52,6 +52,7 @@ import PasswordScore from "../components/PasswordScore.vue";
 
 export default {
   name: "ChangeMaster",
+  localePath: "panel/pages/ChangeMaster",
   components: {
     "password-score": PasswordScore
   },

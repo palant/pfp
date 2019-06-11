@@ -8,31 +8,33 @@
   <div class="password-info-container">
     <password-message ref="password-message"
                       :messages="{
-                        password_ready_message: false,
-                        password_copied_message: true
+                        password_ready: false,
+                        password_copied: true,
+                        no_such_password: false,
+                        unknown_generation_method: false
                       }"
     />
 
     <div class="password-container">
-      <a ref="to-clipboard" href="#" class="to-clipboard-link" :title="$t('to_clipboard')" @click.prevent="copy" />
+      <a ref="to-clipboard" href="#" class="to-clipboard-link" :title="$t('/(panel)(components)(PasswordMenu)to_clipboard')" @click.prevent="copy" />
       <span class="user-name-container">
         <span class="user-name">{{ password.name }}</span>
         <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
       </span>
       <span v-if="showPasswords && value" class="password-value">{{ value }}</span>
-      <a href="#" class="password-remove-link" :title="$t('remove_password')" @click.prevent="removePassword" />
+      <a href="#" class="password-remove-link" :title="$t('/(panel)(components)(PasswordMenu)remove_password')" @click.prevent="removePassword" />
     </div>
     <div class="password-info">
       <template v-if="password.type == 'generated2'">
-        <div class="password-type">{{ $t("password_type_generated2") }} </div>
-        <div>{{ $t("password_length") }} {{ password.length }}</div>
-        <div>{{ $t("allowed_characters") }}  {{ allowedChars }}</div>
+        <div class="password-type">{{ $t("/(panel)(components)(PasswordEntry)password_type_generated2") }} </div>
+        <div>{{ $t("/(panel)(components)(PasswordEntry)password_length") }} {{ password.length }}</div>
+        <div>{{ $t("/(panel)(components)(PasswordEntry)allowed_characters") }}  {{ allowedChars }}</div>
       </template>
       <template v-else-if="password.type == 'stored'">
-        <div class="password-type">{{ $t("password_type_stored_with_recovery") }} <span class="help-icon" :title="$t('recovery_code_explanation')" /></div>
+        <div class="password-type">{{ $t("password_type_stored") }} <span class="help-icon" :title="$t('recovery_code_explanation')" /></div>
         <pre v-if="recoveryCode">{{ recoveryCode }}</pre>
       </template>
-      <div v-if="showNotes && password.notes">{{ $t("password_info_notes") }} {{ password.notes }}</div>
+      <div v-if="showNotes && password.notes">{{ $t("/(panel)(components)(PasswordEntry)notes") }} {{ password.notes }}</div>
     </div>
   </div>
 </template>
@@ -46,6 +48,7 @@ import PasswordMessage from "../../components/PasswordMessage.vue";
 
 export default {
   name: "PasswordInfo",
+  localePath: "allpasswords/components/PasswordInfo",
   components: {
     "password-message": PasswordMessage
   },
@@ -127,7 +130,7 @@ export default {
       let doCopy = () =>
       {
         clipboardSet(this.value);
-        this.showPasswordMessage("password_copied_message");
+        this.showPasswordMessage("password_copied");
       };
 
       if (this.value)
@@ -140,7 +143,7 @@ export default {
             doCopy();
           else
           {
-            this.showPasswordMessage("password_ready_message");
+            this.showPasswordMessage("password_ready");
             let handler = event =>
             {
               window.removeEventListener("click", handler, true);
@@ -155,9 +158,9 @@ export default {
     },
     removePassword()
     {
-      let message = this.$t("remove_password_confirmation", this.password.name, this.siteDisplayName);
+      let message = this.$t("/(panel)(components)(PasswordEntry)remove_confirmation", this.password.name, this.siteDisplayName);
       if (this.password.notes)
-        message += " " + this.$t("remove_password_confirmation_notes", this.password.notes);
+        message += " " + this.$t("/(panel)(components)(PasswordEntry)remove_confirmation_notes", this.password.notes);
       this.$app.confirm(message).then(accepted =>
       {
         if (!accepted)
