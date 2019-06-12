@@ -106,17 +106,25 @@ export default {
             this.setValue([value.substr(index + 1), selectionDirection]);
             if (result == "ok")
             {
-              recoveryCodes.decodeCode(code).then(password =>
+              return recoveryCodes.decodeCode(code).then(password =>
               {
                 this.$emit("done", password);
-              }).catch(this.$app.showUnknownError);
+                if (error)
+                  throw error;
+              }).catch(error =>
+              {
+                if (error == "wrong_version")
+                  throw this.$t(error);
+
+                this.$app.showUnknownError(error);
+              });
             }
             return error ? Promise.reject(error) : Promise.resolve();
           }
           else
           {
-            if (result == "checksum-mismatch")
-              error = this.$t("checksum_mismatch");
+            if (result == "checksum_mismatch")
+              error = this.$t(result);
             else
               error = result;
             return checkSubstr(index - 1);

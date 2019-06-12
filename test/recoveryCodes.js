@@ -74,10 +74,10 @@ exports.testRecoveryCodes = function(test)
   {
     test.equal(valid, "ok", "Unchanged recovery code is valid");
     test.equal(firstLineValid, "unterminated", "Validating first line by itself");
-    test.equal(lastLineValid, "checksum-mismatch", "Validating last line by itself");
+    test.equal(lastLineValid, "checksum_mismatch", "Validating last line by itself");
     test.equal(reducedLinesValid, "unterminated", "Validating code without last line");
-    test.equal(reorderedLinesValid, "checksum-mismatch", "Validating code with last two lines swapped");
-    test.equal(transposedValid, "checksum-mismatch", "Code with two blocks swapped is not valid");
+    test.equal(reorderedLinesValid, "checksum_mismatch", "Validating code with last two lines swapped");
+    test.equal(transposedValid, "checksum_mismatch", "Code with two blocks swapped is not valid");
     test.equal(decoded, stored.password, "Password decoded correctly");
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
