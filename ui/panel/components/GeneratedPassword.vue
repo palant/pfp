@@ -35,7 +35,7 @@
       </div>
 
       <!-- Charset checkboxes are aggregated into a single hidden input to simplify validation -->
-      <validated-input v-model="charsets" :error.sync="charsetsError" hidden @validate="validateCharsets" />
+      <validated-input v-model="charsets" :error.sync="charsetsError" :visible="false" @validate="validateCharsets" />
       <div v-if="charsetsError" class="error">{{ charsetsError }}</div>
 
       <div class="button-container">

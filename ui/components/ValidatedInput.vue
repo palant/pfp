@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <input v-model.trim="actualValue">
+  <input v-if="visible" v-model.trim="actualValue">
 </template>
 
 <script>
@@ -21,6 +21,10 @@ export default {
     "error": {
       type: Object,
       default: null
+    },
+    "visible": {
+      type: Boolean,
+      default: true
     }
   },
   data()
