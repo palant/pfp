@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <input :value="value.value" @input="update" @change="update">
+  <input v-model.trim="actualValue">
 </template>
 
 <script>
@@ -15,37 +15,42 @@ export default {
   name: "ValidatedInput",
   props: {
     "value": {
+      type: String,
+      required: true
+    },
+    "error": {
       type: Object,
-      required: true,
-      validator(val)
-      {
-        return typeof val.value == "string";
-      }
+      default: null
     }
   },
-  data: () => ({
-    eagerValidation: false
-  }),
-  methods: {
-    setValue(value)
+  data()
+  {
+    return {
+      actualValue: this.value,
+      eagerValidation: false
+    };
+  },
+  watch: {
+    value()
     {
-      this.$el.value = value;
+      this.actualValue = this.value;
       this.update();
     },
-    update(forced)
+    actualValue()
     {
-      let value = this.$el.value.trim();
-      if (forced !== true && value == this.value.value)
+      this.$emit("input", this.actualValue);
+    }
+  },
+  methods: {
+    update()
+    {
+      if (!this.eagerValidation)
         return null;
 
-      let newData = {value, error: this.value.error};
-      if (this.eagerValidation)
-      {
-        newData.error = null;
-        this.$emit("validate", newData);
-      }
-      this.$emit("input", newData);
-      return newData;
+      let error = null;
+      this.$emit("validate", this.value, e => error = e);
+      this.$emit("update:error", error);
+      return error;
     }
   }
 };

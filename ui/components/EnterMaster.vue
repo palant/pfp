@@ -9,10 +9,11 @@
     <div v-if="warning" class="warning">{{ warning }}</div>
     <label for="master-password">{{ $t("master_password") }}</label>
     <validated-input id="master-password" v-model="masterPassword" v-focus
-                     type="password" @validate="validateMasterPassword"
+                     type="password" :error.sync="masterPasswordError"
+                     @validate="validateMasterPassword"
     />
-    <div v-if="masterPassword.error" class="error">
-      {{ masterPassword.error }}
+    <div v-if="masterPasswordError" class="error">
+      {{ masterPasswordError }}
     </div>
     <div class="button-container">
       <button type="submit">{{ $t("submit") }}</button>
@@ -27,10 +28,10 @@
 
 import {masterPassword} from "../proxy";
 
-export function validateMasterPassword(val)
+export function validateMasterPassword(value, setError)
 {
-  if (val.value.length < 6)
-    val.error = this.$t("/(components)(EnterMaster)password_too_short");
+  if (value.length < 6)
+    setError(this.$t("/(components)(EnterMaster)password_too_short"));
 }
 
 export default {
@@ -53,7 +54,8 @@ export default {
   data()
   {
     return {
-      masterPassword: {value: ""}
+      masterPassword: "",
+      masterPasswordError: null
     };
   },
   methods: {
@@ -61,18 +63,18 @@ export default {
     {
       if (this.callback)
       {
-        this.callback(this.masterPassword.value);
+        this.callback(this.masterPassword);
         this.$emit("done", true);
       }
       else
       {
-        masterPassword.checkPassword(this.masterPassword.value).then(() =>
+        masterPassword.checkPassword(this.masterPassword).then(() =>
         {
           this.$emit("done", true);
         }).catch(error =>
         {
           if (error == "declined")
-            this.masterPassword.error = this.$t("password_declined");
+            this.masterPasswordError = this.$t("password_declined");
           else if (error == "migrating")
             this.$emit("done", error);
           else

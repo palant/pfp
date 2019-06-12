@@ -7,7 +7,7 @@
 <template>
   <modal-overlay :stretch="true" @cancel="$emit('cancel')">
     <form class="modal-form" @submit.prevent="saveNotes" @reset.prevent="$emit('cancel')">
-      <label>{{ $t(".username_label") }}</label>
+      <label>{{ $t(".(PasswordNameEntry)username_label") }}</label>
       <div>
         {{ password.name }}
         <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>

@@ -9,19 +9,11 @@
     <validated-form class="modal-form" @validated="submit" @reset.native="$emit('cancel')">
       <div v-if="options.replacing" class="warning replacing">{{ $t("replace_warning") }}</div>
 
-      <label for="user-name" :class="{'block-start': options.replacing}">{{ $t(".username_label") }}</label>
-      <validated-input id="user-name" v-model.trim="name" v-focus v-bind="{readonly: options.replacing}" type="text" @validate="validateName" />
-      <div v-if="name.error" class="error">
-        {{ name.error }}
-      </div>
-
-      <a v-if="!revisionVisible && !options.replacing" href="#" class="change-password-revision" @click.prevent="revisionVisible = true">
-        {{ $t(".change_password_revision") }}
-      </a>
-      <template v-else-if="revisionVisible">
-        <label class="block-start" for="password-revision">{{ $t(".revision_label") }}</label>
-        <input id="password-revision" ref="revision" v-model.trim="revision" v-bind="{readonly: options.replacing}" type="text">
-      </template>
+      <password-name-entry ref="name-entry" v-model="name"
+                           :revision.sync="revision"
+                           :readonly="options.replacing"
+                           :class="{'block-start': options.replacing}"
+      />
 
       <label v-if="password && password.notes" class="block-start">
         <input v-model="keepNotes" type="checkbox">
@@ -43,8 +35,8 @@
       </div>
 
       <!-- Charset checkboxes are aggregated into a single hidden input to simplify validation -->
-      <validated-input ref="charsets" v-model="charsets" hidden @validate="validateCharsets" />
-      <div v-if="charsets.error" class="error">{{ charsets.error }}</div>
+      <validated-input v-model="charsets" :error.sync="charsetsError" hidden @validate="validateCharsets" />
+      <div v-if="charsetsError" class="error">{{ charsetsError }}</div>
 
       <div class="button-container">
         <button type="submit">{{ $t("submit") }}</button>
@@ -58,10 +50,14 @@
 "use strict";
 
 import {passwords} from "../../proxy";
+import PasswordNameEntry from "./PasswordNameEntry.vue";
 
 export default {
   name: "GeneratedPassword",
   localePath: "panel/components/GeneratedPassword",
+  components: {
+    "password-name-entry": PasswordNameEntry
+  },
   props: {
     password: {
       type: Object,
@@ -95,37 +91,19 @@ export default {
     }
 
     return {
-      name: {
-        value: name,
-        error: null
-      },
+      name,
       revision: revision || "1",
-      revisionVisible: !!revision,
       length: getProp("length", 16),
       lower: getProp("lower", true),
       upper: getProp("upper", true),
       number: getProp("number", true),
       symbol: getProp("symbol", true),
-      charsets: {value: "", error: null},
+      charsets: "",
+      charsetsError: null,
       keepNotes: !!this.password
     };
   },
   watch: {
-    revision()
-    {
-      if (this.name.error == this.$t(".username_exists"))
-        this.name.error = null;
-    },
-    revisionVisible()
-    {
-      if (this.revisionVisible)
-      {
-        this.$nextTick(() =>
-        {
-          this.$refs.revision.focus();
-        });
-      }
-    },
     lower()
     {
       this.updateCharsets();
@@ -148,19 +126,14 @@ export default {
     this.updateCharsets();
   },
   methods: {
-    validateName(newData)
-    {
-      if (!newData.value)
-        newData.error = this.$t(".username_required");
-    },
     updateCharsets()
     {
-      this.$refs.charsets.setValue([this.lower, this.upper, this.number, this.symbol].join(" "));
+      this.charsets = [this.lower, this.upper, this.number, this.symbol].join(" ");
     },
-    validateCharsets(newData)
+    validateCharsets(value, setError)
     {
-      if (newData.value.split(" ").every(c => c == "false"))
-        newData.error = this.$t("no_characters_selected");
+      if (value.split(" ").every(c => c == "false"))
+        setError(this.$t("no_characters_selected"));
     },
     submit()
     {
@@ -168,7 +141,7 @@ export default {
 
       passwords.addGenerated({
         site: this.$app.site,
-        name: this.name.value,
+        name: this.name,
         revision,
         length: this.length,
         lower: this.lower,
@@ -183,10 +156,7 @@ export default {
       }).catch(error =>
       {
         if (error == "alreadyExists")
-        {
-          this.name.error = this.$t(".username_exists");
-          this.revisionVisible = true;
-        }
+          this.$refs["name-entry"].nameConflict();
         else
           this.$app.showUnknownError(error);
       });

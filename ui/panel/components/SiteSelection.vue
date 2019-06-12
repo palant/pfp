@@ -90,12 +90,6 @@ export default {
       })
       .catch(this.$app.showUnknownError);
   },
-  updated()
-  {
-    // If our parent is ModalOverlay, make sure to notify it about updates.
-    if (this.$parent.ensureDocHeight)
-      this.$parent.ensureDocHeight();
-  },
   methods: {
     updateSites()
     {

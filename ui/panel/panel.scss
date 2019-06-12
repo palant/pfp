@@ -425,6 +425,12 @@ a.iconic-link:hover
   background-repeat: no-repeat;
 }
 
+.password-name-entry
+{
+  display: flex;
+  flex-direction: column;
+}
+
 .length-container,
 .charsets-container
 {

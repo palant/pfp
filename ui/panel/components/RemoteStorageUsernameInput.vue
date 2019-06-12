@@ -8,9 +8,12 @@
   <modal-overlay @cancel="$emit('cancel')">
     <validated-form class="modal-form" @validated="done">
       <label for="username">{{ $t("username_label") }}</label>
-      <validated-input id="username" v-model.trim="username" v-focus placeholder="me@example.com" @validate="validateUsername" />
-      <div v-if="username.error" class="error">
-        {{ username.error }}
+      <validated-input id="username" v-model="username" v-focus
+                       :error.sync="usernameError" placeholder="me@example.com"
+                       @validate="validateUsername"
+      />
+      <div v-if="usernameError" class="error">
+        {{ usernameError }}
       </div>
 
       <div class="remoteStorage-hosting-link">
@@ -45,24 +48,25 @@ export default {
   data()
   {
     return {
-      username: {value: ""}
+      username: "",
+      usernameError: null
     };
   },
   methods: {
     done()
     {
       this.$emit("cancel");
-      if (this.callback && this.username.value)
-        this.callback(this.username.value);
+      if (this.callback && this.username)
+        this.callback(this.username);
     },
-    validateUsername(newData)
+    validateUsername(value, setError)
     {
-      let index = newData.value.indexOf("@");
-      if (index <= 0 || /\s/.test(newData.value))
-        newData.error = this.$t("invalid_username");
+      let index = value.indexOf("@");
+      if (index <= 0 || /\s/.test(value))
+        setError(this.$t("invalid_username"));
       else
       {
-        let host = newData.value.substr(index + 1).toLowerCase();
+        let host = value.substr(index + 1).toLowerCase();
 
         // URL object will always encode non-ASCII characters, yet all of them
         // are valid. Replace by ASCII letters for validation.
@@ -74,7 +78,7 @@ export default {
         }
         catch (e)
         {
-          newData.error = this.$t("invalid_username");
+          setError(this.$t("invalid_username"));
         }
       }
     }

@@ -36,7 +36,7 @@ export default {
       this.forValidatedChildren(child =>
       {
         child.eagerValidation = true;
-        let error = child.update(true).error;
+        let error = child.update();
         if (error && !seenErrors)
         {
           seenErrors = true;

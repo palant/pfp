@@ -9,25 +9,13 @@
     <validated-form class="modal-form" @validated="submit" @reset.native="$emit('cancel')">
       <div class="warning">{{ $t("warning") }}</div>
 
-      <label class="block-start" for="user-name">{{ $t(".username_label") }}</label>
-      <validated-input id="user-name" v-model.trim="name" v-focus type="text" @validate="validateName" />
-      <div v-if="name.error" class="error">
-        {{ name.error }}
-      </div>
-
-      <a v-if="!revisionVisible" href="#" class="change-password-revision" @click.prevent="revisionVisible = true">
-        {{ $t(".change_password_revision") }}
-      </a>
-      <template v-else>
-        <label class="block-start" for="password-revision">{{ $t(".revision_label") }}</label>
-        <input id="password-revision" v-model.trim="revision" type="text">
-      </template>
+      <password-name-entry ref="name-entry" v-model="name" :revision.sync="revision" class="block-start" />
 
       <template v-if="!recoveryActive">
         <label class="block-start" for="password-value">{{ $t("password_label") }}</label>
-        <validated-input id="password-value" v-model.trim="password" type="password" @validate="validatePassword" />
-        <div v-if="password.error" class="error">
-          {{ password.error }}
+        <validated-input id="password-value" v-model="password" :error.sync="passwordError" type="password" @validate="validatePassword" />
+        <div v-if="passwordError" class="error">
+          {{ passwordError }}
         </div>
         <a class="use-recovery" href="#" @click.prevent="recoveryActive = true">{{ $t("use_recovery") }}</a>
       </template>
@@ -48,12 +36,14 @@
 "use strict";
 
 import {passwords} from "../../proxy";
+import PasswordNameEntry from "./PasswordNameEntry.vue";
 import RecoveryCode from "./RecoveryCode.vue";
 
 export default {
   name: "StoredPassword",
   localePath: "panel/components/StoredPassword",
   components: {
+    "password-name-entry": PasswordNameEntry,
     "recovery-code": RecoveryCode
   },
   data()
@@ -61,37 +51,22 @@ export default {
     return {
       name: "",
       revision: "1",
-      revisionVisible: false,
-      password: {
-        value: "",
-        error: null
-      },
+      password: "",
+      passwordError: null,
       recoveryActive: false
     };
   },
-  watch: {
-    revision()
-    {
-      if (this.name.error == this.$t(".username_exists"))
-        this.name.error = null;
-    }
-  },
   methods:
   {
-    validateName(newData)
+    validatePassword(value, setError)
     {
-      if (!newData.value)
-        newData.error = this.$t(".username_required");
-    },
-    validatePassword(newData)
-    {
-      if (!newData.value)
-        newData.error = this.$t("password_value_required");
+      if (!value)
+        setError(this.$t("password_value_required"));
     },
     setPassword(password)
     {
       this.recoveryActive = false;
-      this.password.value = password;
+      this.password = password;
     },
     submit()
     {
@@ -99,9 +74,9 @@ export default {
 
       passwords.addStored({
         site: this.$app.site,
-        name: this.name.value,
+        name: this.name,
         revision,
-        password: this.password.value
+        password: this.password
       }).then(pwdList =>
       {
         this.$app.pwdList = pwdList;
@@ -109,10 +84,7 @@ export default {
       }).catch(error =>
       {
         if (error == "alreadyExists")
-        {
-          this.name.error = this.$t(".username_exists");
-          this.revisionVisible = true;
-        }
+          this.$refs["name-entry"].nameConflict();
         else
           this.$app.showUnknownError(error);
       });

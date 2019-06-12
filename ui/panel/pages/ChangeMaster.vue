@@ -23,18 +23,20 @@
     </div>
     <label class="block-start" for="new-master">{{ $t("new_master") }}</label>
     <validated-input id="new-master" v-model="newMaster" v-focus type="password"
+                     :error.sync="newMasterError"
                      @validate="validateMasterPassword"
     />
-    <div v-if="newMaster.error" class="error">
-      {{ newMaster.error }}
+    <div v-if="newMasterError" class="error">
+      {{ newMasterError }}
     </div>
-    <password-score ref="passwordScore" :password="newMaster.value" />
+    <password-score ref="passwordScore" :password="newMaster" />
     <label class="block-start" for="new-master-repeat">{{ $t("new_master_repeat") }}</label>
     <validated-input id="new-master-repeat" v-model="newMasterRepeat"
-                     type="password" @validate="validateMasterPasswordRepeat"
+                     type="password" :error.sync="newMasterRepeatError"
+                     @validate="validateMasterPasswordRepeat"
     />
-    <div v-if="newMasterRepeat.error" class="error">
-      {{ newMasterRepeat.error }}
+    <div v-if="newMasterRepeatError" class="error">
+      {{ newMasterRepeatError }}
     </div>
     <div class="button-container">
       <button type="submit">{{ $t("submit") }}</button>
@@ -59,8 +61,10 @@ export default {
   data()
   {
     return {
-      newMaster: {value: ""},
-      newMasterRepeat: {value: ""}
+      newMaster: "",
+      newMasterError: null,
+      newMasterRepeat: "",
+      newMasterRepeatError: null
     };
   },
   computed: {
@@ -78,7 +82,7 @@ export default {
       {
         if (accepted)
         {
-          masterPassword.changePassword(this.newMaster.value)
+          masterPassword.changePassword(this.newMaster)
             .then(() => passwords.getPasswords(this.$app.origSite))
             .then(([origSite, site, pwdList]) =>
             {
@@ -93,10 +97,10 @@ export default {
       });
     },
     validateMasterPassword,
-    validateMasterPasswordRepeat(newData)
+    validateMasterPasswordRepeat(value, setError)
     {
-      if (newData.value != this.newMaster.value)
-        newData.error = this.$t("passwords_differ");
+      if (value != this.newMaster)
+        setError(this.$t("passwords_differ"));
     }
   }
 };

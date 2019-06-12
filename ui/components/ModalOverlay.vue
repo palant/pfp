@@ -40,7 +40,8 @@ export default {
   data()
   {
     return {
-      savedActiveElement: null
+      savedActiveElement: null,
+      observer: null
     };
   },
   beforeMount()
@@ -54,10 +55,12 @@ export default {
   mounted()
   {
     this.ensureDocHeight();
-  },
-  updated()
-  {
-    this.ensureDocHeight();
+    this.observer = new MutationObserver(this.ensureDocHeight);
+    this.observer.observe(this.$el, {
+      childList: true,
+      attributes: true,
+      subtree: true
+    });
   },
   beforeDestroy()
   {
@@ -67,6 +70,12 @@ export default {
       if (this.savedActiveElement)
         this.savedActiveElement.focus();
       activeModal = null;
+    }
+
+    if (this.observer)
+    {
+      this.observer.disconnect();
+      this.observer = null;
     }
   },
   methods: {
