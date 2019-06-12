@@ -13,7 +13,10 @@
 
       <template v-if="!recoveryActive">
         <label class="block-start" for="password-value">{{ $t("password_label") }}</label>
-        <validated-input id="password-value" v-model="password" :error.sync="passwordError" type="password" @validate="validatePassword" />
+        <validated-input id="password-value" ref="password" v-model="password"
+                         :error.sync="passwordError" type="password"
+                         @validate="validatePassword"
+        />
         <div v-if="passwordError" class="error">
           {{ passwordError }}
         </div>
@@ -55,6 +58,14 @@ export default {
       passwordError: null,
       recoveryActive: false
     };
+  },
+  watch:
+  {
+    recoveryActive()
+    {
+      if (!this.recoveryActive)
+        this.$nextTick(() => this.$refs.password.$el.focus());
+    }
   },
   methods:
   {
