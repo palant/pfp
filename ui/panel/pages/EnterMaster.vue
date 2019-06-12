@@ -5,62 +5,49 @@
  -->
 
 <template>
-  <validated-form class="page" @validated="submit">
-    <label for="master-password">{{ $t("master_password") }}</label>
-    <validated-input id="master-password" v-model="masterPassword" v-focus
-                     type="password" @validate="validateMasterPassword"
-    />
-    <div v-if="masterPassword.error" class="error">
-      {{ masterPassword.error }}
-    </div>
-    <div class="button-container">
-      <button>{{ $t("submit") }}</button>
-    </div>
-    <div class="link-container">
-      <a href="#" @click.prevent="$app.resettingMaster = true">
-        {{ $t("reset") }}
-      </a>
-    </div>
-  </validated-form>
+  <div>
+    <enter-master class="page" :cancelable="false" @done="done">
+      <div class="link-container">
+        <a href="#" @click.prevent="$app.resettingMaster = true">
+          {{ $t("reset") }}
+        </a>
+      </div>
+    </enter-master>
+  </div>
 </template>
 
 <script>
 "use strict";
 
-import {masterPassword, passwords} from "../../proxy";
-import {validateMasterPassword} from "../../common";
+import EnterMaster from "../../components/EnterMaster.vue";
+import {passwords} from "../../proxy";
 
 export default {
   name: "EnterMaster",
   localePath: "panel/pages/EnterMaster",
-  data()
-  {
-    return {
-      masterPassword: {value: ""}
-    };
+  components: {
+    "enter-master": EnterMaster
   },
   methods: {
-    submit()
+    done(success)
     {
-      masterPassword.checkPassword(this.masterPassword.value)
-        .then(() => passwords.getPasswords(this.$app.origSite))
-        .then(([origSite, site, pwdList]) =>
-        {
-          this.$app.origSite = origSite;
-          this.$app.site = site;
-          this.$app.pwdList = pwdList;
-          this.$app.masterPasswordState = "known";
-        }).catch(error =>
-        {
-          if (error == "declined")
-            this.masterPassword.error = this.$t("password_declined");
-          else if (error == "migrating")
-            this.$app.masterPasswordState = "migrating";
-          else
-            this.$app.showUnknownError(error);
-        });
-    },
-    validateMasterPassword
+      if (!success)
+        return;
+
+      if (success == "migrating")
+        this.$app.masterPasswordState = "migrating";
+      else
+      {
+        passwords.getPasswords(this.$app.origSite)
+          .then(([origSite, site, pwdList]) =>
+          {
+            this.$app.origSite = origSite;
+            this.$app.site = site;
+            this.$app.pwdList = pwdList;
+            this.$app.masterPasswordState = "known";
+          }).catch(this.$app.showUnknownError);
+      }
+    }
   }
 };
 </script>

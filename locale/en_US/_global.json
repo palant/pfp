@@ -1,6 +1,5 @@
 {
   "ok": "OK",
   "cancel": "Cancel",
-  "no_site_placeholder": "(none)",
-  "password_too_short": "The master password should be at least 6 characters long."
+  "no_site_placeholder": "(none)"
 }

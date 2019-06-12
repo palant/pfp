@@ -7,7 +7,7 @@
 <template>
   <div @keydown.ctrl.69.prevent="testUnknownError">
     <in-progress v-if="inProgress" />
-    <enter-master v-if="masterPromise" @cancel="enterMasterDone" />
+    <enter-master v-if="masterPromise" @done="enterMasterDone" />
     <confirm ref="confirm" />
     <unknown-error v-if="unknownError" :error="unknownError" @close="unknownError = null" />
     <password-message ref="global-message"

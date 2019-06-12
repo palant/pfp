@@ -46,7 +46,7 @@
 <script>
 "use strict";
 
-import {validateMasterPassword} from "../../common";
+import {validateMasterPassword} from "../../components/EnterMaster.vue";
 import {passwords, masterPassword} from "../../proxy";
 import PasswordScore from "../components/PasswordScore.vue";
 

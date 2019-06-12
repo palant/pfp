@@ -11,10 +11,10 @@
     <a class="print" href="#" :title="$t('print')" @click.prevent="printPage" />
     <input ref="importFile" type="file" accept="application/json,text/csv" hidden @change="importFileSelected">
     <iframe ref="frame" class="exportDataFrame" />
-    <enter-master v-if="enterMasterCallback"
+    <enter-master v-if="enterMasterCallback" class="modal-form"
                   :warning="$t('import_with_master')"
                   :callback="enterMasterCallback"
-                  @cancel="enterMasterCallback = null"
+                  @done="enterMasterCallback = null"
     />
   </div>
 </template>

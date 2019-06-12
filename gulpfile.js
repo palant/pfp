@@ -65,10 +65,10 @@ function webpack(config)
 
 gulp.task("eslint", function()
 {
-  return gulp.src(["*.js", "ui/**/*.js", "ui/**/*.vue", "lib/**/*.js",
+  return gulp.src(["*.js", "*.json", "ui/**/*.js", "ui/**/*.vue", "lib/**/*.js",
                    "test/**/*.js", "test-lib/**/*.js", "web/**/*.js",
                    "contentScript/**/*.js", "worker/**/*.js",
-                   "!ui/third-party/**"])
+                   "locale/**/*.json", "!ui/third-party/**"])
              .pipe(eslint())
              .pipe(eslint.format())
              .pipe(eslint.failAfterError());

@@ -8,12 +8,6 @@
 
 import {$t} from "./i18n";
 
-export function validateMasterPassword(val)
-{
-  if (val.value.length < 6)
-    val.error = $t("/password_too_short");
-}
-
 export function getSiteDisplayName(site)
 {
   if (site == "pfp.invalid")
