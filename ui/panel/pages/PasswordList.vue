@@ -47,10 +47,10 @@
 
     <div class="block-start">{{ $t("passwords_label") }}</div>
     <div v-if="!$app.pwdList.length">{{ $t("no_passwords_message") }}</div>
-    <div v-else class="password-list-container" @keydown="keyboardNavigation">
+    <div v-else class="password-list-container" role="list" @keydown="keyboardNavigation">
       <password-entry v-for="(password, index) in $app.pwdList"
                       :key="password.name + '\0' + password.revision"
-                      :password="password" :focus="index == 0"
+                      role="listitem" :password="password" :focus="index == 0"
       />
     </div>
 

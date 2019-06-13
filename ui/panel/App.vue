@@ -16,28 +16,28 @@
     <enter-master v-else-if="masterPasswordState == 'set'" />
     <migration v-else-if="masterPasswordState == 'migrating'" />
     <div v-else-if="masterPasswordState == 'known'" class="tabs">
-      <nav v-keyboard-navigation="tab" class="tablist">
+      <nav v-keyboard-navigation="tab" class="tablist" role="list">
         <div />
 
-        <iconic-link class="tab select-site"
+        <iconic-link class="tab select-site" role="listitem"
                      :class="{active: currentPage == 'select-site'}"
                      :title="$t('select_site')"
                      @click="currentPage = 'select-site'"
         />
 
-        <iconic-link class="tab password-list"
+        <iconic-link class="tab password-list" role="listitem"
                      :class="{active: currentPage == 'password-list'}"
                      :title="$t('password_list')"
                      @click="currentPage = 'password-list'"
         />
 
-        <iconic-link class="tab sync"
+        <iconic-link class="tab sync" role="listitem"
                      :class="{active: currentPage == 'sync', failed: $app.sync.error && $app.sync.error != 'sync_connection_error'}"
                      :title="$t($app.sync.provider ? 'sync_state' : 'sync_setup')"
                      @click="currentPage = 'sync'"
         />
 
-        <iconic-link class="tab settings"
+        <iconic-link class="tab settings" role="listitem"
                      :class="{active: currentPage == 'settings'}"
                      :title="$t('settings')"
                      @click="currentPage = 'settings'"
@@ -45,7 +45,7 @@
 
         <div class="spacer" />
 
-        <iconic-link class="tab lock"
+        <iconic-link class="tab lock" role="listitem"
                      :title="$t('lock_passwords')"
                      @click="lockPasswords"
         />
