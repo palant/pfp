@@ -16,39 +16,40 @@
     <enter-master v-else-if="masterPasswordState == 'set'" />
     <migration v-else-if="masterPasswordState == 'migrating'" />
     <div v-else-if="masterPasswordState == 'known'" class="tabs">
-      <div v-keyboard-navigation="tab" class="tablist">
+      <nav v-keyboard-navigation="tab" class="tablist">
         <div />
 
-        <a href="#" class="tab select-site"
-           :class="{active: currentPage == 'select-site'}"
-           :title="$t('select_site')"
-           @click.prevent="currentPage = 'select-site'"
+        <iconic-link class="tab select-site"
+                     :class="{active: currentPage == 'select-site'}"
+                     :title="$t('select_site')"
+                     @click="currentPage = 'select-site'"
         />
 
-        <a href="#" class="tab password-list"
-           :class="{active: currentPage == 'password-list'}"
-           :title="$t('password_list')"
-           @click.prevent="currentPage = 'password-list'"
+        <iconic-link class="tab password-list"
+                     :class="{active: currentPage == 'password-list'}"
+                     :title="$t('password_list')"
+                     @click="currentPage = 'password-list'"
         />
 
-        <a href="#" class="tab sync"
-           :class="{active: currentPage == 'sync', failed: $app.sync.error && $app.sync.error != 'sync_connection_error'}"
-           :title="$t($app.sync.provider ? 'sync_state' : 'sync_setup')"
-           @click.prevent="currentPage = 'sync'"
+        <iconic-link class="tab sync"
+                     :class="{active: currentPage == 'sync', failed: $app.sync.error && $app.sync.error != 'sync_connection_error'}"
+                     :title="$t($app.sync.provider ? 'sync_state' : 'sync_setup')"
+                     @click="currentPage = 'sync'"
         />
 
-        <a href="#" class="tab settings"
-           :class="{active: currentPage == 'settings'}"
-           :title="$t('settings')"
-           @click.prevent="currentPage = 'settings'"
+        <iconic-link class="tab settings"
+                     :class="{active: currentPage == 'settings'}"
+                     :title="$t('settings')"
+                     @click="currentPage = 'settings'"
         />
 
         <div class="spacer" />
 
-        <a href="#" class="tab lock" :title="$t('lock_passwords')"
-           @click.prevent="lockPasswords"
+        <iconic-link class="tab lock"
+                     :title="$t('lock_passwords')"
+                     @click="lockPasswords"
         />
-      </div>
+      </nav>
       <select-site v-if="currentPage == 'select-site'" @selected="currentPage = 'password-list'" />
       <password-list v-if="currentPage == 'password-list'" />
       <sync v-else-if="currentPage == 'sync'" />

@@ -6,7 +6,7 @@
 
 <template>
   <div class="unknown-error warning">
-    <a href="#" class="unknown-error-cancel cancel" :title="$t('close')" @click.prevent="$emit('close')" />
+    <iconic-link class="unknown-error-cancel cancel" :title="$t('close')" @click="$emit('close')" />
     <span>{{ $t("description") + " " }}</span>
     <a v-if="!showDetails" href="#" @click.prevent="showDetails = true">{{ $t("more") }}</a>
     <div v-else class="unknown-error-details">{{ stringify(error) }}</div>

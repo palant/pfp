@@ -6,9 +6,9 @@
 
 <template>
   <div class="global-actions">
-    <a class="export" href="#" :title="$t('export')" @click.prevent="exportData" />
-    <a class="import" href="#" :title="$t('import')" @click.prevent="selectImportFile" />
-    <a class="print" href="#" :title="$t('print')" @click.prevent="printPage" />
+    <iconic-link class="export" :title="$t('export')" @click="exportData" />
+    <iconic-link class="import" :title="$t('import')" @click="selectImportFile" />
+    <iconic-link class="print" :title="$t('print')" @click="printPage" />
     <input ref="importFile" type="file" accept="application/json,text/csv" hidden @change="importFileSelected">
     <iframe ref="frame" class="exportDataFrame" />
     <enter-master v-if="enterMasterCallback" class="modal-form"

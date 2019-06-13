@@ -16,13 +16,13 @@
     />
 
     <div class="password-container">
-      <a ref="to-clipboard" href="#" class="to-clipboard-link" :title="$t('/(panel)(components)(PasswordMenu)to_clipboard')" @click.prevent="copy" />
+      <iconic-link ref="to-clipboard" class="to-clipboard-link" :title="$t('/(panel)(components)(PasswordMenu)to_clipboard')" @click="copy" />
       <span class="user-name-container">
         <span class="user-name">{{ password.name }}</span>
         <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
       </span>
       <span v-if="showPasswords && value" class="password-value">{{ value }}</span>
-      <a href="#" class="password-remove-link" :title="$t('/(panel)(components)(PasswordMenu)remove_password')" @click.prevent="removePassword" />
+      <iconic-link class="password-remove-link" :title="$t('/(panel)(components)(PasswordMenu)remove_password')" @click="removePassword" />
     </div>
     <div class="password-info">
       <template v-if="password.type == 'generated2'">
@@ -31,7 +31,12 @@
         <div>{{ $t("/(panel)(components)(PasswordEntry)allowed_characters") }}  {{ allowedChars }}</div>
       </template>
       <template v-else-if="password.type == 'stored'">
-        <div class="password-type">{{ $t("password_type_stored") }} <span class="help-icon" :title="$t('recovery_code_explanation')" /></div>
+        <div class="password-type">
+          {{ $t("password_type_stored") }}
+          <span class="help-icon" :title="$t('recovery_code_explanation')"
+                :aria-label="$t('recovery_code_explanation')"
+          />
+        </div>
         <pre v-if="recoveryCode">{{ recoveryCode }}</pre>
       </template>
       <div v-if="showNotes && password.notes">{{ $t("/(panel)(components)(PasswordEntry)notes") }} {{ password.notes }}</div>
@@ -174,7 +179,7 @@ export default {
     },
     activate()
     {
-      this.$refs["to-clipboard"].focus();
+      this.$refs["to-clipboard"].$el.focus();
     }
   }
 };

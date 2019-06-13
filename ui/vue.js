@@ -11,6 +11,7 @@ import Vue from "vue";
 import {keyboardNavigationType} from "./common";
 import I18n from "./i18n";
 import ExternalLink from "./components/ExternalLink.vue";
+import IconicLink from "./components/IconicLink.vue";
 import ModalOverlay from "./components/ModalOverlay.vue";
 import ValidatedForm from "./components/ValidatedForm.vue";
 import ValidatedInput from "./components/ValidatedInput.vue";
@@ -29,6 +30,7 @@ if (!("isConnected" in Node.prototype))
 Vue.use(I18n);
 
 Vue.component("external-link", ExternalLink);
+Vue.component("iconic-link", IconicLink);
 Vue.component("modal-overlay", ModalOverlay);
 Vue.component("validated-form", ValidatedForm);
 Vue.component("validated-input", ValidatedInput);
