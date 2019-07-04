@@ -29,7 +29,6 @@
 
 export default {
   name: "PasswordNameEntry",
-  localePath: "panel/components/PasswordNameEntry",
   props: {
     value: {
       type: String,

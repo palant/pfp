@@ -21,7 +21,6 @@
 
 export default {
   name: "ManualAuth",
-  localePath: "panel/components/ManualAuth",
   props: {
     callback: {
       type: Function,

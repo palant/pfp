@@ -85,7 +85,6 @@ import StoredPassword from "../components/StoredPassword.vue";
 
 export default {
   name: "PasswordList",
-  localePath: "panel/pages/PasswordList",
   components: {
     "password-message": PasswordMessage,
     "generated-password": GeneratedPassword,

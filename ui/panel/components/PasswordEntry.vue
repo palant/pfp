@@ -52,7 +52,6 @@ import PasswordMenu from "./PasswordMenu.vue";
 
 export default {
   name: "PasswordEntry",
-  localePath: "panel/components/PasswordEntry",
   components: {
     "generated-password": GeneratedPassword,
     "notes-editor": NotesEditor,

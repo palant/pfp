@@ -22,7 +22,6 @@ import {prefs} from "../proxy";
 
 export default {
   name: "Setting",
-  localePath: "components/Setting",
   props: {
     name: {
       type: String,

@@ -44,7 +44,6 @@ import RecoveryCode from "./RecoveryCode.vue";
 
 export default {
   name: "StoredPassword",
-  localePath: "panel/components/StoredPassword",
   components: {
     "password-name-entry": PasswordNameEntry,
     "recovery-code": RecoveryCode

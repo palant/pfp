@@ -18,7 +18,6 @@ import SiteSelection from "../components/SiteSelection.vue";
 
 export default {
   name: "SelectSite",
-  localePath: "panel/pages/SelectSite",
   components: {
     "site-selection": SiteSelection
   },

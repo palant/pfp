@@ -19,7 +19,6 @@
 
 export default {
   name: "Confirm",
-  localePath: "components/Confirm",
   data()
   {
     return {

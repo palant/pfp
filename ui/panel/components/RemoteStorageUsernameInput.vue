@@ -34,7 +34,6 @@
 
 export default {
   name: "RemoteStorageUsernameInput",
-  localePath: "panel/components/RemoteStorageUsernameInput",
   props: {
     target: {
       type: String,

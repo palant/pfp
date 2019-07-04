@@ -27,7 +27,6 @@ import AllPasswordsApp from "../ui/allpasswords/App.vue";
 
 export default {
   name: "App",
-  localePath: "web/App",
   components: {
     "panel-app": PanelApp,
     "allpasswords-app": AllPasswordsApp

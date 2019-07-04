@@ -47,7 +47,6 @@
 
 export default {
   name: "PasswordMenu",
-  localePath: "panel/components/PasswordMenu",
   props: {
     password: {
       type: Object,

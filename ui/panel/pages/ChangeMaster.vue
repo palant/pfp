@@ -54,7 +54,6 @@ import PasswordScore from "../components/PasswordScore.vue";
 
 export default {
   name: "ChangeMaster",
-  localePath: "panel/pages/ChangeMaster",
   components: {
     "password-score": PasswordScore
   },

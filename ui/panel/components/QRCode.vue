@@ -24,7 +24,6 @@ import JSQR from "jsqr";
 
 export default {
   name: "QRCode",
-  localePath: "panel/components/QRCode",
   props: {
     password: {
       type: Object,

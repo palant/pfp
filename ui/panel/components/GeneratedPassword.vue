@@ -54,7 +54,6 @@ import PasswordNameEntry from "./PasswordNameEntry.vue";
 
 export default {
   name: "GeneratedPassword",
-  localePath: "panel/components/GeneratedPassword",
   components: {
     "password-name-entry": PasswordNameEntry
   },
