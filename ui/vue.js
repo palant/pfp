@@ -10,6 +10,7 @@ import Vue from "vue";
 
 import {keyboardNavigationType} from "./common";
 import I18n from "./i18n";
+import AccessKeys from "./accessKeys";
 import ExternalLink from "./components/ExternalLink.vue";
 import IconicLink from "./components/IconicLink.vue";
 import ModalOverlay from "./components/ModalOverlay.vue";
@@ -28,6 +29,7 @@ if (!("isConnected" in Node.prototype))
 }
 
 Vue.use(I18n);
+Vue.use(AccessKeys);
 
 Vue.component("external-link", ExternalLink);
 Vue.component("iconic-link", IconicLink);

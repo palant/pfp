@@ -33,7 +33,7 @@
 
         <iconic-link class="tab sync" role="listitem"
                      :class="{active: currentPage == 'sync', failed: $app.sync.error && $app.sync.error != 'sync_connection_error'}"
-                     :title="$t($app.sync.provider ? 'sync_state' : 'sync_setup')"
+                     :title="$t('sync')"
                      @click="currentPage = 'sync'"
         />
 
