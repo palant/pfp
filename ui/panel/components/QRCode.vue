@@ -6,7 +6,7 @@
 
 <template>
   <modal-overlay :focus-cancel="true" @cancel="$emit('cancel')">
-    <label>{{ $t(".(PasswordNameEntry)username_label") }}</label>
+    <div>{{ $t(".(PasswordNameEntry)username_label") }}</div>
     <div>
       <span>{{ password.name }}</span>
       <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>

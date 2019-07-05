@@ -64,6 +64,9 @@ function showHints()
   let root = document.querySelector(".modalOverlay") || document;
   for (let element of root.querySelectorAll("button,label,a"))
   {
+    if (element.hasAttribute("data-noaccesskey"))
+      continue;
+
     if (element.classList.contains("tab"))
       elements.push([0, element.title.trim(), element]);
     else if (element.localName == "button")
@@ -157,7 +160,14 @@ function triggerHint(event)
   if (element)
   {
     event.preventDefault();
-    element.click();
+    if (element.localName == "label" && element.hasAttribute("for"))
+    {
+      let target = document.getElementById(element.getAttribute("for"));
+      target.focus();
+      target.click();
+    }
+    else
+      element.click();
   }
 }
 

@@ -6,23 +6,27 @@
 
 <template>
   <div class="page">
-    <label for="site">{{ $t("site") }}</label>
-    <external-link v-if="$app.site == $app.siteDisplayName" id="site"
-                   v-focus="!$app.pwdList.length"
-                   type="url" :param="'https://' + $app.site"
-    >
-      {{ $app.siteDisplayName }}
-    </external-link>
-    <span v-else v-focus="!$app.pwdList.length" class="special-site" tabindex="0">
-      {{ $app.siteDisplayName }}
-    </span>
+    <template v-if="$app.site == $app.siteDisplayName">
+      <label for="site">{{ $t("site") }}</label>
+      <external-link id="site" v-focus="!$app.pwdList.length"
+                     type="url" :param="'https://' + $app.site" data-noaccesskey
+      >
+        {{ $app.siteDisplayName }}
+      </external-link>
+    </template>
+    <template v-else>
+      <div>{{ $t("site") }}</div>
+      <div v-focus="!$app.pwdList.length" class="special-site" tabindex="0">
+        {{ $app.siteDisplayName }}
+      </div>
+    </template>
 
-    <span v-if="$app.origSite != $app.site" class="alias-container">
+    <div v-if="$app.origSite != $app.site" class="alias-container">
       {{ $t("alias_description", $app.origSite) }}
       <a href="#" @click.prevent="removeAlias">
         {{ $t("remove_alias") }}
       </a>
-    </span>
+    </div>
     <a v-else-if="$app.site && $app.site != 'pfp.invalid' && !$app.pwdList.length"
        class="alias-container" href="#" @click.prevent="addAlias"
     >
