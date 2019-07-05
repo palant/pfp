@@ -97,23 +97,29 @@ function showHints()
         if (selector(letter) && !accessKeys.has(letter.toUpperCase()))
         {
           accessKeys.set(letter.toUpperCase(), element);
-          return;
+          return true;
         }
       }
     }
+    return false;
+  }
 
+  let needFallback = [];
+  for (let [, text, element] of elements)
+    if (!findAccessKey(text, element, isUpperCase, isConsonant, () => true))
+      needFallback.push(element);
+
+  for (let element of needFallback)
+  {
     for (let i = 0; i < fallbackKeys.length; i++)
     {
       if (!accessKeys.has(fallbackKeys[i]))
       {
         accessKeys.set(fallbackKeys[i], element);
-        return;
+        break;
       }
     }
   }
-
-  for (let [, text, element] of elements)
-    findAccessKey(text, element, isUpperCase, isConsonant, () => true);
 
   accessKeyHints = [];
   for (let [letter, element] of accessKeys)
