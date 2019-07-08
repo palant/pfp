@@ -125,6 +125,16 @@ button
   font-size: $font-size;
 }
 
+a
+{
+  text-decoration: none;
+
+  &:hover
+  {
+    text-decoration: underline;
+  }
+}
+
 .warning
 {
   background-color: $warning-background;
@@ -304,6 +314,11 @@ input[type="checkbox"]:checked
 {
   flex-grow: 1;
   width: $font-size;
+}
+
+.accessKeyMarker
+{
+  text-decoration: underline;
 }
 
 .accessKeyHint

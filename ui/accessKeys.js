@@ -35,7 +35,7 @@ function isConsonant(char)
 }
 
 let accessKeys = null;
-let accessKeyHints = null;
+let accessKeyElements = null;
 let observer = null;
 
 function onKeyDown(event)
@@ -121,16 +121,53 @@ function showHints()
     }
   }
 
-  accessKeyHints = [];
+  accessKeyElements = [];
   for (let [letter, element] of accessKeys)
   {
-    let hint = document.createElement("div");
-    hint.className = "accessKeyHint";
-    hint.textContent = letter;
-    element.parentNode.appendChild(hint);
-    hint.style.left = (element.offsetLeft + 5) + "px";
-    hint.style.top = (element.offsetTop + (element.offsetHeight - hint.offsetHeight) / 2 - 5) + "px";
-    accessKeyHints.push(hint);
+    let found = false;
+    for (let child = element.firstChild; child; child = child.nextSibling)
+    {
+      if (child.nodeType == Node.TEXT_NODE)
+      {
+        let text = child.nodeValue;
+        let index = text.indexOf(letter);
+        if (index < 0)
+          index = text.indexOf(letter.toLowerCase());
+        if (index >= 0)
+        {
+          found = true;
+          let replacements = [];
+          if (index > 0)
+            replacements.push(document.createTextNode(text.substr(0, index)));
+
+          let span = document.createElement("span");
+          span.className = "accessKeyMarker";
+          span.textContent = text.substr(index, 1);
+          replacements.push(span);
+          accessKeyElements.push(span);
+
+          if (index + 1 < text.length)
+            replacements.push(document.createTextNode(text.substr(index + 1)));
+
+          element.replaceChild(replacements[0], child);
+          let insertionPoint = replacements[0].nextSibling;
+          for (let i = 1; i < replacements.length; i++)
+            element.insertBefore(replacements[i], insertionPoint);
+          break;
+        }
+      }
+    }
+
+    if (!found)
+    {
+      let hint = document.createElement("div");
+      hint.className = "accessKeyHint";
+      hint.textContent = letter;
+      element.parentNode.appendChild(hint);
+      hint.style.left = (element.offsetLeft + (element.offsetWidth - hint.offsetWidth) / 2) + "px";
+      hint.style.top = (element.offsetTop + (element.offsetHeight - hint.offsetHeight) / 2) + "px";
+      accessKeyElements.push(hint);
+    }
   }
 
   observer = new MutationObserver(hideHints);
@@ -147,13 +184,34 @@ function hideHints()
     return;
 
   accessKeys = null;
-  if (accessKeyHints)
+  if (accessKeyElements)
   {
-    for (let element of accessKeyHints)
-      if (element.parentNode)
+    for (let element of accessKeyElements)
+    {
+      if (!element.parentNode)
+        continue;
+
+      if (element.localName == "span")
+      {
+        let text = "";
+        if (element.previousSibling && element.previousSibling.nodeType == Node.TEXT_NODE)
+        {
+          text += element.previousSibling.nodeValue;
+          element.parentNode.removeChild(element.previousSibling);
+        }
+        text += element.textContent;
+        if (element.nextSibling && element.nextSibling.nodeType == Node.TEXT_NODE)
+        {
+          text += element.nextSibling.nodeValue;
+          element.parentNode.removeChild(element.nextSibling);
+        }
+        element.parentNode.replaceChild(document.createTextNode(text), element);
+      }
+      else
         element.parentNode.removeChild(element);
+    }
   }
-  accessKeyHints = null;
+  accessKeyElements = null;
 
   if (observer)
     observer.disconnect();
