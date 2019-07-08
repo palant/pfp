@@ -323,14 +323,18 @@ input[type="checkbox"]:checked
 
 .accessKeyHint
 {
+  $size: $icon-size - 4px;
+  $border-radius: 3px;
+  $padding: 2px;
   position: absolute;
   display: flex;
-  font-size: 75%;
-  border: 1px solid black;
-  border-radius: 3px;
+  font-size: $size - $border-radius * 2 - $padding * 2;
+  border: 1px solid black !important;
+  border-radius: $border-radius;
   background-color: #ffffe0;
-  min-width: 1.5em;
-  min-height: 1.5em;
+  text-decoration: underline;
+  min-width: $size;
+  min-height: $size;
   align-items: center;
   justify-content: center;
   opacity: 0.8;
