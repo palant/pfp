@@ -142,7 +142,7 @@ a
   padding: $block-padding;
 
   @include padding-inline-start($icon-size + $block-padding + $inline-spacing);
-  background-image: url(../images/md-warning.svg);
+  background-image: url(../images/ionicons/md-warning.svg);
   background-size: $icon-size;
   background-position: $block-padding $block-padding;
   background-repeat: no-repeat;
@@ -180,7 +180,7 @@ a
   height: $text-icon-size;
   background-size: $text-icon-size;
   background-repeat: no-repeat;
-  background-image: url("../images/ios-help-circle-outline.svg");
+  background-image: url(../images/ionicons/md-help-circle-outline.svg);
 
   @media print
   {
@@ -201,7 +201,7 @@ input[type="checkbox"]
 
 input[type="checkbox"]:checked
 {
-  background-image: url(../images/checkmark-round.svg);
+  background-image: url(../images/ionicons/md-checkmark.svg);
   background-size: $font-size - 4px;
   background-repeat: no-repeat;
   background-position: center;
@@ -261,7 +261,7 @@ input[type="checkbox"]:checked
   min-height: $small-icon-size;
   background-size: $small-icon-size;
   background-repeat: no-repeat;
-  background-image: url("../images/close-round.svg");
+  background-image: url(../images/ionicons/md-close.svg);
 
   &:hover
   {

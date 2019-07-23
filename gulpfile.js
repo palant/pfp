@@ -136,8 +136,10 @@ function buildCommon(targetdir)
   return merge(
     gulp.src("LICENSE.txt")
         .pipe(gulp.dest(`${targetdir}`)),
-    gulp.src(["ui/**/*.html", "ui/**/*.png", "ui/**/*.svg"])
+    gulp.src("ui/**/*.html")
         .pipe(gulp.dest(`${targetdir}/ui`)),
+    gulp.src("ui/images/**")
+        .pipe(gulp.dest(`${targetdir}/ui/images`)),
     gulp.src("ui/third-party/**")
         .pipe(gulp.dest(`${targetdir}/ui/third-party`)),
     gulp.src(["contentScript/fillIn.js"])
