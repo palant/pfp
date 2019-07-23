@@ -26,13 +26,13 @@
     </div>
     <div class="password-info">
       <template v-if="password.type == 'generated2'">
-        <div class="password-type">{{ $t("/(panel)(components)(PasswordEntry)password_type_generated2") }} </div>
+        <div class="password-type">{{ $t("/(panel)(components)(PasswordEntry)password_type_generated2") }}</div>
         <div>{{ $t("/(panel)(components)(PasswordEntry)password_length") }} {{ password.length }}</div>
         <div>{{ $t("/(panel)(components)(PasswordEntry)allowed_characters") }}  {{ allowedChars }}</div>
       </template>
       <template v-else-if="password.type == 'stored'">
         <div class="password-type">
-          {{ $t("password_type_stored") }}
+          <template>{{ $t("password_type_stored") }}</template>
           <span class="help-icon" :title="$t('recovery_code_explanation')"
                 :aria-label="$t('recovery_code_explanation')"
           />
