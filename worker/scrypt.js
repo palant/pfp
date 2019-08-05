@@ -10,11 +10,15 @@ const N = 32768;
 const r = 8;
 const p = 1;
 
-let {toTypedArray} = require("../lib/typedArrayConversion");
-let {Scrypt} = require("@stablelib/scrypt");
-let hasher = new Scrypt(N, r, p);
+import {toTypedArray} from "../lib/typedArrayConversion";
+import {Scrypt} from "@stablelib/scrypt";
 
-module.exports = hasher;
+const hasher = new Scrypt(N, r, p);
+
+export function scrypt(password, salt, length)
+{
+  return hasher.deriveKey(password, salt, length);
+}
 
 if (typeof self != "undefined")
 {

@@ -8,48 +8,46 @@
 
 const path = require("path");
 
-const MemoryFS = require("memory-fs");
-const {webpack} = require("webpack-stream");
+const rollup = require("rollup");
+const babel = require("rollup-plugin-babel");
+const commonjs = require("rollup-plugin-commonjs");
+const resolve = require("rollup-plugin-node-resolve");
 
-module.exports = function(source)
+module.exports = function(regexp)
 {
-  let fs = new MemoryFS();
-  let filename = path.basename(this.resourcePath);
-
-  let compiler = webpack({
-    mode: "production",
-    entry: this.resourcePath,
-    output: {
-      filename,
-      path: "/",
-    },
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          use: {
-            loader: "babel-loader",
-            options: {
-              presets: ["@babel/preset-env"]
-            }
-          }
-        }
-      ]
-    }
-  });
-  compiler.outputFileSystem = fs;
-
-  let callback = this.async();
-  compiler.run((err, stats) =>
-  {
-    if (err)
-      callback(err);
-    else if (stats.hasErrors())
-      callback(stats.toJson().errors);
-    else
+  return {
+    name: "worker-loader",
+    resolveId(id)
     {
-      let data = fs.readFileSync("/" + filename, "utf-8");
-      callback(null, "module.exports = " + JSON.stringify(data) + ";");
+      if (!regexp.test(id))
+        return null;
+      return id;
+    },
+    load(id)
+    {
+      if (!regexp.test(id))
+        return null;
+
+      return rollup.rollup({
+        input: id.replace(/^\.\.\//, ""),
+        plugins: [resolve(), commonjs(), babel({
+          babelrc: false,
+          presets: ["@babel/preset-env"]
+        })]
+      }).then(bundle =>
+      {
+        return bundle.generate({
+          name: "worker",
+          format: "iife",
+          compact: true
+        });
+      }).then(({output}) =>
+      {
+        if (output.length != 1 || !output[0].code)
+          throw new Error("Unexpected rollup output");
+
+        return "export default " + JSON.stringify(output[0].code);
+      });
     }
-  });
+  };
 };

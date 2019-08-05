@@ -6,7 +6,7 @@
 
 "use strict";
 
-let crypto = require("../lib/crypto");
+let {crypto} = require("../build-test/lib");
 
 exports.testBase32 = function(test)
 {

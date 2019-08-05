@@ -170,20 +170,6 @@ exports.runTests = function()
     }
   }
 
-  function rewriteRequires(source)
-  {
-    let modules = new Map();
-    for (let file of readdir("test-lib"))
-      modules.set(file.replace(/\.js$/, ""), path.resolve("test-lib", file));
-    return source.replace(/(\brequire\(["'])\.\/([^"']+)/g, (match, prefix, request) =>
-    {
-      if (modules.has(request))
-        return prefix + escape_string(modules.get(request));
-      else
-        return match;
-    });
-  }
-
   let {TextEncoder, TextDecoder} = require("text-encoding");
 
   class WorkerEventTarget
@@ -246,15 +232,13 @@ exports.runTests = function()
     }
   }
 
-  let crypto = require("./test-lib/fake-crypto");
   let atob = str => Buffer.from(str, "base64").toString("binary");
   let btoa = str => Buffer.from(str, "binary").toString("base64");
   let {URL} = require("url");
 
   let nodeunit = require("sandboxed-module").require("nodeunit", {
-    sourceTransformers: {rewriteRequires},
     globals: {
-      console, process, Buffer, TextEncoder, TextDecoder, crypto, atob, btoa, URL,
+      console, process, Buffer, TextEncoder, TextDecoder, atob, btoa, URL,
       Worker: FakeWorker,
       navigator: {
         onLine: true

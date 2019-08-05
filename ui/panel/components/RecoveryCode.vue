@@ -32,6 +32,7 @@ import {recoveryCodes} from "../../proxy";
 
 export default {
   name: "RecoveryCode",
+  localePath: "panel/components/RecoveryCode",
   data()
   {
     return {

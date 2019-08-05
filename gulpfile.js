@@ -14,53 +14,53 @@ const del = require("del");
 const gulp = require("gulp");
 const eslint = require("gulp-eslint");
 const htmlhint = require("gulp-htmlhint");
+const rollupStream = require("gulp-better-rollup");
 const sass = require("gulp-sass");
 const stylelint = require("gulp-stylelint");
-const merge = require("merge-stream");
 const zip = require("gulp-zip");
-const webpackStream = require("webpack-stream");
-const mergeConfig = require("webpack-merge");
-const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const merge = require("merge-stream");
+const alias = require("rollup-plugin-alias");
+const babel = require("rollup-plugin-babel");
+const commonjs = require("rollup-plugin-commonjs");
+const json = require("rollup-plugin-json");
+const resolve = require("rollup-plugin-node-resolve");
+const vue = require("rollup-plugin-vue");
 
 const utils = require("./gulp-utils");
 
-const webpackBaseConfig = {
-  mode: "production",
-  optimization: {
-    minimize: false
-  },
-  node: {
-    process: false,
-    global: false,
-    setImmediate: false
-  },
-  module: {
-    rules: [
-      {
-        test: /\.vue$/,
-        use: {
-          loader: "vue-loader",
-          options: {
-            transformAssetUrls: {img: []},
-            compilerOptions: {
-              whitespace: "condense"
-            }
+function rollup(overrides = {})
+{
+  let prePlugins = overrides.plugins || [];
+  let postPlugins = overrides.postPlugins || [];
+  delete overrides.plugins;
+  delete overrides.postPlugins;
+
+  return rollupStream({
+    plugins: [
+      ...prePlugins,
+      resolve(),
+      commonjs({
+        include: ["node_modules/**"]
+      }),
+      vue({
+        template: {
+          compilerOptions: {
+            whitespace: "condense"
           }
         }
-      }
-    ]
-  },
-  plugins: [new VueLoaderPlugin()],
-  externals: {
-    vue: "Vue",
-    jsqr: "JSQR",
-    zxcvbn: "zxcvbn"
-  }
-};
-
-function webpack(config)
-{
-  return webpackStream(mergeConfig(webpackBaseConfig, config));
+      }),
+      ...postPlugins
+    ],
+    external: ["vue", "jsqr", "zxcvbn"]
+  }, Object.assign({
+    format: "iife",
+    compact: true,
+    globals: {
+      vue: "Vue",
+      jsqr: "JSQR",
+      zxcvbn: "zxcvbn"
+    }
+  }, overrides));
 }
 
 gulp.task("eslint", function()
@@ -100,33 +100,24 @@ gulp.task("validate", gulp.parallel("eslint", "htmlhint", "stylelint"));
 
 function buildWorkers(targetdir)
 {
-  let resolveConfig = {};
+  let overrides = {};
 
   if (targetdir == "build-test/worker")
   {
-    resolveConfig.alias = {
-      "../lib/typedArrayConversion$": path.resolve(__dirname, "test-lib", "typedArrayConversion.js")
+    overrides = {
+      plugins: [alias({
+        "../lib/typedArrayConversion": path.resolve(__dirname, "test-lib", "typedArrayConversion.js")
+      })],
+      format: "cjs"
     };
   }
 
   return merge(
     gulp.src(["worker/pbkdf2.js"])
-        .pipe(webpack({
-          output: {
-            filename: "pbkdf2.js",
-            pathinfo: true
-          },
-          resolve: resolveConfig
-        }))
+        .pipe(rollup(overrides))
         .pipe(gulp.dest(`${targetdir}`)),
     gulp.src(["worker/scrypt.js"])
-        .pipe(webpack({
-          output: {
-            filename: "scrypt.js",
-            pathinfo: true
-          },
-          resolve: resolveConfig
-        }))
+        .pipe(rollup(overrides))
         .pipe(gulp.dest(`${targetdir}`))
   );
 }
@@ -143,38 +134,21 @@ function buildCommon(targetdir)
     gulp.src("ui/third-party/**")
         .pipe(gulp.dest(`${targetdir}/ui/third-party`)),
     gulp.src(["contentScript/fillIn.js"])
-        .pipe(webpack({
-          output: {
-            filename: "fillIn.js",
-            pathinfo: true
-          }
-        }))
+        .pipe(rollup())
         .pipe(gulp.dest(`${targetdir}/contentScript`)),
     gulp.src("ui/panel/main.js")
-        .pipe(webpack({
-          output: {
-            filename: "panel.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          }
+        .pipe(rollup({
+          file: "panel.js"
         }))
         .pipe(gulp.dest(`${targetdir}/ui/panel`)),
     gulp.src("ui/allpasswords/main.js")
-        .pipe(webpack({
-          output: {
-            filename: "allpasswords.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          }
+        .pipe(rollup({
+          file: "allpasswords.js"
         }))
         .pipe(gulp.dest(`${targetdir}/ui/allpasswords`)),
     gulp.src("ui/options/main.js")
-        .pipe(webpack({
-          output: {
-            filename: "options.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          }
+        .pipe(rollup({
+          file: "options.js"
         }))
         .pipe(gulp.dest(`${targetdir}/ui/options`)),
     gulp.src(["ui/**/*.scss"])
@@ -185,12 +159,8 @@ function buildCommon(targetdir)
         .pipe(utils.toChromeLocale())
         .pipe(gulp.dest(`${targetdir}/_locales`)),
     gulp.src("lib/main.js")
-        .pipe(webpack({
-          output: {
-            filename: "background.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          }
+        .pipe(rollup({
+          file: "background.js"
         }))
         .pipe(gulp.dest(`${targetdir}`)),
     gulp.src(["lib/reloader.js"])
@@ -252,7 +222,19 @@ gulp.task("build-firefox", gulp.series("validate", function buildFirefox()
 
 gulp.task("build-test", gulp.series("validate", function buildTest()
 {
-  return buildWorkers("build-test/worker");
+  return merge(
+    buildWorkers("build-test/worker"),
+    gulp.src("test-lib/lib.js")
+        .pipe(rollup({
+          plugins: [alias({
+            "./browserAPI": path.resolve(__dirname, "test-lib", "browserAPI.js"),
+            "./typedArrayConversion": path.resolve(__dirname, "test-lib", "typedArrayConversion.js"),
+            "./sync-providers/dropbox": path.resolve(__dirname, "test-lib", "sync-providers", "dropbox.js"),
+          })],
+          format: "cjs"
+        }))
+        .pipe(gulp.dest("build-test"))
+  );
 }));
 
 gulp.task("watch-firefox", gulp.series("build-firefox", function watchFirefox()
@@ -281,64 +263,30 @@ gulp.task("build-web", gulp.series("validate", "build-web-locales", function bui
         .pipe(sass())
         .pipe(gulp.dest(targetdir)),
     gulp.src("lib/main.js")
-        .pipe(webpack({
-          output: {
-            filename: "background.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          },
-          module: {
-            rules: [
-              {
-                test: /\/(scrypt|pbkdf2)\.js$/,
-                use: path.resolve(__dirname, "workerLoader.js")
-              },
-              {
-                test: /\.js$/,
-                use: {
-                  loader: "babel-loader",
-                  options: {
-                    presets: ["@babel/preset-env"]
-                  }
-                }
-              }
-            ]
-          },
-          resolve: {
-            alias: {
-              "./browserAPI$": path.resolve(__dirname, "web", "backgroundBrowserAPI.js"),
-              "../browserAPI$": path.resolve(__dirname, "web", "backgroundBrowserAPI.js")
-            }
-          }
+        .pipe(rollup({
+          file: "background.js",
+          plugins: [alias({
+            "./browserAPI": path.resolve(__dirname, "web", "backgroundBrowserAPI.js"),
+            "../browserAPI": path.resolve(__dirname, "web", "backgroundBrowserAPI.js")
+          }), require("./workerLoader")(/\/(scrypt|pbkdf2)\.js$/)],
+          postPlugins: [babel({
+            babelrc: false,
+            presets: ["@babel/preset-env"]
+          })]
         }))
         .pipe(gulp.dest(targetdir)),
     gulp.src("web/index.js")
-        .pipe(webpack({
-          output: {
-            filename: "index.js",
-            pathinfo: true,
-            library: "__webpack_require__"
-          },
-          module: {
-            rules: [
-              {
-                test: /\.js$/,
-                use: {
-                  loader: "babel-loader",
-                  options: {
-                    presets: ["@babel/preset-env"]
-                  }
-                }
-              }
-            ]
-          },
-          resolve: {
-            alias: {
-              "./browserAPI$": path.resolve(__dirname, "web", "contentBrowserAPI.js"),
-              "../browserAPI$": path.resolve(__dirname, "web", "contentBrowserAPI.js"),
-              "locale$": path.resolve(__dirname, "build-web", "locale", "en_US.json")
-            }
-          }
+        .pipe(rollup({
+          plugins: [alias({
+            "./browserAPI": path.resolve(__dirname, "web", "contentBrowserAPI.js"),
+            "../browserAPI": path.resolve(__dirname, "web", "contentBrowserAPI.js"),
+            "locale": path.resolve(__dirname, "build-web", "locale", "en_US.json"),
+            resolve: [".js", ".json"]
+          }), json()],
+          postPlugins: [babel({
+            babelrc: false,
+            presets: ["@babel/preset-env"]
+          })]
         }))
         .pipe(gulp.dest(targetdir)),
     gulp.src("web/**/*.scss")

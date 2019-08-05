@@ -9,13 +9,12 @@
     "url": "https://github.com/palant/easypasswords.git"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
-    "babel-loader": "^8.0.6",
     "del": "^4.1.1",
     "eslint-plugin-json": "^1.4.0",
     "eslint-plugin-vue": "^5.2.2",
     "gulp": "^4.0.2",
+    "gulp-better-rollup": "^4.0.1",
     "gulp-eslint": "^5.0.0",
     "gulp-htmlhint": "^2.2.1",
     "gulp-sass": "^4.0.2",
@@ -24,14 +23,18 @@
     "memory-fs": "^0.4.1",
     "merge-stream": "^1.0.1",
     "nodeunit": "^0.11.3",
+    "rollup": "^1.18.0",
+    "rollup-plugin-alias": "^1.5.2",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.0.1",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-vue": "^5.0.1",
     "sandboxed-module": "^2.0.3",
     "stylelint": "^10.0.1",
     "stylelint-config-standard": "^18.3.0",
     "text-encoding": "^0.7.0",
-    "vue-loader": "^15.7.0",
-    "vue-template-compiler": "^2.6.10",
-    "webpack-merge": "^4.2.1",
-    "webpack-stream": "~5.0.0"
+    "vue-template-compiler": "^2.6.10"
   },
   "dependencies": {
     "@stablelib/scrypt": "^0.10.1"

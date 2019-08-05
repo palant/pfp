@@ -6,7 +6,7 @@
 
 "use strict";
 
-let {toTypedArray} = require("../lib/typedArrayConversion");
+import {toTypedArray} from "../lib/typedArrayConversion";
 
 // We expand += intentionally to improve Chrome performance
 /* eslint operator-assignment: "off" */
@@ -212,7 +212,7 @@ function prepareKey(password)
   return [hasher.preprocessBlock(ikey), hasher.preprocessBlock(okey)];
 }
 
-function pbkdf2(password, salt, iterations, length)
+export function pbkdf2(password, salt, iterations, length)
 {
   length |= 0;
 
@@ -257,8 +257,6 @@ function pbkdf2(password, salt, iterations, length)
 
   return new Uint8Array(result.buffer, 0, length);
 }
-
-exports.pbkdf2 = pbkdf2;
 
 if (typeof self != "undefined")
 {

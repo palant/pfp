@@ -80,7 +80,7 @@ export const masterPassword = Proxy("masterPassword", [
 ]);
 
 export const passwordRetrieval = Proxy("passwordRetrieval", [
-  "fillIn", "copyToClipboard"
+  "fillIn"
 ]);
 
 export const prefs = Proxy("prefs", ["get", "set"]);
@@ -90,7 +90,7 @@ export const recoveryCodes = Proxy("recoveryCodes", [
 ]);
 
 export const sync = Proxy("sync", [
-  "authorize", "getManualAuthURL", "manualAuthorization", "disable", "sync"
+  "authorize", "getManualAuthURL", "manualAuthorization", "disableSync", "sync"
 ]);
 
 export const ui = Proxy("ui", ["showAllPasswords", "getLink", "openLink"]);

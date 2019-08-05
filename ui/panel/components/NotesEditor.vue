@@ -29,6 +29,7 @@ import {passwords} from "../../proxy";
 
 export default {
   name: "NotesEditor",
+  localePath: "panel/components/NotesEditor",
   props: {
     password: {
       type: Object,

@@ -27,6 +27,7 @@ import EnterMaster from "../modals/EnterMaster.vue";
 
 export default {
   name: "GlobalActions",
+  localePath: "allpasswords/components/GlobalActions",
   components: {
     "enter-master": EnterMaster
   },

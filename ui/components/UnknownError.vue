@@ -18,6 +18,7 @@
 
 export default {
   name: "UnknownError",
+  localePath: "components/UnknownError",
   props: {
     error: {
       type: Object,

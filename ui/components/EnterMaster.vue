@@ -36,6 +36,7 @@ export function validateMasterPassword(value, setError)
 
 export default {
   name: "EnterMaster",
+  localePath: "components/EnterMaster",
   props: {
     callback: {
       type: Function,

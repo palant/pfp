@@ -24,6 +24,7 @@ import {passwords} from "../../proxy";
 
 export default {
   name: "EnterMaster",
+  localePath: "panel/pages/EnterMaster",
   components: {
     "enter-master": EnterMaster
   },

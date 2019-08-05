@@ -8,6 +8,8 @@
 
 /* global _parameters */
 
+import {port} from "../ui/messaging";
+
 function getActiveElement(doc)
 {
   let result = doc.activeElement;
@@ -195,7 +197,6 @@ function fillIn(wnd, name, password, noFocus)
   else if (!fillIn(window, name, password))
     result = "no_password_fields";
 
-  let {port} = require("../ui/messaging");
   port.emit("done", {
     scriptID,
     result

@@ -6,7 +6,9 @@
 
 "use strict";
 
-let {EventTarget} = require("./eventTarget");
+import {EventTarget} from "./eventTarget";
+import scryptWorker from "../worker/scrypt.js";
+import pbkdf2Worker from "../worker/pbkdf2.js";
 
 function textToURL(text)
 {
@@ -15,7 +17,7 @@ function textToURL(text)
 
 let currentURL = null;
 
-module.exports = {
+let browser = {
   storage: {
     local: {
       get: keys =>
@@ -81,9 +83,9 @@ module.exports = {
     getURL: path =>
     {
       if (path == "worker/scrypt.js")
-        return textToURL(require("../worker/scrypt.js"));
+        return textToURL(scryptWorker);
       else if (path == "worker/pbkdf2.js")
-        return textToURL(require("../worker/pbkdf2.js"));
+        return textToURL(pbkdf2Worker);
       else
         return path;
     },
@@ -110,10 +112,12 @@ window.addEventListener("toBackground", event =>
 window.addEventListener("port-connected", event =>
 {
   port.name = event.detail;
-  module.exports.runtime.onConnect._emit(port);
+  browser.runtime.onConnect._emit(port);
 });
 
 window.addEventListener("show-panel", event =>
 {
   currentURL = "https://" + event.detail;
 });
+
+export default browser;

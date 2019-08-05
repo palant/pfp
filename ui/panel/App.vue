@@ -101,6 +101,7 @@ port.on("init", state =>
 
 export default {
   name: "App",
+  localePath: "panel/App",
   components: {
     "change-master": ChangeMaster,
     "enter-master": EnterMaster,

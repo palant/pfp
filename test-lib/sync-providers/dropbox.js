@@ -10,30 +10,12 @@ const dummyToken = String(Math.random()).substr(2);
 
 let files = {};
 
-exports.changeRevisionOnGet = 0;
-
-exports._get = function(path)
-{
-  return files[path];
-};
-
-exports._set = function(path, revision, contents)
-{
-  files[path] = {revision, contents};
-};
-
-exports._reset = function()
-{
-  files = {};
-  exports.changeRevisionOnGet = 0;
-};
-
-exports.authorize = function()
+export function authorize()
 {
   return Promise.resolve(dummyToken);
-};
+}
 
-exports.get = function(path, token)
+export function get(path, token)
 {
   if (token != dummyToken)
     return Promise.reject("sync_invalid_token");
@@ -45,16 +27,16 @@ exports.get = function(path, token)
   {
     if (result)
       result = Object.assign({}, result);
-    if (result && exports.changeRevisionOnGet > 0)
+    if (result && provider.changeRevisionOnGet > 0)
     {
       files[path].revision++;
-      exports.changeRevisionOnGet--;
+      provider.changeRevisionOnGet--;
     }
     return result;
   });
-};
+}
 
-exports.put = function(path, contents, replaceRevision, token)
+export function put(path, contents, replaceRevision, token)
 {
   if (token != dummyToken)
     return Promise.reject("sync_invalid_token");
@@ -71,4 +53,26 @@ exports.put = function(path, contents, replaceRevision, token)
   {
     files[path] = {revision, contents};
   });
+}
+
+let provider = {
+  changeRevisionOnGet: 0,
+  _get(path)
+  {
+    return files[path];
+  },
+  _set(path, revision, contents)
+  {
+    files[path] = {revision, contents};
+  },
+  _reset()
+  {
+    files = {};
+    provider.changeRevisionOnGet = 0;
+  },
+  authorize,
+  get,
+  put
 };
+
+export default provider;

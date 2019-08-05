@@ -6,11 +6,10 @@
 
 "use strict";
 
-let sync = require("../lib/sync");
-let masterPassword = require("../lib/masterPassword");
-let passwords = require("../lib/passwords");
-let storage = require("../lib/storage");
-let provider = require("../test-lib/sync-providers/dropbox");
+let {
+  sync, masterPassword, passwords, crypto, storage, browserAPI, fakeCrypto,
+  provider
+} = require("../build-test/lib");
 
 let dummyMaster = "foobar";
 
@@ -27,7 +26,7 @@ function done()
 
 function getLocalData()
 {
-  let {storageData} = require("../test-lib/browserAPI");
+  let {storageData} = browserAPI;
   let filteredData = {};
   for (let key of Object.keys(storageData))
     if (key.startsWith("site:"))
@@ -37,14 +36,15 @@ function getLocalData()
 
 function checkSyncError(test)
 {
-  if (sync.syncData && sync.syncData.error)
-    test.ok(false, `Unexpected error: ${sync.syncData.error}`);
+  let syncData = sync.getSyncData();
+  if (syncData && syncData.error)
+    test.ok(false, `Unexpected error: ${syncData.error}`);
 }
 
 function sign(data)
 {
   let ciphertext = atob(data.data["sync-secret"].split("_")[1]);
-  let secret = atob(JSON.parse(crypto.subtle._fakeDecrypt(ciphertext)));
+  let secret = atob(JSON.parse(fakeCrypto.subtle._fakeDecrypt(ciphertext)));
 
   let values = [data.revision];
   let keys = Object.keys(data.data);
@@ -57,7 +57,7 @@ function sign(data)
 
 exports.setUp = function(callback)
 {
-  let {storageData: storage} = require("../test-lib/browserAPI");
+  let {storageData: storage} = browserAPI;
   for (let key of Object.keys(storage))
     delete storage[key];
 
@@ -70,23 +70,23 @@ exports.setUp = function(callback)
 
 exports.tearDown = function(callback)
 {
-  sync.disable().then(() => callback());
+  sync.disableSync().then(() => callback());
 };
 
 exports.testAuthorizeAndDisable = function(test)
 {
   Promise.resolve().then(() =>
   {
-    test.ok(!sync.syncData, "Sync not set up initially");
+    test.deepEqual(sync.getSyncData(), {}, "Sync not set up initially");
     return sync.authorize("dropbox");
   }).then(() =>
   {
-    test.ok(sync.syncData, "Sync set up after authorization");
-    test.equal(sync.syncData.provider, "dropbox", "Sync provider");
-    return sync.disable();
+    test.notDeepEqual(sync.getSyncData(), {}, "Sync set up after authorization");
+    test.equal(sync.getSyncData().provider, "dropbox", "Sync provider");
+    return sync.disableSync();
   }).then(() =>
   {
-    test.ok(!sync.syncData, "Sync not set up after disabling");
+    test.deepEqual(sync.getSyncData(), {}, "Sync not set up after disabling");
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
@@ -258,7 +258,7 @@ exports.testMerge = function(test)
         "site:example.com:blub": "blab"
       }
     })));
-    return sync.disable();
+    return sync.disableSync();
   }).then(() =>
   {
     return Promise.all([
@@ -377,7 +377,7 @@ exports.testUnrelated = function(test)
       "site:foo": "foo"
     }, "Local contents after update");
 
-    return Promise.all([salt, hmac, masterPassword.encrypt(require("../lib/crypto").generateRandom(32))]);
+    return Promise.all([salt, hmac, masterPassword.encrypt(crypto.generateRandom(32))]);
   }).then(([salt, hmac, secret]) =>
   {
     provider._set("/passwords.json", 8, JSON.stringify(sign({
@@ -395,8 +395,8 @@ exports.testUnrelated = function(test)
     return Promise.all([salt, hmac, secret, sync.sync()]);
   }).then(([salt, hmac, secret, _]) =>
   {
-    test.equal(sync.syncData.error, "sync_unrelated_client", "Attempting to sync with a different sync secret");
-    return Promise.all([salt, hmac, secret, sync.disable()]);
+    test.equal(sync.getSyncData().error, "sync_unrelated_client", "Attempting to sync with a different sync secret");
+    return Promise.all([salt, hmac, secret, sync.disableSync()]);
   }).then(([salt, hmac, secret, _]) =>
   {
     return Promise.all([salt, hmac, secret, sync.authorize("dropbox")]);
@@ -441,43 +441,43 @@ exports.testErrors = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.ok(!sync.syncData.error, "No error after initial sync");
+    test.ok(!sync.getSyncData().error, "No error after initial sync");
     return Promise.all([
       masterPassword.forgetPassword(),
       storage.set("site:foo", "bar", null)
     ]);
   }).then(() =>
   {
-    sync.syncData.token += "0";
+    sync.getSyncData().token += "0";
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync_invalid_token", "Attempting to sync with an invalid token");
-    sync.syncData.token = sync.syncData.token.slice(0, -1);
+    test.equal(sync.getSyncData().error, "sync_invalid_token", "Attempting to sync with an invalid token");
+    sync.getSyncData().token = sync.getSyncData().token.slice(0, -1);
 
     provider._set("/passwords.json", 2, "invalid JSON");
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with invalid JSON");
+    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with invalid JSON");
 
     provider._set("/passwords.json", 3, JSON.stringify(null));
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with null data");
+    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with null data");
 
     provider._set("/passwords.json", 4, JSON.stringify(123));
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with non-object");
+    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with non-object");
 
     provider._set("/passwords.json", 5, JSON.stringify({}));
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with empty object");
+    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with empty object");
 
     provider._set("/passwords.json", 6, JSON.stringify({
       application: "foobar",
@@ -486,7 +486,7 @@ exports.testErrors = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with unknown application's data");
+    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with unknown application's data");
 
     provider._set("/passwords.json", 7, JSON.stringify({
       application: "pfp",
@@ -495,7 +495,7 @@ exports.testErrors = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with unknown format version");
+    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with unknown format version");
 
     provider._set("/passwords.json", 8, JSON.stringify({
       application: "pfp",
@@ -505,7 +505,7 @@ exports.testErrors = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with null data");
+    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with null data");
 
     provider._set("/passwords.json", 9, JSON.stringify({
       application: "pfp",
@@ -515,7 +515,7 @@ exports.testErrors = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with non-object data");
+    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with non-object data");
 
     provider._set("/passwords.json", 9, JSON.stringify({
       application: "pfp",
@@ -530,7 +530,7 @@ exports.testErrors = function(test)
     ]);
   }).then(([salt, hmac, secret, _]) =>
   {
-    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with empty data");
+    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with empty data");
 
     provider._set("/passwords.json", 8, JSON.stringify(sign({
       application: "pfp",
@@ -544,7 +544,7 @@ exports.testErrors = function(test)
     return Promise.all([salt, hmac, secret, sync.sync()]);
   }).then(([salt, hmac, secret, _]) =>
   {
-    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with signature but no revision number");
+    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with signature but no revision number");
 
     provider._set("/passwords.json", 8, JSON.stringify({
       application: "pfp",
@@ -559,7 +559,7 @@ exports.testErrors = function(test)
     return Promise.all([salt, hmac, secret, sync.sync()]);
   }).then(([salt, hmac, secret, _]) =>
   {
-    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync without signature");
+    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync without signature");
 
     provider._set("/passwords.json", 8, JSON.stringify({
       application: "pfp",
@@ -575,7 +575,7 @@ exports.testErrors = function(test)
     return Promise.all([salt, hmac, secret, sync.sync()]);
   }).then(([salt, hmac, secret, _]) =>
   {
-    test.equal(sync.syncData.error, "sync_unrelated_client", "Attempting to sync with different sync secret");
+    test.equal(sync.getSyncData().error, "sync_unrelated_client", "Attempting to sync with different sync secret");
 
     provider._set("/passwords.json", 8, JSON.stringify({
       application: "pfp",
@@ -591,7 +591,7 @@ exports.testErrors = function(test)
     return Promise.all([salt, hmac, secret, sync.sync()]);
   }).then(([salt, hmac, secret, _]) =>
   {
-    test.equal(sync.syncData.error, "sync_tampered_data", "Attempting to sync with invalid signature");
+    test.equal(sync.getSyncData().error, "sync_tampered_data", "Attempting to sync with invalid signature");
 
     provider._set("/passwords.json", 8, JSON.stringify({
       application: "pfp",
@@ -607,7 +607,7 @@ exports.testErrors = function(test)
     return Promise.all([salt, hmac, secret, sync.sync()]);
   }).then(([salt, hmac, secret, _]) =>
   {
-    test.equal(sync.syncData.error, "sync_unknown_data_format", "Attempting to sync with numerical signature");
+    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with numerical signature");
 
     provider._set("/passwords.json", 8, JSON.stringify(sign({
       application: "pfp",
@@ -622,7 +622,7 @@ exports.testErrors = function(test)
     return Promise.all([salt, hmac, secret, sync.sync()]);
   }).then(([salt, hmac, secret, _]) =>
   {
-    test.equal(sync.syncData.error, "sync_tampered_data", "Attempting to downgrade revision");
+    test.equal(sync.getSyncData().error, "sync_tampered_data", "Attempting to downgrade revision");
 
     provider._set("/passwords.json", 8, JSON.stringify(sign({
       application: "pfp",
@@ -637,7 +637,7 @@ exports.testErrors = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.ok(!sync.syncData.error, "Error reset after successful sync");
+    test.ok(!sync.getSyncData().error, "Error reset after successful sync");
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
@@ -654,7 +654,7 @@ exports.testNesting = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.ok(!sync.syncData.error, "No error after initial sync");
+    test.ok(!sync.getSyncData().error, "No error after initial sync");
 
     return Promise.all([
       masterPassword.forgetPassword(),
@@ -666,7 +666,7 @@ exports.testNesting = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.ok(!sync.syncData.error, "No error after conflict with another client");
+    test.ok(!sync.getSyncData().error, "No error after conflict with another client");
 
     let {revision, contents} = provider._get("/passwords.json");
     test.equal(JSON.parse(contents).data["site:foo"], "bar",
@@ -679,7 +679,7 @@ exports.testNesting = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.equals(sync.syncData.error, "sync_too_many_retries", "Error on too many conflicts");
+    test.equals(sync.getSyncData().error, "sync_too_many_retries", "Error on too many conflicts");
 
     let {revision, contents} = provider._get("/passwords.json");
     test.equal(JSON.parse(contents).data["site:foo"], "bar",
@@ -740,7 +740,7 @@ exports.testRekey = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.ok(!sync.syncData.error, "No error after rekeying sync");
+    test.ok(!sync.getSyncData().error, "No error after rekeying sync");
     return Promise.all([
       storage.get("salt", null),
       passwords.getAllPasswords()
@@ -801,7 +801,7 @@ exports.testRekey = function(test)
     return sync.sync();
   }).then(() =>
   {
-    test.ok(!sync.syncData.error, "No error after rekeying sync");
+    test.ok(!sync.getSyncData().error, "No error after rekeying sync");
     return Promise.all([
       storage.get("salt", null),
       passwords.getAllPasswords()

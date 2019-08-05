@@ -6,7 +6,7 @@
 
 "use strict";
 
-exports.toTypedArray = function(obj)
+export function toTypedArray(obj)
 {
   // Unit tests will send array buffers as "objects"
   let length = 0;
@@ -17,4 +17,4 @@ exports.toTypedArray = function(obj)
   for (let i = 0; i < length; i++)
     array[i] = obj[i];
   return array;
-};
+}

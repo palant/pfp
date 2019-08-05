@@ -6,7 +6,7 @@
 
 "use strict";
 
-let Lock = require("../lib/lock");
+let {Lock} = require("../build-test/lib");
 
 exports.testSequentialLock = function(test)
 {

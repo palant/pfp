@@ -35,6 +35,7 @@ import PasswordInfo from "./PasswordInfo.vue";
 
 export default {
   name: "SiteInfo",
+  localePath: "allpasswords/components/SiteInfo",
   components: {
     "password-info": PasswordInfo
   },

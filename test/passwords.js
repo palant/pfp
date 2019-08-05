@@ -6,10 +6,7 @@
 
 "use strict";
 
-let crypto = require("../lib/crypto");
-let passwords = require("../lib/passwords");
-let masterPassword = require("../lib/masterPassword");
-let storage = require("../lib/storage");
+let {crypto, passwords, masterPassword, storage, browserAPI} = require("../build-test/lib");
 
 let dummyMaster = "foobar";
 
@@ -103,7 +100,7 @@ let origConsoleError;
 
 exports.setUp = function(callback)
 {
-  let {storageData: storage} = require("../test-lib/browserAPI");
+  let {storageData: storage} = browserAPI;
   for (let key of Object.keys(storage))
     delete storage[key];
 
@@ -1584,7 +1581,7 @@ exports.testMigration = function(test)
   let encrypt = data => btoa(iv) + "_" + btoa(cryptoPrefix + JSON.stringify(data));
   let digest = data => btoa(hmacPrefix + data);
 
-  let {storageData} = require("../test-lib/browserAPI");
+  let {storageData} = browserAPI;
   storageData.salt = btoa(salt);
   storageData["hmac-secret"] = encrypt(btoa(hmacSecret));
 
@@ -1664,7 +1661,7 @@ exports.testMigration = function(test)
   {
     function checkState()
     {
-      return masterPassword.state.then(state =>
+      return masterPassword.getState().then(state =>
       {
         if (state != "migrating")
           return state;
@@ -1744,7 +1741,7 @@ exports.testMigration = function(test)
     return masterPassword.checkPassword(dummyMaster);
   }).then(() =>
   {
-    return masterPassword.state;
+    return masterPassword.getState();
   }).then(state =>
   {
     test.equal(state, "known", "No repeated migration on next login");

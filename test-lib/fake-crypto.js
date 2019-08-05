@@ -11,25 +11,25 @@ let crypto = require("crypto");
 let fakeEncryption = true;
 let randomByte = null;
 
-exports.enableFakeEncryption = () =>
+export function enableFakeEncryption()
 {
   fakeEncryption = true;
-};
+}
 
-exports.disableFakeEncryption = () =>
+export function disableFakeEncryption()
 {
   fakeEncryption = false;
-};
+}
 
-exports.enableFakeRandom = value =>
+export function enableFakeRandom(value)
 {
   randomByte = value;
-};
+}
 
-exports.disableFakeRandom = () =>
+export function disableFakeRandom()
 {
   randomByte = null;
-};
+}
 
 function Key(keyData, algo, usages)
 {
@@ -51,7 +51,7 @@ function Key(keyData, algo, usages)
   }
 }
 
-exports.getRandomValues = function(buf)
+export function getRandomValues(buf)
 {
   if (buf.BYTES_PER_ELEMENT != 1)
     throw new Error("Parameter doesn't appear to be an Uint8Array.");
@@ -60,7 +60,7 @@ exports.getRandomValues = function(buf)
     buf.set(require("crypto").randomBytes(buf.length));
   else
     buf.fill(randomByte);
-};
+}
 
 function getEncryptionPrefix(algoName, key, iv)
 {
@@ -77,7 +77,7 @@ function getEncryptionPrefix(algoName, key, iv)
 const AES_KEY_LENGTH = 32;
 const AES_IV_LENGTH = 12;
 
-exports.subtle = {
+export const subtle = {
   importKey(format, keyData, algo, extractable, usages)
   {
     return Promise.resolve().then(() =>

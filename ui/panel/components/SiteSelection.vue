@@ -42,6 +42,7 @@ import {passwords} from "../../proxy";
 
 export default {
   name: "SiteSelection",
+  localePath: "panel/components/SiteSelection",
   props: {
     message: {
       type: String,

@@ -16,8 +16,10 @@ export function $t(id, ...params)
     path = "";
     id = id.substr(1);
   }
+  else if (this.$options.localePath)
+    path = this.$options.localePath;
   else
-    path = this.$options.__file.replace(/^ui\//, "").replace(/\.vue$/, "");
+    throw new Error("Components without localePath option can only use absolute string paths");
 
   while (id.length)
   {

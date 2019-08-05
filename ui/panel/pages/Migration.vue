@@ -35,6 +35,7 @@ import {passwords} from "../../proxy";
 
 export default {
   name: "Migration",
+  localePath: "panel/pages/Migration",
   data()
   {
     return {

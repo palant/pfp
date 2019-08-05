@@ -53,6 +53,7 @@ import PasswordMessage from "../../components/PasswordMessage.vue";
 
 export default {
   name: "PasswordInfo",
+  localePath: "allpasswords/components/PasswordInfo",
   components: {
     "password-message": PasswordMessage
   },

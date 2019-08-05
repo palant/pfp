@@ -8,21 +8,23 @@
 
 let path = require("path");
 
-exports.runtime = {
+let browser = {};
+
+browser.runtime = {
   getURL: filepath =>
   {
     return path.resolve(__dirname, "..", "build-test", ...filepath.split("/"));
   }
 };
 
-let storageData = exports.storageData = Object.create(null);
+let storageData = browser.storageData = Object.create(null);
 
 function clone(value)
 {
   return JSON.parse(JSON.stringify(value));
 }
 
-exports.storage = {
+browser.storage = {
   local: {
     get: function(keys)
     {
@@ -58,3 +60,5 @@ exports.storage = {
     }
   }
 };
+
+export default browser;

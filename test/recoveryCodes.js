@@ -6,11 +6,9 @@
 
 "use strict";
 
-/* global crypto */
-
-let passwords = require("../lib/passwords");
-let recoveryCodes = require("../lib/recoveryCodes");
-let masterPassword = require("../lib/masterPassword");
+let {
+  passwords, recoveryCodes, masterPassword, fakeCrypto
+} = require("../build-test/lib");
 
 function unexpectedError(error)
 {
@@ -25,15 +23,15 @@ function done()
 
 exports.setUp = function(callback)
 {
-  crypto.disableFakeEncryption();
-  crypto.enableFakeRandom(2);
+  fakeCrypto.disableFakeEncryption();
+  fakeCrypto.enableFakeRandom(2);
   callback();
 };
 
 exports.tearDown = function(callback)
 {
-  crypto.enableFakeEncryption();
-  crypto.disableFakeRandom();
+  fakeCrypto.enableFakeEncryption();
+  fakeCrypto.disableFakeRandom();
   callback();
 };
 

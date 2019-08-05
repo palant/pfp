@@ -86,6 +86,7 @@ import RemoteStorageUsernameInput from "../components/RemoteStorageUsernameInput
 
 export default {
   name: "Sync",
+  localePath: "panel/pages/Sync",
   components: {
     "manual-auth": ManualAuth,
     "remoteStorage-username-input": RemoteStorageUsernameInput
@@ -137,7 +138,7 @@ export default {
       {
         if (disable)
         {
-          sync.disable().then(() =>
+          sync.disableSync().then(() =>
           {
             this.$app.sync = {
               provider: null

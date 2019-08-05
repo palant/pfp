@@ -6,11 +6,11 @@
 
 "use strict";
 
-let scrypt = require("../worker/scrypt");
+let {scrypt} = require("../build-test/worker/scrypt");
 
 function compare(test, password, salt, length, expected)
 {
-  let result = scrypt.deriveKey(
+  let result = scrypt(
     Buffer.from(password, "utf-8"),
     Buffer.from(salt, "utf-8"),
     length

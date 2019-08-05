@@ -52,6 +52,7 @@ import InProgress from "./modals/InProgress.vue";
 
 export default {
   name: "App",
+  localePath: "allpasswords/App",
   components: {
     "confirm": Confirm,
     "password-message": PasswordMessage,

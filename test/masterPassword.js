@@ -6,8 +6,7 @@
 
 "use strict";
 
-let passwords = require("../lib/passwords");
-let masterPassword = require("../lib/masterPassword");
+let {passwords, masterPassword, browserAPI} = require("../build-test/lib");
 
 let dummyMaster = "foobar";
 
@@ -29,7 +28,7 @@ function done()
 
 exports.setUp = function(callback)
 {
-  let {storageData: storage} = require("../test-lib/browserAPI");
+  let {storageData: storage} = browserAPI;
   for (let key of Object.keys(storage))
     delete storage[key];
 
@@ -42,19 +41,19 @@ exports.testGetAndForget = function(test)
 {
   Promise.resolve().then(() =>
   {
-    masterPassword.get();
+    masterPassword.getMasterPassword();
     test.ok(false, "Getting master password didn't throw");
   }).catch(expectedValue.bind(test, "master_password_required")).then(() =>
   {
     return masterPassword.changePassword(dummyMaster);
   }).then(() =>
   {
-    test.equal(masterPassword.get(), dummyMaster);
+    test.equal(masterPassword.getMasterPassword(), dummyMaster);
 
     return masterPassword.forgetPassword();
   }).catch(unexpectedError.bind(test)).then(() =>
   {
-    masterPassword.get();
+    masterPassword.getMasterPassword();
     test.ok(false, "Getting master password didn't throw");
   }).catch(expectedValue.bind(test, "master_password_required")).then(() =>
   {
@@ -64,7 +63,7 @@ exports.testGetAndForget = function(test)
     return masterPassword.checkPassword(dummyMaster);
   }).then(() =>
   {
-    test.equal(masterPassword.get(), dummyMaster);
+    test.equal(masterPassword.getMasterPassword(), dummyMaster);
   }).catch(unexpectedError.bind(test)).then(done.bind(test));
 };
 
@@ -90,14 +89,14 @@ exports.testCheckPassword = function(test)
 
 exports.testState = function(test)
 {
-  masterPassword.state.then(state =>
+  masterPassword.getState().then(state =>
   {
     test.equal(state, "unset");
 
     return masterPassword.changePassword(dummyMaster);
   }).then(() =>
   {
-    return masterPassword.state;
+    return masterPassword.getState();
   }).then(state =>
   {
     test.equal(state, "known");
@@ -105,7 +104,7 @@ exports.testState = function(test)
     return masterPassword.forgetPassword();
   }).then(() =>
   {
-    return masterPassword.state;
+    return masterPassword.getState();
   }).then(state =>
   {
     test.equal(state, "set");
@@ -113,7 +112,7 @@ exports.testState = function(test)
     return masterPassword.checkPassword(dummyMaster);
   }).then(() =>
   {
-    return masterPassword.state;
+    return masterPassword.getState();
   }).then(state =>
   {
     test.equal(state, "known");
