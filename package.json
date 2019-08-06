@@ -20,7 +20,6 @@
     "gulp-sass": "^4.0.2",
     "gulp-stylelint": "^9.0.0",
     "gulp-zip": "^4.2.0",
-    "memory-fs": "^0.4.1",
     "merge-stream": "^1.0.1",
     "nodeunit": "^0.11.3",
     "rollup": "^1.18.0",
