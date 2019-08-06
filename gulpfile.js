@@ -22,7 +22,6 @@ const merge = require("merge-stream");
 const alias = require("rollup-plugin-alias");
 const babel = require("rollup-plugin-babel");
 const commonjs = require("rollup-plugin-commonjs");
-const json = require("rollup-plugin-json");
 const resolve = require("rollup-plugin-node-resolve");
 const vue = require("rollup-plugin-vue");
 
@@ -239,14 +238,7 @@ gulp.task("watch-firefox", gulp.series("build-firefox", function watchFirefox()
   gulp.watch(["*.js", "*.json", "ui/**/*", "lib/**/*", "contentScript/**/*", "worker/**/*", "locale/**/*"], ["build-firefox"]);
 }));
 
-gulp.task("build-web-locales", function buildWebLocales()
-{
-  return gulp.src("locale/**/*.json")
-      .pipe(utils.combineLocales())
-      .pipe(gulp.dest("build-web/locale"));
-});
-
-gulp.task("build-web", gulp.series("validate", "build-web-locales", function buildWeb()
+gulp.task("build-web", gulp.series("validate", function buildWeb()
 {
   let targetdir = "build-web";
   return merge(
@@ -262,28 +254,36 @@ gulp.task("build-web", gulp.series("validate", "build-web-locales", function bui
     gulp.src("lib/main.js")
         .pipe(rollup({
           file: "background.js",
-          plugins: [alias({
-            "./browserAPI": path.resolve(__dirname, "web", "backgroundBrowserAPI.js"),
-            "../browserAPI": path.resolve(__dirname, "web", "backgroundBrowserAPI.js")
-          }), require("./workerLoader")(/\/(scrypt|pbkdf2)\.js$/)],
-          postPlugins: [babel({
-            babelrc: false,
-            presets: ["@babel/preset-env"]
-          })]
+          plugins: [
+            alias({
+              "./browserAPI": path.resolve(__dirname, "web", "backgroundBrowserAPI.js"),
+              "../browserAPI": path.resolve(__dirname, "web", "backgroundBrowserAPI.js")
+            }),
+            require("./workerLoader")(/\/(scrypt|pbkdf2)\.js$/)
+          ],
+          postPlugins: [
+            babel({
+              babelrc: false,
+              presets: ["@babel/preset-env"]
+            })
+          ]
         }))
         .pipe(gulp.dest(targetdir)),
     gulp.src("web/index.js")
         .pipe(rollup({
-          plugins: [alias({
-            "./browserAPI": path.resolve(__dirname, "web", "contentBrowserAPI.js"),
-            "../browserAPI": path.resolve(__dirname, "web", "contentBrowserAPI.js"),
-            "locale": path.resolve(__dirname, "build-web", "locale", "en_US.json"),
-            resolve: [".js", ".json"]
-          }), json()],
-          postPlugins: [babel({
-            babelrc: false,
-            presets: ["@babel/preset-env"]
-          })]
+          plugins: [
+            alias({
+              "./browserAPI": path.resolve(__dirname, "web", "contentBrowserAPI.js"),
+              "../browserAPI": path.resolve(__dirname, "web", "contentBrowserAPI.js")
+            }),
+            require("./localeLoader")(path.resolve(__dirname, "locale", "en_US"))
+          ],
+          postPlugins: [
+            babel({
+              babelrc: false,
+              presets: ["@babel/preset-env"]
+            })
+          ]
         }))
         .pipe(gulp.dest(targetdir)),
     gulp.src("web/**/*.scss")
@@ -325,7 +325,7 @@ gulp.task("web", gulp.series("build-web", function zipWeb()
   let manifest = require("./manifest.json");
   return gulp.src([
     "build-web/**",
-    "!build-web/**/.*", "!build-web/**/*.zip", "!build-web/locale/**"
+    "!build-web/**/.*", "!build-web/**/*.zip"
   ]).pipe(zip("pfp-web-" + manifest.version + ".zip")).pipe(gulp.dest("build-web"));
 }));
 
