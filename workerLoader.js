@@ -17,12 +17,6 @@ module.exports = function(regexp)
 {
   return {
     name: "worker-loader",
-    resolveId(id)
-    {
-      if (!regexp.test(id))
-        return null;
-      return id;
-    },
     load(id)
     {
       if (!regexp.test(id))
