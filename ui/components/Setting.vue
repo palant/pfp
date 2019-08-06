@@ -46,12 +46,12 @@ export default {
   watch: {
     value()
     {
-      prefs.set(this.name, this.value);
+      prefs.setPref(this.name, this.value);
     }
   },
   created()
   {
-    prefs.get(this.name, this.defValue).then(value => this.value = value);
+    prefs.getPref(this.name, this.defValue).then(value => this.value = value);
   }
 };
 </script>

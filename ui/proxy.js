@@ -83,7 +83,7 @@ export const passwordRetrieval = Proxy("passwordRetrieval", [
   "fillIn"
 ]);
 
-export const prefs = Proxy("prefs", ["get", "set"]);
+export const prefs = Proxy("prefs", ["getPref", "setPref"]);
 
 export const recoveryCodes = Proxy("recoveryCodes", [
   "getValidChars", "getCode", "formatCode", "isValid", "decodeCode"
