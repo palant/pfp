@@ -212,7 +212,7 @@ function prepareKey(password)
   return [hasher.preprocessBlock(ikey), hasher.preprocessBlock(okey)];
 }
 
-export function pbkdf2(password, salt, iterations, length)
+function pbkdf2(password, salt, iterations, length)
 {
   length |= 0;
 
@@ -268,6 +268,9 @@ if (typeof self != "undefined")
     });
   };
 }
+
+if (typeof exports != "undefined")
+  exports.pbkdf2 = pbkdf2;
 
 // The following snippet is taken from rusha 0.8.4:
 // https://github.com/srijs/rusha/blob/v0.8.4/rusha.js#L307

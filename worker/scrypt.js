@@ -15,7 +15,7 @@ import {Scrypt} from "@stablelib/scrypt";
 
 const hasher = new Scrypt(N, r, p);
 
-export function scrypt(password, salt, length)
+function scrypt(password, salt, length)
 {
   return hasher.deriveKey(password, salt, length);
 }
@@ -30,3 +30,6 @@ if (typeof self != "undefined")
     });
   };
 }
+
+if (typeof exports != "undefined")
+  exports.scrypt = scrypt;

@@ -134,5 +134,8 @@ export function runApp(App, isWebClient = false)
     });
   }
 
-  window.addEventListener("load", init);
+  if (document.readyState != "complete")
+    window.addEventListener("load", init);
+  else
+    init();
 }

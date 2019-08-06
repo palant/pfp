@@ -9,4 +9,18 @@
 import {runApp} from "../ui/vue";
 import App from "./App.vue";
 
-runApp(App, true);
+let frame = document.createElement("frame");
+frame.src = "about:blank";
+frame.hidden = true;
+frame.addEventListener("load", event =>
+{
+  let frameDoc = frame.contentDocument;
+  let script = frameDoc.createElement("script");
+  script.src = "background.js";
+  script.addEventListener("load", event =>
+  {
+    runApp(App, true);
+  });
+  frameDoc.body.appendChild(script);
+});
+document.body.appendChild(frame);

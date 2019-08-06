@@ -38,6 +38,11 @@ function rollup(overrides = {})
   return rollupStream({
     plugins: [
       ...prePlugins,
+      require("./globalLoader")({
+        vue: "Vue",
+        jsqr: "JSQR",
+        zxcvbn: "zxcvbn"
+      }),
       resolve(),
       commonjs({
         include: ["node_modules/**"]
@@ -50,16 +55,10 @@ function rollup(overrides = {})
         }
       }),
       ...postPlugins
-    ],
-    external: ["vue", "jsqr", "zxcvbn"]
+    ]
   }, Object.assign({
-    format: "iife",
-    compact: true,
-    globals: {
-      vue: "Vue",
-      jsqr: "JSQR",
-      zxcvbn: "zxcvbn"
-    }
+    format: "cjs",
+    compact: true
   }, overrides));
 }
 
@@ -108,7 +107,6 @@ function buildWorkers(targetdir)
       plugins: [alias({
         "../lib/typedArrayConversion": path.resolve(__dirname, "test-lib", "typedArrayConversion.js")
       })],
-      format: "cjs"
     };
   }
 
@@ -230,8 +228,7 @@ gulp.task("build-test", gulp.series("validate", function buildTest()
             "./browserAPI": path.resolve(__dirname, "test-lib", "browserAPI.js"),
             "./typedArrayConversion": path.resolve(__dirname, "test-lib", "typedArrayConversion.js"),
             "./sync-providers/dropbox": path.resolve(__dirname, "test-lib", "sync-providers", "dropbox.js"),
-          })],
-          format: "cjs"
+          })]
         }))
         .pipe(gulp.dest("build-test"))
   );
