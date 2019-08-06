@@ -10,7 +10,7 @@ import * as crypto from "../lib/crypto";
 import Lock from "../lib/lock";
 import * as masterPassword from "../lib/masterPassword";
 import * as passwords from "../lib/passwords";
-import storage from "../lib/storage";
+import storageDefault, * as storageExports from "../lib/storage";
 import * as recoveryCodes from "../lib/recoveryCodes";
 import * as sync from "../lib/sync";
 import browserAPI from "./browserAPI";
@@ -19,7 +19,9 @@ import provider from "./sync-providers/dropbox";
 
 global.crypto = fakeCrypto;
 
+export const storage = Object.assign({}, storageDefault, storageExports);
+
 export {
-  crypto, Lock, masterPassword, passwords, storage, recoveryCodes, sync,
+  crypto, Lock, masterPassword, passwords, recoveryCodes, sync,
   browserAPI, fakeCrypto, provider
 };

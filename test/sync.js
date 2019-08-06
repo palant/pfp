@@ -377,7 +377,7 @@ exports.testUnrelated = function(test)
       "site:foo": "foo"
     }, "Local contents after update");
 
-    return Promise.all([salt, hmac, masterPassword.encrypt(crypto.generateRandom(32))]);
+    return Promise.all([salt, hmac, storage.encrypt(crypto.generateRandom(32))]);
   }).then(([salt, hmac, secret]) =>
   {
     provider._set("/passwords.json", 8, JSON.stringify(sign({
