@@ -6,33 +6,29 @@
 
 "use strict";
 
-const path = require("path");
-
 const rollup = require("rollup");
-const babel = require("rollup-plugin-babel");
-const commonjs = require("rollup-plugin-commonjs");
-const resolve = require("rollup-plugin-node-resolve");
 
 module.exports = function(regexp)
 {
   return {
     name: "worker-loader",
+    buildStart(options)
+    {
+      this._plugins = options.plugins;
+    },
     load(id)
     {
       if (!regexp.test(id))
         return null;
 
       return rollup.rollup({
-        input: id.replace(/^\.\.\//, ""),
-        plugins: [resolve(), commonjs(), babel({
-          babelrc: false,
-          presets: ["@babel/preset-env"]
-        })]
+        input: id,
+        plugins: this._plugins.filter(p => p.name != "worker-loader")
       }).then(bundle =>
       {
         return bundle.generate({
           name: "worker",
-          format: "iife",
+          format: "cjs",
           compact: true
         });
       }).then(({output}) =>
