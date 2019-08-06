@@ -6,6 +6,8 @@
 
 "use strict";
 
+import "../lib/importers/default";
+import "../lib/importers/lastPass";
 import * as crypto from "../lib/crypto";
 import Lock from "../lib/lock";
 import * as masterPassword from "../lib/masterPassword";
