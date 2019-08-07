@@ -13,7 +13,7 @@ let browser = {};
 browser.runtime = {
   getURL: filepath =>
   {
-    return path.resolve(__dirname, "..", "build-test", ...filepath.split("/"));
+    return path.resolve(__dirname, ...filepath.split("/"));
   }
 };
 

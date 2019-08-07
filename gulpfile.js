@@ -19,12 +19,12 @@ const sass = require("gulp-sass");
 const stylelint = require("gulp-stylelint");
 const zip = require("gulp-zip");
 const merge = require("merge-stream");
-const alias = require("rollup-plugin-alias");
 const babel = require("rollup-plugin-babel");
 const commonjs = require("rollup-plugin-commonjs");
 const resolve = require("rollup-plugin-node-resolve");
 const vue = require("rollup-plugin-vue");
 
+const replace = require("./replacePlugin");
 const utils = require("./gulp-utils");
 
 function rollup(overrides = {})
@@ -103,8 +103,8 @@ function buildWorkers(targetdir)
   if (targetdir == "build-test/worker")
   {
     overrides = {
-      plugins: [alias({
-        "../lib/typedArrayConversion": path.resolve(__dirname, "test-lib", "typedArrayConversion.js")
+      plugins: [replace({
+        [path.resolve(__dirname, "lib", "typedArrayConversion.js")]: path.resolve(__dirname, "test-lib", "typedArrayConversion.js")
       })],
     };
   }
@@ -223,10 +223,10 @@ gulp.task("build-test", gulp.series("validate", function buildTest()
     buildWorkers("build-test/worker"),
     gulp.src("test-lib/lib.js")
         .pipe(rollup({
-          plugins: [alias({
-            "./browserAPI": path.resolve(__dirname, "test-lib", "browserAPI.js"),
-            "./typedArrayConversion": path.resolve(__dirname, "test-lib", "typedArrayConversion.js"),
-            "./sync-providers/dropbox": path.resolve(__dirname, "test-lib", "sync-providers", "dropbox.js"),
+          plugins: [replace({
+            [path.resolve(__dirname, "lib", "browserAPI.js")]: path.resolve(__dirname, "test-lib", "browserAPI.js"),
+            [path.resolve(__dirname, "lib", "typedArrayConversion.js")]: path.resolve(__dirname, "test-lib", "typedArrayConversion.js"),
+            [path.resolve(__dirname, "lib", "sync-providers", "dropbox.js")]: path.resolve(__dirname, "test-lib", "sync-providers", "dropbox.js")
           })]
         }))
         .pipe(gulp.dest("build-test"))
@@ -255,9 +255,8 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
         .pipe(rollup({
           file: "background.js",
           plugins: [
-            alias({
-              "./browserAPI": path.resolve(__dirname, "web", "backgroundBrowserAPI.js"),
-              "../browserAPI": path.resolve(__dirname, "web", "backgroundBrowserAPI.js")
+            replace({
+              [path.resolve(__dirname, "lib", "browserAPI.js")]: path.resolve(__dirname, "web", "backgroundBrowserAPI.js")
             }),
             require("./workerLoader")(/\/(scrypt|pbkdf2)\.js$/)
           ],
@@ -272,9 +271,8 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
     gulp.src("web/index.js")
         .pipe(rollup({
           plugins: [
-            alias({
-              "./browserAPI": path.resolve(__dirname, "web", "contentBrowserAPI.js"),
-              "../browserAPI": path.resolve(__dirname, "web", "contentBrowserAPI.js")
+            replace({
+              [path.resolve(__dirname, "ui", "browserAPI.js")]: path.resolve(__dirname, "web", "contentBrowserAPI.js")
             }),
             require("./localeLoader")(path.resolve(__dirname, "locale", "en_US"))
           ],

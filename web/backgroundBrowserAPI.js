@@ -6,7 +6,7 @@
 
 "use strict";
 
-import {EventTarget} from "./eventTarget";
+import {EventTarget} from "../web/eventTarget";
 import scryptWorker from "../worker/scrypt.js";
 import pbkdf2Worker from "../worker/pbkdf2.js";
 

@@ -7,7 +7,7 @@
 "use strict";
 
 import locale from "locale";
-import {EventTarget} from "./eventTarget";
+import {EventTarget} from "../web/eventTarget";
 
 let port = {
   postMessage(payload)

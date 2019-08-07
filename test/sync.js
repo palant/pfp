@@ -57,9 +57,9 @@ function sign(data)
 
 exports.setUp = function(callback)
 {
-  let {storageData: storage} = browserAPI;
-  for (let key of Object.keys(storage))
-    delete storage[key];
+  let {storageData} = browserAPI;
+  for (let key of Object.keys(storageData))
+    delete storageData[key];
 
   masterPassword.forgetPassword();
 

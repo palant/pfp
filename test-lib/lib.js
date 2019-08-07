@@ -8,6 +8,7 @@
 
 import "../lib/importers/default";
 import "../lib/importers/lastPass";
+import browserAPI from "../lib/browserAPI";
 import * as crypto from "../lib/crypto";
 import Lock from "../lib/lock";
 import * as masterPassword from "../lib/masterPassword";
@@ -15,9 +16,8 @@ import * as passwords from "../lib/passwords";
 import storageDefault, * as storageExports from "../lib/storage";
 import * as recoveryCodes from "../lib/recoveryCodes";
 import * as sync from "../lib/sync";
-import browserAPI from "./browserAPI";
+import provider from "../lib/sync-providers/dropbox";
 import * as fakeCrypto from "./fake-crypto";
-import provider from "./sync-providers/dropbox";
 
 global.crypto = fakeCrypto;
 
