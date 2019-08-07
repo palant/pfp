@@ -36,7 +36,7 @@ module.exports = function(regexp)
         if (output.length != 1 || !output[0].code)
           throw new Error("Unexpected rollup output");
 
-        return "export default " + JSON.stringify(output[0].code.replace(/\n\s+/g, "\n"));
+        return "export default function(){" + output[0].code + "}";
       });
     }
   };

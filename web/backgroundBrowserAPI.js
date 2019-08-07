@@ -10,8 +10,9 @@ import {EventTarget} from "./eventTarget";
 import scryptWorker from "../worker/scrypt.js";
 import pbkdf2Worker from "../worker/pbkdf2.js";
 
-function textToURL(text)
+function functionToURL(func)
 {
+  let text = "(" + func.toString() + ")()";
   return URL.createObjectURL(new Blob([text], {type: "text/javascript"}));
 }
 
@@ -83,9 +84,9 @@ let browser = {
     getURL: path =>
     {
       if (path == "worker/scrypt.js")
-        return textToURL(scryptWorker);
+        return functionToURL(scryptWorker);
       else if (path == "worker/pbkdf2.js")
-        return textToURL(pbkdf2Worker);
+        return functionToURL(pbkdf2Worker);
       else
         return path;
     },
