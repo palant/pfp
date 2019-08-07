@@ -170,7 +170,7 @@ exports.runTests = function()
     }
   }
 
-  let {TextEncoder, TextDecoder} = require("text-encoding");
+  let {TextEncoder, TextDecoder} = require("util");
 
   class WorkerEventTarget
   {
