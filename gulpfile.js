@@ -251,29 +251,14 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
     gulp.src(["ui/**/*.scss", "!ui/options/options.scss"])
         .pipe(sass())
         .pipe(gulp.dest(targetdir)),
-    gulp.src("lib/main.js")
-        .pipe(rollup({
-          file: "background.js",
-          plugins: [
-            replace({
-              [path.resolve(__dirname, "lib", "browserAPI.js")]: path.resolve(__dirname, "web", "backgroundBrowserAPI.js")
-            }),
-            require("./workerLoader")(/\/(scrypt|pbkdf2)\.js$/)
-          ],
-          postPlugins: [
-            babel({
-              babelrc: false,
-              presets: ["@babel/preset-env"]
-            })
-          ]
-        }))
-        .pipe(gulp.dest(targetdir)),
     gulp.src("web/index.js")
         .pipe(rollup({
           plugins: [
             replace({
+              [path.resolve(__dirname, "lib", "browserAPI.js")]: path.resolve(__dirname, "web", "backgroundBrowserAPI.js"),
               [path.resolve(__dirname, "ui", "browserAPI.js")]: path.resolve(__dirname, "web", "contentBrowserAPI.js")
             }),
+            require("./workerLoader")(/\/(scrypt|pbkdf2)\.js$/),
             require("./localeLoader")(path.resolve(__dirname, "locale", "en_US"))
           ],
           postPlugins: [
