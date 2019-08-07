@@ -6,7 +6,6 @@
 
 "use strict";
 
-const fs = require("fs");
 const path = require("path");
 
 module.exports = function(map)
@@ -15,22 +14,18 @@ module.exports = function(map)
 
   return {
     name: "replace",
-    load(id)
+    resolveId(id, importer)
     {
-      let newId = map.get(id);
-      if (!newId)
+      if (!id.endsWith(".js"))
+        id += ".js";
+      if (!importer)
+        importer = __dirname;
+      let resolved = path.normalize(path.join(path.dirname(importer), ...id.split("/")));
+      let mapped = map.get(resolved);
+      if (mapped)
+        return mapped;
+      else
         return null;
-
-      return new Promise((resolve, reject) =>
-      {
-        fs.readFile(newId, {encoding: "utf-8"}, (err, data) =>
-        {
-          if (err)
-            reject(err);
-          else
-            resolve(data);
-        });
-      });
     }
   };
 };
