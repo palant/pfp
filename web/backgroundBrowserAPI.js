@@ -76,7 +76,7 @@ let browser = {
       if (params.url != "ui/allpasswords/allpasswords.html")
         return Promise.reject(new Error("Not implemented"));
 
-      parent.dispatchEvent(new Event("show-allpasswords"));
+      window.dispatchEvent(new Event("show-allpasswords"));
       return Promise.resolve();
     }
   },
@@ -97,7 +97,7 @@ let browser = {
 let port = {
   postMessage(payload)
   {
-    parent.dispatchEvent(new CustomEvent("fromBackground", {
+    window.dispatchEvent(new CustomEvent("fromBackground", {
       detail: payload
     }));
   },
@@ -105,18 +105,18 @@ let port = {
   onDisconnect: new EventTarget()
 };
 
-parent.addEventListener("toBackground", event =>
+window.addEventListener("toBackground", event =>
 {
   port.onMessage._emit(event.detail);
 });
 
-parent.addEventListener("port-connected", event =>
+window.addEventListener("port-connected", event =>
 {
   port.name = event.detail;
   browser.runtime.onConnect._emit(port);
 });
 
-parent.addEventListener("show-panel", event =>
+window.addEventListener("show-panel", event =>
 {
   currentURL = "https://" + event.detail;
 });
