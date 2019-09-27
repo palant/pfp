@@ -19,6 +19,11 @@ function getActiveElement(doc)
     return result;
 }
 
+function isVisible(element)
+{
+  return element.offsetHeight && element.offsetWidth;
+}
+
 function fakeInput(field, value)
 {
   field.value = value;
@@ -142,7 +147,7 @@ function fillIn(wnd, name, password, noFocus, passwordFieldRequired)
   {
     // accounts.google.com has the password field hidden while email is being
     // entered, fill in here despite being hidden.
-    fields = fields.filter(element => element.offsetHeight && element.offsetWidth);
+    fields = fields.filter(isVisible);
   }
 
   let result = false;
@@ -176,6 +181,14 @@ function fillIn(wnd, name, password, noFocus, passwordFieldRequired)
       fakeInput(field, name);
 
       let button = field.form.querySelector("input[type=submit], button[type=submit]");
+      if (!button)
+      {
+        // Assume that the only visible button on the form is the submit button
+        let buttons = field.form.querySelectorAll("input[type=button], button");
+        buttons = Array.prototype.filter.call(buttons, isVisible);
+        if (buttons.length == 1)
+          button = buttons[0];
+      }
       if (button)
         button.click();
       else
