@@ -174,23 +174,35 @@ function fillIn(wnd, name, password, noFocus, passwordFieldRequired)
   {
     // Try finding user name
     let field = getActiveElement(wnd.document);
-    if (field.localName == "input" && userNameFieldTypes.has(field.type) && field.form)
+    if (field.localName == "input" && userNameFieldTypes.has(field.type))
     {
       fakeInput(field, name);
 
-      let button = field.form.querySelector("input[type=submit], button[type=submit]");
-      if (!button)
+      let button = null;
+      if (field.form)
       {
-        // Assume that the only visible button on the form is the submit button
-        let buttons = field.form.querySelectorAll("input[type=button], button");
-        buttons = Array.prototype.filter.call(buttons, isVisible);
-        if (buttons.length == 1)
-          button = buttons[0];
+        let button = field.form.querySelector("input[type=submit], button[type=submit]");
+        if (!button)
+        {
+          // Assume that the only visible button on the form is the submit button
+          let buttons = field.form.querySelectorAll("input[type=button], button");
+          buttons = Array.prototype.filter.call(buttons, isVisible);
+          if (buttons.length == 1)
+            button = buttons[0];
+        }
       }
       if (button)
         button.click();
-      else
+      else if (field.form)
         field.form.dispatchEvent(new Event("submit", {bubbles: true}));
+      else
+      {
+        field.dispatchEvent(new KeyboardEvent("keydown", {
+          key: "Enter",
+          keyCode: 13,
+          bubbles: true
+        }));
+      }
       result = true;
 
       let attempt = 0;
