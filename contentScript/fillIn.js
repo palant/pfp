@@ -43,7 +43,7 @@ function findNameField(passwordField)
     let element = elements[i];
     if (element == passwordField)
       break;
-    if (element instanceof HTMLInputElement && userNameFieldTypes.has(element.type))
+    if (element.localName == "input" && userNameFieldTypes.has(element.type))
       nameField = element;
   }
   return nameField;
@@ -120,7 +120,7 @@ function fillIn(wnd, name, password, noFocus)
   if (wnd == wnd.top)
   {
     let field = getActiveElement(wnd.document);
-    if (field instanceof HTMLInputElement && field.type == "password" && field.maxLength != 1)
+    if (field.localName == "input" && field.type == "password" && field.maxLength != 1)
     {
       fakeInput(field, password);
       fillInName(field, name);
@@ -171,7 +171,7 @@ function fillIn(wnd, name, password, noFocus)
   {
     // Try finding user name
     let field = getActiveElement(wnd.document);
-    if (field instanceof HTMLInputElement && userNameFieldTypes.has(field.type) && field.form)
+    if (field.localName == "input" && userNameFieldTypes.has(field.type) && field.form)
     {
       fakeInput(field, name);
 
