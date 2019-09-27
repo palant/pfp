@@ -131,7 +131,9 @@ function buildCommon(targetdir)
     gulp.src("ui/third-party/**")
         .pipe(gulp.dest(`${targetdir}/ui/third-party`)),
     gulp.src(["contentScript/fillIn.js"])
-        .pipe(rollup())
+        .pipe(rollup({
+          format: "iife"
+        }))
         .pipe(gulp.dest(`${targetdir}/contentScript`)),
     gulp.src("ui/panel/main.js")
         .pipe(rollup({
