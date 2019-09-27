@@ -115,7 +115,7 @@ function fillInPartialPassword(fields, name, password, noFocus)
   return true;
 }
 
-function fillIn(wnd, name, password, noFocus)
+function fillIn(wnd, name, password, noFocus, passwordFieldRequired)
 {
   if (wnd == wnd.top)
   {
@@ -167,7 +167,7 @@ function fillIn(wnd, name, password, noFocus)
       result = true;
   }
 
-  if (!result && wnd == wnd.top)
+  if (!result && !passwordFieldRequired && wnd == wnd.top)
   {
     // Try finding user name
     let field = getActiveElement(wnd.document);
@@ -182,7 +182,13 @@ function fillIn(wnd, name, password, noFocus)
         field.form.dispatchEvent(new Event("submit", {bubbles: true}));
       result = true;
 
-      window.setTimeout(() => fillIn(wnd, name, password, noFocus), 100);
+      let attempt = 0;
+      let checkForPasswordFields = function()
+      {
+        if (!fillIn(wnd, name, password, noFocus, true) && ++attempt < 50)
+          window.setTimeout(checkForPasswordFields, 100);
+      };
+      window.setTimeout(checkForPasswordFields, 100);
     }
   }
 
