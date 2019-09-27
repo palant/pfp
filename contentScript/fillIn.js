@@ -38,20 +38,18 @@ const userNameFieldTypes = new Set(["", "text", "email", "url"]);
 
 function findNameField(passwordField)
 {
-  if (!passwordField.form)
-    return null;
+  let root = passwordField.form || document.documentElement;
+  let walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+  walker.currentNode = passwordField;
 
-  let nameField = null;
-  let elements = passwordField.form.elements;
-  for (let i = 0; i < elements.length; i++)
+  let element;
+  do
   {
-    let element = elements[i];
-    if (element == passwordField)
-      break;
-    if (element.localName == "input" && userNameFieldTypes.has(element.type))
-      nameField = element;
-  }
-  return nameField;
+    element = walker.previousNode();
+    if (element && element.localName == "input" && userNameFieldTypes.has(element.type))
+      return element;
+  } while (element);
+  return null;
 }
 
 function fillInName(passwordField, name)
