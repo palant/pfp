@@ -19,9 +19,9 @@ const sass = require("gulp-sass");
 const stylelint = require("gulp-stylelint");
 const zip = require("gulp-zip");
 const merge = require("merge-stream");
-const babel = require("rollup-plugin-babel");
-const commonjs = require("rollup-plugin-commonjs");
-const resolve = require("rollup-plugin-node-resolve");
+const babel = require("@rollup/plugin-babel").default;
+const commonjs = require("@rollup/plugin-commonjs");
+const resolve = require("@rollup/plugin-node-resolve").default;
 const vue = require("rollup-plugin-vue");
 
 const replace = require("./replacePlugin");
@@ -170,7 +170,7 @@ function buildCommon(targetdir)
 
 function touchReloader(targetdir)
 {
-  fs.writeFileSync(path.join(targetdir, "random.json"), Math.random());
+  fs.writeFileSync(path.join(targetdir, "random.json"), String(Math.random()));
 }
 
 function removeReloader(data)
@@ -266,6 +266,7 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
           postPlugins: [
             babel({
               babelrc: false,
+              babelHelpers: "bundled",
               presets: ["@babel/preset-env"]
             })
           ]

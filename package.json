@@ -9,30 +9,30 @@
     "url": "https://github.com/palant/easypasswords.git"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.5.5",
-    "del": "^5.0.0",
-    "eslint-plugin-json": "^1.4.0",
-    "eslint-plugin-vue": "^5.2.3",
+    "@babel/preset-env": "^7.10.2",
+    "@rollup/plugin-babel": "^5.0.3",
+    "@rollup/plugin-commonjs": "^13.0.0",
+    "@rollup/plugin-node-resolve": "^8.0.1",
+    "del": "^5.1.0",
+    "eslint-plugin-json": "^2.1.1",
+    "eslint-plugin-vue": "^6.2.2",
     "gulp": "^4.0.2",
     "gulp-better-rollup": "^4.0.1",
     "gulp-eslint": "^6.0.0",
-    "gulp-htmlhint": "^2.2.1",
-    "gulp-sass": "^4.0.2",
-    "gulp-stylelint": "^9.0.0",
-    "gulp-zip": "^5.0.0",
+    "gulp-htmlhint": "^3.0.1",
+    "gulp-sass": "^4.1.0",
+    "gulp-stylelint": "^13.0.0",
+    "gulp-zip": "^5.0.1",
     "merge-stream": "^2.0.0",
     "nodeunit": "^0.11.3",
-    "rollup": "^1.18.0",
-    "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-commonjs": "^10.0.1",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-vue": "^5.0.1",
-    "sandboxed-module": "^2.0.3",
-    "stylelint": "^10.1.0",
-    "stylelint-config-standard": "^18.3.0",
-    "vue-template-compiler": "^2.6.10"
+    "rollup": "^1.31.1",
+    "rollup-plugin-vue": "^5.1.9",
+    "sandboxed-module": "^2.0.4",
+    "stylelint": "^13.6.0",
+    "stylelint-config-standard": "^20.0.0",
+    "vue-template-compiler": "^2.6.11"
   },
   "dependencies": {
-    "@stablelib/scrypt": "^0.10.1"
+    "@stablelib/scrypt": "^1.0.0"
   }
 }
