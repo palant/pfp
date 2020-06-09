@@ -30,8 +30,19 @@ let browser = {
 
         let items = {};
         for (let key of keys)
+        {
           if (key in localStorage)
-            items[key] = JSON.parse(localStorage[key]);
+          {
+            try
+            {
+              items[key] = JSON.parse(localStorage[key]);
+            }
+            catch (e)
+            {
+              // Ignore non-JSON values
+            }
+          }
+        }
         return Promise.resolve(items);
       },
       set: items =>
