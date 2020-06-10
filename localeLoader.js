@@ -6,8 +6,8 @@
 
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
 function walkDirectory(dir, callback)
 {
@@ -35,7 +35,7 @@ function walkDirectory(dir, callback)
   });
 }
 
-module.exports = function(localeRoot)
+export default function(localeRoot)
 {
   return {
     name: "locale-loader",
@@ -75,4 +75,4 @@ module.exports = function(localeRoot)
       });
     }
   };
-};
+}

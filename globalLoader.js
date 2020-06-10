@@ -6,7 +6,7 @@
 
 "use strict";
 
-module.exports = function(map)
+export default function(map)
 {
   return {
     name: "global-loader",
@@ -24,4 +24,4 @@ module.exports = function(map)
       return "export default " + map[id];
     }
   };
-};
+}

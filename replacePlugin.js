@@ -6,9 +6,9 @@
 
 "use strict";
 
-const path = require("path");
+import path from "path";
 
-module.exports = function(map)
+export default function(map)
 {
   map = new Map(Object.entries(map).map(([key, value]) => [path.normalize(key), path.normalize(value)]));
 
@@ -19,7 +19,7 @@ module.exports = function(map)
       if (!id.endsWith(".js"))
         id += ".js";
       if (!importer)
-        importer = __dirname;
+        importer = process.cwd(); // import.meta unsupported by current eslint version
       let resolved = path.normalize(path.join(path.dirname(importer), ...id.split("/")));
       let mapped = map.get(resolved);
       if (mapped)
@@ -28,4 +28,4 @@ module.exports = function(map)
         return null;
     }
   };
-};
+}

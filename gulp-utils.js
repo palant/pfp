@@ -6,20 +6,22 @@
 
 "use strict";
 
-let fs = require("fs");
-let path = require("path");
-let {spawn} = require("child_process");
-let {Duplex, Transform} = require("stream");
+import fs from "fs";
+import path from "path";
+import {spawn} from "child_process";
+import {Duplex, Transform} from "stream";
+import {TextEncoder, TextDecoder} from "util";
+import sandboxedModule from "sandboxed-module";
 
-exports.readArg = function(prefix, defaultValue)
+export function readArg(prefix, defaultValue)
 {
   for (let arg of process.argv)
     if (arg.startsWith(prefix))
       return arg.substr(prefix.length);
   return defaultValue;
-};
+}
 
-function transform(modifier, opts)
+export function transform(modifier, opts)
 {
   if (!opts)
     opts = {};
@@ -53,9 +55,8 @@ function transform(modifier, opts)
   };
   return stream;
 }
-exports.transform = transform;
 
-exports.jsonModify = function(modifier, newName)
+export function jsonModify(modifier, newName)
 {
   return transform((filepath, contents) =>
   {
@@ -65,9 +66,9 @@ exports.jsonModify = function(modifier, newName)
       filepath = path.resolve(filepath, "..", newName);
     return [filepath, JSON.stringify(data, null, 2)];
   });
-};
+}
 
-exports.combineLocales = function()
+export function combineLocales()
 {
   let rootDir = path.join(process.cwd(), "locale");
   let locales = {};
@@ -120,9 +121,9 @@ exports.combineLocales = function()
   });
 
   return stream;
-};
+}
 
-exports.toChromeLocale = function()
+export function toChromeLocale()
 {
   return transform((filepath, contents) =>
   {
@@ -132,7 +133,7 @@ exports.toChromeLocale = function()
       data[key] = {message: strings[key]};
 
     let locale = path.basename(filepath, ".json");
-    let manifest = require("./package.json");
+    let manifest = JSON.parse(fs.readFileSync("./package.json"));
     data.name = {"message": manifest.title};
     data.description = {"message": manifest.description};
     if ("locales" in manifest && locale in manifest.locales)
@@ -149,9 +150,9 @@ exports.toChromeLocale = function()
       JSON.stringify(data, null, 2)
     ];
   });
-};
+}
 
-exports.runTests = function()
+export function runTests()
 {
   function escape_string(str)
   {
@@ -169,8 +170,6 @@ exports.runTests = function()
         yield prefix + file;
     }
   }
-
-  let {TextEncoder, TextDecoder} = require("util");
 
   class WorkerEventTarget
   {
@@ -224,7 +223,7 @@ exports.runTests = function()
     {
       super();
 
-      require("sandboxed-module").require(url, {
+      sandboxedModule.require(url, {
         globals: {
           self: new WorkerEventTarget(this)
         }
@@ -234,9 +233,8 @@ exports.runTests = function()
 
   let atob = str => Buffer.from(str, "base64").toString("binary");
   let btoa = str => Buffer.from(str, "binary").toString("base64");
-  let {URL} = require("url");
 
-  let nodeunit = require("sandboxed-module").require("nodeunit", {
+  let nodeunit = sandboxedModule.require("nodeunit", {
     globals: {
       console, process, Buffer, TextEncoder, TextDecoder, atob, btoa, URL,
       Worker: FakeWorker,
@@ -260,4 +258,4 @@ exports.runTests = function()
       });
     });
   });
-};
+}

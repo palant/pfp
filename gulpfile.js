@@ -6,26 +6,32 @@
 
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-const url = require("url");
+import fs from "fs";
+import path from "path";
+import url from "url";
 
-const del = require("del");
-const gulp = require("gulp");
-const eslint = require("gulp-eslint");
-const htmlhint = require("gulp-htmlhint");
-const rollupStream = require("gulp-better-rollup");
-const sass = require("gulp-sass");
-const stylelint = require("gulp-stylelint");
-const zip = require("gulp-zip");
-const merge = require("merge-stream");
-const babel = require("@rollup/plugin-babel").default;
-const commonjs = require("@rollup/plugin-commonjs");
-const resolve = require("@rollup/plugin-node-resolve").default;
-const vue = require("rollup-plugin-vue");
+import del from "del";
+import gulp from "gulp";
+import eslint from "gulp-eslint";
+import htmlhint from "gulp-htmlhint";
+import rollupStream from "gulp-better-rollup";
+import sass from "gulp-sass";
+import stylelint from "gulp-stylelint";
+import zip from "gulp-zip";
+import merge from "merge-stream";
+import babel from "@rollup/plugin-babel";
+import commonjs from "@rollup/plugin-commonjs";
+import resolve from "@rollup/plugin-node-resolve";
+import vue from "rollup-plugin-vue";
 
-const replace = require("./replacePlugin");
-const utils = require("./gulp-utils");
+import globalLoader from "./globalLoader.js";
+import * as utils from "./gulp-utils.js";
+import localeLoader from "./localeLoader.js";
+import replace from "./replacePlugin.js";
+import workerLoader from "./workerLoader.js";
+
+const VERSION = JSON.parse(fs.readFileSync("./manifest.json")).version;
+const __dirname = process.cwd(); // import.meta unsupported by current eslint version
 
 function rollup(overrides = {})
 {
@@ -37,12 +43,12 @@ function rollup(overrides = {})
   return rollupStream({
     plugins: [
       ...prePlugins,
-      require("./globalLoader")({
+      globalLoader({
         vue: "Vue",
         jsqr: "JSQR",
         zxcvbn: "zxcvbn"
       }),
-      resolve(),
+      resolve.default(),
       commonjs({
         include: ["node_modules/**"]
       }),
@@ -260,11 +266,11 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
               [path.resolve(__dirname, "lib", "browserAPI.js")]: path.resolve(__dirname, "web", "backgroundBrowserAPI.js"),
               [path.resolve(__dirname, "ui", "browserAPI.js")]: path.resolve(__dirname, "web", "contentBrowserAPI.js")
             }),
-            require("./workerLoader")(/\/(scrypt|pbkdf2)\.js$/),
-            require("./localeLoader")(path.resolve(__dirname, "locale", "en_US"))
+            workerLoader(/\/(scrypt|pbkdf2)\.js$/),
+            localeLoader(path.resolve(__dirname, "locale", "en_US"))
           ],
           postPlugins: [
-            babel({
+            babel.default({
               babelrc: false,
               babelHelpers: "bundled",
               presets: ["@babel/preset-env"]
@@ -282,7 +288,6 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
 
 gulp.task("crx", gulp.series("build-chrome", function buildCRX()
 {
-  let manifest = require("./manifest.json");
   return merge(
     gulp.src([
       "build-chrome/**",
@@ -290,12 +295,11 @@ gulp.task("crx", gulp.series("build-chrome", function buildCRX()
       "!build-chrome/**/.*", "!build-chrome/**/*.zip", "!build-chrome/**/*.crx"
     ]),
     gulp.src("build-chrome/manifest.json").pipe(utils.jsonModify(removeReloader))
-  ).pipe(zip("pfp-" + manifest.version + ".zip")).pipe(gulp.dest("build-chrome"));
+  ).pipe(zip("pfp-" + VERSION + ".zip")).pipe(gulp.dest("build-chrome"));
 }));
 
 gulp.task("xpi", gulp.series("build-firefox", function buildXPI()
 {
-  let manifest = require("./manifest.json");
   return merge(
     gulp.src([
       "build-firefox/**",
@@ -303,16 +307,15 @@ gulp.task("xpi", gulp.series("build-firefox", function buildXPI()
       "!build-firefox/**/.*", "!build-firefox/**/*.xpi"
     ]),
     gulp.src("build-firefox/manifest.json").pipe(utils.jsonModify(removeReloader))
-  ).pipe(zip("pfp-" + manifest.version + ".xpi")).pipe(gulp.dest("build-firefox"));
+  ).pipe(zip("pfp-" + VERSION + ".xpi")).pipe(gulp.dest("build-firefox"));
 }));
 
 gulp.task("web", gulp.series("build-web", function zipWeb()
 {
-  let manifest = require("./manifest.json");
   return gulp.src([
     "build-web/**",
     "!build-web/**/.*", "!build-web/**/*.zip"
-  ]).pipe(zip("pfp-web-" + manifest.version + ".zip")).pipe(gulp.dest("build-web"));
+  ]).pipe(zip("pfp-web-" + VERSION + ".zip")).pipe(gulp.dest("build-web"));
 }));
 
 gulp.task("test", gulp.series("validate", "build-test", function doTest()

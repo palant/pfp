@@ -4,6 +4,7 @@
   "description": "Use a single master password to generate secure passwords for all websites - without losing track of passwords you cannot change.",
   "author": "Wladimir Palant",
   "license": "MPL-2.0",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/palant/easypasswords.git"

@@ -6,9 +6,9 @@
 
 "use strict";
 
-const rollup = require("rollup");
+import rollup from "rollup";
 
-module.exports = function(regexp)
+export default function(regexp)
 {
   return {
     name: "worker-loader",
@@ -40,4 +40,4 @@ module.exports = function(regexp)
       });
     }
   };
-};
+}

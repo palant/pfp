@@ -8,7 +8,7 @@
 
 "use strict";
 
-const https = require("https");
+import https from "https";
 
 // Only Latin, Greek and Cyrillic vowels for now, derivations of those will
 // be determined below.
