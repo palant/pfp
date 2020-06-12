@@ -78,77 +78,68 @@ const AES_KEY_LENGTH = 32;
 const AES_IV_LENGTH = 12;
 
 export const subtle = {
-  importKey(format, keyData, algo, extractable, usages)
+  importKey: async function(format, keyData, algo, extractable, usages)
   {
-    return Promise.resolve().then(() =>
-    {
-      if (format != "raw")
-        throw new Error("Unexpected data format");
-      if (extractable)
-        throw new Error("Extractable keys not supported");
+    if (format != "raw")
+      throw new Error("Unexpected data format");
+    if (extractable)
+      throw new Error("Extractable keys not supported");
 
-      if (typeof algo == "object")
-        algo = algo.name;
-      return new Key(keyData, algo, usages);
-    });
+    if (typeof algo == "object")
+      algo = algo.name;
+    return new Key(keyData, algo, usages);
   },
 
-  encrypt(algo, key, cleartext)
+  encrypt: async function(algo, key, cleartext)
   {
-    return Promise.resolve().then(() =>
+    if (key._algo != algo.name)
+      throw new Error("Key algorithm doesn't match encryption algorithm");
+    if (!key._encrypt)
+      throw new Error("Key not suitable for encryption");
+
+    if (fakeEncryption)
+      return Buffer.concat([getEncryptionPrefix(algo.name, key, algo.iv), Buffer.from(cleartext)]);
+    else
     {
-      if (key._algo != algo.name)
-        throw new Error("Key algorithm doesn't match encryption algorithm");
-      if (!key._encrypt)
-        throw new Error("Key not suitable for encryption");
+      if (algo.name != "AES-GCM" || key._data.length != AES_KEY_LENGTH)
+        throw new Error("Only AES256-GCM is supported");
 
-      if (fakeEncryption)
-        return Buffer.concat([getEncryptionPrefix(algo.name, key, algo.iv), Buffer.from(cleartext)]);
-      else
-      {
-        if (algo.name != "AES-GCM" || key._data.length != AES_KEY_LENGTH)
-          throw new Error("Only AES256-GCM is supported");
-
-        let cipher = crypto.createCipheriv("aes-256-gcm", key._data, algo.iv);
-        let encrypted = [cipher.update(cleartext), cipher.final()];
-        encrypted.unshift(cipher.getAuthTag());
-        return Buffer.concat(encrypted);
-      }
-    });
+      let cipher = crypto.createCipheriv("aes-256-gcm", key._data, algo.iv);
+      let encrypted = [cipher.update(cleartext), cipher.final()];
+      encrypted.unshift(cipher.getAuthTag());
+      return Buffer.concat(encrypted);
+    }
   },
 
-  decrypt(algo, key, ciphertext)
+  decrypt: async function(algo, key, ciphertext)
   {
-    return Promise.resolve().then(() =>
+    if (key._algo != algo.name)
+      throw new Error("Key algorithm doesn't match decryption algorithm");
+    if (!key._decrypt)
+      throw new Error("Key not suitable for decryption");
+
+    if (fakeEncryption)
     {
-      if (key._algo != algo.name)
-        throw new Error("Key algorithm doesn't match decryption algorithm");
-      if (!key._decrypt)
-        throw new Error("Key not suitable for decryption");
-
-      if (fakeEncryption)
+      let prefix = getEncryptionPrefix(algo.name, key, algo.iv);
+      ciphertext = Buffer.from(ciphertext);
+      if (ciphertext.length < prefix.length ||
+          ciphertext.compare(prefix, 0, prefix.length, 0, prefix.length) != 0)
       {
-        let prefix = getEncryptionPrefix(algo.name, key, algo.iv);
-        ciphertext = Buffer.from(ciphertext);
-        if (ciphertext.length < prefix.length ||
-            ciphertext.compare(prefix, 0, prefix.length, 0, prefix.length) != 0)
-        {
-          throw new Error("Ciphertext encrypted with wrong algorithm");
-        }
-
-        return ciphertext.slice(prefix.length);
+        throw new Error("Ciphertext encrypted with wrong algorithm");
       }
-      else
-      {
-        if (algo.name != "AES-GCM" || key._data.length != AES_KEY_LENGTH)
-          throw new Error("Only AES256-GCM is supported");
 
-        let decipher = crypto.createDecipheriv("aes-256-gcm", key._data, algo.iv);
-        decipher.setAuthTag(ciphertext.slice(0, 16));
-        let decrypted = [decipher.update(ciphertext.slice(16)), decipher.final()];
-        return Buffer.concat(decrypted);
-      }
-    });
+      return ciphertext.slice(prefix.length);
+    }
+    else
+    {
+      if (algo.name != "AES-GCM" || key._data.length != AES_KEY_LENGTH)
+        throw new Error("Only AES256-GCM is supported");
+
+      let decipher = crypto.createDecipheriv("aes-256-gcm", key._data, algo.iv);
+      decipher.setAuthTag(ciphertext.slice(0, 16));
+      let decrypted = [decipher.update(ciphertext.slice(16)), decipher.final()];
+      return Buffer.concat(decrypted);
+    }
   },
 
   _fakeDecrypt(text)
@@ -159,24 +150,21 @@ export const subtle = {
     return text.substr("AES-GCM!".length + AES_KEY_LENGTH + "!".length + AES_IV_LENGTH + "!".length);
   },
 
-  sign(algo, key, cleartext)
+  sign: async function(algo, key, cleartext)
   {
-    return Promise.resolve().then(() =>
-    {
-      if (algo.name != "HMAC" && algo.hash != "SHA-256")
-        throw new Error("Unexpected signing algorithm");
-      if (key._algo != algo.name)
-        throw new Error("Key algorithm doesn't match signing algorithm");
-      if (!key._sign)
-        throw new Error("Key not suitable for signing");
+    if (algo.name != "HMAC" && algo.hash != "SHA-256")
+      throw new Error("Unexpected signing algorithm");
+    if (key._algo != algo.name)
+      throw new Error("Key algorithm doesn't match signing algorithm");
+    if (!key._sign)
+      throw new Error("Key not suitable for signing");
 
-      return Buffer.concat([
-        Buffer.from(algo.name, "utf-8"),
-        Buffer.from("!", "utf-8"),
-        Buffer.from(key._data),
-        Buffer.from("!", "utf-8"),
-        Buffer.from(cleartext)
-      ]);
-    });
+    return Buffer.concat([
+      Buffer.from(algo.name, "utf-8"),
+      Buffer.from("!", "utf-8"),
+      Buffer.from(key._data),
+      Buffer.from("!", "utf-8"),
+      Buffer.from(cleartext)
+    ]);
   }
 };

@@ -24,37 +24,26 @@ export function readArg(prefix, defaultValue)
   return defaultValue;
 }
 
-export function transform(modifier, opts)
+export function transform(modifier)
 {
-  if (!opts)
-    opts = {};
-
   let stream = new Transform({objectMode: true});
-  stream._transform = function(file, encoding, callback)
+  stream._transform = async function(file, encoding, callback)
   {
-    if (!file.isBuffer())
-      throw new Error("Unexpected file type");
+    try
+    {
+      if (!file.isBuffer())
+        throw new Error("Unexpected file type");
 
-    if (opts.files && opts.files.indexOf(file.path) < 0)
-    {
-      callback(null, file);
-      return;
-    }
-
-    Promise.resolve().then(() =>
-    {
-      let contents = opts.raw ? file.contents : file.contents.toString("utf-8");
-      return modifier(file.path, contents);
-    }).then(([filepath, contents]) =>
-    {
-      file.path = filepath;
+      let contents = file.contents.toString("utf-8");
+      [file.path, contents] = await modifier(file.path, contents);
       file.contents = Buffer.from(contents, "utf-8");
       callback(null, file);
-    }).catch(e =>
+    }
+    catch (e)
     {
       console.error(e);
       callback(e);
-    });
+    }
   };
   return stream;
 }
@@ -189,15 +178,21 @@ export function runTests()
     callback(null);
   };
 
-  stream._flush = function(callback)
+  stream._flush = async function(callback)
   {
-    mocha.loadFilesAsync().then(function()
+    try
     {
-      return new Promise((resolve, reject) =>
+      await mocha.loadFilesAsync();
+      await new Promise((resolve, reject) =>
       {
         mocha.run(failures => failures ? reject(new Error(`${failures} test(s) failed`)) : resolve());
       });
-    }).then(() => callback(null)).catch(error => callback(error));
+      callback(null);
+    }
+    catch (e)
+    {
+      callback(e);
+    }
   };
 
   stream.on("close", () => testEnv.teardown());

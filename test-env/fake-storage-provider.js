@@ -10,49 +10,44 @@ const dummyToken = String(Math.random()).substr(2);
 
 let files = {};
 
-export function authorize()
+export async function authorize()
 {
-  return Promise.resolve(dummyToken);
+  return dummyToken;
 }
 
-export function get(path, token)
+export async function get(path, token)
 {
   if (token != dummyToken)
-    return Promise.reject("sync_invalid_token");
+    throw "sync_invalid_token";
 
   if (!path.startsWith("/"))
-    return Promise.reject("sync_invalid_path");
+    throw "sync_invalid_path";
 
-  return Promise.resolve(files.hasOwnProperty(path) ? files[path] : null).then(result =>
+  let result = null;
+  if (files.hasOwnProperty(path))
+    result = Object.assign({}, files[path]);
+  if (result && provider.changeRevisionOnGet > 0)
   {
-    if (result)
-      result = Object.assign({}, result);
-    if (result && provider.changeRevisionOnGet > 0)
-    {
-      files[path].revision++;
-      provider.changeRevisionOnGet--;
-    }
-    return result;
-  });
+    files[path].revision++;
+    provider.changeRevisionOnGet--;
+  }
+  return result;
 }
 
-export function put(path, contents, replaceRevision, token)
+export async function put(path, contents, replaceRevision, token)
 {
   if (token != dummyToken)
-    return Promise.reject("sync_invalid_token");
+    throw "sync_invalid_token";
 
   if (!path.startsWith("/"))
-    return Promise.reject("sync_invalid_path");
+    throw "sync_invalid_path";
 
   let currentRevision = files.hasOwnProperty(path) ? files[path].revision : null;
   if (currentRevision !== replaceRevision)
-    return Promise.reject("sync_wrong_revision");
+    throw "sync_wrong_revision";
 
   let revision = currentRevision ? String(parseInt(currentRevision, 10) + 1) : "1";
-  return Promise.resolve().then(() =>
-  {
-    files[path] = {revision, contents};
-  });
+  files[path] = {revision, contents};
 }
 
 let provider = {

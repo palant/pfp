@@ -44,14 +44,14 @@ export default function(localeRoot)
       return id == "locale" ? id : null;
     },
 
-    load(id)
+    load: async function(id)
     {
       if (id != "locale")
         return null;
 
       let locale = {};
 
-      return walkDirectory(localeRoot, file =>
+      await walkDirectory(localeRoot, file =>
       {
         let parts = path.relative(localeRoot, file).split(path.sep);
 
@@ -69,10 +69,9 @@ export default function(localeRoot)
 
         for (let name of Object.keys(data))
           locale[prefix + name] = data[name];
-      }).then(() =>
-      {
-        return "export default " + JSON.stringify(locale, null, 2);
       });
+
+      return "export default " + JSON.stringify(locale, null, 2);
     }
   };
 }

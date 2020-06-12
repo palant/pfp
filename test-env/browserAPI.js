@@ -26,7 +26,7 @@ function clone(value)
 
 browser.storage = {
   local: {
-    get: function(keys)
+    get: async function(keys)
     {
       let items = {};
       if (typeof keys == "string")
@@ -36,27 +36,21 @@ browser.storage = {
       for (let key of keys)
         if (key in storageData)
           items[key] = clone(storageData[key]);
-      return Promise.resolve(items);
+      return items;
     },
 
-    set: function(items)
+    set: async function(items)
     {
-      return Promise.resolve().then(() =>
-      {
-        for (let key of Object.keys(items))
-          storageData[key] = clone(items[key]);
-      });
+      for (let key of Object.keys(items))
+        storageData[key] = clone(items[key]);
     },
 
-    remove: function(keys)
+    remove: async function(keys)
     {
-      return Promise.resolve().then(() =>
-      {
-        if (typeof keys == "string")
-          keys = [keys];
-        for (let key of keys)
-          delete storageData[key];
-      });
+      if (typeof keys == "string")
+        keys = [keys];
+      for (let key of keys)
+        delete storageData[key];
     }
   }
 };
