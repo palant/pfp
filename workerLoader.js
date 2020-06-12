@@ -6,7 +6,7 @@
 
 "use strict";
 
-import rollup from "rollup";
+import {rollup} from "rollup";
 
 export default function(regexp)
 {
@@ -16,28 +16,25 @@ export default function(regexp)
     {
       this._plugins = options.plugins;
     },
-    load(id)
+    load: async function(id)
     {
       if (!regexp.test(id))
         return null;
 
-      return rollup.rollup({
+      let bundle = await rollup({
         input: id,
         plugins: this._plugins.filter(p => p.name != "worker-loader")
-      }).then(bundle =>
-      {
-        return bundle.generate({
-          name: "worker",
-          format: "cjs",
-          compact: true
-        });
-      }).then(({output}) =>
-      {
-        if (output.length != 1 || !output[0].code)
-          throw new Error("Unexpected rollup output");
-
-        return "export default function(){" + output[0].code + "}";
       });
+
+      let {output} = await bundle.generate({
+        name: "worker",
+        format: "cjs",
+        compact: true
+      });
+      if (output.length != 1 || !output[0].code)
+        throw new Error("Unexpected rollup output");
+
+      return "export default function(){" + output[0].code + "}";
     }
   };
 }

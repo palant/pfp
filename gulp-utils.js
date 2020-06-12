@@ -6,11 +6,13 @@
 
 "use strict";
 
+import {spawn} from "child_process";
 import fs from "fs";
 import path from "path";
-import {spawn} from "child_process";
 import {Duplex, Transform} from "stream";
+
 import Mocha from "mocha";
+import {rollup} from "rollup";
 
 import testEnv from "./test-env/setup.js";
 
@@ -55,6 +57,22 @@ export function transform(modifier, opts)
     });
   };
   return stream;
+}
+
+export function rollupStream(inputOptions, outputOptions)
+{
+  return transform(async function(filepath, contenst)
+  {
+    inputOptions.input = filepath;
+
+    let bundle = await rollup(inputOptions);
+    let {output} = await bundle.generate(outputOptions);
+    if (output.length != 1 || !output[0].code)
+      throw new Error("Unexpected rollup output");
+
+    let newPath = path.join(path.dirname(filepath), output[0].fileName);
+    return [newPath, output[0].code];
+  });
 }
 
 export function jsonModify(modifier, newName)

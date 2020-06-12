@@ -14,7 +14,6 @@ import del from "del";
 import gulp from "gulp";
 import eslint from "gulp-eslint";
 import htmlhint from "gulp-htmlhint";
-import rollupStream from "gulp-better-rollup";
 import sass from "gulp-sass";
 import stylelint from "gulp-stylelint";
 import zip from "gulp-zip";
@@ -40,7 +39,7 @@ function rollup(overrides = {})
   delete overrides.plugins;
   delete overrides.postPlugins;
 
-  return rollupStream({
+  return utils.rollupStream({
     plugins: [
       ...prePlugins,
       globalLoader({
@@ -127,7 +126,7 @@ function buildCommon(targetdir)
         .pipe(gulp.dest(`${targetdir}/ui/images`)),
     gulp.src("ui/third-party/**")
         .pipe(gulp.dest(`${targetdir}/ui/third-party`)),
-    gulp.src(["contentScript/fillIn.js"])
+    gulp.src("contentScript/fillIn.js")
         .pipe(rollup({
           format: "iife"
         }))
