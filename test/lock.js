@@ -6,120 +6,88 @@
 
 "use strict";
 
-let {Lock} = require("../build-test/lib");
+import Lock from "../lib/lock.js";
 
-exports.testSequentialLock = function(test)
+describe("lock.js", () =>
 {
-  let lock = new Lock();
+  it("should allow acquiring and releasing lock sequentially", async function()
+  {
+    let lock = new Lock();
 
-  let promise = lock.acquire().then(() =>
-  {
-    lock.release();
-  }).then(() =>
-  {
-    return lock.acquire();
-  }).then(() =>
-  {
-    lock.release();
-  }).then(() => test.done()).catch(e =>
-  {
-    console.error(e);
-    test.ok(false, "Exception thrown");
-    test.done();
+    await lock.acquire();
+    await lock.release();
+    await lock.acquire();
+    await lock.release();
   });
-};
 
-exports.testParallelLock = function(test)
-{
-  let lock = new Lock();
-
-  let result = [];
-  let promise1 = lock.acquire().then(() =>
+  it("should sequentialize parallel operations", async function()
   {
-    result.push(1);
-    return new Promise((resolve, reject) =>
+    let lock = new Lock();
+
+    let result = [];
+    let func1 = async function()
     {
-      setTimeout(resolve, 200);
-    });
-  }).then(() =>
-  {
-    result.push(2);
-  }).finally(() => lock.release());
+      await lock.acquire();
+      result.push(1);
+      await new Promise((resolve, reject) =>
+      {
+        setTimeout(resolve, 200);
+      });
+      result.push(2);
+      await lock.release();
+    };
 
-  let promise2 = lock.acquire().then(() =>
-  {
-    result.push(3);
-  }).finally(() => lock.release());
+    let func2 = async function()
+    {
+      await lock.acquire();
+      result.push(3);
+      await lock.release();
+    };
 
-  Promise.all([promise1, promise2]).then(() =>
-  {
-    test.deepEqual(result, [1, 2, 3]);
-    test.done();
-  }).catch(e =>
-  {
-    console.error(e);
-    test.ok(false, "Exception thrown");
-    test.done();
-  });
-};
+    await Promise.all([func1(), func2()]);
 
-exports.testDeadLock = function(test)
-{
-  let lock = new Lock();
-
-  lock.acquire().then(() =>
-  {
-    return lock.acquire();
-  }).then(() =>
-  {
-    test.ok(false, "Acquired lock twice");
-  }).catch(e =>
-  {
-    console.error(e);
-    test.ok(false, "Exception thrown");
+    expect(result).to.deep.equal([1, 2, 3]);
   });
 
-  setTimeout(() => test.done(), 200);
-};
+  it("should wait indefinitely on deadlock", function(done)
+  {
+    setTimeout(() => done(null), 200);
 
-exports.testMultipleLocks = function(test)
-{
-  let lock1 = new Lock();
-  let lock2 = new Lock();
+    (async function()
+    {
+      let lock = new Lock();
 
-  lock1.acquire().then(() =>
-  {
-    return lock2.acquire();
-  }).then(() =>
-  {
-    test.ok(true, "Acquired two locks in parallel");
-  }).finally(() =>
-  {
-    lock1.release();
-    lock2.release();
-  }).catch(e =>
-  {
-    console.error(e);
-    test.ok(false, "Exception thrown");
-  }).then(() => test.done());
-};
+      await lock.acquire();
+      await lock.acquire();
+      expect.fail("Acquired lock twice");
+    })().catch(error => done(error));
+  });
 
-exports.testDoubleRelease = function(test)
-{
-  let lock = new Lock();
+  it("should allow acquiring two locks in parallel", async function()
+  {
+    let lock1 = new Lock();
+    let lock2 = new Lock();
 
-  lock.acquire().then(() =>
+    await lock1.acquire();
+    await lock2.acquire();
+    await lock1.release();
+    await lock2.release();
+  });
+
+  it("should not allow releasing a lock twice", async function()
   {
-    lock.release();
-  }).catch(e =>
-  {
-    console.error(e);
-    test.ok(false, "Exception thrown");
-  }).then(() =>
-  {
-    lock.release();
-  }).then(() =>
-  {
-    test.ok(false, "Successfully released lock twice");
-  }).catch(() => void 0).then(() => test.done());
-};
+    let lock = new Lock();
+
+    await lock.acquire();
+    await lock.release();
+    try
+    {
+      await lock.release();
+      expect.fail("Released lock twice");
+    }
+    catch (e)
+    {
+      // Expected
+    }
+  });
+});

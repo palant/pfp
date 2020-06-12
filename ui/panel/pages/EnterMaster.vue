@@ -19,8 +19,8 @@
 <script>
 "use strict";
 
+import {passwords} from "../../proxy.js";
 import EnterMaster from "../../components/EnterMaster.vue";
-import {passwords} from "../../proxy";
 
 export default {
   name: "EnterMaster",

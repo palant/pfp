@@ -26,7 +26,7 @@
 <script>
 "use strict";
 
-import {masterPassword} from "../proxy";
+import {masterPassword} from "../proxy.js";
 
 export function validateMasterPassword(value, setError)
 {

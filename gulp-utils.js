@@ -10,8 +10,9 @@ import fs from "fs";
 import path from "path";
 import {spawn} from "child_process";
 import {Duplex, Transform} from "stream";
-import {TextEncoder, TextDecoder} from "util";
-import sandboxedModule from "sandboxed-module";
+import Mocha from "mocha";
+
+import testEnv from "./test-env/setup.js";
 
 export function readArg(prefix, defaultValue)
 {
@@ -154,108 +155,35 @@ export function toChromeLocale()
 
 export function runTests()
 {
-  function escape_string(str)
-  {
-    return str.replace(/(["'\\])/g, "\\$1");
-  }
+  testEnv.setup();
 
-  function* readdir(dir, prefix = "")
-  {
-    for (let file of fs.readdirSync(dir))
-    {
-      let stats = fs.statSync(path.join(dir, file));
-      if (stats.isDirectory())
-        yield* readdir(path.join(dir, file), prefix + file + "/");
-      else if (path.extname(file) == ".js")
-        yield prefix + file;
-    }
-  }
-
-  class WorkerEventTarget
-  {
-    constructor(other)
-    {
-      if (other)
-      {
-        this.other = other;
-        this.other.other = this;
-      }
-      let listeners = [];
-
-      this.addEventListener = (type, listener) =>
-      {
-        if (type != "message")
-          return;
-        listeners.push(listener);
-      };
-      this.removeEventListener = (type, listener) =>
-      {
-        if (type != "message")
-          return;
-        let index = listeners.indexOf(listener);
-        if (index >= 0)
-          listeners.splice(index, 1);
-      };
-      this.onmessage = null;
-
-      this.triggerListeners = function(data)
-      {
-        let event = {type: "message", data};
-        if (typeof this.onmessage == "function")
-          this.onmessage(event);
-        for (let listener of listeners)
-          listener(event);
-      };
-
-      this.postMessage = data =>
-      {
-        Promise.resolve().then(() =>
-        {
-          this.other.triggerListeners(data);
-        });
-      };
-    }
-  }
-
-  class FakeWorker extends WorkerEventTarget
-  {
-    constructor(url)
-    {
-      super();
-
-      sandboxedModule.require(url, {
-        globals: {
-          self: new WorkerEventTarget(this)
-        }
-      });
-    }
-  }
-
-  let atob = str => Buffer.from(str, "base64").toString("binary");
-  let btoa = str => Buffer.from(str, "binary").toString("base64");
-
-  let nodeunit = sandboxedModule.require("nodeunit", {
-    globals: {
-      console, process, Buffer, TextEncoder, TextDecoder, atob, btoa, URL,
-      Worker: FakeWorker,
-      navigator: {
-        onLine: true
-      }
-    }
+  let mocha = new Mocha({
+    timeout: 10000
   });
-  let reporter = nodeunit.reporters.default;
 
-  return transform((filepath, contents) =>
+  let stream = new Transform({objectMode: true});
+  stream._transform = function(file, encoding, callback)
   {
-    return new Promise((resolve, reject) =>
+    if (!file.path)
+      throw new Error("Unexpected file type");
+
+    mocha.addFile(file.path);
+    callback(null);
+  };
+
+  stream._flush = function(callback)
+  {
+    mocha.loadFilesAsync().then(function()
     {
-      reporter.run([filepath], null, error =>
+      return new Promise((resolve, reject) =>
       {
-        if (error)
-          reject(error);
-        else
-          resolve([filepath, contents]);
+        mocha.run(failures => failures ? reject(new Error(`${failures} test(s) failed`)) : resolve());
       });
-    });
-  });
+    }).then(() => callback(null)).catch(error => callback(error));
+  };
+
+  stream.on("close", () => testEnv.teardown());
+  stream.on("error", () => testEnv.teardown());
+
+  return stream;
 }

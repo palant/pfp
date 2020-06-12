@@ -106,15 +106,6 @@ function buildWorkers(targetdir)
 {
   let overrides = {};
 
-  if (targetdir == "build-test/worker")
-  {
-    overrides = {
-      plugins: [replace({
-        [path.resolve(__dirname, "lib", "typedArrayConversion.js")]: path.resolve(__dirname, "test-lib", "typedArrayConversion.js")
-      })],
-    };
-  }
-
   return merge(
     gulp.src(["worker/pbkdf2.js"])
         .pipe(rollup(overrides))
@@ -225,22 +216,6 @@ gulp.task("build-firefox", gulp.series("validate", function buildFirefox()
   return stream;
 }));
 
-gulp.task("build-test", gulp.series("validate", function buildTest()
-{
-  return merge(
-    buildWorkers("build-test/worker"),
-    gulp.src("test-lib/lib.js")
-        .pipe(rollup({
-          plugins: [replace({
-            [path.resolve(__dirname, "lib", "browserAPI.js")]: path.resolve(__dirname, "test-lib", "browserAPI.js"),
-            [path.resolve(__dirname, "lib", "typedArrayConversion.js")]: path.resolve(__dirname, "test-lib", "typedArrayConversion.js"),
-            [path.resolve(__dirname, "lib", "sync-providers", "dropbox.js")]: path.resolve(__dirname, "test-lib", "sync-providers", "dropbox.js")
-          })]
-        }))
-        .pipe(gulp.dest("build-test"))
-  );
-}));
-
 gulp.task("watch-firefox", gulp.series("build-firefox", function watchFirefox()
 {
   gulp.watch(["*.js", "*.json", "ui/**/*", "lib/**/*", "contentScript/**/*", "worker/**/*", "locale/**/*"], ["build-firefox"]);
@@ -318,7 +293,7 @@ gulp.task("web", gulp.series("build-web", function zipWeb()
   ]).pipe(zip("pfp-web-" + VERSION + ".zip")).pipe(gulp.dest("build-web"));
 }));
 
-gulp.task("test", gulp.series("validate", "build-test", function doTest()
+gulp.task("test", gulp.series("validate", function doTest()
 {
   let testFile = utils.readArg("--test=");
   if (!testFile)
@@ -332,7 +307,7 @@ gulp.task("test", gulp.series("validate", "build-test", function doTest()
 
 gulp.task("clean", function()
 {
-  return del(["build-chrome", "build-firefox", "build-test", "build-web"]);
+  return del(["build-chrome", "build-firefox", "build-web"]);
 });
 
 gulp.task("all", gulp.parallel("xpi", "crx", "web"));

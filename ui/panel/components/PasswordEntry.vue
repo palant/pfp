@@ -43,8 +43,8 @@
 <script>
 "use strict";
 
-import {set as clipboardSet} from "../../clipboard";
-import {passwords, passwordRetrieval} from "../../proxy";
+import {set as clipboardSet} from "../../clipboard.js";
+import {passwords, passwordRetrieval} from "../../proxy.js";
 import GeneratedPassword from "./GeneratedPassword.vue";
 import NotesEditor from "./NotesEditor.vue";
 import QRCode from "./QRCode.vue";

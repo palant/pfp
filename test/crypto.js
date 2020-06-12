@@ -6,25 +6,26 @@
 
 "use strict";
 
-let {crypto} = require("../build-test/lib");
+import {toBase32, fromBase32} from "../lib/crypto.js";
 
-exports.testBase32 = function(test)
+describe("crypto.js", () =>
 {
-  function doTest(hex, encoded)
+  it("should produce the expected Base32 result and decode it back correctly", () =>
   {
-    let binary = new Uint8Array(hex.length / 2);
-    for (let i = 0; i < hex.length; i += 2)
-      binary[i / 2] = parseInt(hex.substr(i, 2), 16);
+    function doTest(hex, encoded)
+    {
+      let binary = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < hex.length; i += 2)
+        binary[i / 2] = parseInt(hex.substr(i, 2), 16);
 
-    test.equal(crypto.toBase32(binary), encoded, `Encoding ${hex}`);
-    test.deepEqual(crypto.fromBase32(encoded), binary, `Decoding ${encoded}`);
-  }
+      expect(toBase32(binary)).to.deep.equal(encoded);
+      expect(fromBase32(encoded)).to.deep.equal(binary);
+    }
 
-  doTest("0000000000", "AAAAAAAA");
-  doTest("0842108421", "BBBBBBBB");
-  doTest("ffffffffff", "99999999");
-  doTest("0000000000ffffffffff", "AAAAAAAA99999999");
-  doTest("00443214C74254B635CF84653A56D7C675BE77DF", "ABCDEFGHJKLMNPQRSTUVWXYZ23456789");
-
-  test.done();
-};
+    doTest("0000000000", "AAAAAAAA");
+    doTest("0842108421", "BBBBBBBB");
+    doTest("ffffffffff", "99999999");
+    doTest("0000000000ffffffffff", "AAAAAAAA99999999");
+    doTest("00443214C74254B635CF84653A56D7C675BE77DF", "ABCDEFGHJKLMNPQRSTUVWXYZ23456789");
+  });
+});

@@ -28,9 +28,9 @@
 <script>
 "use strict";
 
-import {getSiteDisplayName} from "../../common";
-import {port} from "../../messaging";
-import {passwords} from "../../proxy";
+import {getSiteDisplayName} from "../../common.js";
+import {port} from "../../messaging.js";
+import {passwords} from "../../proxy.js";
 import PasswordInfo from "./PasswordInfo.vue";
 
 export default {

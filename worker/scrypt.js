@@ -10,8 +10,8 @@ const N = 32768;
 const r = 8;
 const p = 1;
 
-import {toTypedArray} from "../lib/typedArrayConversion";
-import {Scrypt} from "@stablelib/scrypt";
+import scryptModule from "@stablelib/scrypt";
+const {Scrypt} = scryptModule;
 
 const hasher = new Scrypt(N, r, p);
 
@@ -20,16 +20,11 @@ function scrypt(password, salt, length)
   return hasher.deriveKey(password, salt, length);
 }
 
-if (typeof self != "undefined")
+const _self = self;
+_self.onmessage = function({data: {jobId, password, salt, length}})
 {
-  self.onmessage = function({data: {jobId, password, salt, length}})
-  {
-    self.postMessage({
-      jobId,
-      result: hasher.deriveKey(toTypedArray(password), toTypedArray(salt), length)
-    });
-  };
-}
-
-if (typeof exports != "undefined")
-  exports.scrypt = scrypt;
+  _self.postMessage({
+    jobId,
+    result: hasher.deriveKey(password, salt, length)
+  });
+};

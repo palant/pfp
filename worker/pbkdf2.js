@@ -6,8 +6,6 @@
 
 "use strict";
 
-import {toTypedArray} from "../lib/typedArrayConversion";
-
 // We expand += intentionally to improve Chrome performance
 /* eslint operator-assignment: "off" */
 
@@ -258,19 +256,17 @@ function pbkdf2(password, salt, iterations, length)
   return new Uint8Array(result.buffer, 0, length);
 }
 
-if (typeof self != "undefined")
+const _self = self;
+_self.onmessage = function({data: {jobId, password, salt, iterations, length}})
 {
-  self.onmessage = function({data: {jobId, password, salt, length}})
-  {
-    self.postMessage({
-      jobId,
-      result: pbkdf2(toTypedArray(password), toTypedArray(salt), NUM_ITERATIONS, length)
-    });
-  };
-}
+  if (typeof iterations != "number")
+    iterations = NUM_ITERATIONS;
 
-if (typeof exports != "undefined")
-  exports.pbkdf2 = pbkdf2;
+  _self.postMessage({
+    jobId,
+    result: pbkdf2(password, salt, iterations, length)
+  });
+};
 
 // The following snippet is taken from rusha 0.8.4:
 // https://github.com/srijs/rusha/blob/v0.8.4/rusha.js#L307

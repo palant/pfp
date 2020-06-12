@@ -48,8 +48,8 @@
 <script>
 "use strict";
 
+import {passwords, masterPassword} from "../../proxy.js";
 import {validateMasterPassword} from "../../components/EnterMaster.vue";
-import {passwords, masterPassword} from "../../proxy";
 import PasswordScore from "../components/PasswordScore.vue";
 
 export default {

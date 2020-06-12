@@ -79,8 +79,8 @@
 <script>
 "use strict";
 
-import {keyboardNavigationType} from "../../common";
-import {passwords, passwordRetrieval, ui} from "../../proxy";
+import {keyboardNavigationType} from "../../common.js";
+import {passwords, passwordRetrieval, ui} from "../../proxy.js";
 import PasswordMessage from "../../components/PasswordMessage.vue";
 import GeneratedPassword from "../components/GeneratedPassword.vue";
 import PasswordEntry from "../components/PasswordEntry.vue";

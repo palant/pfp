@@ -8,7 +8,7 @@
 
 /* global _parameters */
 
-import {port} from "../ui/messaging";
+import {port} from "../ui/messaging.js";
 
 function getActiveElement(doc)
 {

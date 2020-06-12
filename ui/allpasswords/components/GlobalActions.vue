@@ -22,7 +22,7 @@
 <script>
 "use strict";
 
-import {passwords} from "../../proxy";
+import {passwords} from "../../proxy.js";
 import EnterMaster from "../modals/EnterMaster.vue";
 
 export default {

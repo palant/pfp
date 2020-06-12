@@ -47,8 +47,8 @@
 <script>
 "use strict";
 
-import {set as clipboardSet} from "../../clipboard";
-import {passwords, recoveryCodes} from "../../proxy";
+import {set as clipboardSet} from "../../clipboard.js";
+import {passwords, recoveryCodes} from "../../proxy.js";
 import PasswordMessage from "../../components/PasswordMessage.vue";
 
 export default {

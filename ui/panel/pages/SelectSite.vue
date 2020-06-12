@@ -13,7 +13,7 @@
 <script>
 "use strict";
 
-import {passwords} from "../../proxy";
+import {passwords} from "../../proxy.js";
 import SiteSelection from "../components/SiteSelection.vue";
 
 export default {

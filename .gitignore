@@ -1,7 +1,5 @@
 /build-firefox/
 /build-chrome/
-/build-edge/
-/build-test/
 /build-web/
 /node_modules/
 *.xpi

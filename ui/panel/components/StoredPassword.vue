@@ -38,7 +38,7 @@
 <script>
 "use strict";
 
-import {passwords} from "../../proxy";
+import {passwords} from "../../proxy.js";
 import PasswordNameEntry from "./PasswordNameEntry.vue";
 import RecoveryCode from "./RecoveryCode.vue";
 

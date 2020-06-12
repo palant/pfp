@@ -6,18 +6,18 @@
 
 "use strict";
 
-let path = require("path");
+import path from "path";
 
 let browser = {};
 
 browser.runtime = {
   getURL: filepath =>
   {
-    return path.resolve(__dirname, ...filepath.split("/"));
+    return path.resolve(process.cwd(), ...filepath.split("/"));
   }
 };
 
-let storageData = browser.storageData = Object.create(null);
+export const storageData = Object.create(null);
 
 function clone(value)
 {

@@ -41,7 +41,7 @@
 <script>
 "use strict";
 
-import {setErrorHandler} from "../proxy";
+import {setErrorHandler} from "../proxy.js";
 import Confirm from "../components/Confirm.vue";
 import PasswordMessage from "../components/PasswordMessage.vue";
 import UnknownError from "../components/UnknownError.vue";

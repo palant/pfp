@@ -6,7 +6,7 @@
 
 "use strict";
 
-import {i18n} from "./browserAPI";
+import {i18n} from "./browserAPI.js";
 
 export function $t(id, ...params)
 {

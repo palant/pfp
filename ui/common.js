@@ -6,7 +6,7 @@
 
 "use strict";
 
-import {$t} from "./i18n";
+import {$t} from "./i18n.js";
 
 export function getSiteDisplayName(site)
 {

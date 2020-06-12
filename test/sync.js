@@ -6,118 +6,105 @@
 
 "use strict";
 
-let {
-  sync, masterPassword, passwords, crypto, storage, browserAPI, fakeCrypto,
-  provider
-} = require("../build-test/lib");
+import {generateRandom} from "../lib/crypto.js";
+import {
+  changePassword, checkPassword, forgetPassword
+} from "../lib/masterPassword.js";
+import {
+  addGenerated, addStored, addAlias, getAllPasswords
+} from "../lib/passwords.js";
+import storage, {encrypt} from "../lib/storage.js";
+import {
+  setDropboxProvider, getSyncData, disableSync, authorize, sync
+} from "../lib/sync.js";
+import {storageData} from "../test-env/browserAPI.js";
+import provider from "../test-env/fake-storage-provider.js";
 
 let dummyMaster = "foobar";
 
-function unexpectedError(error)
+describe("sync.js", () =>
 {
-  this.ok(false, "Unexpected error: " + error);
-  console.error(error);
-}
-
-function done()
-{
-  this.done();
-}
-
-function getLocalData()
-{
-  let {storageData} = browserAPI;
-  let filteredData = {};
-  for (let key of Object.keys(storageData))
-    if (key.startsWith("site:"))
-      filteredData[key] = storageData[key];
-  return filteredData;
-}
-
-function checkSyncError(test)
-{
-  let syncData = sync.getSyncData();
-  if (syncData && syncData.error)
-    test.ok(false, `Unexpected error: ${syncData.error}`);
-}
-
-function sign(data)
-{
-  let ciphertext = atob(data.data["sync-secret"].split("_")[1]);
-  let secret = atob(JSON.parse(fakeCrypto.subtle._fakeDecrypt(ciphertext)));
-
-  let values = [data.revision];
-  let keys = Object.keys(data.data);
-  keys.sort();
-  for (let key of keys)
-    values.push([key, data.data[key]]);
-  data.signature = btoa("HMAC!" + secret + "!" + JSON.stringify(values));
-  return data;
-}
-
-exports.setUp = function(callback)
-{
-  let {storageData} = browserAPI;
-  for (let key of Object.keys(storageData))
-    delete storageData[key];
-
-  masterPassword.forgetPassword();
-
-  provider._reset();
-
-  callback();
-};
-
-exports.tearDown = function(callback)
-{
-  sync.disableSync().then(() => callback());
-};
-
-exports.testAuthorizeAndDisable = function(test)
-{
-  Promise.resolve().then(() =>
+  let origProvider;
+  before(() =>
   {
-    test.deepEqual(sync.getSyncData(), {}, "Sync not set up initially");
-    return sync.authorize("dropbox");
-  }).then(() =>
-  {
-    test.notDeepEqual(sync.getSyncData(), {}, "Sync set up after authorization");
-    test.equal(sync.getSyncData().provider, "dropbox", "Sync provider");
-    return sync.disableSync();
-  }).then(() =>
-  {
-    test.deepEqual(sync.getSyncData(), {}, "Sync not set up after disabling");
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
-};
+    origProvider = setDropboxProvider(provider);
+  });
 
-exports.testMerge = function(test)
-{
-  Promise.resolve().then(() =>
+  after(() =>
   {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    return sync.authorize("dropbox");
-  }).then(() =>
-  {
-    return sync.sync();
-  }).then(() =>
-  {
-    checkSyncError(test);
+    setDropboxProvider(origProvider);
+  });
 
-    return Promise.all([
-      storage.get("salt", null),
-      storage.get("hmac-secret", null),
-      storage.get("sync-secret", null),
-      masterPassword.forgetPassword()
-    ]);
-  }).then(([salt, hmac, secret, _]) =>
+  afterEach(async function()
   {
+    for (let key of Object.keys(storageData))
+      delete storageData[key];
+
+    forgetPassword();
+
+    await disableSync();
+    provider._reset();
+  });
+
+  function getLocalData()
+  {
+    let filteredData = {};
+    for (let key of Object.keys(storageData))
+      if (key.startsWith("site:"))
+        filteredData[key] = storageData[key];
+    return filteredData;
+  }
+
+  function checkSyncError()
+  {
+    let syncData = getSyncData();
+    if (syncData)
+      expect(syncData.error).to.be.undefined;
+  }
+
+  function sign(data)
+  {
+    let ciphertext = atob(data.data["sync-secret"].split("_")[1]);
+    let secret = atob(JSON.parse(crypto.subtle._fakeDecrypt(ciphertext)));
+
+    let values = [data.revision];
+    let keys = Object.keys(data.data);
+    keys.sort();
+    for (let key of keys)
+      values.push([key, data.data[key]]);
+    data.signature = btoa("HMAC!" + secret + "!" + JSON.stringify(values));
+    return data;
+  }
+
+  it("should be set up after authorization", async function()
+  {
+    expect(getSyncData()).to.deep.equal({});
+
+    await authorize("dropbox");
+    expect(getSyncData()).not.to.deep.equal({});
+    expect(getSyncData().provider).to.equal("dropbox");
+
+    await disableSync();
+    expect(getSyncData()).to.deep.equal({});
+  });
+
+  it("should merge concurrent changes", async function()
+  {
+    await changePassword(dummyMaster);
+    await authorize("dropbox");
+    await sync();
+    checkSyncError();
+
+    let salt = await storage.get("salt", null);
+    let hmac = await storage.get("hmac-secret", null);
+    let secret = await storage.get("sync-secret", null);
+    await forgetPassword();
+
     let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 1, "File revision after initial sync");
+    expect(revision).to.equal("1");
 
     let parsed = JSON.parse(contents);
-    test.deepEqual(parsed, sign({
+    expect(parsed).to.deep.equal(sign({
       application: "pfp",
       format: 3,
       revision: 1,
@@ -126,37 +113,29 @@ exports.testMerge = function(test)
         "hmac-secret": hmac,
         "sync-secret": secret
       }
-    }), "Remote contents after initial sync");
+    }));
 
+    // No data change
     parsed.format = 2;
     provider._get("/passwords.json").contents = JSON.stringify(parsed);
-    return sync.sync();
-  }).then(() =>
-  {
-    checkSyncError(test);
 
-    let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 1, "No file revision change without changes");
-    return Promise.all([
-      storage.set("site:foo", "bar", null),
-      storage.set("site:foo:blubber", "blabber", null)
-    ]);
-  }).then(() =>
-  {
-    return Promise.all([
-      storage.get("salt", null),
-      storage.get("hmac-secret", null),
-      storage.get("sync-secret", null),
-      sync.sync()
-    ]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    checkSyncError(test);
+    await sync();
+    checkSyncError();
 
-    let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 2, "File revision after local-only update");
+    ({revision, contents} = provider._get("/passwords.json"));
+    expect(revision).to.equal("1");
 
-    test.deepEqual(JSON.parse(contents), sign({
+    // Local-only change
+    await storage.set("site:foo", "bar", null);
+    await storage.set("site:foo:blubber", "blabber", null);
+
+    await sync();
+    checkSyncError();
+
+    ({revision, contents} = provider._get("/passwords.json"));
+    expect(revision).to.equal("2");
+
+    expect(JSON.parse(contents)).to.deep.equal(sign({
       application: "pfp",
       format: 3,
       revision: 2,
@@ -167,9 +146,10 @@ exports.testMerge = function(test)
         "site:foo": "bar",
         "site:foo:blubber": "blabber"
       }
-    }), "Remote contents after local-only update");
+    }));
 
-    provider._set("/passwords.json", 3, JSON.stringify(sign({
+    // Remote-only change
+    provider._set("/passwords.json", "3", JSON.stringify(sign({
       application: "pfp",
       format: 3,
       revision: 8,
@@ -181,20 +161,20 @@ exports.testMerge = function(test)
         "site:example.com:blub": "blab"
       }
     })));
-    return Promise.all([salt, hmac, secret, sync.sync()]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    checkSyncError(test);
 
-    let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 3, "No file revision change after remote-only update");
+    await sync();
+    checkSyncError();
 
-    test.deepEqual(getLocalData(), {
+    ({revision, contents} = provider._get("/passwords.json"));
+    expect(revision).to.equal("3");
+
+    expect(getLocalData()).to.deep.equal({
       "site:foo": "bas",
       "site:example.com:blub": "blab"
-    }, "Local contents after remote-only update");
+    });
 
-    provider._set("/passwords.json", 4, JSON.stringify(sign({
+    // Parallel local and remote changes (conflict resolution)
+    provider._set("/passwords.json", "4", JSON.stringify(sign({
       application: "pfp",
       format: 3,
       revision: 9,
@@ -207,26 +187,16 @@ exports.testMerge = function(test)
       }
     })));
 
-    return Promise.all([
-      storage.set("site:foo", "foo", null),
-      storage.set("site:example.com:blub", "blub", null)
-    ]);
-  }).then(() =>
-  {
-    return Promise.all([
-      storage.get("salt", null),
-      storage.get("hmac-secret", null),
-      storage.get("sync-secret", null),
-      sync.sync()
-    ]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    checkSyncError(test);
+    await storage.set("site:foo", "foo", null);
+    await storage.set("site:example.com:blub", "blub", null);
 
-    let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 5, "File revision after conflict resolution");
+    await sync();
+    checkSyncError();
 
-    test.deepEqual(JSON.parse(contents), sign({
+    ({revision, contents} = provider._get("/passwords.json"));
+    expect(revision).to.equal("5");
+
+    expect(JSON.parse(contents)).to.deep.equal(sign({
       application: "pfp",
       format: 3,
       revision: 10,
@@ -238,15 +208,16 @@ exports.testMerge = function(test)
         "site:foo:x": "y",
         "site:example.com:blub": "blub"
       }
-    }), "Remote contents after conflict resolution");
+    }));
 
-    test.deepEqual(getLocalData(), {
+    expect(getLocalData()).to.deep.equal({
       "site:foo": "foo",
       "site:foo:x": "y",
       "site:example.com:blub": "blub"
-    }, "Local contents after conflict resolution");
+    });
 
-    provider._set("/passwords.json", 6, JSON.stringify(sign({
+    // Reconnecting the client after remote changes
+    provider._set("/passwords.json", "6", JSON.stringify(sign({
       application: "pfp",
       format: 3,
       revision: 14,
@@ -258,32 +229,18 @@ exports.testMerge = function(test)
         "site:example.com:blub": "blab"
       }
     })));
-    return sync.disableSync();
-  }).then(() =>
-  {
-    return Promise.all([
-      sync.authorize("dropbox"),
-      masterPassword.checkPassword(dummyMaster)
-    ]);
-  }).then(() =>
-  {
-    return sync.sync();
-  }).then(() =>
-  {
-    return Promise.all([
-      storage.get("salt", null),
-      storage.get("hmac-secret", null),
-      storage.get("sync-secret", null),
-      masterPassword.forgetPassword()
-    ]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    checkSyncError(test);
 
-    let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 7, "File revision after reconnecting client");
+    await disableSync();
+    await authorize("dropbox");
+    await checkPassword(dummyMaster);
+    await sync();
+    await forgetPassword();
+    checkSyncError();
 
-    test.deepEqual(JSON.parse(contents), sign({
+    ({revision, contents} = provider._get("/passwords.json"));
+    expect(revision).to.equal("7");
+
+    expect(JSON.parse(contents)).to.deep.equal(sign({
       application: "pfp",
       format: 3,
       revision: 15,
@@ -296,16 +253,17 @@ exports.testMerge = function(test)
         "site:foo:x": "y",
         "site:example.com:blub": "blub"
       }
-    }), "Remote contents after reconnecting client");
+    }));
 
-    test.deepEqual(getLocalData(), {
+    expect(getLocalData()).to.deep.equal({
       "site:foo": "foo",
       "site:foo:blubber": "blabber",
       "site:foo:x": "y",
       "site:example.com:blub": "blub"
-    }, "Local contents after reconnecting client");
+    });
 
-    provider._set("/passwords.json", 8, JSON.stringify(sign({
+    // Remote-only key removal
+    provider._set("/passwords.json", "8", JSON.stringify(sign({
       application: "pfp",
       format: 3,
       revision: 18,
@@ -319,45 +277,31 @@ exports.testMerge = function(test)
       }
     })));
 
-    return Promise.all([salt, hmac, secret, sync.sync()]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    checkSyncError(test);
+    await sync();
+    checkSyncError();
 
-    let {revision, contents} = provider._get("/passwords.json");
-    test.equal(revision, 8, "No file revision change after remote removal of a previously synced key");
+    ({revision, contents} = provider._get("/passwords.json"));
+    expect(revision).to.equal("8");
 
-    test.deepEqual(getLocalData(), {
+    expect(getLocalData()).to.deep.equal({
       "site:foo": "foo",
       "site:foo:x": "y",
       "site:example.com:blub": "blub"
-    }, "Local contents after remote removal of a previously synced key");
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
-};
+    });
+  });
 
-exports.testUnrelated = function(test)
-{
-  Promise.resolve().then(() =>
+  it("should recognize attempts to replace an unrelated backup", async function()
   {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    return sync.authorize("dropbox");
-  }).then(() =>
-  {
-    return sync.sync();
-  }).then(() =>
-  {
-    checkSyncError(test);
+    await changePassword(dummyMaster);
+    await authorize("dropbox");
+    await sync();
+    checkSyncError();
 
-    return Promise.all([
-      storage.get("salt", null),
-      storage.get("hmac-secret", null),
-      storage.get("sync-secret", null)
-    ]);
-  }).then(([salt, hmac, secret]) =>
-  {
-    provider._set("/passwords.json", 8, JSON.stringify(sign({
+    let salt = await storage.get("salt", null);
+    let hmac = await storage.get("hmac-secret", null);
+    let secret = await storage.get("sync-secret", null);
+
+    provider._set("/passwords.json", "8", JSON.stringify(sign({
       application: "pfp",
       format: 3,
       revision: 20,
@@ -368,19 +312,16 @@ exports.testUnrelated = function(test)
         "site:foo": "foo",
       }
     })));
-    return Promise.all([salt, hmac, sync.sync()]);
-  }).then(([salt, hmac, _]) =>
-  {
-    checkSyncError(test);
 
-    test.deepEqual(getLocalData(), {
+    await sync();
+    checkSyncError();
+
+    expect(getLocalData()).to.deep.equal({
       "site:foo": "foo"
-    }, "Local contents after update");
+    });
 
-    return Promise.all([salt, hmac, storage.encrypt(crypto.generateRandom(32))]);
-  }).then(([salt, hmac, secret]) =>
-  {
-    provider._set("/passwords.json", 8, JSON.stringify(sign({
+    secret = await encrypt(generateRandom(32));
+    provider._set("/passwords.json", "8", JSON.stringify(sign({
       application: "pfp",
       format: 3,
       revision: 2,
@@ -392,28 +333,22 @@ exports.testUnrelated = function(test)
         "site:bar": "foo"
       }
     })));
-    return Promise.all([salt, hmac, secret, sync.sync()]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unrelated_client", "Attempting to sync with a different sync secret");
-    return Promise.all([salt, hmac, secret, sync.disableSync()]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    return Promise.all([salt, hmac, secret, sync.authorize("dropbox")]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    return Promise.all([salt, hmac, secret, sync.sync()]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    checkSyncError(test);
 
-    test.deepEqual(getLocalData(), {
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unrelated_client");
+
+    await disableSync();
+    await authorize("dropbox");
+    await sync();
+    checkSyncError();
+
+    expect(getLocalData()).to.deep.equal({
       "site:foo": "foo",
       "site:bar": "foo"
-    }, "Local contents after reconnect");
+    });
 
     let parsed = JSON.parse(provider._get("/passwords.json").contents);
-    test.deepEqual(parsed, sign({
+    expect(parsed).to.deep.equal(sign({
       application: "pfp",
       format: 3,
       revision: 3,
@@ -424,115 +359,82 @@ exports.testUnrelated = function(test)
         "site:foo": "foo",
         "site:bar": "foo"
       }
-    }), "Remote contents after reconnect");
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
-};
+    }));
+  });
 
-exports.testErrors = function(test)
-{
-  return Promise.resolve().then(() =>
+  it("should produce expected error codes for error conditions", async function()
   {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    return sync.authorize("dropbox");
-  }).then(() =>
-  {
-    return sync.sync();
-  }).then(() =>
-  {
-    test.ok(!sync.getSyncData().error, "No error after initial sync");
-    return Promise.all([
-      masterPassword.forgetPassword(),
-      storage.set("site:foo", "bar", null)
-    ]);
-  }).then(() =>
-  {
-    sync.getSyncData().token += "0";
-    return sync.sync();
-  }).then(() =>
-  {
-    test.equal(sync.getSyncData().error, "sync_invalid_token", "Attempting to sync with an invalid token");
-    sync.getSyncData().token = sync.getSyncData().token.slice(0, -1);
+    await changePassword(dummyMaster);
+    await authorize("dropbox");
+    await sync();
+    expect(getSyncData().error).to.be.undefined;
 
-    provider._set("/passwords.json", 2, "invalid JSON");
-    return sync.sync();
-  }).then(() =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with invalid JSON");
+    await forgetPassword();
+    await storage.set("site:foo", "bar", null);
 
-    provider._set("/passwords.json", 3, JSON.stringify(null));
-    return sync.sync();
-  }).then(() =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with null data");
+    getSyncData().token += "0";
+    await sync();
+    expect(getSyncData().error).to.equal("sync_invalid_token");
+    getSyncData().token = getSyncData().token.slice(0, -1);
 
-    provider._set("/passwords.json", 4, JSON.stringify(123));
-    return sync.sync();
-  }).then(() =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with non-object");
+    provider._set("/passwords.json", "2", "invalid JSON");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unknown_data_format");
 
-    provider._set("/passwords.json", 5, JSON.stringify({}));
-    return sync.sync();
-  }).then(() =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with empty object");
+    provider._set("/passwords.json", "3", JSON.stringify(null));
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unknown_data_format");
 
-    provider._set("/passwords.json", 6, JSON.stringify({
+    provider._set("/passwords.json", "4", JSON.stringify(123));
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unknown_data_format");
+
+    provider._set("/passwords.json", "5", JSON.stringify({}));
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unknown_data_format");
+
+    provider._set("/passwords.json", "6", JSON.stringify({
       application: "foobar",
       format: 3
     }));
-    return sync.sync();
-  }).then(() =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with unknown application's data");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unknown_data_format");
 
-    provider._set("/passwords.json", 7, JSON.stringify({
+    provider._set("/passwords.json", "7", JSON.stringify({
       application: "pfp",
       format: 321
     }));
-    return sync.sync();
-  }).then(() =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with unknown format version");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unknown_data_format");
 
-    provider._set("/passwords.json", 8, JSON.stringify({
+    provider._set("/passwords.json", "8", JSON.stringify({
       application: "pfp",
       format: 3,
       data: null
     }));
-    return sync.sync();
-  }).then(() =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with null data");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unknown_data_format");
 
-    provider._set("/passwords.json", 9, JSON.stringify({
+    provider._set("/passwords.json", "9", JSON.stringify({
       application: "pfp",
       format: 3,
       data: 456
     }));
-    return sync.sync();
-  }).then(() =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with non-object data");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unknown_data_format");
 
-    provider._set("/passwords.json", 9, JSON.stringify({
+    provider._set("/passwords.json", "9", JSON.stringify({
       application: "pfp",
       format: 3,
       data: {}
     }));
-    return Promise.all([
-      storage.get("salt", null),
-      storage.get("hmac-secret", null),
-      storage.get("sync-secret", null),
-      sync.sync()
-    ]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with empty data");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unknown_data_format");
 
-    provider._set("/passwords.json", 8, JSON.stringify(sign({
+    let salt = await storage.get("salt", null);
+    let hmac = await storage.get("hmac-secret", null);
+    let secret = await storage.get("sync-secret", null);
+    provider._set("/passwords.json", "8", JSON.stringify(sign({
       application: "pfp",
       format: 3,
       data: {
@@ -541,12 +443,10 @@ exports.testErrors = function(test)
         "sync-secret": secret
       }
     })));
-    return Promise.all([salt, hmac, secret, sync.sync()]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with signature but no revision number");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unknown_data_format");
 
-    provider._set("/passwords.json", 8, JSON.stringify({
+    provider._set("/passwords.json", "8", JSON.stringify({
       application: "pfp",
       format: 3,
       revision: 2,
@@ -556,12 +456,10 @@ exports.testErrors = function(test)
         "sync-secret": secret
       }
     }));
-    return Promise.all([salt, hmac, secret, sync.sync()]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync without signature");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unknown_data_format");
 
-    provider._set("/passwords.json", 8, JSON.stringify({
+    provider._set("/passwords.json", "8", JSON.stringify({
       application: "pfp",
       format: 3,
       revision: 2,
@@ -572,12 +470,10 @@ exports.testErrors = function(test)
         "sync-secret": "unrelated"
       }
     }));
-    return Promise.all([salt, hmac, secret, sync.sync()]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unrelated_client", "Attempting to sync with different sync secret");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unrelated_client");
 
-    provider._set("/passwords.json", 8, JSON.stringify({
+    provider._set("/passwords.json", "8", JSON.stringify({
       application: "pfp",
       format: 3,
       revision: 2,
@@ -588,12 +484,10 @@ exports.testErrors = function(test)
         "sync-secret": secret
       }
     }));
-    return Promise.all([salt, hmac, secret, sync.sync()]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    test.equal(sync.getSyncData().error, "sync_tampered_data", "Attempting to sync with invalid signature");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_tampered_data");
 
-    provider._set("/passwords.json", 8, JSON.stringify({
+    provider._set("/passwords.json", "8", JSON.stringify({
       application: "pfp",
       format: 3,
       revision: 2,
@@ -604,12 +498,10 @@ exports.testErrors = function(test)
         "sync-secret": secret
       }
     }));
-    return Promise.all([salt, hmac, secret, sync.sync()]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    test.equal(sync.getSyncData().error, "sync_unknown_data_format", "Attempting to sync with numerical signature");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_unknown_data_format");
 
-    provider._set("/passwords.json", 8, JSON.stringify(sign({
+    provider._set("/passwords.json", "8", JSON.stringify(sign({
       application: "pfp",
       format: 3,
       revision: 0.5,
@@ -619,12 +511,10 @@ exports.testErrors = function(test)
         "sync-secret": secret
       }
     })));
-    return Promise.all([salt, hmac, secret, sync.sync()]);
-  }).then(([salt, hmac, secret, _]) =>
-  {
-    test.equal(sync.getSyncData().error, "sync_tampered_data", "Attempting to downgrade revision");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_tampered_data");
 
-    provider._set("/passwords.json", 8, JSON.stringify(sign({
+    provider._set("/passwords.json", "8", JSON.stringify(sign({
       application: "pfp",
       format: 3,
       revision: 2,
@@ -634,122 +524,78 @@ exports.testErrors = function(test)
         "sync-secret": secret
       }
     })));
-    return sync.sync();
-  }).then(() =>
-  {
-    test.ok(!sync.getSyncData().error, "Error reset after successful sync");
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
-};
+    await sync();
+    expect(getSyncData().error).to.be.undefined;
+  });
 
-exports.testNesting = function(test)
-{
-  return Promise.resolve().then(() =>
+  it("should deal with concurrent uploads by other clients", async function()
   {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    return sync.authorize("dropbox");
-  }).then(() =>
-  {
-    return sync.sync();
-  }).then(() =>
-  {
-    test.ok(!sync.getSyncData().error, "No error after initial sync");
+    await changePassword(dummyMaster);
+    await authorize("dropbox");
+    await sync();
+    expect(getSyncData().error).to.be.undefined;
 
-    return Promise.all([
-      masterPassword.forgetPassword(),
-      storage.set("site:foo", "bar", null)
-    ]);
-  }).then(() =>
-  {
+    await forgetPassword();
+    await storage.set("site:foo", "bar", null);
+
     provider.changeRevisionOnGet = 1;
-    return sync.sync();
-  }).then(() =>
-  {
-    test.ok(!sync.getSyncData().error, "No error after conflict with another client");
+    await sync();
+    expect(getSyncData().error).to.be.undefined;
 
     let {revision, contents} = provider._get("/passwords.json");
-    test.equal(JSON.parse(contents).data["site:foo"], "bar",
-               "Remote contents after conflict with another client");
+    expect(JSON.parse(contents).data["site:foo"]).to.equal("bar");
 
-    return storage.delete("site:foo");
-  }).then(() =>
-  {
+    await storage.delete("site:foo");
+
     provider.changeRevisionOnGet = 10;
-    return sync.sync();
-  }).then(() =>
-  {
-    test.equals(sync.getSyncData().error, "sync_too_many_retries", "Error on too many conflicts");
+    await sync();
+    expect(getSyncData().error).to.equal("sync_too_many_retries");
 
-    let {revision, contents} = provider._get("/passwords.json");
-    test.equal(JSON.parse(contents).data["site:foo"], "bar",
-               "Remote contents unchanged after too many conflicts");
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
-};
+    ({revision, contents} = provider._get("/passwords.json"));
+    expect(JSON.parse(contents).data["site:foo"]).to.equal("bar");
+  });
 
-exports.testRekey = function(test)
-{
-  let salt = null;
-  return Promise.resolve().then(() =>
+  it("should allow syncs to data with a different HMAC secret", async function()
   {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    return sync.authorize("dropbox");
-  }).then(() =>
-  {
-    return sync.sync();
-  }).then(() =>
-  {
-    salt = JSON.parse(provider._get("/passwords.json").contents).data.salt;
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    return Promise.all([
-      passwords.addGenerated({
-        site: "example.com",
-        name: "foo",
-        length: 8,
-        lower: true,
-        upper: false,
-        number: true,
-        symbol: false
-      }),
-      passwords.addGenerated({
-        site: "example.info",
-        name: "bar",
-        length: 16,
-        lower: false,
-        upper: true,
-        number: false,
-        symbol: true
-      }),
-      passwords.addStored({
-        site: "example.com",
-        name: "foo",
-        revision: 2,
-        password: "bar"
-      }),
-      passwords.addAlias("example.net", "example.com")
-    ]);
-  }).then(() =>
-  {
-    return sync.authorize("dropbox");
-  }).then(() =>
-  {
-    return sync.sync();
-  }).then(() =>
-  {
-    test.ok(!sync.getSyncData().error, "No error after rekeying sync");
-    return Promise.all([
-      storage.get("salt", null),
-      passwords.getAllPasswords()
-    ]);
-  }).then(([storedSalt, allPasswords]) =>
-  {
-    test.equal(storedSalt, salt);
+    await changePassword(dummyMaster);
+    await authorize("dropbox");
+    await sync();
 
-    test.deepEqual(allPasswords, {
+    let salt = JSON.parse(provider._get("/passwords.json").contents).data.salt;
+    await changePassword(dummyMaster);
+
+    await addGenerated({
+      site: "example.com",
+      name: "foo",
+      length: 8,
+      lower: true,
+      upper: false,
+      number: true,
+      symbol: false
+    });
+    await addGenerated({
+      site: "example.info",
+      name: "bar",
+      length: 16,
+      lower: false,
+      upper: true,
+      number: false,
+      symbol: true
+    });
+    await addStored({
+      site: "example.com",
+      name: "foo",
+      revision: 2,
+      password: "bar"
+    });
+    await addAlias("example.net", "example.com");
+
+    await authorize("dropbox");
+    await sync();
+    expect(getSyncData().error).to.be.undefined;
+
+    expect(await storage.get("salt", null)).to.equal(salt);
+    expect(await getAllPasswords()).to.deep.equal({
       "example.com": {
         site: "example.com",
         passwords: [
@@ -790,27 +636,14 @@ exports.testRekey = function(test)
         aliases: []
       }
     });
-  }).then(() =>
-  {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    return sync.authorize("dropbox");
-  }).then(() =>
-  {
-    return sync.sync();
-  }).then(() =>
-  {
-    test.ok(!sync.getSyncData().error, "No error after rekeying sync");
-    return Promise.all([
-      storage.get("salt", null),
-      passwords.getAllPasswords()
-    ]);
-  }).then(([storedSalt, allPasswords]) =>
-  {
-    test.equal(storedSalt, salt);
 
-    test.deepEqual(allPasswords, {
+    await changePassword(dummyMaster);
+    await authorize("dropbox");
+    await sync();
+    expect(getSyncData().error).to.be.undefined;
+
+    expect(await storage.get("salt", null)).to.equal(salt);
+    expect(await getAllPasswords()).to.deep.equal({
       "example.com": {
         site: "example.com",
         passwords: [
@@ -851,5 +684,5 @@ exports.testRekey = function(test)
         aliases: []
       }
     });
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
-};
+  });
+});

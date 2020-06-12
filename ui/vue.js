@@ -8,9 +8,9 @@
 
 import Vue from "vue";
 
-import {keyboardNavigationType} from "./common";
-import I18n from "./i18n";
-import AccessKeys from "./accessKeys";
+import {keyboardNavigationType} from "./common.js";
+import I18n from "./i18n.js";
+import AccessKeys from "./accessKeys.js";
 import ExternalLink from "./components/ExternalLink.vue";
 import IconicLink from "./components/IconicLink.vue";
 import ModalOverlay from "./components/ModalOverlay.vue";

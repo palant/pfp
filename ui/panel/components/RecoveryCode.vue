@@ -28,7 +28,7 @@
 <script>
 "use strict";
 
-import {recoveryCodes} from "../../proxy";
+import {recoveryCodes} from "../../proxy.js";
 
 export default {
   name: "RecoveryCode",

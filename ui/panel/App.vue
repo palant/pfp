@@ -61,9 +61,9 @@
 <script>
 "use strict";
 
-import {getSiteDisplayName, keyboardNavigationType} from "../common";
-import {port} from "../messaging";
-import {masterPassword} from "../proxy";
+import {getSiteDisplayName, keyboardNavigationType} from "../common.js";
+import {port} from "../messaging.js";
+import {masterPassword} from "../proxy.js";
 import EnterMaster from "./pages/EnterMaster.vue";
 import ChangeMaster from "./pages/ChangeMaster.vue";
 import Migration from "./pages/Migration.vue";

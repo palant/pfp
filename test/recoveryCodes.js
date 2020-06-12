@@ -6,76 +6,51 @@
 
 "use strict";
 
-let {
-  passwords, recoveryCodes, masterPassword, fakeCrypto
-} = require("../build-test/lib");
+import {changePassword} from "../lib/masterPassword.js";
+import {addStored} from "../lib/passwords.js";
+import {getCode, isValid, decodeCode} from "../lib/recoveryCodes.js";
+import {
+  enableFakeEncryption, disableFakeEncryption, enableFakeRandom,
+  disableFakeRandom
+} from "../test-env/fake-crypto.js";
 
-function unexpectedError(error)
+describe("recoveryCodes.js", () =>
 {
-  this.ok(false, "Unexpected error: " + error);
-  console.error(error);
-}
-
-function done()
-{
-  this.done();
-}
-
-exports.setUp = function(callback)
-{
-  fakeCrypto.disableFakeEncryption();
-  fakeCrypto.enableFakeRandom(2);
-  callback();
-};
-
-exports.tearDown = function(callback)
-{
-  fakeCrypto.enableFakeEncryption();
-  fakeCrypto.disableFakeRandom();
-  callback();
-};
-
-exports.testRecoveryCodes = function(test)
-{
-  const dummyMaster = "foobar";
-  const stored = {
-    site: "example.com",
-    name: "foo",
-    password: "bar"
-  };
-
-  Promise.resolve().then(() =>
+  before(() =>
   {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
+    disableFakeEncryption();
+    enableFakeRandom(2);
+  });
+
+  after(() =>
   {
-    return passwords.addStored(stored);
-  }).then(pwdList =>
+    enableFakeEncryption();
+    disableFakeRandom();
+  });
+
+  it("should produce usable recovery codes", async function()
   {
-    return recoveryCodes.getCode(stored);
-  }).then(code =>
-  {
+    const dummyMaster = "foobar";
+    const stored = {
+      site: "example.com",
+      name: "foo",
+      password: "bar"
+    };
+
+    await changePassword(dummyMaster);
+    await addStored(stored);
+
+    let code = await getCode(stored);
     let lines = code.trim().split(/[\r\n]+/);
-    test.ok(lines[0].length == lines[lines.length - 1].length, "Lines have the same length");
+    expect(lines[0].length).to.equal(lines[lines.length - 1].length);
 
-    return Promise.all([
-      code,
-      recoveryCodes.isValid(code),
-      recoveryCodes.isValid(lines[0]),
-      recoveryCodes.isValid(lines[lines.length - 1]),
-      recoveryCodes.isValid(lines.slice(0, -1).join("\n")),
-      recoveryCodes.isValid(lines.slice(0, -2).concat([lines[lines.length - 1], lines[lines.length - 2]]).join("\n")),
-      recoveryCodes.isValid(code.substr(10, 10) + code.substr(0, 10) + code.substr(20)),
-      recoveryCodes.decodeCode(code)
-    ]);
-  }).then(([code, valid, firstLineValid, lastLineValid, reducedLinesValid, reorderedLinesValid, transposedValid, decoded]) =>
-  {
-    test.equal(valid, "ok", "Unchanged recovery code is valid");
-    test.equal(firstLineValid, "unterminated", "Validating first line by itself");
-    test.equal(lastLineValid, "checksum_mismatch", "Validating last line by itself");
-    test.equal(reducedLinesValid, "unterminated", "Validating code without last line");
-    test.equal(reorderedLinesValid, "checksum_mismatch", "Validating code with last two lines swapped");
-    test.equal(transposedValid, "checksum_mismatch", "Code with two blocks swapped is not valid");
-    test.equal(decoded, stored.password, "Password decoded correctly");
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
-};
+    expect(await isValid(code)).to.equal("ok");
+    expect(await isValid(lines[0])).to.equal("unterminated");
+    expect(await isValid(lines[lines.length - 1])).to.equal("checksum_mismatch");
+    expect(await isValid(lines.slice(0, -1).join("\n"))).to.equal("unterminated");
+    expect(await isValid(lines.slice(0, -2).concat([lines[lines.length - 1], lines[lines.length - 2]]).join("\n"))).to.equal("checksum_mismatch");
+    expect(await isValid(code.substr(10, 10) + code.substr(0, 10) + code.substr(20))).to.equal("checksum_mismatch");
+
+    expect(await decodeCode(code)).to.equal(stored.password);
+  });
+});

@@ -6,168 +6,112 @@
 
 "use strict";
 
-let {passwords, masterPassword, browserAPI} = require("../build-test/lib");
+import {
+  addGenerated, addStored, addAlias, getAllPasswords
+} from "../lib/passwords.js";
+import {
+  getMasterPassword, changePassword, forgetPassword, checkPassword, getState
+} from "../lib/masterPassword.js";
+import {storageData} from "../test-env/browserAPI.js";
 
-let dummyMaster = "foobar";
-
-function expectedValue(expected, value)
+describe("masterPassword.js", () =>
 {
-  this.equal(value, expected);
-}
+  let dummyMaster = "foobar";
 
-function unexpectedError(error)
-{
-  this.ok(false, "Unexpected error: " + error);
-  console.error(error);
-}
+  afterEach(() =>
+  {
+    for (let key of Object.keys(storageData))
+      delete storageData[key];
 
-function done()
-{
-  this.done();
-}
+    forgetPassword();
+  });
 
-exports.setUp = function(callback)
-{
-  let {storageData} = browserAPI;
-  for (let key of Object.keys(storageData))
-    delete storageData[key];
+  it("should only give out master password when unlocked", async function()
+  {
+    expect(getMasterPassword).to.throw("master_password_required");
 
-  masterPassword.forgetPassword();
+    await changePassword(dummyMaster);
+    expect(getMasterPassword()).to.equal(dummyMaster);
 
-  callback();
-};
+    await forgetPassword();
+    expect(getMasterPassword).to.throw("master_password_required");
 
-exports.testGetAndForget = function(test)
-{
-  Promise.resolve().then(() =>
-  {
-    masterPassword.getMasterPassword();
-    test.ok(false, "Getting master password didn't throw");
-  }).catch(expectedValue.bind(test, "master_password_required")).then(() =>
-  {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    test.equal(masterPassword.getMasterPassword(), dummyMaster);
+    await forgetPassword();
+    await checkPassword(dummyMaster);
+    expect(getMasterPassword()).to.equal(dummyMaster);
+  });
 
-    return masterPassword.forgetPassword();
-  }).catch(unexpectedError.bind(test)).then(() =>
+  it("should accept only the correct master password", async function()
   {
-    masterPassword.getMasterPassword();
-    test.ok(false, "Getting master password didn't throw");
-  }).catch(expectedValue.bind(test, "master_password_required")).then(() =>
-  {
-    return masterPassword.forgetPassword();
-  }).then(() =>
-  {
-    return masterPassword.checkPassword(dummyMaster);
-  }).then(() =>
-  {
-    test.equal(masterPassword.getMasterPassword(), dummyMaster);
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
-};
+    try
+    {
+      await checkPassword(dummyMaster);
+      expect.fail("Accepted master password when none is set");
+    }
+    catch (e)
+    {
+      expect(e).to.equal("declined");
+    }
 
-exports.testCheckPassword = function(test)
-{
-  masterPassword.checkPassword(dummyMaster).then(() =>
-  {
-    test.ok(false, "Accepted master password when none is set");
-  }).catch(expectedValue.bind(test, "declined")).then(() =>
-  {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    return masterPassword.checkPassword(dummyMaster);
-  }).catch(unexpectedError.bind(test)).then(() =>
-  {
-    return masterPassword.checkPassword(dummyMaster + dummyMaster);
-  }).then(() =>
-  {
-    test.ok(false, "Accepted wrong master password");
-  }).catch(expectedValue.bind(test, "declined")).then(done.bind(test));
-};
+    await changePassword(dummyMaster);
+    await checkPassword(dummyMaster);
 
-exports.testState = function(test)
-{
-  masterPassword.getState().then(state =>
-  {
-    test.equal(state, "unset");
+    try
+    {
+      await checkPassword(dummyMaster + dummyMaster);
+      expect.fail("Accepted wrong master password");
+    }
+    catch (e)
+    {
+      expect(e).to.equal("declined");
+    }
+  });
 
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
+  it("should report correct state", async function()
   {
-    return masterPassword.getState();
-  }).then(state =>
-  {
-    test.equal(state, "known");
+    expect(await getState()).to.equal("unset");
 
-    return masterPassword.forgetPassword();
-  }).then(() =>
-  {
-    return masterPassword.getState();
-  }).then(state =>
-  {
-    test.equal(state, "set");
+    await changePassword(dummyMaster);
+    expect(await getState()).to.equal("known");
 
-    return masterPassword.checkPassword(dummyMaster);
-  }).then(() =>
-  {
-    return masterPassword.getState();
-  }).then(state =>
-  {
-    test.equal(state, "known");
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
-};
+    await forgetPassword();
+    expect(await getState()).to.equal("set");
 
-exports.testClearOnChange = function(test)
-{
-  function addData()
-  {
-    return Promise.all([
-      passwords.addGenerated({
-        site: "example.com",
-        name: "foo",
-        length: 8,
-        lower: true,
-        upper: false,
-        number: true,
-        symbol: false,
-        legacy: true
-      }),
-      passwords.addStored({
-        site: "example.info",
-        name: "bar",
-        password: "foo"
-      }),
-      passwords.addAlias("sub.example.info", "example.com")
-    ]);
-  }
+    await checkPassword(dummyMaster);
+    expect(await getState()).to.equal("known");
+  });
 
-  Promise.resolve().then(() =>
+  it("should clear all data on master password change", async function()
   {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    return addData();
-  }).then(() =>
-  {
-    return masterPassword.changePassword(dummyMaster);
-  }).then(() =>
-  {
-    return passwords.getAllPasswords();
-  }).then(allPasswords =>
-  {
-    test.deepEqual(allPasswords, {});
+    function addData()
+    {
+      return Promise.all([
+        addGenerated({
+          site: "example.com",
+          name: "foo",
+          length: 8,
+          lower: true,
+          upper: false,
+          number: true,
+          symbol: false,
+          legacy: true
+        }),
+        addStored({
+          site: "example.info",
+          name: "bar",
+          password: "foo"
+        }),
+        addAlias("sub.example.info", "example.com")
+      ]);
+    }
 
-    return addData();
-  }).then(() =>
-  {
-    return masterPassword.changePassword(dummyMaster + dummyMaster);
-  }).then(() =>
-  {
-    return passwords.getAllPasswords();
-  }).then(allPasswords =>
-  {
-    test.deepEqual(allPasswords, {});
-  }).catch(unexpectedError.bind(test)).then(done.bind(test));
-};
+    await changePassword(dummyMaster);
+    await addData();
+    await changePassword(dummyMaster);
+    expect(await getAllPasswords()).to.deep.equal({});
+
+    await addData();
+    await changePassword(dummyMaster + dummyMaster);
+    expect(await getAllPasswords()).to.deep.equal({});
+  });
+});

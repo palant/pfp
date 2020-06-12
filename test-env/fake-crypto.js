@@ -6,7 +6,7 @@
 
 "use strict";
 
-let crypto = require("crypto");
+import crypto from "crypto";
 
 let fakeEncryption = true;
 let randomByte = null;
@@ -57,7 +57,7 @@ export function getRandomValues(buf)
     throw new Error("Parameter doesn't appear to be an Uint8Array.");
 
   if (randomByte === null)
-    buf.set(require("crypto").randomBytes(buf.length));
+    buf.set(crypto.randomBytes(buf.length));
   else
     buf.fill(randomByte);
 }

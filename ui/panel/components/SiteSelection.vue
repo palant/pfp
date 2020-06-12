@@ -37,8 +37,8 @@
 <script>
 "use strict";
 
-import {getSiteDisplayName} from "../../common";
-import {passwords} from "../../proxy";
+import {getSiteDisplayName} from "../../common.js";
+import {passwords} from "../../proxy.js";
 
 export default {
   name: "SiteSelection",

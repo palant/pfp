@@ -6,7 +6,7 @@
 
 "use strict";
 
-import {port} from "./messaging";
+import {port} from "./messaging.js";
 
 let errorHandlers = new Map();
 let currentHandlers = new Map();

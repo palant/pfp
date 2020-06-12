@@ -80,7 +80,7 @@
 <script>
 "use strict";
 
-import {sync} from "../../proxy";
+import {sync} from "../../proxy.js";
 import ManualAuth from "../components/ManualAuth.vue";
 import RemoteStorageUsernameInput from "../components/RemoteStorageUsernameInput.vue";
 

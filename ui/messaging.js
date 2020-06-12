@@ -6,8 +6,8 @@
 
 "use strict";
 
-import {EventTarget, emit} from "../lib/eventTarget";
-import {runtime} from "./browserAPI";
+import {EventTarget, emit} from "../lib/eventTarget.js";
+import {runtime} from "./browserAPI.js";
 
 let messageQueue = null;
 let portName = "contentScript";

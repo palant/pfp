@@ -18,8 +18,8 @@
 <script>
 "use strict";
 
-import {getSiteDisplayName} from "../../common";
-import {passwords} from "../../proxy";
+import {getSiteDisplayName} from "../../common.js";
+import {passwords} from "../../proxy.js";
 import Shortcuts from "./Shortcuts.vue";
 import SiteInfo from "./SiteInfo.vue";
 

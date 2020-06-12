@@ -25,7 +25,7 @@
 <script>
 "use strict";
 
-import {passwords} from "../../proxy";
+import {passwords} from "../../proxy.js";
 
 export default {
   name: "NotesEditor",
