@@ -75,8 +75,6 @@ export default {
         {
           if (error == "declined")
             this.masterPasswordError = this.$t("password_declined");
-          else if (error == "migrating")
-            this.$emit("done", error);
           else
             this.$app.showUnknownError(error);
         });

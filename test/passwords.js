@@ -6,7 +6,7 @@
 
 "use strict";
 
-import {derivePassword, derivePasswordLegacy} from "../lib/crypto.js";
+import {derivePassword} from "../lib/crypto.js";
 import {
   addGenerated, addStored, removePassword, getPassword, getPasswords,
   getAllPasswords, addAlias, removeAlias, getAlias, getNotes, setNotes,
@@ -44,32 +44,6 @@ const generated2 = {
   symbol: true,
   notes: "some notes",
   password: "$X*RR~V}?;FY[T|~"
-};
-
-const generated3 = {
-  site: "example.com",
-  name: "foo",
-  type: "generated",
-  revision: "2",
-  length: 16,
-  lower: true,
-  upper: true,
-  number: false,
-  symbol: false,
-  notes: "more notes",
-  password: "ZfrQyEEavZqtjzcr"
-};
-
-const generated4 = {
-  site: "example.info",
-  name: "bar",
-  type: "generated",
-  length: 8,
-  lower: false,
-  upper: false,
-  number: true,
-  symbol: true,
-  password: "6;!!|7/{"
 };
 
 const stored1 = {
@@ -858,18 +832,6 @@ describe("passwords.js", () =>
           symbol: generated2.symbol,
           notes: generated2.notes
         }),
-        [`site:${digest(generated3.site)}:${digest(generated3.site + "\0" + generated3.name + "\0" + generated3.revision)}`]: encrypt({
-          type: generated3.type,
-          site: generated3.site,
-          name: generated3.name,
-          revision: generated3.revision,
-          length: generated3.length,
-          lower: generated3.lower,
-          upper: generated3.upper,
-          number: generated3.number,
-          symbol: generated3.symbol,
-          notes: generated3.notes
-        }),
         [`site:${digest("sub." + generated1.site)}`]: encrypt({
           site: "sub." + generated1.site,
           alias: generated1.site
@@ -901,14 +863,6 @@ describe("passwords.js", () =>
           upper: generated1.upper,
           number: generated1.number,
           symbol: generated1.symbol
-        },
-        {
-          type: "stored",
-          site: generated3.site,
-          name: generated3.name,
-          revision: generated3.revision,
-          password: generated3.password,
-          notes: generated3.notes
         }],
         aliases: ["sub." + generated1.site]
       }
@@ -967,18 +921,6 @@ describe("passwords.js", () =>
           password: stored2.password,
           notes: stored2.notes
         }),
-        [`site:${digest(generated3.site)}:${digest(generated3.site + "\0" + generated3.name + "\0" + generated3.revision)}`]: encrypt({
-          type: generated3.type,
-          site: generated3.site,
-          name: generated3.name,
-          revision: generated3.revision,
-          length: generated3.length,
-          lower: generated3.lower,
-          upper: generated3.upper,
-          number: generated3.number,
-          symbol: generated3.symbol,
-          notes: generated3.notes
-        }),
         [`site:${digest("sub." + generated1.site)}`]: encrypt({
           site: "sub." + generated1.site,
           alias: generated1.site
@@ -994,10 +936,6 @@ describe("passwords.js", () =>
       masterPassword: backupMaster,
       domain: generated2.site
     }, generated2));
-    let generated3result = await derivePasswordLegacy(Object.assign({
-      masterPassword: backupMaster,
-      domain: generated3.site
-    }, generated3));
 
     expect(await getAllPasswords()).to.be.deep.equal({
       [generated1.site]: {
@@ -1022,14 +960,6 @@ describe("passwords.js", () =>
           site: generated1.site,
           name: generated1.name,
           password: generated1result
-        },
-        {
-          type: "stored",
-          site: generated3.site,
-          name: generated3.name,
-          revision: generated3.revision,
-          password: generated3result,
-          notes: generated3.notes
         }],
         aliases: ["sub." + generated1.site]
       }
@@ -1404,164 +1334,5 @@ describe("passwords.js", () =>
     {
       expect(e).to.equal("unknown_data_format");
     }
-  });
-
-  it("should perform data migration when updating from older data format", async function()
-  {
-    let salt = "asdf";
-    let hmacSecret = "fdsa";
-    let key = "4MgE2P1PbjLyAz7JxczGjOPNtaaqNKofAmGSbNvRtUM=";
-    let iv = "fakeivwhatever";
-    let cryptoPrefix = "AES-GCM!" + atob(key) + "!" + iv + "!";
-    let hmacPrefix = "HMAC!" + hmacSecret + "!";
-    let encrypt = data => btoa(iv) + "_" + btoa(cryptoPrefix + JSON.stringify(data));
-    let digest = data => btoa(hmacPrefix + data);
-
-    storageData.salt = btoa(salt);
-    storageData["hmac-secret"] = encrypt(btoa(hmacSecret));
-
-    function setPassword(passwordData)
-    {
-      storageData[`site:${digest(passwordData.site)}`] = encrypt({site: passwordData.site});
-      storageData[`site:${digest(passwordData.site)}:${digest(passwordData.site + "\0" + passwordData.name + "\0" + (passwordData.revision || ""))}`] = encrypt(passwordData);
-    }
-
-    setPassword({
-      site: generated1.site,
-      name: generated1.name,
-      revision: "",
-      type: "generated2",
-      length: generated1.length,
-      lower: generated1.lower,
-      upper: generated1.upper,
-      number: generated1.number,
-      symbol: generated1.symbol
-    });
-    setPassword({
-      site: generated2.site,
-      name: generated2.name,
-      revision: generated2.revision,
-      type: "generated2",
-      length: generated2.length,
-      lower: generated2.lower,
-      upper: generated2.upper,
-      number: generated2.number,
-      symbol: generated2.symbol,
-      notes: generated2.notes
-    });
-    setPassword({
-      site: generated3.site,
-      name: generated3.name,
-      revision: generated3.revision,
-      type: "generated",
-      length: generated3.length,
-      lower: generated3.lower,
-      upper: generated3.upper,
-      number: generated3.number,
-      symbol: generated3.symbol,
-      notes: generated3.notes
-    });
-    setPassword({
-      site: generated4.site,
-      name: generated4.name,
-      revision: "",
-      type: "generated",
-      length: generated4.length,
-      lower: generated4.lower,
-      upper: generated4.upper,
-      number: generated4.number,
-      symbol: generated4.symbol
-    });
-    setPassword({
-      site: stored2.site,
-      name: stored2.name,
-      revision: "",
-      type: "stored",
-      password: stored2.password,
-      notes: stored2.notes
-    });
-
-    storageData[`site:${digest("sub." + generated4.site)}`] = encrypt({
-      site: "sub." + generated4.site,
-      alias: generated4.site
-    });
-
-    try
-    {
-      await checkPassword(dummyMaster);
-      expect.fail("Checking master password didn't trigger migration");
-    }
-    catch (e)
-    {
-      expect(e).to.equal("migrating");
-    }
-
-    while (await getState() == "migrating")
-    {
-      await new Promise((resolve, reject) =>
-      {
-        setTimeout(resolve, 10);
-      });
-    }
-
-    expect(await getState()).to.equal("known");
-
-    expect(await getAllPasswords()).to.deep.equal({
-      [generated1.site]: {
-        site: generated1.site,
-        passwords: [{
-          type: "stored",
-          site: stored2.site,
-          name: stored2.name,
-          revision: "",
-          password: stored2.password,
-          notes: stored2.notes
-        }, {
-          type: "generated2",
-          site: generated2.site,
-          name: generated2.name,
-          revision: generated2.revision,
-          length: generated2.length,
-          lower: generated2.lower,
-          upper: generated2.upper,
-          number: generated2.number,
-          symbol: generated2.symbol,
-          notes: generated2.notes
-        }, {
-          type: "generated2",
-          site: generated1.site,
-          name: generated1.name,
-          revision: "",
-          length: generated1.length,
-          lower: generated1.lower,
-          upper: generated1.upper,
-          number: generated1.number,
-          symbol: generated1.symbol
-        }, {
-          type: "stored",
-          site: generated3.site,
-          name: generated3.name,
-          revision: generated3.revision,
-          password: generated3.password,
-          notes: generated3.notes
-        }],
-        aliases: []
-      },
-      [generated4.site]: {
-        site: generated4.site,
-        passwords: [{
-          type: "stored",
-          site: generated4.site,
-          name: generated4.name,
-          revision: "",
-          password: generated4.password
-        }],
-        aliases: ["sub." + generated4.site]
-      }
-    });
-
-    await forgetPassword();
-    await checkPassword(dummyMaster);
-    expect(await getState()).to.equal("known");
   });
 });

@@ -103,16 +103,9 @@ gulp.task("validate", gulp.parallel("eslint", "htmlhint", "stylelint"));
 
 function buildWorkers(targetdir)
 {
-  let overrides = {};
-
-  return merge(
-    gulp.src(["worker/pbkdf2.js"])
-        .pipe(rollup(overrides))
-        .pipe(gulp.dest(`${targetdir}`)),
-    gulp.src(["worker/scrypt.js"])
-        .pipe(rollup(overrides))
-        .pipe(gulp.dest(`${targetdir}`))
-  );
+  return gulp.src(["worker/scrypt.js"])
+             .pipe(rollup())
+             .pipe(gulp.dest(`${targetdir}`));
 }
 
 function buildCommon(targetdir)
@@ -240,7 +233,7 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
               [path.resolve(__dirname, "lib", "browserAPI.js")]: path.resolve(__dirname, "web", "backgroundBrowserAPI.js"),
               [path.resolve(__dirname, "ui", "browserAPI.js")]: path.resolve(__dirname, "web", "contentBrowserAPI.js")
             }),
-            workerLoader(/\/(scrypt|pbkdf2)\.js$/),
+            workerLoader(/\/scrypt\.js$/),
             localeLoader(path.resolve(__dirname, "locale", "en_US"))
           ],
           postPlugins: [

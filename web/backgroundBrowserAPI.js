@@ -8,7 +8,6 @@
 
 import {EventTarget} from "./eventTarget";
 import scryptWorker from "../worker/scrypt.js";
-import pbkdf2Worker from "../worker/pbkdf2.js";
 
 function functionToURL(func)
 {
@@ -96,8 +95,6 @@ let browser = {
     {
       if (path == "worker/scrypt.js")
         return functionToURL(scryptWorker);
-      else if (path == "worker/pbkdf2.js")
-        return functionToURL(pbkdf2Worker);
       else
         return path;
     },

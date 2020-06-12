@@ -14,7 +14,6 @@
 
     <change-master v-if="masterPasswordState == 'unset' || (masterPasswordState == 'set' && resettingMaster)" />
     <enter-master v-else-if="masterPasswordState == 'set'" />
-    <migration v-else-if="masterPasswordState == 'migrating'" />
     <div v-else-if="masterPasswordState == 'known'" class="tabs">
       <nav v-keyboard-navigation="tab" class="tablist" role="list">
         <div />
@@ -66,7 +65,6 @@ import {port} from "../messaging.js";
 import {masterPassword} from "../proxy.js";
 import EnterMaster from "./pages/EnterMaster.vue";
 import ChangeMaster from "./pages/ChangeMaster.vue";
-import Migration from "./pages/Migration.vue";
 import PasswordList from "./pages/PasswordList.vue";
 import SelectSite from "./pages/SelectSite.vue";
 import Settings from "./pages/Settings.vue";
@@ -105,7 +103,6 @@ export default {
   components: {
     "change-master": ChangeMaster,
     "enter-master": EnterMaster,
-    "migration": Migration,
     "password-list": PasswordList,
     "select-site": SelectSite,
     "settings": Settings,

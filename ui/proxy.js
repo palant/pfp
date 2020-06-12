@@ -72,7 +72,7 @@ export function setErrorHandler(error, handler)
 export const passwords = Proxy("passwords", [
   "exportPasswordData", "importPasswordData", "getPasswords", "addAlias",
   "removeAlias", "addGenerated", "addStored", "removePassword", "getPassword",
-  "setNotes", "getAllPasswords", "getAllSites", "isMigrating"
+  "setNotes", "getAllPasswords", "getAllSites"
 ]);
 
 export const masterPassword = Proxy("masterPassword", [

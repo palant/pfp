@@ -137,35 +137,6 @@ h1
   }
 }
 
-.migration > p,
-.migration > ul
-{
-  font-size: $font-size-small;
-}
-
-.migration > p
-{
-  margin: $block-spacing / 2 0;
-}
-
-.migration-in-progress
-{
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.migration-spinning-wheel
-{
-  @include margin-inline-end($inline-spacing);
-  $image-size: $font-size;
-  min-width: $image-size;
-  min-height: $image-size;
-  background-size: $image-size;
-  background-repeat: no-repeat;
-  background-image: url(../images/circles.svg);
-}
-
 .tabs
 {
   display: flex;

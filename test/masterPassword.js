@@ -93,8 +93,7 @@ describe("masterPassword.js", () =>
           lower: true,
           upper: false,
           number: true,
-          symbol: false,
-          legacy: true
+          symbol: false
         }),
         addStored({
           site: "example.info",

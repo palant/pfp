@@ -34,19 +34,14 @@ export default {
       if (!success)
         return;
 
-      if (success == "migrating")
-        this.$app.masterPasswordState = "migrating";
-      else
-      {
-        passwords.getPasswords(this.$app.origSite)
-          .then(([origSite, site, pwdList]) =>
-          {
-            this.$app.origSite = origSite;
-            this.$app.site = site;
-            this.$app.pwdList = pwdList;
-            this.$app.masterPasswordState = "known";
-          }).catch(this.$app.showUnknownError);
-      }
+      passwords.getPasswords(this.$app.origSite)
+        .then(([origSite, site, pwdList]) =>
+        {
+          this.$app.origSite = origSite;
+          this.$app.site = site;
+          this.$app.pwdList = pwdList;
+          this.$app.masterPasswordState = "known";
+        }).catch(this.$app.showUnknownError);
     }
   }
 };
