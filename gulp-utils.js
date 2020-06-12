@@ -16,6 +16,34 @@ import {rollup} from "rollup";
 
 import testEnv from "./test-env/setup.js";
 
+function getKeys(obj, keys)
+{
+  if (!obj || typeof obj != "object")
+    return;
+
+  if (Array.isArray(obj))
+  {
+    for (let i = 0; i < obj.length; i++)
+      getKeys(obj[i], keys);
+  }
+  else
+  {
+    for (let key in obj)
+    {
+      keys.add(key);
+      getKeys(obj[key], keys);
+    }
+  }
+}
+
+export function stringifyObject(obj)
+{
+  let keys = new Set();
+  getKeys(obj, keys);
+
+  return JSON.stringify(obj, Array.from(keys).sort(), 2);
+}
+
 export function readArg(prefix, defaultValue)
 {
   for (let arg of process.argv)
@@ -72,7 +100,7 @@ export function jsonModify(modifier, newName)
     data = modifier(data) || data;
     if (newName)
       filepath = path.resolve(filepath, "..", newName);
-    return [filepath, JSON.stringify(data, null, 2)];
+    return [filepath, stringifyObject(data)];
   });
 }
 
@@ -121,7 +149,7 @@ export function combineLocales()
     for (let locale of Object.keys(locales))
     {
       let file = files[locale];
-      file.contents = Buffer.from(JSON.stringify(locales[locale], null, 2), "utf-8");
+      file.contents = Buffer.from(stringifyObject(locales[locale]), "utf-8");
       file.path = path.join(process.cwd(), "locale", locale + ".json");
       stream.push(file);
     }
@@ -155,7 +183,7 @@ export function toChromeLocale()
 
     return [
       path.join(path.dirname(filepath), locale, "messages.json"),
-      JSON.stringify(data, null, 2)
+      stringifyObject(data)
     ];
   });
 }

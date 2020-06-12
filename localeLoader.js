@@ -9,6 +9,8 @@
 import fs from "fs";
 import path from "path";
 
+import {stringifyObject} from "./gulp-utils.js";
+
 function walkDirectory(dir, callback)
 {
   return new Promise((resolve, reject) =>
@@ -71,7 +73,7 @@ export default function(localeRoot)
           locale[prefix + name] = data[name];
       });
 
-      return "export default " + JSON.stringify(locale, null, 2);
+      return "export default " + stringifyObject(locale);
     }
   };
 }
