@@ -239,8 +239,11 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
           postPlugins: [
             babel.default({
               babelrc: false,
-              babelHelpers: "bundled",
-              presets: ["@babel/preset-env"]
+              babelHelpers: "runtime",
+              presets: ["@babel/preset-env"],
+              plugins: [
+                ["@babel/transform-runtime"]
+              ]
             })
           ]
         }))

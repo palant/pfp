@@ -56,6 +56,9 @@ export default {
       if (![1,2,3,4].includes(3))
         throw new Error("Array.includes() returned unexpected result");
 
+      if (!Array.isArray(Object.values({})))
+        throw new Error("Object.values() returned unexpected result");
+
       if (new KeyboardEvent("keydown", {key: "Escape"}).key != "Escape")
         throw new Error("KeyboardEvent() returned unexpected result");
 

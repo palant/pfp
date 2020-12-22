@@ -44,12 +44,12 @@ describe("recoveryCodes.js", () =>
     let lines = code.trim().split(/[\r\n]+/);
     expect(lines[0].length).to.equal(lines[lines.length - 1].length);
 
-    expect(await isValid(code)).to.equal("ok");
-    expect(await isValid(lines[0])).to.equal("unterminated");
-    expect(await isValid(lines[lines.length - 1])).to.equal("checksum_mismatch");
-    expect(await isValid(lines.slice(0, -1).join("\n"))).to.equal("unterminated");
-    expect(await isValid(lines.slice(0, -2).concat([lines[lines.length - 1], lines[lines.length - 2]]).join("\n"))).to.equal("checksum_mismatch");
-    expect(await isValid(code.substr(10, 10) + code.substr(0, 10) + code.substr(20))).to.equal("checksum_mismatch");
+    expect(isValid(code)).to.equal("ok");
+    expect(isValid(lines[0])).to.equal("unterminated");
+    expect(isValid(lines[lines.length - 1])).to.equal("checksum_mismatch");
+    expect(isValid(lines.slice(0, -1).join("\n"))).to.equal("unterminated");
+    expect(isValid(lines.slice(0, -2).concat([lines[lines.length - 1], lines[lines.length - 2]]).join("\n"))).to.equal("checksum_mismatch");
+    expect(isValid(code.substr(10, 10) + code.substr(0, 10) + code.substr(20))).to.equal("checksum_mismatch");
 
     expect(await decodeCode(code)).to.equal(stored.password);
   });

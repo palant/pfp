@@ -3,6 +3,7 @@ node_js:
   - "13.8.0"
   - "13"
   - "14"
+  - "15"
 before_script:
   - npm install -g gulp
 script:

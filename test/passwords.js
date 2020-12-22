@@ -9,8 +9,8 @@
 import {derivePassword} from "../lib/crypto.js";
 import {
   addGenerated, addStored, removePassword, getPassword, getPasswords,
-  getAllPasswords, addAlias, removeAlias, getAlias, getNotes, setNotes,
-  exportPasswordData, importPasswordData
+  getAllPasswords, getAllSites, addAlias, removeAlias, getAlias, getNotes,
+  setNotes, exportPasswordData, importPasswordData
 } from "../lib/passwords.js";
 import {
   changePassword, checkPassword, forgetPassword, getState
@@ -526,6 +526,7 @@ describe("passwords.js", () =>
     await changePassword(dummyMaster);
 
     expect(await getAllPasswords()).to.deep.equal({});
+    expect(await getAllSites()).to.deep.equal([]);
 
     await addGenerated(generated1);
     expect(await getAllPasswords()).to.deep.equal({
@@ -544,6 +545,7 @@ describe("passwords.js", () =>
         aliases: []
       }
     });
+    expect(await getAllSites()).to.deep.equal([generated1.site]);
 
     await addStored(stored2);
     expect(await getAllPasswords()).to.deep.equal({
@@ -568,6 +570,7 @@ describe("passwords.js", () =>
         aliases: []
       }
     });
+    expect(await getAllSites()).to.deep.equal([generated1.site]);
 
     await addAlias("example.info", generated1.site);
     await addAlias("sub1.example.info", generated1.site);
@@ -611,6 +614,7 @@ describe("passwords.js", () =>
         aliases: ["sub2.example.info"]
       }
     });
+    expect(await getAllSites()).to.deep.equal([generated1.site, "sub." + generated2.site]);
 
     await setNotes(stored2, "foobarnotes");
     expect(await getAllPasswords()).to.deep.equal({
@@ -651,6 +655,7 @@ describe("passwords.js", () =>
         aliases: ["sub2.example.info"]
       }
     });
+    expect(await getAllSites()).to.deep.equal([generated1.site, "sub." + generated2.site]);
 
     await removePassword({site: "sub." + generated2.site, name: generated2.name, revision: generated2.revision});
     expect(await getAllPasswords()).to.deep.equal({
@@ -675,6 +680,7 @@ describe("passwords.js", () =>
         aliases: ["example.info", "sub1.example.info"]
       }
     });
+    expect(await getAllSites()).to.deep.equal([generated1.site]);
   });
 
   it("should export data in expected format", async function()

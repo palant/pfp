@@ -231,8 +231,8 @@ describe("sync.js", () =>
     })));
 
     await disableSync();
-    await authorize("dropbox");
     await checkPassword(dummyMaster);
+    await authorize("dropbox");
     await sync();
     await forgetPassword();
     checkSyncError();
@@ -684,5 +684,16 @@ describe("sync.js", () =>
         aliases: []
       }
     });
+  });
+
+  it("should disable on master password changes", async function()
+  {
+    await changePassword(dummyMaster);
+    await authorize("dropbox");
+    await sync();
+    expect(getSyncData().error).to.be.undefined;
+
+    await changePassword(dummyMaster + dummyMaster);
+    expect(getSyncData()).to.deep.equal({});
   });
 });
