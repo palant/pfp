@@ -47,7 +47,7 @@ function rollup(overrides = {})
         jsqr: "JSQR",
         zxcvbn: "zxcvbn"
       }),
-      resolve.default(),
+      resolve(),
       commonjs({
         include: ["node_modules/**"]
       }),
