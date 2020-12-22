@@ -35,8 +35,6 @@
     "vue-template-compiler": "^2.6.11"
   },
   "dependencies": {
-    "@stablelib/scrypt": "^1.0.0",
-    "node-sass": "^5.0.0",
-    "web-ext": "^5.0.0"
+    "@stablelib/scrypt": "^1.0.0"
   }
 }
