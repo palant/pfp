@@ -28,12 +28,9 @@
     "merge-stream": "^2.0.0",
     "mocha": "^7.2.0",
     "node-sass": "^5.0.0",
-    "postcss": "^7.0.35",
     "rollup": "^2.35.1",
     "rollup-plugin-vue": "^5.1.9",
-    "stylelint": "^13.8.0",
-    "stylelint-config-standard": "^20.0.0",
-    "vue-template-compiler": "^2.6.12"
+    "stylelint-config-standard": "^20.0.0"
   },
   "dependencies": {
     "@stablelib/scrypt": "^1.0.0"
