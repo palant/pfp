@@ -14,6 +14,11 @@ let currentHandlers = new Map();
 let maxMessageId = 0;
 function sendMessage(message)
 {
+  // Unwrap any Vue reactive objects
+  for (let i = 0; i < message.args.length; i++)
+    if (message.args[i] && typeof message.args[i].__v_raw != "undefined")
+      message.args[i] = message.args[i].__v_raw;
+
   return new Promise((resolve, reject) =>
   {
     let messageId = message.messageId = port.name + ++maxMessageId;
@@ -51,7 +56,7 @@ function sendMessage(message)
   });
 }
 
-function Proxy(moduleName, methods)
+function proxy(moduleName, methods)
 {
   let proxy = {};
 
@@ -69,28 +74,28 @@ export function setErrorHandler(error, handler)
   errorHandlers.set(error, handler);
 }
 
-export const passwords = Proxy("passwords", [
+export const passwords = proxy("passwords", [
   "exportPasswordData", "importPasswordData", "getPasswords", "addAlias",
   "removeAlias", "addGenerated", "addStored", "removePassword", "getPassword",
   "setNotes", "getAllPasswords", "getAllSites"
 ]);
 
-export const masterPassword = Proxy("masterPassword", [
+export const masterPassword = proxy("masterPassword", [
   "changePassword", "checkPassword", "forgetPassword"
 ]);
 
-export const passwordRetrieval = Proxy("passwordRetrieval", [
+export const passwordRetrieval = proxy("passwordRetrieval", [
   "fillIn"
 ]);
 
-export const prefs = Proxy("prefs", ["getPref", "setPref"]);
+export const prefs = proxy("prefs", ["getPref", "setPref"]);
 
-export const recoveryCodes = Proxy("recoveryCodes", [
+export const recoveryCodes = proxy("recoveryCodes", [
   "getValidChars", "getCode", "formatCode", "isValid", "decodeCode"
 ]);
 
-export const sync = Proxy("sync", [
+export const sync = proxy("sync", [
   "authorize", "getManualAuthURL", "manualAuthorization", "disableSync", "sync"
 ]);
 
-export const ui = Proxy("ui", ["showAllPasswords", "getLink", "openLink"]);
+export const ui = proxy("ui", ["showAllPasswords", "getLink", "openLink"]);

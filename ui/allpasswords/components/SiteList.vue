@@ -69,7 +69,7 @@ export default {
         for (let name of siteNames)
           siteList.push(sites[name]);
         this.sites = siteList;
-      }).catch(this.$app.showUnknownError);
+      }).catch(this.$root.showUnknownError);
     },
     getLetters(sites)
     {

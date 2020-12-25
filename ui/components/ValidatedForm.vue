@@ -15,34 +15,35 @@
 
 export default {
   name: "ValidatedForm",
+  emits: ["validated"],
+  data: () => ({children: []}),
   methods: {
-    forValidatedChildren(callback, vm)
+    registerValidatedChild(child)
     {
-      if (!vm)
-        vm = this;
+      this.children.push(child);
+    },
 
-      for (let child of vm.$children)
-      {
-        if (child.$options.name == "ValidatedInput")
-          callback(child);
-        else
-          this.forValidatedChildren(callback, child);
-      }
+    unregisterValidatedChild(child)
+    {
+      let index = this.children.indexOf(child);
+      if (index >= 0)
+        this.children.splice(index, 1);
     },
 
     submit()
     {
       let seenErrors = false;
-      this.forValidatedChildren(child =>
+      for (let child of this.children)
       {
         child.eagerValidation = true;
         let error = child.update();
         if (error && !seenErrors)
         {
           seenErrors = true;
-          child.$el.focus();
+          if (child.$el.focus)
+            child.$el.focus();
         }
-      });
+      }
 
       if (!seenErrors)
         this.$emit("validated");

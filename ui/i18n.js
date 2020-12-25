@@ -53,8 +53,8 @@ export function $t(id, ...params)
 }
 
 export default {
-  install: function(Vue)
+  install(app)
   {
-    Vue.prototype.$t = $t;
+    app.config.globalProperties.$t = $t;
   }
 };

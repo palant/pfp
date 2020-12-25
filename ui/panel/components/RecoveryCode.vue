@@ -33,6 +33,7 @@ import {recoveryCodes} from "../../proxy.js";
 export default {
   name: "RecoveryCode",
   localePath: "panel/components/RecoveryCode",
+  emits: ["done"],
   data()
   {
     return {
@@ -46,7 +47,7 @@ export default {
     recoveryCodes.getValidChars().then(validChars =>
     {
       this.validChars = validChars;
-    }).catch(this.$app.showUnknownError);
+    }).catch(this.$root.showUnknownError);
   },
   methods: {
     insert(str, substr, pos)
@@ -115,7 +116,7 @@ export default {
                 if (error == "wrong_version")
                   throw this.$t(error);
 
-                this.$app.showUnknownError(error);
+                this.$root.showUnknownError(error);
               });
             }
             return error ? Promise.reject(error) : Promise.resolve();

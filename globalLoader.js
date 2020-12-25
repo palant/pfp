@@ -21,7 +21,10 @@ export default function(map)
       if (!map.hasOwnProperty(id))
         return null;
 
-      return "export default " + map[id];
+      if (typeof map[id] == "string")
+        return "export default " + map[id];
+      else
+        return `export const { ${map[id].names.join(",")} } = ${map[id].object}`;
     }
   };
 }

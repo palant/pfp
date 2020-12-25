@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <div @keydown.ctrl.69.prevent="testUnknownError"
+  <div @keydown.ctrl.e.prevent="testUnknownError"
        @keydown.ctrl.exact="tabNavigation"
        @keydown.meta.exact="tabNavigation"
   >
@@ -15,7 +15,7 @@
     <change-master v-if="masterPasswordState == 'unset' || (masterPasswordState == 'set' && resettingMaster)" />
     <enter-master v-else-if="masterPasswordState == 'set'" />
     <div v-else-if="masterPasswordState == 'known'" class="tabs">
-      <nav v-keyboard-navigation="tab" class="tablist" role="list">
+      <nav v-keyboard-navigation:tab class="tablist" role="list">
         <div />
 
         <iconic-link class="tab select-site" role="listitem"
@@ -31,7 +31,7 @@
         />
 
         <iconic-link class="tab sync" role="listitem"
-                     :class="{active: currentPage == 'sync', failed: $app.sync.error && $app.sync.error != 'sync_connection_error'}"
+                     :class="{active: currentPage == 'sync', failed: $root.sync.error && $root.sync.error != 'sync_connection_error'}"
                      :title="$t('sync')"
                      @click="currentPage = 'sync'"
         />
@@ -131,7 +131,7 @@ export default {
         this.currentPage = "select-site";
     }
   },
-  created: function()
+  created()
   {
     app = this;
   },

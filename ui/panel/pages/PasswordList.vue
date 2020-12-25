@@ -6,35 +6,35 @@
 
 <template>
   <div class="page">
-    <template v-if="$app.site == $app.siteDisplayName">
+    <template v-if="$root.site == $root.siteDisplayName">
       <label for="site">{{ $t("site") }}</label>
-      <external-link id="site" v-focus="!$app.pwdList.length"
-                     type="url" :param="'https://' + $app.site" data-noaccesskey
+      <external-link id="site" v-focus="!$root.pwdList.length"
+                     type="url" :param="'https://' + $root.site" data-noaccesskey
       >
-        {{ $app.siteDisplayName }}
+        {{ $root.siteDisplayName }}
       </external-link>
     </template>
     <template v-else>
       <div>{{ $t("site") }}</div>
-      <div v-focus="!$app.pwdList.length" class="special-site" tabindex="0">
-        {{ $app.siteDisplayName }}
+      <div v-focus="!$root.pwdList.length" class="special-site" tabindex="0">
+        {{ $root.siteDisplayName }}
       </div>
     </template>
 
-    <div v-if="$app.origSite != $app.site" class="alias-container">
-      {{ $t("alias_description", $app.origSite) }}
+    <div v-if="$root.origSite != $root.site" class="alias-container">
+      {{ $t("alias_description", $root.origSite) }}
       <a href="#" @click.prevent="removeAlias">
         {{ $t("remove_alias") }}
       </a>
     </div>
-    <a v-else-if="$app.site && $app.site != 'pfp.invalid' && !$app.pwdList.length"
+    <a v-else-if="$root.site && $root.site != 'pfp.invalid' && !$root.pwdList.length"
        class="alias-container" href="#" @click.prevent="addAlias"
     >
       {{ $t("add_alias") }}
     </a>
 
     <modal-overlay v-if="modal == 'site-selection'" :stretch="true" @cancel="modal = null">
-      <site-selection :message="$t('select_alias', $app.origSite)" :callback="selectionCallback" />
+      <site-selection :message="$t('select_alias', $root.origSite)" :callback="selectionCallback" />
     </modal-overlay>
 
     <password-message ref="password-message" class="block-start"
@@ -50,20 +50,20 @@
     />
 
     <div class="block-start">{{ $t("passwords_label") }}</div>
-    <div v-if="!$app.pwdList.length">{{ $t("no_passwords_message") }}</div>
+    <div v-if="!$root.pwdList.length">{{ $t("no_passwords_message") }}</div>
     <div v-else class="password-list-container" role="list" @keydown="keyboardNavigation">
-      <password-entry v-for="(password, index) in $app.pwdList"
+      <password-entry v-for="(password, index) in $root.pwdList"
                       :key="password.name + '\0' + password.revision"
                       role="listitem" :password="password" :focus="index == 0"
       />
     </div>
 
-    <a v-if="$app.site" class="add-password-link" href="#" @click.prevent="modal = 'generated'">
+    <a v-if="$root.site" class="add-password-link" href="#" @click.prevent="modal = 'generated'">
       {{ $t("generate_password_link") }}
     </a>
     <generated-password v-if="modal == 'generated'" @cancel="modal = null" />
 
-    <a v-if="$app.site" class="add-password-link" href="#" @click.prevent="modal = 'stored'">
+    <a v-if="$root.site" class="add-password-link" href="#" @click.prevent="modal = 'stored'">
       {{ $t("stored_password_link") }}
     </a>
     <stored-password v-if="modal == 'stored'" @cancel="modal = null" />
@@ -159,37 +159,37 @@ export default {
       this.selectionCallback = site =>
       {
         this.modal = null;
-        if (site == this.$app.origSite)
+        if (site == this.$root.origSite)
           return;
 
-        passwords.addAlias(this.$app.origSite, site)
-          .then(() => passwords.getPasswords(this.$app.origSite))
+        passwords.addAlias(this.$root.origSite, site)
+          .then(() => passwords.getPasswords(this.$root.origSite))
           .then(([origSite, site, pwdList]) =>
           {
-            this.$app.origSite = origSite;
-            this.$app.site = site;
-            this.$app.pwdList = pwdList;
+            this.$root.origSite = origSite;
+            this.$root.site = site;
+            this.$root.pwdList = pwdList;
           })
-          .catch(this.$app.showUnknownError);
+          .catch(this.$root.showUnknownError);
       };
       this.modal = "site-selection";
     },
     removeAlias()
     {
-      let message = this.$t("remove_alias_confirmation", this.$app.origSite, this.$app.siteDisplayName);
-      this.$app.confirm(message).then(response =>
+      let message = this.$t("remove_alias_confirmation", this.$root.origSite, this.$root.siteDisplayName);
+      this.$root.confirm(message).then(response =>
       {
         if (response)
         {
-          passwords.removeAlias(this.$app.origSite)
-            .then(() => passwords.getPasswords(this.$app.origSite))
+          passwords.removeAlias(this.$root.origSite)
+            .then(() => passwords.getPasswords(this.$root.origSite))
             .then(([origSite, site, pwdList]) =>
             {
-              this.$app.origSite = origSite;
-              this.$app.site = site;
-              this.$app.pwdList = pwdList;
+              this.$root.origSite = origSite;
+              this.$root.site = site;
+              this.$root.pwdList = pwdList;
             })
-            .catch(this.$app.showUnknownError);
+            .catch(this.$root.showUnknownError);
         }
       });
     },
@@ -197,7 +197,7 @@ export default {
     {
       ui.showAllPasswords()
         .then(() => window.close())
-        .catch(this.$app.showUnknownError);
+        .catch(this.$root.showUnknownError);
     }
   }
 };

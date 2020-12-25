@@ -56,7 +56,7 @@ export default {
   data()
   {
     return {
-      value: this.$app.site && this.$app.siteDisplayName,
+      value: this.$root.site && this.$root.siteDisplayName,
       allSites: null,
       sites: [],
       activeIndex: -1,
@@ -88,7 +88,7 @@ export default {
         });
         this.updateSites();
       })
-      .catch(this.$app.showUnknownError);
+      .catch(this.$root.showUnknownError);
   },
   methods: {
     updateSites()

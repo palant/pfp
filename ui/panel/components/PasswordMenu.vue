@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <modal-overlay v-keyboard-navigation="password-menu-entry" @cancel="$emit('cancel')">
+  <modal-overlay v-keyboard-navigation:password-menu-entry @cancel="$emit('cancel')">
     <a v-if="!$isWebClient" v-focus href="#" class="password-menu-entry" @click.prevent="$parent.fillIn">
       <span class="to-document-link iconic-link" />
       {{ $t("to_document") }}
@@ -53,6 +53,7 @@ export default {
       type: Object,
       required: true
     }
-  }
+  },
+  emits: ["cancel"]
 };
 </script>

@@ -6,15 +6,15 @@
 
 <template>
   <modal-overlay :stretch="true" @cancel="$emit('cancel')">
-    <validated-form class="modal-form" @validated="submit" @reset.native="$emit('cancel')">
+    <validated-form class="modal-form" @validated="submit" @reset="$emit('cancel')">
       <div class="warning">{{ $t("warning") }}</div>
 
-      <password-name-entry ref="name-entry" v-model="name" :revision.sync="revision" class="block-start" />
+      <password-name-entry ref="name-entry" v-model="name" v-model:revision="revision" class="block-start" />
 
       <template v-if="!recoveryActive">
         <label class="block-start" for="password-value">{{ $t("password_label") }}</label>
         <validated-input id="password-value" ref="password" v-model="password"
-                         :error.sync="passwordError" type="password"
+                         v-model:error="passwordError" type="password"
                          @validate="validatePassword"
         />
         <div v-if="passwordError" class="error">
@@ -49,6 +49,7 @@ export default {
     "password-name-entry": PasswordNameEntry,
     "recovery-code": RecoveryCode
   },
+  emits: ["cancel"],
   data()
   {
     return {
@@ -84,20 +85,20 @@ export default {
       let revision = this.revision != "1" ? this.revision : "";
 
       passwords.addStored({
-        site: this.$app.site,
+        site: this.$root.site,
         name: this.name,
         revision,
         password: this.password
       }).then(pwdList =>
       {
-        this.$app.pwdList = pwdList;
+        this.$root.pwdList = pwdList;
         this.$emit("cancel");
       }).catch(error =>
       {
         if (error == "alreadyExists")
           this.$refs["name-entry"].nameConflict();
         else
-          this.$app.showUnknownError(error);
+          this.$root.showUnknownError(error);
       });
     }
   }

@@ -51,7 +51,7 @@ export default {
         }, messageHideDelay);
       }
       else
-        this.$app.showUnknownError(this.message);
+        this.$root.showUnknownError(this.message);
     }
   }
 };

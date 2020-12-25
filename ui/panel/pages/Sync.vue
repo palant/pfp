@@ -6,41 +6,41 @@
 
 <template>
   <div class="page">
-    <template v-if="$app.sync.provider">
+    <template v-if="$root.sync.provider">
       <div>{{ $t("provider_label") }}</div>
       <div>
-        {{ labelForProvider($app.sync.provider) }}
-        <template v-if="$app.sync.username">
-          ({{ $app.sync.username }})
+        {{ labelForProvider($root.sync.provider) }}
+        <template v-if="$root.sync.username">
+          ({{ $root.sync.username }})
         </template>
       </div>
 
       <div class="block-start">{{ $t("lastTime_label") }}</div>
       <div>
-        <template v-if="$app.sync.isSyncing">{{ $t("lastTime_now") }}</template>
-        <template v-else-if="$app.sync.lastSync">{{ new Date($app.sync.lastSync).toLocaleString() }}</template>
+        <template v-if="$root.sync.isSyncing">{{ $t("lastTime_now") }}</template>
+        <template v-else-if="$root.sync.lastSync">{{ new Date($root.sync.lastSync).toLocaleString() }}</template>
         <template v-else>{{ $t("lastTime_never") }}</template>
 
-        <template v-if="$app.sync.lastSync && !$app.sync.isSyncing">
-          <span v-if="$app.sync.error" class="sync-failed">{{ " " + $t("failed") }}</span>
+        <template v-if="$root.sync.lastSync && !$root.sync.isSyncing">
+          <span v-if="$root.sync.error" class="sync-failed">{{ " " + $t("failed") }}</span>
           <template v-else>{{ " " + $t("succeeded") }}</template>
         </template>
       </div>
 
-      <div v-if="$app.sync.error" class="warning sync-error">
-        {{ localize($app.sync.error) }}
-        <a v-if="$app.sync.error == 'sync_invalid_token'" href="#" @click.prevent="authorize($app.sync.provider)">
+      <div v-if="$root.sync.error" class="warning sync-error">
+        {{ localize($root.sync.error) }}
+        <a v-if="$root.sync.error == 'sync_invalid_token'" href="#" @click.prevent="authorize($root.sync.provider)">
           {{ $t("reauthorize") }}
         </a>
       </div>
       <div class="button-container">
-        <button v-focus :disabled="$app.sync.isSyncing" @click="doSync">{{ $t("do_sync") }}</button>
+        <button v-focus :disabled="$root.sync.isSyncing" @click="doSync">{{ $t("do_sync") }}</button>
         <button @click="disableSync">{{ $t("disable") }}</button>
       </div>
     </template>
     <template v-else>
       <div class="sync-section">{{ $t("selection_label") }}</div>
-      <div v-keyboard-navigation="sync-provider-link" class="sync-provider-selection">
+      <div v-keyboard-navigation:sync-provider-link class="sync-provider-selection">
         <a v-for="(provider, index) in providers" :key="provider.name"
            v-focus="index == 0" class="sync-provider-link"
            href="#" @click.prevent="authorize(provider.name)"
@@ -134,13 +134,13 @@ export default {
     },
     disableSync()
     {
-      this.$app.confirm(this.$t("disable_confirmation")).then(disable =>
+      this.$root.confirm(this.$t("disable_confirmation")).then(disable =>
       {
         if (disable)
         {
           sync.disableSync().then(() =>
           {
-            this.$app.sync = {
+            this.$root.sync = {
               provider: null
             };
           });
@@ -165,7 +165,7 @@ export default {
 
         this.manualAuthCallback = code =>
         {
-          return sync.manualAuthorization(provider, username, code).catch(this.$app.showUnknownError);
+          return sync.manualAuthorization(provider, username, code).catch(this.$root.showUnknownError);
         };
 
         sync.getManualAuthURL(provider, username).then(url =>
@@ -175,7 +175,7 @@ export default {
         {
           this.manualAuthCallback = null;
           wnd.close();
-          this.$app.showUnknownError(error);
+          this.$root.showUnknownError(error);
         });
       }
       else

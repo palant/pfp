@@ -36,6 +36,7 @@ export default {
       required: true
     }
   },
+  emits: ["cancel"],
   data()
   {
     return {
@@ -48,9 +49,9 @@ export default {
     {
       passwords.setNotes(this.password, this.value).then(pwdList =>
       {
-        this.$app.pwdList = pwdList;
+        this.$root.pwdList = pwdList;
         this.$emit("cancel");
-      }).catch(this.$app.showUnknownError);
+      }).catch(this.$root.showUnknownError);
     }
   }
 };

@@ -6,11 +6,11 @@
 
 <template>
   <modal-overlay :stretch="true" @cancel="$emit('cancel')">
-    <validated-form class="modal-form" @validated="submit" @reset.native="$emit('cancel')">
+    <validated-form class="modal-form" @validated="submit" @reset="$emit('cancel')">
       <div v-if="options.replacing" class="warning replacing">{{ $t("replace_warning") }}</div>
 
       <password-name-entry ref="name-entry" v-model="name"
-                           :revision.sync="revision"
+                           v-model:revision="revision"
                            :readonly="options.replacing"
                            :class="{'block-start': options.replacing}"
       />
@@ -35,7 +35,9 @@
       </div>
 
       <!-- Charset checkboxes are aggregated into a single hidden input to simplify validation -->
-      <validated-input v-model="charsets" :error.sync="charsetsError" :visible="false" @validate="validateCharsets" />
+      <validated-input v-model="charsets" v-model:error="charsetsError"
+                       :visible="false" @validate="validateCharsets"
+      />
       <div v-if="charsetsError" class="error">{{ charsetsError }}</div>
 
       <div class="button-container">
@@ -68,6 +70,7 @@ export default {
       default: Object
     }
   },
+  emits: ["cancel"],
   data()
   {
     let getProp = (prop, defValue) =>
@@ -82,7 +85,7 @@ export default {
     let revision = getProp("revision");
     if (this.options.incRevision)
     {
-      let pwdList = this.$app.pwdList;
+      let pwdList = this.$root.pwdList;
       revision = (parseInt(revision, 10) || 1) + 1;
       if (revision < 2)
         revision = 2;
@@ -140,7 +143,7 @@ export default {
       let revision = this.revision != "1" ? this.revision : "";
 
       passwords.addGenerated({
-        site: this.$app.site,
+        site: this.$root.site,
         name: this.name,
         revision,
         length: this.length,
@@ -151,14 +154,14 @@ export default {
         notes: this.keepNotes ? this.password.notes : null
       }, this.options.replacing).then(pwdList =>
       {
-        this.$app.pwdList = pwdList;
+        this.$root.pwdList = pwdList;
         this.$emit("cancel");
       }).catch(error =>
       {
         if (error == "alreadyExists")
           this.$refs["name-entry"].nameConflict();
         else
-          this.$app.showUnknownError(error);
+          this.$root.showUnknownError(error);
       });
     }
   }

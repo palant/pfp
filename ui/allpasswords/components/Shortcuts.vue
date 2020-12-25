@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <div v-keyboard-navigation="shortcut-letter" class="shortcuts">
+  <div v-keyboard-navigation:shortcut-letter class="shortcuts">
     <a v-for="(letter, index) in letters" :key="letter.letter"
        v-focus="index == 0" class="shortcut-letter" href="#"
        @click.prevent="$emit('clicked', letter.param)"
@@ -23,6 +23,7 @@ export default {
       type: Array,
       required: true
     }
-  }
+  },
+  emits: ["clicked"]
 };
 </script>

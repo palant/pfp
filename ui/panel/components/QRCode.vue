@@ -35,6 +35,7 @@ export default {
       required: true
     }
   },
+  emits: ["cancel"],
   data()
   {
     let qr = new JSQR();

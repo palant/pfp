@@ -6,7 +6,7 @@
 
 <template>
   <validated-form class="page" @validated="submit"
-                  @reset.native.prevent="hasPassword && ($app.resettingMaster = false)"
+                  @reset.prevent="hasPassword && ($root.resettingMaster = false)"
   >
     <div>
       <template v-if="!hasPassword">
@@ -22,8 +22,8 @@
       </external-link>
     </div>
     <label class="block-start" for="new-master">{{ $t("new_master") }}</label>
-    <validated-input id="new-master" v-model="newMaster" v-focus type="password"
-                     :error.sync="newMasterError"
+    <validated-input id="new-master" v-model="newMaster"
+                     v-model:error="newMasterError" v-focus type="password"
                      @validate="validateMasterPassword"
     />
     <div v-if="newMasterError" class="error">
@@ -32,7 +32,7 @@
     <password-score ref="passwordScore" :password="newMaster" />
     <label class="block-start" for="new-master-repeat">{{ $t("new_master_repeat") }}</label>
     <validated-input id="new-master-repeat" v-model="newMasterRepeat"
-                     type="password" :error.sync="newMasterRepeatError"
+                     v-model:error="newMasterRepeatError" type="password"
                      @validate="validateMasterPasswordRepeat"
     />
     <div v-if="newMasterRepeatError" class="error">
@@ -49,7 +49,7 @@
 "use strict";
 
 import {passwords, masterPassword} from "../../proxy.js";
-import {validateMasterPassword} from "../../components/EnterMaster.vue";
+import {validateMasterPassword} from "../../components/EnterMasterShared.vue";
 import PasswordScore from "../components/PasswordScore.vue";
 
 export default {
@@ -70,29 +70,29 @@ export default {
   computed: {
     hasPassword()
     {
-      return this.$app.masterPasswordState != "unset";
+      return this.$root.masterPasswordState != "unset";
     }
   },
   methods: {
     submit()
     {
       let score = this.$refs.passwordScore.value;
-      let ask = score < 3 ? this.$app.confirm(this.$t("weak_password")) : Promise.resolve(true);
+      let ask = score < 3 ? this.$root.confirm(this.$t("weak_password")) : Promise.resolve(true);
       ask.then(accepted =>
       {
         if (accepted)
         {
           masterPassword.changePassword(this.newMaster)
-            .then(() => passwords.getPasswords(this.$app.origSite))
+            .then(() => passwords.getPasswords(this.$root.origSite))
             .then(([origSite, site, pwdList]) =>
             {
-              this.$app.origSite = origSite;
-              this.$app.site = site;
-              this.$app.pwdList = pwdList;
-              this.$app.masterPasswordState = "known";
-              this.$app.resettingMaster = false;
+              this.$root.origSite = origSite;
+              this.$root.site = site;
+              this.$root.pwdList = pwdList;
+              this.$root.masterPasswordState = "known";
+              this.$root.resettingMaster = false;
             })
-            .catch(this.$app.showUnknownError);
+            .catch(this.$root.showUnknownError);
         }
       });
     },

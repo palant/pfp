@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <div @keydown.ctrl.69.prevent="testUnknownError">
+  <div @keydown.ctrl.e.prevent="testUnknownError">
     <in-progress v-if="inProgress" />
     <enter-master v-if="masterPromise" @done="enterMasterDone" />
     <confirm ref="confirm" />

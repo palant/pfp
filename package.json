@@ -18,7 +18,7 @@
     "chai": "^4.2.0",
     "del": "^5.1.0",
     "eslint-plugin-json": "^2.1.2",
-    "eslint-plugin-vue": "^6.2.2",
+    "eslint-plugin-vue": "^7.3.0",
     "gulp": "^4.0.2",
     "gulp-eslint": "^6.0.0",
     "gulp-htmlhint": "^3.0.1",
@@ -29,7 +29,7 @@
     "mocha": "^7.2.0",
     "node-sass": "^5.0.0",
     "rollup": "^2.35.1",
-    "rollup-plugin-vue": "^5.1.9",
+    "rollup-plugin-vue": "^6.0.0",
     "stylelint-config-standard": "^20.0.0"
   },
   "dependencies": {

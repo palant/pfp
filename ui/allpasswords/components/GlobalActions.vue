@@ -56,7 +56,7 @@ export default {
         link.href = URL.createObjectURL(blob);
         link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".json";
         link.click();
-      }).catch(this.$app.showGlobalMessage);
+      }).catch(this.$root.showGlobalMessage);
     },
     selectImportFile()
     {
@@ -67,7 +67,7 @@ export default {
       let reader = new FileReader();
       reader.onload = () =>
       {
-        this.$app.confirm(this.$t("import_confirm")).then(accepted =>
+        this.$root.confirm(this.$t("import_confirm")).then(accepted =>
         {
           if (accepted)
             this.doImport(reader.result);
@@ -78,19 +78,19 @@ export default {
     },
     doImport(data, masterPass)
     {
-      this.$app.inProgress = true;
+      this.$root.inProgress = true;
       passwords.importPasswordData(data, masterPass).then(() =>
       {
-        this.$app.inProgress = false;
-        this.$app.showGlobalMessage("import_success");
-        this.$app.updateData();
+        this.$root.inProgress = false;
+        this.$root.showGlobalMessage("import_success");
+        this.$root.updateData();
       }).catch(error =>
       {
-        this.$app.inProgress = false;
+        this.$root.inProgress = false;
         if (error == "wrong_master_password")
           this.enterMasterCallback = newMaster => this.doImport(data, newMaster);
         else
-          this.$app.showGlobalMessage(error);
+          this.$root.showGlobalMessage(error);
       });
     },
     printPage()

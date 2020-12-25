@@ -242,7 +242,7 @@ function triggerHint(event)
 }
 
 export default {
-  install: function(Vue)
+  install(app)
   {
     window.addEventListener("keydown", onKeyDown, true);
     window.addEventListener("keyup", onKeyUp, true);

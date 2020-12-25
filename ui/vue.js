@@ -6,7 +6,7 @@
 
 "use strict";
 
-import Vue from "vue";
+import {createApp} from "vue";
 
 import {keyboardNavigationType} from "./common.js";
 import I18n from "./i18n.js";
@@ -28,114 +28,108 @@ if (!("isConnected" in Node.prototype))
   });
 }
 
-Vue.use(I18n);
-Vue.use(AccessKeys);
+function init(App, isWebClient)
+{
+  let app = createApp(App);
 
-Vue.component("external-link", ExternalLink);
-Vue.component("iconic-link", IconicLink);
-Vue.component("modal-overlay", ModalOverlay);
-Vue.component("validated-form", ValidatedForm);
-Vue.component("validated-input", ValidatedInput);
+  app.config.globalProperties.$isWebClient = isWebClient;
 
-Vue.directive("focus", {
-  inserted(element, binding)
-  {
-    if (typeof binding.value == "undefined" || binding.value)
-      element.focus();
-  }
-});
+  app.use(I18n);
+  app.use(AccessKeys);
 
-Vue.directive("cancel", {
-  inserted(element, binding, vnode)
-  {
-    vnode.context.$el.addEventListener("keydown", event =>
+  app.component("external-link", ExternalLink);
+  app.component("iconic-link", IconicLink);
+  app.component("modal-overlay", ModalOverlay);
+  app.component("validated-form", ValidatedForm);
+  app.component("validated-input", ValidatedInput);
+
+  app.directive("focus", {
+    mounted(element, binding)
     {
-      if (event.defaultPrevented || event.key != "Escape" ||
-          event.shiftKey || event.ctrlKey || event.altKey || event.metaKey)
+      if (typeof binding.value == "undefined" || binding.value)
+        element.focus();
+    }
+  });
+
+  app.directive("cancel", {
+    mounted(element, binding)
+    {
+      binding.instance.$el.addEventListener("keydown", event =>
       {
-        return;
-      }
-      if (!element.isConnected)
-        return;
+        if (event.defaultPrevented || event.key != "Escape" ||
+            event.shiftKey || event.ctrlKey || event.altKey || event.metaKey)
+        {
+          return;
+        }
+        if (!element.isConnected)
+          return;
 
-      event.preventDefault();
-      element.click();
-    });
-  }
-});
+        event.preventDefault();
+        element.click();
+      });
+    }
+  });
 
-Vue.directive("select", {
-  inserted(element)
-  {
-    element.select();
-  }
-});
-
-Vue.directive("scroll-active", {
-  update(element)
-  {
-    if (element.classList.contains("active"))
-      element.scrollIntoView({block: "nearest"});
-  }
-});
-
-Vue.directive("keyboard-navigation", {
-  inserted(element, binding)
-  {
-    element.addEventListener("keydown", event =>
+  app.directive("select", {
+    mounted(element)
     {
-      if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey)
-        return;
+      element.select();
+    }
+  });
 
-      let type = keyboardNavigationType(event);
-      if (!type)
-        return;
+  app.directive("scroll-active", {
+    updated(element)
+    {
+      if (element.classList.contains("active"))
+        element.scrollIntoView({block: "nearest"});
+    }
+  });
 
-      let current = document.activeElement;
-      let elements = document.getElementsByClassName(binding.expression);
-      let index = [].indexOf.call(elements, current);
-      if (index < 0)
-        return;
+  app.directive("keyboard-navigation", {
+    mounted(element, binding)
+    {
+      element.addEventListener("keydown", event =>
+      {
+        if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey)
+          return;
 
-      event.preventDefault();
-      if (type.startsWith("back") && index - 1 >= 0)
-        elements[index - 1].focus();
-      else if (type.startsWith("forward") && index + 1 < elements.length)
-        elements[index + 1].focus();
-      else if (type.startsWith("start"))
-        elements[0].focus();
-      else if (type.startsWith("end"))
-        elements[elements.length - 1].focus();
-    });
-  }
-});
+        let type = keyboardNavigationType(event);
+        if (!type)
+          return;
 
-Vue.mixin({
-  beforeCreate()
-  {
-    if (this.$options.name == "App")
-      this.$app = this;
-    else if (this.$parent)
-      this.$app = this.$parent.$app;
-  }
-});
+        let current = document.activeElement;
+        let elements = document.getElementsByClassName(binding.arg);
+        let index = [].indexOf.call(elements, current);
+        if (index < 0)
+          return;
+
+        event.preventDefault();
+        if (type.startsWith("back") && index - 1 >= 0)
+          elements[index - 1].focus();
+        else if (type.startsWith("forward") && index + 1 < elements.length)
+          elements[index + 1].focus();
+        else if (type.startsWith("start"))
+          elements[0].focus();
+        else if (type.startsWith("end"))
+          elements[elements.length - 1].focus();
+      });
+    }
+  });
+
+  app.mount("#app");
+}
 
 export function runApp(App, isWebClient = false)
 {
-  Vue.prototype.$isWebClient = isWebClient;
-
-  function init()
-  {
-    window.removeEventListener("load", init);
-
-    new Vue({
-      el: "#app",
-      render: createElement => createElement(App)
-    });
-  }
-
   if (document.readyState != "complete")
-    window.addEventListener("load", init);
+  {
+    let callback = function()
+    {
+      window.removeEventListener("load", callback);
+      init(App, isWebClient);
+    };
+    window.addEventListener("load", callback);
+  }
   else
-    init();
+    init(App, isWebClient);
 }

@@ -8,8 +8,9 @@
   <modal-overlay @cancel="$emit('cancel')">
     <validated-form class="modal-form" @validated="done">
       <label for="username">{{ $t("username_label") }}</label>
-      <validated-input id="username" v-model="username" v-focus
-                       :error.sync="usernameError" placeholder="me@example.com"
+      <validated-input id="username" v-model="username"
+                       v-model:error="usernameError" v-focus
+                       placeholder="me@example.com"
                        @validate="validateUsername"
       />
       <div v-if="usernameError" class="error">
@@ -45,6 +46,7 @@ export default {
       required: true
     }
   },
+  emits: ["cancel"],
   data()
   {
     return {

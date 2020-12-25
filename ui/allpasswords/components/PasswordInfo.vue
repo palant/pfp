@@ -32,7 +32,7 @@
       </template>
       <template v-else-if="password.type == 'stored'">
         <div class="password-type">
-          <template>{{ $t("password_type_stored") }}</template>
+          <template v-if="true">{{ $t("password_type_stored") }}</template>
           <span class="help-icon" :title="$t('recovery_code_explanation')"
                 :aria-label="$t('recovery_code_explanation')"
           />
@@ -75,6 +75,7 @@ export default {
       required: true
     }
   },
+  emits: ["removed"],
   data()
   {
     return {
@@ -166,7 +167,7 @@ export default {
       let message = this.$t("/(panel)(components)(PasswordEntry)remove_confirmation", this.password.name, this.siteDisplayName);
       if (this.password.notes)
         message += " " + this.$t("/(panel)(components)(PasswordEntry)remove_confirmation_notes", this.password.notes);
-      this.$app.confirm(message).then(accepted =>
+      this.$root.confirm(message).then(accepted =>
       {
         if (!accepted)
           return;

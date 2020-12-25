@@ -53,6 +53,7 @@ export default {
       required: true
     }
   },
+  emits: ["removed"],
   computed: {
     displayName()
     {

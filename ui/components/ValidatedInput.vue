@@ -14,7 +14,7 @@
 export default {
   name: "ValidatedInput",
   props: {
-    "value": {
+    "modelValue": {
       type: String,
       required: true
     },
@@ -27,22 +27,45 @@ export default {
       default: true
     }
   },
+  emits: ["validate", "update:modelValue", "update:error"],
   data()
   {
     return {
-      actualValue: this.value,
+      actualValue: this.modelValue,
       eagerValidation: false
     };
   },
   watch: {
-    value()
+    modelValue()
     {
-      this.actualValue = this.value;
+      this.actualValue = this.modelValue;
       this.update();
     },
     actualValue()
     {
-      this.$emit("input", this.actualValue);
+      this.$emit("update:modelValue", this.actualValue);
+    }
+  },
+  mounted()
+  {
+    for (let parent = this.$parent; parent; parent = parent.$parent)
+    {
+      if (parent.registerValidatedChild)
+      {
+        parent.registerValidatedChild(this);
+        break;
+      }
+    }
+  },
+  beforeUnmount()
+  {
+    for (let parent = this.$parent; parent; parent = parent.$parent)
+    {
+      if (parent.unregisterValidatedChild)
+      {
+        parent.unregisterValidatedChild(this);
+        break;
+      }
     }
   },
   methods: {
@@ -52,7 +75,7 @@ export default {
         return null;
 
       let error = null;
-      this.$emit("validate", this.value, e => error = e);
+      this.$emit("validate", this.modelValue, e => error = e);
       this.$emit("update:error", error);
       return error;
     }

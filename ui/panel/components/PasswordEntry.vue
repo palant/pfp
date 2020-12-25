@@ -197,15 +197,15 @@ export default {
     removePassword()
     {
       this.modal = null;
-      let message = this.$t("remove_confirmation", this.password.name, this.$app.siteDisplayName);
+      let message = this.$t("remove_confirmation", this.password.name, this.$root.siteDisplayName);
       if (this.password.notes)
         message += " " + this.$t("remove_confirmation_notes", this.password.notes);
-      this.$app.confirm(message).then(response =>
+      this.$root.confirm(message).then(response =>
       {
         if (response)
         {
           passwords.removePassword(this.password)
-            .then(pwdList => this.$app.pwdList = pwdList)
+            .then(pwdList => this.$root.pwdList = pwdList)
             .catch(this.$parent.showPasswordMessage);
         }
       });

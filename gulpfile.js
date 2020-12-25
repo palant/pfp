@@ -22,6 +22,7 @@ import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import vue from "rollup-plugin-vue";
+import Vue from "vue";
 
 import globalLoader from "./globalLoader.js";
 import * as utils from "./gulp-utils.js";
@@ -43,7 +44,7 @@ function rollup(overrides = {})
     plugins: [
       ...prePlugins,
       globalLoader({
-        vue: "Vue",
+        vue: {object: "Vue", names: Object.keys(Vue)},
         jsqr: "JSQR",
         zxcvbn: "zxcvbn"
       }),

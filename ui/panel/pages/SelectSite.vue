@@ -22,18 +22,19 @@ export default {
   components: {
     "site-selection": SiteSelection
   },
+  emits: ["selected"],
   methods: {
     selected(site)
     {
       passwords.getPasswords(site)
         .then(([origSite, site, pwdList]) =>
         {
-          this.$app.origSite = origSite;
-          this.$app.site = site;
-          this.$app.pwdList = pwdList;
+          this.$root.origSite = origSite;
+          this.$root.site = site;
+          this.$root.pwdList = pwdList;
           this.$emit("selected");
         })
-        .catch(this.$app.showUnknownError);
+        .catch(this.$root.showUnknownError);
     }
   }
 };

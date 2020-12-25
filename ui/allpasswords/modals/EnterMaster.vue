@@ -6,19 +6,19 @@
 
 <template>
   <modal-overlay @cancel="done(false)">
-    <enter-master class="modal-form" :warning="warning" :callback="callback" @done="done" />
+    <enter-master-shared class="modal-form" :warning="warning" :callback="callback" @done="done" />
   </modal-overlay>
 </template>
 
 <script>
 "use strict";
 
-import EnterMaster from "../../components/EnterMaster.vue";
+import EnterMasterShared from "../../components/EnterMasterShared.vue";
 
 export default {
   name: "EnterMaster",
   components: {
-    "enter-master": EnterMaster
+    "enter-master-shared": EnterMasterShared
   },
   props: {
     callback: {
@@ -30,6 +30,7 @@ export default {
       default: null
     }
   },
+  emits: ["done"],
   methods: {
     done(success)
     {

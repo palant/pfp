@@ -37,6 +37,7 @@ export default {
       default: false
     }
   },
+  emits: ["cancel"],
   data()
   {
     return {
@@ -62,7 +63,7 @@ export default {
       subtree: true
     });
   },
-  beforeDestroy()
+  beforeUnmount()
   {
     if (activeModal == this)
     {
@@ -88,7 +89,7 @@ export default {
       document.body.style.minHeight = height + "px";
 
       if (this.focusCancel)
-        this.$refs.cancel.focus();
+        this.$refs.cancel.$el.focus();
     }
   }
 };

@@ -5,11 +5,12 @@
  -->
 
 <template>
-  <validated-form @validated="submit" @reset.native.prevent="$emit('done', false)">
+  <validated-form @validated="submit" @reset.prevent="$emit('done', false)">
     <div v-if="warning" class="warning">{{ warning }}</div>
     <label for="master-password">{{ $t("master_password") }}</label>
-    <validated-input id="master-password" v-model="masterPassword" v-focus
-                     type="password" :error.sync="masterPasswordError"
+    <validated-input id="master-password" v-model="masterPassword"
+                     v-model:error="masterPasswordError" v-focus
+                     type="password"
                      @validate="validateMasterPassword"
     />
     <div v-if="masterPasswordError" class="error">
@@ -31,12 +32,12 @@ import {masterPassword} from "../proxy.js";
 export function validateMasterPassword(value, setError)
 {
   if (value.length < 6)
-    setError(this.$t("/(components)(EnterMaster)password_too_short"));
+    setError(this.$t("/(components)(EnterMasterShared)password_too_short"));
 }
 
 export default {
-  name: "EnterMaster",
-  localePath: "components/EnterMaster",
+  name: "EnterMasterShared",
+  localePath: "components/EnterMasterShared",
   props: {
     callback: {
       type: Function,
@@ -51,6 +52,7 @@ export default {
       default: true
     }
   },
+  emits: ["done"],
   data()
   {
     return {
@@ -76,7 +78,7 @@ export default {
           if (error == "declined")
             this.masterPasswordError = this.$t("password_declined");
           else
-            this.$app.showUnknownError(error);
+            this.$root.showUnknownError(error);
         });
       }
     },

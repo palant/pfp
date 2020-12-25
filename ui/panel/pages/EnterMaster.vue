@@ -6,13 +6,13 @@
 
 <template>
   <div>
-    <enter-master class="page" :cancelable="false" @done="done">
+    <enter-master-shared class="page" :cancelable="false" @done="done">
       <div class="link-container">
-        <a href="#" @click.prevent="$app.resettingMaster = true">
+        <a href="#" @click.prevent="$root.resettingMaster = true">
           {{ $t("reset") }}
         </a>
       </div>
-    </enter-master>
+    </enter-master-shared>
   </div>
 </template>
 
@@ -20,13 +20,13 @@
 "use strict";
 
 import {passwords} from "../../proxy.js";
-import EnterMaster from "../../components/EnterMaster.vue";
+import EnterMasterShared from "../../components/EnterMasterShared.vue";
 
 export default {
   name: "EnterMaster",
   localePath: "panel/pages/EnterMaster",
   components: {
-    "enter-master": EnterMaster
+    "enter-master-shared": EnterMasterShared
   },
   methods: {
     done(success)
@@ -34,14 +34,14 @@ export default {
       if (!success)
         return;
 
-      passwords.getPasswords(this.$app.origSite)
+      passwords.getPasswords(this.$root.origSite)
         .then(([origSite, site, pwdList]) =>
         {
-          this.$app.origSite = origSite;
-          this.$app.site = site;
-          this.$app.pwdList = pwdList;
-          this.$app.masterPasswordState = "known";
-        }).catch(this.$app.showUnknownError);
+          this.$root.origSite = origSite;
+          this.$root.site = site;
+          this.$root.pwdList = pwdList;
+          this.$root.masterPasswordState = "known";
+        }).catch(this.$root.showUnknownError);
     }
   }
 };

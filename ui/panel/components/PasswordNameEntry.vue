@@ -7,8 +7,8 @@
 <template>
   <div class="password-name-entry">
     <label for="user-name">{{ $t("username_label") }}</label>
-    <validated-input id="user-name" v-model="name" v-focus v-bind="{readonly}"
-                     :error.sync="error" type="text" @validate="validateName"
+    <validated-input id="user-name" v-model="name" v-model:error="error" v-focus
+                     v-bind="{readonly}" vtype="text" @validate="validateName"
     />
     <div v-if="error" class="error">
       {{ error }}
@@ -31,7 +31,7 @@ export default {
   name: "PasswordNameEntry",
   localePath: "panel/components/PasswordNameEntry",
   props: {
-    value: {
+    modelValue: {
       type: String,
       required: true
     },
@@ -44,23 +44,24 @@ export default {
       default: false
     }
   },
+  emits: ["update:modelValue", "update:revision"],
   data()
   {
     return {
-      name: this.value,
+      name: this.modelValue,
       error: null,
       actualRevision: this.revision,
       revisionVisible: this.revision != "1"
     };
   },
   watch: {
-    value()
+    modelValue()
     {
-      this.name = this.value;
+      this.name = this.modelValue;
     },
     name()
     {
-      this.$emit("input", this.name);
+      this.$emit("update:modelValue", this.name);
     },
     actualRevision()
     {

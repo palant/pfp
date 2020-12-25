@@ -41,7 +41,7 @@ export default {
     ui.getLink({
       type: this.type,
       param: this.param
-    }).then(url => this.url = url).catch(this.$app.showUnknownError);
+    }).then(url => this.url = url).catch(this.$root.showUnknownError);
   },
   methods:
   {
@@ -50,7 +50,7 @@ export default {
       ui.openLink({
         type: this.type,
         param: this.param
-      }).catch(this.$app.showUnknownError);
+      }).catch(this.$root.showUnknownError);
     }
   }
 };
