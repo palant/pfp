@@ -5,8 +5,8 @@
  -->
 
 <template>
-  <validated-form class="page" @validated="submit"
-                  @reset.prevent="hasPassword && ($root.resettingMaster = false)"
+  <ValidatedForm class="page" @validated="submit"
+                 @reset.prevent="hasPassword && ($root.resettingMaster = false)"
   >
     <div>
       <template v-if="!hasPassword">
@@ -17,23 +17,23 @@
       </div>
 
       {{ $t("master_security_message") }}
-      <external-link type="documentation" param="choosing-master-password">
+      <ExternalLink type="documentation" param="choosing-master-password">
         {{ $t(".learn_more") }}
-      </external-link>
+      </ExternalLink>
     </div>
     <label class="block-start" for="new-master">{{ $t("new_master") }}</label>
-    <validated-input id="new-master" v-model="newMaster"
-                     v-model:error="newMasterError" v-focus type="password"
-                     @validate="validateMasterPassword"
+    <ValidatedInput id="new-master" v-model="newMaster"
+                    v-model:error="newMasterError" v-focus type="password"
+                    @validate="validateMasterPassword"
     />
     <div v-if="newMasterError" class="error">
       {{ newMasterError }}
     </div>
-    <password-score ref="passwordScore" :password="newMaster" />
+    <PasswordScore ref="passwordScore" :password="newMaster" />
     <label class="block-start" for="new-master-repeat">{{ $t("new_master_repeat") }}</label>
-    <validated-input id="new-master-repeat" v-model="newMasterRepeat"
-                     v-model:error="newMasterRepeatError" type="password"
-                     @validate="validateMasterPasswordRepeat"
+    <ValidatedInput id="new-master-repeat" v-model="newMasterRepeat"
+                    v-model:error="newMasterRepeatError" type="password"
+                    @validate="validateMasterPasswordRepeat"
     />
     <div v-if="newMasterRepeatError" class="error">
       {{ newMasterRepeatError }}
@@ -42,7 +42,7 @@
       <button type="submit">{{ $t("submit") }}</button>
       <button v-if="hasPassword" v-cancel type="reset">{{ $t("/cancel") }}</button>
     </div>
-  </validated-form>
+  </ValidatedForm>
 </template>
 
 <script>
@@ -56,7 +56,7 @@ export default {
   name: "ChangeMaster",
   localePath: "panel/pages/ChangeMaster",
   components: {
-    "password-score": PasswordScore
+    PasswordScore
   },
   data()
   {

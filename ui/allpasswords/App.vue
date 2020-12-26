@@ -6,21 +6,21 @@
 
 <template>
   <div @keydown.ctrl.e.prevent="testUnknownError">
-    <in-progress v-if="inProgress" />
-    <enter-master v-if="masterPromise" @done="enterMasterDone" />
-    <confirm ref="confirm" />
-    <unknown-error v-if="unknownError" :error="unknownError" @close="unknownError = null" />
-    <password-message ref="global-message"
-                      :messages="{
-                        import_success: true,
-                        unknown_data_format: false,
-                        syntax_error: false
-                      }"
+    <InProgress v-if="inProgress" />
+    <EnterMaster v-if="masterPromise" @done="enterMasterDone" />
+    <Confirm ref="confirm" />
+    <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
+    <PasswordMessage ref="global-message"
+                     :messages="{
+                       import_success: true,
+                       unknown_data_format: false,
+                       syntax_error: false
+                     }"
     />
 
     <div class="title-container">
       <h1 class="title">{{ $t("title") }}</h1>
-      <global-actions />
+      <GlobalActions />
     </div>
 
     <div class="options">
@@ -34,7 +34,7 @@
 
     <div class="intro">{{ $t("intro") }}</div>
 
-    <site-list ref="siteList" :show-notes="showNotes" :show-passwords="confirmedPasswords && showPasswords" />
+    <SiteList ref="siteList" :show-notes="showNotes" :show-passwords="confirmedPasswords && showPasswords" />
   </div>
 </template>
 
@@ -54,13 +54,13 @@ export default {
   name: "App",
   localePath: "allpasswords/App",
   components: {
-    "confirm": Confirm,
-    "password-message": PasswordMessage,
-    "unknown-error": UnknownError,
-    "global-actions": GlobalActions,
-    "site-list": SiteList,
-    "enter-master": EnterMaster,
-    "in-progress": InProgress
+    Confirm,
+    PasswordMessage,
+    UnknownError,
+    GlobalActions,
+    SiteList,
+    EnterMaster,
+    InProgress
   },
   data()
   {

@@ -6,7 +6,7 @@
 
 <template>
   <div class="page">
-    <site-selection :message="$t('label')" :callback="selected" />
+    <SiteSelection :message="$t('label')" :callback="selected" />
   </div>
 </template>
 
@@ -20,7 +20,7 @@ export default {
   name: "SelectSite",
   localePath: "panel/pages/SelectSite",
   components: {
-    "site-selection": SiteSelection
+    SiteSelection
   },
   emits: ["selected"],
   methods: {

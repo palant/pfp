@@ -5,11 +5,11 @@
  -->
 
 <template>
-  <modal-overlay :cancelable="false">
+  <ModalOverlay :cancelable="false">
     <div class="in-progress">
       <div class="spinning-wheel" />
     </div>
-  </modal-overlay>
+  </ModalOverlay>
 </template>
 
 <script>

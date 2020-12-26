@@ -5,13 +5,13 @@
  -->
 
 <template>
-  <modal-overlay v-if="message" @cancel="reject">
+  <ModalOverlay v-if="message" @cancel="reject">
     <div>{{ message }}</div>
     <div class="button-container">
       <button v-focus @click="accept">{{ $t("yes") }}</button>
       <button @click="reject">{{ $t("no") }}</button>
     </div>
-  </modal-overlay>
+  </ModalOverlay>
 </template>
 
 <script>

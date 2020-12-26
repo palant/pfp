@@ -16,11 +16,11 @@
       {{ site.aliases.slice().sort().join(", ") }}
     </div>
 
-    <password-info v-for="password in site.passwords" :key="password.name"
-                   ref="password" :password="password"
-                   :site-display-name="displayName" :show-notes="showNotes"
-                   :show-passwords="showPasswords"
-                   @removed="removePassword(password)"
+    <PasswordInfo v-for="password in site.passwords" :key="password.name"
+                  ref="password" :password="password"
+                  :site-display-name="displayName" :show-notes="showNotes"
+                  :show-passwords="showPasswords"
+                  @removed="removePassword(password)"
     />
   </div>
 </template>
@@ -37,7 +37,7 @@ export default {
   name: "SiteInfo",
   localePath: "allpasswords/components/SiteInfo",
   components: {
-    "password-info": PasswordInfo
+    PasswordInfo
   },
   props: {
     site: {

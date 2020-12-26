@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <modal-overlay :stretch="true" @cancel="$emit('cancel')">
+  <ModalOverlay :stretch="true" @cancel="$emit('cancel')">
     <form class="modal-form" @submit.prevent="saveNotes" @reset.prevent="$emit('cancel')">
       <div>{{ $t(".(PasswordNameEntry)username_label") }}</div>
       <div>
@@ -19,7 +19,7 @@
         <button type="reset">{{ $t("/cancel") }}</button>
       </div>
     </form>
-  </modal-overlay>
+  </ModalOverlay>
 </template>
 
 <script>

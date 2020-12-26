@@ -5,13 +5,13 @@
  -->
 
 <template>
-  <validated-form @validated="submit" @reset.prevent="$emit('done', false)">
+  <ValidatedForm @validated="submit" @reset.prevent="$emit('done', false)">
     <div v-if="warning" class="warning">{{ warning }}</div>
     <label for="master-password">{{ $t("master_password") }}</label>
-    <validated-input id="master-password" v-model="masterPassword"
-                     v-model:error="masterPasswordError" v-focus
-                     type="password"
-                     @validate="validateMasterPassword"
+    <ValidatedInput id="master-password" v-model="masterPassword"
+                    v-model:error="masterPasswordError" v-focus
+                    type="password"
+                    @validate="validateMasterPassword"
     />
     <div v-if="masterPasswordError" class="error">
       {{ masterPasswordError }}
@@ -21,7 +21,7 @@
       <button v-if="cancelable" type="reset">{{ $t("/cancel") }}</button>
     </div>
     <slot />
-  </validated-form>
+  </ValidatedForm>
 </template>
 
 <script>

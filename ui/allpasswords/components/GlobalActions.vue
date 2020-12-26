@@ -6,15 +6,15 @@
 
 <template>
   <div class="global-actions">
-    <iconic-link class="export" :title="$t('export')" @click="exportData" />
-    <iconic-link class="import" :title="$t('import')" @click="selectImportFile" />
-    <iconic-link class="print" :title="$t('print')" @click="printPage" />
+    <IconicLink class="export" :title="$t('export')" @click="exportData" />
+    <IconicLink class="import" :title="$t('import')" @click="selectImportFile" />
+    <IconicLink class="print" :title="$t('print')" @click="printPage" />
     <input ref="importFile" type="file" accept="application/json,text/csv" hidden @change="importFileSelected">
     <iframe ref="frame" class="exportDataFrame" />
-    <enter-master v-if="enterMasterCallback" class="modal-form"
-                  :warning="$t('import_with_master')"
-                  :callback="enterMasterCallback"
-                  @done="enterMasterCallback = null"
+    <EnterMaster v-if="enterMasterCallback" class="modal-form"
+                 :warning="$t('import_with_master')"
+                 :callback="enterMasterCallback"
+                 @done="enterMasterCallback = null"
     />
   </div>
 </template>
@@ -29,7 +29,7 @@ export default {
   name: "GlobalActions",
   localePath: "allpasswords/components/GlobalActions",
   components: {
-    "enter-master": EnterMaster
+    EnterMaster
   },
   data()
   {

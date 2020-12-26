@@ -8,7 +8,7 @@
   <div class="modalOverlay" @click.self="$emit('cancel')" @keydown.stop>
     <div ref="inner" class="modalOverlay-inner" :class="{stretch: stretch, cancelable: cancelable}">
       <div v-if="cancelable" class="modalOverlay-cancel-container">
-        <iconic-link ref="cancel" v-cancel class="cancel" :title="$t('/cancel')" @click="$emit('cancel')" />
+        <IconicLink ref="cancel" v-cancel class="cancel" :title="$t('/cancel')" @click="$emit('cancel')" />
       </div>
       <div>
         <slot />

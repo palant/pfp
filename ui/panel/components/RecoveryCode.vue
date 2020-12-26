@@ -10,9 +10,9 @@
     <div class="recovery-code-accepted">
       <div v-for="(line, index) in accepted" :key="line">
         {{ line }}
-        <iconic-link v-if="index == accepted.length - 1"
-                     class="recovery-code-strip cancel"
-                     :title="$t('remove_line')" @click="accepted.pop()"
+        <IconicLink v-if="index == accepted.length - 1"
+                    class="recovery-code-strip cancel"
+                    :title="$t('remove_line')" @click="accepted.pop()"
         />
       </div>
     </div>

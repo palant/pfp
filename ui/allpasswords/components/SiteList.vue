@@ -6,11 +6,11 @@
 
 <template>
   <div class="list">
-    <shortcuts :letters="getLetters(sites)" @clicked="scrollToSite" />
+    <Shortcuts :letters="getLetters(sites)" @clicked="scrollToSite" />
 
-    <site-info v-for="site in sites" :key="site.site"
-               :ref="'site.' + site.site" :site="site" :show-notes="showNotes"
-               :show-passwords="showPasswords" @removed="removeSite(site)"
+    <SiteInfo v-for="site in sites" :key="site.site"
+              :ref="'site.' + site.site" :site="site" :show-notes="showNotes"
+              :show-passwords="showPasswords" @removed="removeSite(site)"
     />
   </div>
 </template>
@@ -26,8 +26,8 @@ import SiteInfo from "./SiteInfo.vue";
 export default {
   name: "SiteList",
   components: {
-    "shortcuts": Shortcuts,
-    "site-info": SiteInfo
+    Shortcuts,
+    SiteInfo
   },
   props: {
     showNotes: {

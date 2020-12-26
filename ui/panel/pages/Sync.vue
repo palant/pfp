@@ -53,9 +53,9 @@
       <div class="block-start sync-section">{{ $t("how_heading") }}</div>
       <div class="sync-explanation">
         {{ $t("how_text") }}
-        <external-link type="documentation" param="sync">
+        <ExternalLink type="documentation" param="sync">
           {{ $t(".learn_more") }}
-        </external-link>
+        </ExternalLink>
       </div>
 
       <div class="block-start sync-section">{{ $t("security_heading") }}</div>
@@ -65,14 +65,14 @@
       <div class="sync-explanation">{{ $t("no_account_text") }}</div>
     </template>
 
-    <manual-auth v-if="manualAuthCallback"
-                 :callback="manualAuthCallback"
-                 @cancel="manualAuthCallback = null"
+    <ManualAuth v-if="manualAuthCallback"
+                :callback="manualAuthCallback"
+                @cancel="manualAuthCallback = null"
     />
 
-    <remoteStorage-username-input v-if="remoteStorageUsernameCallback"
-                                  :callback="remoteStorageUsernameCallback"
-                                  @cancel="remoteStorageUsernameCallback = null"
+    <RemoteStorageUsernameInput v-if="remoteStorageUsernameCallback"
+                                :callback="remoteStorageUsernameCallback"
+                                @cancel="remoteStorageUsernameCallback = null"
     />
   </div>
 </template>
@@ -88,8 +88,8 @@ export default {
   name: "Sync",
   localePath: "panel/pages/Sync",
   components: {
-    "manual-auth": ManualAuth,
-    "remoteStorage-username-input": RemoteStorageUsernameInput
+    ManualAuth,
+    RemoteStorageUsernameInput
   },
   data()
   {

@@ -5,14 +5,14 @@
  -->
 
 <template>
-  <modal-overlay :stretch="true" @cancel="$emit('cancel')">
-    <validated-form class="modal-form" @validated="submit" @reset="$emit('cancel')">
+  <ModalOverlay :stretch="true" @cancel="$emit('cancel')">
+    <ValidatedForm class="modal-form" @validated="submit" @reset="$emit('cancel')">
       <div v-if="options.replacing" class="warning replacing">{{ $t("replace_warning") }}</div>
 
-      <password-name-entry ref="name-entry" v-model="name"
-                           v-model:revision="revision"
-                           :readonly="options.replacing"
-                           :class="{'block-start': options.replacing}"
+      <PasswordNameEntry ref="name-entry" v-model="name"
+                         v-model:revision="revision"
+                         :readonly="options.replacing"
+                         :class="{'block-start': options.replacing}"
       />
 
       <label v-if="password && password.notes" class="block-start">
@@ -35,8 +35,8 @@
       </div>
 
       <!-- Charset checkboxes are aggregated into a single hidden input to simplify validation -->
-      <validated-input v-model="charsets" v-model:error="charsetsError"
-                       :visible="false" @validate="validateCharsets"
+      <ValidatedInput v-model="charsets" v-model:error="charsetsError"
+                      :visible="false" @validate="validateCharsets"
       />
       <div v-if="charsetsError" class="error">{{ charsetsError }}</div>
 
@@ -44,8 +44,8 @@
         <button type="submit">{{ $t("submit") }}</button>
         <button type="reset">{{ $t("/cancel") }}</button>
       </div>
-    </validated-form>
-  </modal-overlay>
+    </ValidatedForm>
+  </ModalOverlay>
 </template>
 
 <script>
@@ -58,7 +58,7 @@ export default {
   name: "GeneratedPassword",
   localePath: "panel/components/GeneratedPassword",
   components: {
-    "password-name-entry": PasswordNameEntry
+    PasswordNameEntry
   },
   props: {
     password: {

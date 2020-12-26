@@ -5,17 +5,17 @@
  -->
 
 <template>
-  <modal-overlay :stretch="true" @cancel="$emit('cancel')">
-    <validated-form class="modal-form" @validated="submit" @reset="$emit('cancel')">
+  <ModalOverlay :stretch="true" @cancel="$emit('cancel')">
+    <ValidatedForm class="modal-form" @validated="submit" @reset="$emit('cancel')">
       <div class="warning">{{ $t("warning") }}</div>
 
-      <password-name-entry ref="name-entry" v-model="name" v-model:revision="revision" class="block-start" />
+      <PasswordNameEntry ref="name-entry" v-model="name" v-model:revision="revision" class="block-start" />
 
       <template v-if="!recoveryActive">
         <label class="block-start" for="password-value">{{ $t("password_label") }}</label>
-        <validated-input id="password-value" ref="password" v-model="password"
-                         v-model:error="passwordError" type="password"
-                         @validate="validatePassword"
+        <ValidatedInput id="password-value" ref="password" v-model="password"
+                        v-model:error="passwordError" type="password"
+                        @validate="validatePassword"
         />
         <div v-if="passwordError" class="error">
           {{ passwordError }}
@@ -23,7 +23,7 @@
         <a class="use-recovery" href="#" @click.prevent="recoveryActive = true">{{ $t("use_recovery") }}</a>
       </template>
       <template v-else>
-        <recovery-code @done="setPassword" />
+        <RecoveryCode @done="setPassword" />
         <a class="cancel-recovery" href="#" @click.prevent="recoveryActive = false">{{ $t("cancel_recovery") }}</a>
       </template>
 
@@ -31,8 +31,8 @@
         <button type="submit">{{ $t("submit") }}</button>
         <button type="reset">{{ $t("/cancel") }}</button>
       </div>
-    </validated-form>
-  </modal-overlay>
+    </ValidatedForm>
+  </ModalOverlay>
 </template>
 
 <script>
@@ -46,8 +46,8 @@ export default {
   name: "StoredPassword",
   localePath: "panel/components/StoredPassword",
   components: {
-    "password-name-entry": PasswordNameEntry,
-    "recovery-code": RecoveryCode
+    PasswordNameEntry,
+    RecoveryCode
   },
   emits: ["cancel"],
   data()

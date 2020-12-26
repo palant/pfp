@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <modal-overlay :focus-cancel="true" @cancel="$emit('cancel')">
+  <ModalOverlay :focus-cancel="true" @cancel="$emit('cancel')">
     <div>{{ $t(".(PasswordNameEntry)username_label") }}</div>
     <div>
       <span>{{ password.name }}</span>
@@ -14,7 +14,7 @@
     <div class="block-start qrcode-canvas-container">
       <canvas ref="canvas" :width="matrix.pixelWidth" :height="matrix.pixelWidth" />
     </div>
-  </modal-overlay>
+  </ModalOverlay>
 </template>
 
 <script>

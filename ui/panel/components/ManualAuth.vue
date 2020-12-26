@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <modal-overlay @cancel="$emit('cancel')">
+  <ModalOverlay @cancel="$emit('cancel')">
     <form class="modal-form" @submit.prevent="done">
       <label for="sync-token">{{ $t("token_label") }}</label>
       <input id="sync-token" v-model.trim="token" v-focus>
@@ -13,7 +13,7 @@
         <button type="submit">{{ $t("/ok") }}</button>
       </div>
     </form>
-  </modal-overlay>
+  </ModalOverlay>
 </template>
 
 <script>

@@ -6,13 +6,13 @@
 
 <template>
   <div>
-    <enter-master-shared class="page" :cancelable="false" @done="done">
+    <EnterMasterShared class="page" :cancelable="false" @done="done">
       <div class="link-container">
         <a href="#" @click.prevent="$root.resettingMaster = true">
           {{ $t("reset") }}
         </a>
       </div>
-    </enter-master-shared>
+    </EnterMasterShared>
   </div>
 </template>
 
@@ -26,7 +26,7 @@ export default {
   name: "EnterMaster",
   localePath: "panel/pages/EnterMaster",
   components: {
-    "enter-master-shared": EnterMasterShared
+    EnterMasterShared
   },
   methods: {
     done(success)

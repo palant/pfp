@@ -9,50 +9,50 @@
        @keydown.ctrl.exact="tabNavigation"
        @keydown.meta.exact="tabNavigation"
   >
-    <confirm ref="confirm" />
-    <unknown-error v-if="unknownError" :error="unknownError" @close="unknownError = null" />
+    <Confirm ref="confirm" />
+    <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
 
-    <change-master v-if="masterPasswordState == 'unset' || (masterPasswordState == 'set' && resettingMaster)" />
-    <enter-master v-else-if="masterPasswordState == 'set'" />
+    <ChangeMaster v-if="masterPasswordState == 'unset' || (masterPasswordState == 'set' && resettingMaster)" />
+    <EnterMaster v-else-if="masterPasswordState == 'set'" />
     <div v-else-if="masterPasswordState == 'known'" class="tabs">
       <nav v-keyboard-navigation:tab class="tablist" role="list">
         <div />
 
-        <iconic-link class="tab select-site" role="listitem"
-                     :class="{active: currentPage == 'select-site'}"
-                     :title="$t('select_site')"
-                     @click="currentPage = 'select-site'"
+        <IconicLink class="tab select-site" role="listitem"
+                    :class="{active: currentPage == 'select-site'}"
+                    :title="$t('select_site')"
+                    @click="currentPage = 'select-site'"
         />
 
-        <iconic-link class="tab password-list" role="listitem"
-                     :class="{active: currentPage == 'password-list'}"
-                     :title="$t('password_list')"
-                     @click="currentPage = 'password-list'"
+        <IconicLink class="tab password-list" role="listitem"
+                    :class="{active: currentPage == 'password-list'}"
+                    :title="$t('password_list')"
+                    @click="currentPage = 'password-list'"
         />
 
-        <iconic-link class="tab sync" role="listitem"
-                     :class="{active: currentPage == 'sync', failed: $root.sync.error && $root.sync.error != 'sync_connection_error'}"
-                     :title="$t('sync')"
-                     @click="currentPage = 'sync'"
+        <IconicLink class="tab sync" role="listitem"
+                    :class="{active: currentPage == 'sync', failed: $root.sync.error && $root.sync.error != 'sync_connection_error'}"
+                    :title="$t('sync')"
+                    @click="currentPage = 'sync'"
         />
 
-        <iconic-link class="tab settings" role="listitem"
-                     :class="{active: currentPage == 'settings'}"
-                     :title="$t('settings')"
-                     @click="currentPage = 'settings'"
+        <IconicLink class="tab settings" role="listitem"
+                    :class="{active: currentPage == 'settings'}"
+                    :title="$t('settings')"
+                    @click="currentPage = 'settings'"
         />
 
         <div class="spacer" />
 
-        <iconic-link class="tab lock" role="listitem"
-                     :title="$t('lock_passwords')"
-                     @click="lockPasswords"
+        <IconicLink class="tab lock" role="listitem"
+                    :title="$t('lock_passwords')"
+                    @click="lockPasswords"
         />
       </nav>
-      <select-site v-if="currentPage == 'select-site'" @selected="currentPage = 'password-list'" />
-      <password-list v-if="currentPage == 'password-list'" />
-      <sync v-else-if="currentPage == 'sync'" />
-      <settings v-else-if="currentPage == 'settings'" />
+      <SelectSite v-if="currentPage == 'select-site'" @selected="currentPage = 'password-list'" />
+      <PasswordList v-if="currentPage == 'password-list'" />
+      <Sync v-else-if="currentPage == 'sync'" />
+      <Settings v-else-if="currentPage == 'settings'" />
     </div>
   </div>
 </template>
@@ -101,14 +101,14 @@ export default {
   name: "App",
   localePath: "panel/App",
   components: {
-    "change-master": ChangeMaster,
-    "enter-master": EnterMaster,
-    "password-list": PasswordList,
-    "select-site": SelectSite,
-    "settings": Settings,
-    "sync": Sync,
-    "confirm": Confirm,
-    "unknown-error": UnknownError
+    ChangeMaster,
+    EnterMaster,
+    PasswordList,
+    SelectSite,
+    Settings,
+    Sync,
+    Confirm,
+    UnknownError
   },
   data()
   {

@@ -5,29 +5,29 @@
  -->
 
 <template>
-  <modal-overlay @cancel="$emit('cancel')">
-    <validated-form class="modal-form" @validated="done">
+  <ModalOverlay @cancel="$emit('cancel')">
+    <ValidatedForm class="modal-form" @validated="done">
       <label for="username">{{ $t("username_label") }}</label>
-      <validated-input id="username" v-model="username"
-                       v-model:error="usernameError" v-focus
-                       placeholder="me@example.com"
-                       @validate="validateUsername"
+      <ValidatedInput id="username" v-model="username"
+                      v-model:error="usernameError" v-focus
+                      placeholder="me@example.com"
+                      @validate="validateUsername"
       />
       <div v-if="usernameError" class="error">
         {{ usernameError }}
       </div>
 
       <div class="remoteStorage-hosting-link">
-        <external-link type="url" param="https://wiki.remotestorage.io/Servers">
+        <ExternalLink type="url" param="https://wiki.remotestorage.io/Servers">
           {{ $t("get_account") }}
-        </external-link>
+        </ExternalLink>
       </div>
 
       <div class="button-container">
         <button type="submit">{{ $t("/ok") }}</button>
       </div>
-    </validated-form>
-  </modal-overlay>
+    </ValidatedForm>
+  </ModalOverlay>
 </template>
 
 <script>

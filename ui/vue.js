@@ -37,11 +37,11 @@ function init(App, isWebClient)
   app.use(I18n);
   app.use(AccessKeys);
 
-  app.component("external-link", ExternalLink);
-  app.component("iconic-link", IconicLink);
-  app.component("modal-overlay", ModalOverlay);
-  app.component("validated-form", ValidatedForm);
-  app.component("validated-input", ValidatedInput);
+  app.component("ExternalLink", ExternalLink);
+  app.component("IconicLink", IconicLink);
+  app.component("ModalOverlay", ModalOverlay);
+  app.component("ValidatedForm", ValidatedForm);
+  app.component("ValidatedInput", ValidatedInput);
 
   app.directive("focus", {
     mounted(element, binding)

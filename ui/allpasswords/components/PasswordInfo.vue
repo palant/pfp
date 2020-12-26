@@ -6,23 +6,23 @@
 
 <template>
   <div class="password-info-container">
-    <password-message ref="password-message"
-                      :messages="{
-                        password_ready: false,
-                        password_copied: true,
-                        no_such_password: false,
-                        unknown_generation_method: false
-                      }"
+    <PasswordMessage ref="password-message"
+                     :messages="{
+                       password_ready: false,
+                       password_copied: true,
+                       no_such_password: false,
+                       unknown_generation_method: false
+                     }"
     />
 
     <div class="password-container">
-      <iconic-link ref="to-clipboard" class="to-clipboard-link" :title="$t('/(panel)(components)(PasswordMenu)to_clipboard')" @click="copy" />
+      <IconicLink ref="to-clipboard" class="to-clipboard-link" :title="$t('/(panel)(components)(PasswordMenu)to_clipboard')" @click="copy" />
       <span class="user-name-container">
         <span class="user-name">{{ password.name }}</span>
         <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
       </span>
       <span v-if="showPasswords && value" class="password-value">{{ value }}</span>
-      <iconic-link class="password-remove-link" :title="$t('/(panel)(components)(PasswordMenu)remove_password')" @click="removePassword" />
+      <IconicLink class="password-remove-link" :title="$t('/(panel)(components)(PasswordMenu)remove_password')" @click="removePassword" />
     </div>
     <div class="password-info">
       <template v-if="password.type == 'generated2'">
@@ -55,7 +55,7 @@ export default {
   name: "PasswordInfo",
   localePath: "allpasswords/components/PasswordInfo",
   components: {
-    "password-message": PasswordMessage
+    PasswordMessage
   },
   props: {
     password: {
