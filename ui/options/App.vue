@@ -5,10 +5,8 @@
  -->
 
 <template>
-  <div>
-    <Setting name="autolock" :def-value="true" :focus="true" />
-    <Setting name="autolock_delay" :def-value="10" />
-  </div>
+  <Setting name="autolock" :def-value="true" :focus="true" />
+  <Setting name="autolock_delay" :def-value="10" />
 </template>
 
 <script>
