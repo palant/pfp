@@ -74,7 +74,7 @@ function rollup(overrides = {})
       ...postPlugins
     ]
   }, Object.assign({
-    format: "cjs",
+    format: "iife",
     compact: true
   }, overrides));
 }
@@ -133,9 +133,7 @@ function buildCommon(targetdir)
     gulp.src("ui/third-party/**")
         .pipe(gulp.dest(`${targetdir}/ui/third-party`)),
     gulp.src("contentScript/fillIn.js")
-        .pipe(rollup({
-          format: "iife"
-        }))
+        .pipe(rollup())
         .pipe(gulp.dest(`${targetdir}/contentScript`)),
     gulp.src("ui/*/main.js")
         .pipe(rollup({

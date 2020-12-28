@@ -22,7 +22,7 @@ export default function()
           imported = imported.replace(/ as /g, ":");
           return `const{${imported}}=${chunkNames[chunkFile]};`;
         });
-        return code;
+        return `(function(){${code}})();`;
       }
       else
       {
