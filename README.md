@@ -19,6 +19,8 @@ Additional dependencies are installed using the following command in the extensi
 How to build
 ------------
 
+You can pass `--dev` command line flag for all build commands. This will bundle the development Vue version and result in additional debugging output.
+
 ### Firefox
 
 The following command with produce a file with a name like `build-firefox/pfp-n.n.n.xpi`:
