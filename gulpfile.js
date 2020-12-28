@@ -22,11 +22,11 @@ import alias from "@rollup/plugin-alias";
 import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
-import iife from "rollup-plugin-iife";
 import vue from "rollup-plugin-vue";
 
 import globalLoader from "./globalLoader.js";
 import * as utils from "./gulp-utils.js";
+import iife from "./iifeChunks.js";
 import localeLoader from "./localeLoader.js";
 import replace from "./replacePlugin.js";
 import workerLoader from "./workerLoader.js";
