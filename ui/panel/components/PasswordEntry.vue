@@ -5,37 +5,39 @@
  -->
 
 <template>
-  <div class="password-container">
-    <IconicLink class="password-menu-link iconic-link"
-                :class="{menuactive: modal == 'menu'}"
-                :title="$t('password_menu')" @click="modal = 'menu'"
-    />
-    <IconicLink v-if="!$isWebClient" v-focus="focus"
-                class="to-document-link iconic-link"
-                :title="$t('.(PasswordMenu)to_document')" @click="fillIn"
-    />
-    <IconicLink v-focus="$isWebClient && focus"
-                class="to-clipboard-link iconic-link"
-                :title="$t('.(PasswordMenu)to_clipboard')" @click="copy"
-    />
-    <span class="user-name-container" :title="tooltip">
-      <span>{{ password.name }}</span>
-      <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
-    </span>
-  </div>
+  <div>
+    <div class="password-container">
+      <IconicLink class="password-menu-link iconic-link"
+                  :class="{menuactive: modal == 'menu'}"
+                  :title="$t('password_menu')" @click="modal = 'menu'"
+      />
+      <IconicLink v-if="!$isWebClient" v-focus="focus"
+                  class="to-document-link iconic-link"
+                  :title="$t('.(PasswordMenu)to_document')" @click="fillIn"
+      />
+      <IconicLink v-focus="$isWebClient && focus"
+                  class="to-clipboard-link iconic-link"
+                  :title="$t('.(PasswordMenu)to_clipboard')" @click="copy"
+      />
+      <span class="user-name-container" :title="tooltip">
+        <span>{{ password.name }}</span>
+        <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
+      </span>
+    </div>
 
-  <GeneratedPassword v-if="modal == 'generated'" :password="password"
-                     :options="passwordOptions" @cancel="modal = null"
-  />
-  <PasswordMenu v-if="modal == 'menu'" :password="password"
-                @cancel="modal = null"
-  />
-  <QRCode v-if="modal == 'qrcode'" :password="password" :value="value"
-          @cancel="modal = null"
-  />
-  <NotesEditor v-if="modal == 'notes'" :password="password"
-               @cancel="modal = null"
-  />
+    <GeneratedPassword v-if="modal == 'generated'" :password="password"
+                       :options="passwordOptions" @cancel="modal = null"
+    />
+    <PasswordMenu v-if="modal == 'menu'" :password="password"
+                  @cancel="modal = null"
+    />
+    <QRCode v-if="modal == 'qrcode'" :password="password" :value="value"
+            @cancel="modal = null"
+    />
+    <NotesEditor v-if="modal == 'notes'" :password="password"
+                 @cancel="modal = null"
+    />
+  </div>
 </template>
 
 <script>
