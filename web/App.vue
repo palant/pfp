@@ -27,6 +27,7 @@ import AllPasswordsApp from "../ui/allpasswords/App.vue";
 
 export default {
   name: "App",
+  localePath: "web/App",
   components: {
     "panel-app": PanelApp,
     "allpasswords-app": AllPasswordsApp
@@ -46,9 +47,9 @@ export default {
       }));
     }
   },
-  mounted()
+  mounted: async function()
   {
-    Promise.resolve().then(() =>
+    try
     {
       if (!"asdf".includes("d"))
         throw new Error("String.includes() returned unexpected result");
@@ -62,18 +63,19 @@ export default {
       if (new KeyboardEvent("keydown", {key: "Escape"}).key != "Escape")
         throw new Error("KeyboardEvent() returned unexpected result");
 
-      return crypto.subtle.importKey(
+      await crypto.subtle.importKey(
         "raw",
         new Uint8Array(16),
         "AES-GCM",
         false,
         ["encrypt"]
       );
-    }).catch(error =>
+    }
+    catch(error)
     {
       this.browserSupported = false;
       console.log(error);
-    });
+    }
 
     window.addEventListener("show-panel", () =>
     {

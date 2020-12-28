@@ -252,6 +252,7 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
             babel.default({
               babelrc: false,
               babelHelpers: "runtime",
+              extensions: [".js", ".vue"],
               presets: ["@babel/preset-env"],
               plugins: [
                 ["@babel/transform-runtime"]

@@ -20,7 +20,7 @@ let currentURL = null;
 let browser = {
   storage: {
     local: {
-      get: keys =>
+      get: async function(keys)
       {
         if (typeof keys == "string")
           keys = [keys];
@@ -42,52 +42,43 @@ let browser = {
             }
           }
         }
-        return Promise.resolve(items);
-      },
-      set: items =>
-      {
-        return Promise.resolve().then(() =>
-        {
-          for (let key of Object.keys(items))
-            localStorage[key] = JSON.stringify(items[key]);
-        });
+        return items;
       },
 
-      remove: keys =>
+      set: async function(items)
       {
-        return Promise.resolve().then(() =>
-        {
-          if (typeof keys == "string")
-            keys = [keys];
-          for (let key of keys)
-            delete localStorage[key];
-        });
+        for (let key of Object.keys(items))
+          localStorage[key] = JSON.stringify(items[key]);
       },
 
-      clear: () =>
+      remove: async function(keys)
       {
-        return Promise.resolve().then(() =>
-        {
-          localStorage.clear();
-        });
+        if (typeof keys == "string")
+          keys = [keys];
+        for (let key of keys)
+          delete localStorage[key];
+      },
+
+      clear: async function()
+      {
+        localStorage.clear();
       }
     }
   },
   tabs: {
-    query: params =>
+    query: async function(params)
     {
       if (params.active && currentURL)
-        return Promise.resolve([{url: currentURL}]);
+        return [{url: currentURL}];
       else
-        return Promise.resolve([]);
+        return [];
     },
-    create: params =>
+    create: async function(params)
     {
       if (params.url != "ui/allpasswords/allpasswords.html")
-        return Promise.reject(new Error("Not implemented"));
+        throw new Error("Not implemented");
 
       window.dispatchEvent(new Event("show-allpasswords"));
-      return Promise.resolve();
     }
   },
   runtime: {
