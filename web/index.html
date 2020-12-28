@@ -11,6 +11,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=600, initial-scale=1">
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" id="dynamicStyle">
   </head>
   <body>
     <noscript>
@@ -18,6 +19,10 @@
         Please enable JavaScript for this application to work.
       </div>
     </noscript>
+
+    <div class="warning" id="compatWarning" hidden>
+      Your browser lacks the required functionality for this application. At least Mozilla Firefox 47, Google Chrome 54, Opera 41, Apple Safari 11 or Microsoft Edge 14 is required.
+    </div>
 
     <div id="loading" class="modalOverlay">
       <div class="modalOverlay-inner">
@@ -29,7 +34,6 @@
 
     <div id="app"></div>
 
-    <script src="third-party/vue-2.6.10.min.js"></script>
     <script src="third-party/zxcvbn-4.4.2.js"></script>
     <script src="third-party/jsqr-1.0.2.js"></script>
     <script src="index.js"></script>

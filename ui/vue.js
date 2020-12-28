@@ -28,7 +28,7 @@ if (!("isConnected" in Node.prototype))
   });
 }
 
-function init(App, isWebClient)
+export function runApp(App, isWebClient = false)
 {
   let app = createApp(App);
 
@@ -116,20 +116,9 @@ function init(App, isWebClient)
     }
   });
 
-  app.mount("#app");
-}
-
-export function runApp(App, isWebClient = false)
-{
-  if (document.readyState != "complete")
-  {
-    let callback = function()
-    {
-      window.removeEventListener("load", callback);
-      init(App, isWebClient);
-    };
-    window.addEventListener("load", callback);
-  }
+  if (document.readyState == "complete")
+    app.mount("#app");
   else
-    init(App, isWebClient);
+    window.addEventListener("load", () => app.mount("#app"));
+  return app;
 }
