@@ -18,11 +18,12 @@ import sass from "gulp-sass";
 import stylelint from "gulp-stylelint";
 import zip from "gulp-zip";
 import merge from "merge-stream";
+import alias from "@rollup/plugin-alias";
 import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
+import iife from "rollup-plugin-iife";
 import vue from "rollup-plugin-vue";
-import Vue from "vue";
 
 import globalLoader from "./globalLoader.js";
 import * as utils from "./gulp-utils.js";
@@ -44,9 +45,20 @@ function rollup(overrides = {})
     plugins: [
       ...prePlugins,
       globalLoader({
-        vue: {object: "Vue", names: Object.keys(Vue)},
         jsqr: "JSQR",
         zxcvbn: "zxcvbn"
+      }),
+      alias({
+        entries: [
+          {
+            find: "vue",
+            replacement: (
+              utils.hasArg("--dev")
+                ? "vue/dist/vue.runtime.esm-browser.js"
+                : "vue/dist/vue.runtime.esm-browser.prod.js"
+            )
+          }
+        ]
       }),
       resolve(),
       commonjs({
@@ -125,21 +137,20 @@ function buildCommon(targetdir)
           format: "iife"
         }))
         .pipe(gulp.dest(`${targetdir}/contentScript`)),
-    gulp.src("ui/panel/main.js")
+    gulp.src("ui/*/main.js")
         .pipe(rollup({
-          file: "panel.js"
+          format: "es",
+          manualChunks(id)
+          {
+            if (id.endsWith("/vue.js") || id.endsWith("/clipboard.js") || id.indexOf("/ui/components/") >= 0)
+              return "shared";
+            return null;
+          },
+          dir: "",
+          chunkFileNames: "ui/[name].js",
+          postPlugins: [iife()]
         }))
-        .pipe(gulp.dest(`${targetdir}/ui/panel`)),
-    gulp.src("ui/allpasswords/main.js")
-        .pipe(rollup({
-          file: "allpasswords.js"
-        }))
-        .pipe(gulp.dest(`${targetdir}/ui/allpasswords`)),
-    gulp.src("ui/options/main.js")
-        .pipe(rollup({
-          file: "options.js"
-        }))
-        .pipe(gulp.dest(`${targetdir}/ui/options`)),
+        .pipe(gulp.dest(`${targetdir}`)),
     gulp.src(["ui/**/*.scss"])
         .pipe(sass())
         .pipe(gulp.dest(`${targetdir}/ui`)),

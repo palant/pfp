@@ -13,6 +13,7 @@ import {Duplex, Transform} from "stream";
 
 import Mocha from "mocha";
 import {rollup} from "rollup";
+import File from "vinyl";
 
 import testEnv from "./test-env/setup.js";
 
@@ -44,6 +45,11 @@ export function stringifyObject(obj)
   return JSON.stringify(obj, Array.from(keys).sort(), 2);
 }
 
+export function hasArg(arg)
+{
+  return process.argv.includes(arg);
+}
+
 export function readArg(prefix, defaultValue)
 {
   for (let arg of process.argv)
@@ -52,7 +58,7 @@ export function readArg(prefix, defaultValue)
   return defaultValue;
 }
 
-export function transform(modifier)
+export function transform(modifier, finalizer)
 {
   let stream = new Transform({objectMode: true});
   stream._transform = async function(file, encoding, callback)
@@ -63,9 +69,14 @@ export function transform(modifier)
         throw new Error("Unexpected file type");
 
       let contents = file.contents.toString("utf-8");
-      [file.path, contents] = await modifier(file.path, contents);
-      file.contents = Buffer.from(contents, "utf-8");
-      callback(null, file);
+      let result = await modifier(file.path, contents);
+      if (result)
+      {
+        [file.path, contents] = result;
+        file.contents = Buffer.from(contents, "utf-8");
+        this.push(file);
+      }
+      callback(null);
     }
     catch (e)
     {
@@ -73,22 +84,60 @@ export function transform(modifier)
       callback(e);
     }
   };
+
+  if (finalizer)
+  {
+    stream._flush = async function(callback)
+    {
+      try
+      {
+        let files = await finalizer();
+        for (let [path, contents] of files)
+        {
+          this.push(new File({
+            path: path,
+            contents: Buffer.from(contents, "utf-8")
+          }));
+        }
+        callback(null);
+      }
+      catch (e)
+      {
+        console.error(e);
+        callback(e);
+      }
+    };
+  }
   return stream;
 }
 
 export function rollupStream(inputOptions, outputOptions)
 {
-  return transform(async function(filepath, contenst)
+  let files = [];
+
+  return transform(filepath => void files.push(filepath), async function()
   {
-    inputOptions.input = filepath;
+    let chunkPaths = {};
+    for (let file of files)
+    {
+      let chunkName = file.replace(/\W/g, "_");
+      chunkPaths[chunkName] = file;
+    }
+    inputOptions.input = files.length == 1 ? files[0] : chunkPaths;
 
     let bundle = await rollup(inputOptions);
     let {output} = await bundle.generate(outputOptions);
-    if (output.length != 1 || !output[0].code)
-      throw new Error("Unexpected rollup output");
 
-    let newPath = path.join(path.dirname(filepath), output[0].fileName);
-    return [newPath, output[0].code];
+    let result = [];
+    for (let chunk of output)
+    {
+      if (!chunk.code)
+        throw new Error("Unexpected rollup output");
+
+      let filepath = chunkPaths[chunk.name];
+      result.push([filepath || chunk.fileName, chunk.code]);
+    }
+    return result;
   });
 }
 
