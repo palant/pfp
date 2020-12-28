@@ -88,7 +88,7 @@ export default {
     },
     scrollToSite(site)
     {
-      this.$refs["site." + site][0].activate();
+      this.$refs["site." + site].activate();
     },
     removeSite(site)
     {

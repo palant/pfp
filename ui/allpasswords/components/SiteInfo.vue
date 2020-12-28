@@ -80,7 +80,7 @@ export default {
     activate()
     {
       this.$el.scrollIntoView(true);
-      this.$refs.password[0].activate();
+      this.$refs.password.activate();
     }
   }
 };
