@@ -62,7 +62,7 @@
 
 import {getSiteDisplayName, keyboardNavigationType} from "../common.js";
 import {port} from "../messaging.js";
-import {masterPassword} from "../proxy.js";
+import {masterPassword, passwords, ui, sync} from "../proxy.js";
 import EnterMaster from "./pages/EnterMaster.vue";
 import ChangeMaster from "./pages/ChangeMaster.vue";
 import PasswordList from "./pages/PasswordList.vue";
@@ -104,7 +104,7 @@ export default {
       origSite: null,
       pwdList: null,
       masterPasswordState: null,
-      sync: null
+      sync: {}
     };
   },
   computed: {
@@ -120,16 +120,42 @@ export default {
         this.currentPage = "select-site";
     }
   },
-  created()
+  created: async function()
   {
-    port.on("init", state =>
+    let data = {};
+    [data.origSite, data.masterPasswordState] = await Promise.all([
+      ui.getCurrentHost(),
+      masterPassword.getState()
+    ]);
+
+    if (data.masterPasswordState == "known")
     {
-      for (let key of Object.keys(state))
-        this[key] = state[key];
-    });
+      [data.origSite, data.site, data.pwdList] = await passwords.getPasswords(data.origSite);
+    }
+
+    // Update all data at once to prevent inconsistent intermediate states
+    Object.assign(this, data);
+
+    await this.updateSyncState();
+    port.on("syncUpdate", () => this.updateSyncState());
   },
   methods:
   {
+    updateSyncState: async function()
+    {
+      let [syncData, isSyncing] = await Promise.all([
+        sync.getSyncData(),
+        sync.isSyncing()
+      ]);
+
+      this.sync = {
+        provider: syncData.provider || null,
+        username: syncData.username || null,
+        lastSync: syncData.lastSync || null,
+        error: syncData.error || null,
+        isSyncing
+      };
+    },
     testUnknownError()
     {
       this.showUnknownError(new Error("Unexpected error triggered via Ctrl+E"));
