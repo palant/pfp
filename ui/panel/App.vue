@@ -79,23 +79,7 @@ const pages = [
   "settings"
 ];
 
-let initialData = {
-  site: null,
-  origSite: null,
-  pwdList: null,
-  masterPasswordState: null,
-  sync: null
-};
-
 let app = null;
-
-port.on("init", state =>
-{
-  let target = app || initialData;
-  for (let key of Object.keys(initialData))
-    if (key in state)
-      target[key] = state[key];
-});
 
 export default {
   name: "App",
@@ -112,11 +96,16 @@ export default {
   },
   data()
   {
-    return Object.assign({
+    return {
       unknownError: null,
       resettingMaster: false,
-      currentPage: initialData.site === "" ? "select-site" : "password-list"
-    }, initialData);
+      currentPage: "password-list",
+      site: null,
+      origSite: null,
+      pwdList: null,
+      masterPasswordState: null,
+      sync: null
+    };
   },
   computed: {
     siteDisplayName()
@@ -133,7 +122,11 @@ export default {
   },
   created()
   {
-    app = this;
+    port.on("init", state =>
+    {
+      for (let key of Object.keys(state))
+        this[key] = state[key];
+    });
   },
   methods:
   {
