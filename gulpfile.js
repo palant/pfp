@@ -248,6 +248,8 @@ gulp.task("build-web", gulp.series("validate", function buildWeb()
           ],
           postPlugins: [
             babel.default({
+              retainLines: true,
+              compact: false,
               babelrc: false,
               babelHelpers: "runtime",
               extensions: [".js", ".vue"],
