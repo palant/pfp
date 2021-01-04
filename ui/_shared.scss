@@ -135,6 +135,12 @@ a
   }
 }
 
+a:focus
+{
+  /* Make sure outline is always visible, browsers normally won’t show it before Tab is pressed */
+  outline: 1px dotted;
+}
+
 .warning
 {
   background-color: $warning-background;
