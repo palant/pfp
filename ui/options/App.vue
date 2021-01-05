@@ -5,6 +5,7 @@
  -->
 
 <template>
+  <SizeSelector />
   <Setting name="autolock" :def-value="true" :focus="true" />
   <Setting name="autolock_delay" :def-value="10" />
 </template>
@@ -12,11 +13,13 @@
 <script>
 "use strict";
 
+import SizeSelector from "../components/SizeSelector.vue";
 import Setting from "../components/Setting.vue";
 
 export default {
   name: "App",
   components: {
+    SizeSelector,
     Setting
   }
 };

@@ -6,8 +6,8 @@
 
 @import "../_shared.scss";
 
-$body-width: 600px;
-$page-padding: 10px;
+$body-width: 25em;
+$page-padding: 0.5em;
 $menu-border-width: 1px;
 
 :root
@@ -26,7 +26,7 @@ h1
   font-size: 100%;
   font-weight: bold;
   margin-top: 0;
-  margin-bottom: $block-spacing;
+  margin-bottom: var(--block-spacing);
 }
 
 .page
@@ -38,7 +38,7 @@ h1
 
 .unknown-error
 {
-  margin: $inline-spacing;
+  margin: var(--inline-spacing);
 }
 
 .special-site
@@ -50,7 +50,7 @@ h1
 .button-container,
 .link-container
 {
-  margin-top: $block-spacing;
+  margin-top: var(--block-spacing);
 }
 
 .button-container:not([hidden]),
@@ -63,12 +63,12 @@ h1
 
 .link-container
 {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .unknown-error-details
 {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
   white-space: pre-wrap;
 }
 
@@ -153,11 +153,11 @@ h1
   display: flex;
   flex-direction: column;
   background-color: #eee;
-  @include padding-inline-start($inline-spacing);
+  @include padding-inline-start(var(--inline-spacing));
 
   & > :first-child
   {
-    height: $inline-spacing;
+    height: var(--inline-spacing);
   }
 
   & > :not(.active)
@@ -168,9 +168,9 @@ h1
 
 .tab
 {
-  min-width: $icon-size + 2 * $inline-spacing;
-  min-height: $icon-size + 2 * $inline-spacing;
-  background-size: $icon-size;
+  min-width: calc(var(--icon-size) + 2 * var(--inline-spacing));
+  min-height: calc(var(--icon-size) + 2 * var(--inline-spacing));
+  background-size: var(--icon-size);
   background-repeat: no-repeat;
   background-position: 50%;
   border: 1px solid #eee;
@@ -180,12 +180,12 @@ h1
     background-color: $background-color;
     border-color: #ccc;
 
-    border-radius: $border-radius 0 0 $border-radius;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
     border-right-color: $background-color;
 
     :root[dir="rtl"] &
     {
-      border-radius: 0 $border-radius $border-radius 0;
+      border-radius: 0 var(--border-radius) var(--border-radius) 0;
       border-left-color: $background-color;
     }
   }
@@ -233,7 +233,7 @@ h1
 
 .alias-container
 {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .password-list-container
@@ -241,7 +241,7 @@ h1
   display: flex;
   flex-direction: column;
   padding: 1px;
-  max-height: 300px;
+  max-height: 12.5em;
   overflow: auto;
 }
 
@@ -269,15 +269,15 @@ h1
 
 .password-revision
 {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
   vertical-align: text-top;
 }
 
 .iconic-link
 {
-  min-width: $icon-size;
-  min-height: $icon-size;
-  background-size: $icon-size;
+  min-width: var(--icon-size);
+  min-height: var(--icon-size);
+  background-size: var(--icon-size);
   background-repeat: no-repeat;
   margin: 1px;
 }
@@ -339,7 +339,7 @@ a.iconic-link:hover
     display: flex;
     flex-direction: row;
     align-items: center;
-    font-size: $font-size-small;
+    font-size: var(--font-size-small);
     color: $text-color;
     text-decoration: none;
   }
@@ -351,7 +351,7 @@ a.iconic-link:hover
 
   & > .iconic-link
   {
-    @include margin-inline-end($inline-spacing);
+    @include margin-inline-end(var(--inline-spacing));
   }
 }
 
@@ -366,24 +366,24 @@ a.iconic-link:hover
 
     &:first-child
     {
-      @include padding-inline-end($inline-spacing);
+      @include padding-inline-end(var(--inline-spacing));
       @include border-end(1px solid #ccc);
     }
 
     &:last-child
     {
       justify-content: flex-end;
-      @include padding-inline-start($inline-spacing);
+      @include padding-inline-start(var(--inline-spacing));
     }
   }
 }
 
 .add-password-link
 {
-  min-height: $icon-size;
-  @include padding-inline-start($icon-size + $inline-spacing);
+  min-height: var(--icon-size);
+  @include padding-inline-start(calc(var(--icon-size) + var(--inline-spacing)));
   background-image: url(../images/ionicons/md-add-circle-outline.svg);
-  background-size: $icon-size;
+  background-size: var(--icon-size);
   background-repeat: no-repeat;
 }
 
@@ -402,14 +402,14 @@ a.iconic-link:hover
 
 .warning.replacing
 {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .change-password-revision,
 .use-recovery,
 .cancel-recovery
 {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 #password-length
@@ -425,8 +425,8 @@ a.iconic-link:hover
 .site-autocomplete
 {
   border: $menu-border-width solid $text-color;
-  padding: $block-padding;
-  max-height: 8 * $font-size;
+  padding: var(--block-padding);
+  max-height: 8em;
   overflow: auto;
 
   & > .site-entry
@@ -444,17 +444,17 @@ a.iconic-link:hover
 .recovery-code-accepted
 {
   margin: 0;
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .recovery-code-strip
 {
-  margin: -2px $inline-spacing;
+  margin: -2px var(--inline-spacing);
 }
 
 #recoveryInput
 {
-  min-height: 100px;
+  min-height: 4em;
 }
 
 .qrcode-canvas-container
@@ -466,7 +466,7 @@ a.iconic-link:hover
 
 #notes-textarea
 {
-  min-height: 300px;
+  min-height: 12.5em;
 }
 
 .sync-section
@@ -477,7 +477,7 @@ a.iconic-link:hover
 .sync-explanation,
 .remoteStorage-hosting-link
 {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .sync-provider-selection
@@ -498,7 +498,7 @@ a.iconic-link:hover
 {
   $height: 24px;
   display: inline-block;
-  margin: 0 $inline-spacing;
+  margin: 0 var(--inline-spacing);
   height: $height;
   background-size: auto $height;
   background-repeat: no-repeat;
@@ -529,7 +529,7 @@ a.iconic-link:hover
 
 .sync-error
 {
-  margin-top: $block-spacing;
+  margin-top: var(--block-spacing);
 }
 
 .modalOverlay-inner

@@ -11,6 +11,7 @@
   >
     <Confirm ref="confirm" />
     <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
+    <SizeSelector />
 
     <ChangeMaster v-if="masterPasswordState == 'unset' || (masterPasswordState == 'set' && resettingMaster)" />
     <EnterMaster v-else-if="masterPasswordState == 'set'" />
@@ -70,6 +71,7 @@ import SelectSite from "./pages/SelectSite.vue";
 import Settings from "./pages/Settings.vue";
 import Sync from "./pages/Sync.vue";
 import Confirm from "../components/Confirm.vue";
+import SizeSelector from "../components/SizeSelector.vue";
 import UnknownError from "../components/UnknownError.vue";
 
 const pages = [
@@ -92,6 +94,7 @@ export default {
     Settings,
     Sync,
     Confirm,
+    SizeSelector,
     UnknownError
   },
   data()
