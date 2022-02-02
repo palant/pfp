@@ -2,6 +2,10 @@ language: node_js
 node_js:
   - "15.0.0"
   - "15"
+  - "16.0.0"
+  - "16"
+  - "17.0.0"
+  - "17"
 before_script:
   - npm install -g gulp
 script:
