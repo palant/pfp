@@ -16,15 +16,15 @@ import resolve from "@rollup/plugin-node-resolve";
 import vue from "rollup-plugin-vue";
 
 import {series, parallel, Files, MemoryFile} from "builder";
-import eslint from "builder/tools/eslint";
-import htmlValidate from "builder/tools/html-validate";
-import mocha from "builder/tools/mocha";
-import rollup from "builder/tools/rollup";
-import sass from "builder/tools/sass";
-import stylelint from "builder/tools/stylelint";
-import zip from "builder/tools/zip";
 
-import * as utils from "./build-utils.js";
+import eslint from "./build/eslint.js";
+import htmlValidate from "./build/html-validate.js";
+import mocha from "./build/mocha.js";
+import rollup from "./build/rollup.js";
+import sass from "./build/sass.js";
+import stylelint from "./build/stylelint.js";
+import * as utils from "./build/utils.js";
+import zip from "./build/zip.js";
 import globalLoader from "./globalLoader.js";
 import iife from "./iifeChunks.js";
 import localeLoader from "./localeLoader.js";
