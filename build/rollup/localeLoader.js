@@ -9,7 +9,7 @@
 import fs from "fs";
 import path from "path";
 
-import {stringifyObject} from "./build/utils.js";
+import {stringifyObject} from "../utils.js";
 
 function walkDirectory(dir, callback)
 {
