@@ -203,17 +203,17 @@ h1
 
 .select-site
 {
-  background-image: url(../images/ionicons/md-search.svg);
+  background-image: url("../images/ionicons/md-search.svg");
 }
 
 .password-list
 {
-  background-image: url(../images/ionicons/md-list.svg);
+  background-image: url("../images/ionicons/md-list.svg");
 }
 
 .sync
 {
-  background-image: url(../images/ionicons/md-sync.svg);
+  background-image: url("../images/ionicons/md-sync.svg");
 
   &.failed:not(.active)
   {
@@ -223,12 +223,12 @@ h1
 
 .settings
 {
-  background-image: url(../images/ionicons/md-settings.svg);
+  background-image: url("../images/ionicons/md-settings.svg");
 }
 
 .lock
 {
-  background-image: url(../images/ionicons/md-exit.svg);
+  background-image: url("../images/ionicons/md-exit.svg");
 }
 
 .alias-container
@@ -289,7 +289,7 @@ a.iconic-link:hover
 
 .password-menu-link
 {
-  background-image: url(../images/ionicons/md-more.svg);
+  background-image: url("../images/ionicons/md-more.svg");
 }
 
 .password-menu-link.menuactive
@@ -299,37 +299,37 @@ a.iconic-link:hover
 
 .to-document-link
 {
-  background-image: url(../images/ionicons/md-color-wand.svg);
+  background-image: url("../images/ionicons/md-color-wand.svg");
 }
 
 .to-clipboard-link
 {
-  background-image: url(../images/ionicons/md-clipboard.svg);
+  background-image: url("../images/ionicons/md-clipboard.svg");
 }
 
 .show-qrcode-link
 {
-  background-image: url(../images/ionicons/md-barcode.svg);
+  background-image: url("../images/ionicons/md-barcode.svg");
 }
 
 .notes-link
 {
-  background-image: url(../images/ionicons/md-paper.svg);
+  background-image: url("../images/ionicons/md-paper.svg");
 }
 
 .make-generated-link
 {
-  background-image: url(../images/ionicons/md-arrow-round-up.svg);
+  background-image: url("../images/ionicons/md-arrow-round-up.svg");
 }
 
 .bump-revision-link
 {
-  background-image: url(../images/ionicons/md-refresh.svg);
+  background-image: url("../images/ionicons/md-refresh.svg");
 }
 
 .password-remove-link
 {
-  background-image: url(../images/ionicons/md-trash.svg);
+  background-image: url("../images/ionicons/md-trash.svg");
 }
 
 .password-menu-entry
@@ -382,7 +382,7 @@ a.iconic-link:hover
 {
   min-height: var(--icon-size);
   @include padding-inline-start(calc(var(--icon-size) + var(--inline-spacing)));
-  background-image: url(../images/ionicons/md-add-circle-outline.svg);
+  background-image: url("../images/ionicons/md-add-circle-outline.svg");
   background-size: var(--icon-size);
   background-repeat: no-repeat;
 }
@@ -507,19 +507,19 @@ a.iconic-link:hover
 .sync-provider-icon.dropbox
 {
   width: 28.183px;
-  background-image: url(../images/logos/dropbox.svg);
+  background-image: url("../images/logos/dropbox.svg");
 }
 
 .sync-provider-icon.gdrive
 {
   width: 27.676px;
-  background-image: url(../images/logos/gdrive.svg);
+  background-image: url("../images/logos/gdrive.svg");
 }
 
 .sync-provider-icon.remotestorage
 {
   width: 20.792px;
-  background-image: url(../images/remotestorage.svg);
+  background-image: url("../images/remotestorage.svg");
 }
 
 .sync-failed

@@ -4,7 +4,7 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
-$font-family: 'Helvetica Neue', helvetica, arial, sans-serif;
+$font-family: "Helvetica Neue", helvetica, arial, sans-serif;
 
 $text-color: #000;
 $background-color: #fff;
@@ -174,7 +174,7 @@ a:focus
   padding: var(--block-padding);
 
   @include padding-inline-start(calc(var(--icon-size) + var(--block-padding) + var(--inline-spacing)));
-  background-image: url(../images/ionicons/md-warning.svg);
+  background-image: url("../images/ionicons/md-warning.svg");
   background-size: var(--icon-size);
   background-position: var(--block-padding) var(--block-padding);
   background-repeat: no-repeat;
@@ -212,7 +212,7 @@ a:focus
   height: var(--text-icon-size);
   background-size: var(--text-icon-size);
   background-repeat: no-repeat;
-  background-image: url(../images/ionicons/md-help-circle-outline.svg);
+  background-image: url("../images/ionicons/md-help-circle-outline.svg");
 
   @media print
   {
@@ -246,12 +246,12 @@ a:focus
 
 .increase-size
 {
-  background-image: url(../images/increase-size.svg);
+  background-image: url("../images/increase-size.svg");
 }
 
 .decrease-size
 {
-  background-image: url(../images/decrease-size.svg);
+  background-image: url("../images/decrease-size.svg");
 }
 
 input[type="checkbox"]
@@ -267,7 +267,7 @@ input[type="checkbox"]
 
 input[type="checkbox"]:checked
 {
-  background-image: url(../images/ionicons/md-checkmark.svg);
+  background-image: url("../images/ionicons/md-checkmark.svg");
   background-size: calc(var(--font-size) - 4px);
   background-repeat: no-repeat;
   background-position: center;
@@ -285,7 +285,7 @@ input[type="checkbox"]:checked
   z-index: 10000;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 70%);
 }
 
 .modalOverlay-inner
@@ -327,7 +327,7 @@ input[type="checkbox"]:checked
   min-height: var(--small-icon-size);
   background-size: var(--small-icon-size);
   background-repeat: no-repeat;
-  background-image: url(../images/ionicons/md-close.svg);
+  background-image: url("../images/ionicons/md-close.svg");
 
   &:hover
   {

@@ -7,7 +7,11 @@
     "block-opening-brace-newline-after": "always",
     "block-opening-brace-space-before": null,
     "block-opening-brace-space-after": null,
+    "color-function-notation": "legacy",
     "declaration-empty-line-before": null,
-    "no-descending-specificity": null
+    "no-descending-specificity": null,
+    "property-no-vendor-prefix": null,
+    "selector-class-pattern": null,
+    "selector-id-pattern": null
   }
 }

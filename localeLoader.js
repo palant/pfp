@@ -9,7 +9,7 @@
 import fs from "fs";
 import path from "path";
 
-import {stringifyObject} from "./gulp-utils.js";
+import {stringifyObject} from "./build-utils.js";
 
 function walkDirectory(dir, callback)
 {

@@ -8,30 +8,26 @@ You can get an idea of how PfP works by using the [online version](https://pfp.w
 Installing build prerequisites
 ------------------------------
 
-In order to build PfP you will need to install [Node.js](https://nodejs.org/) first (Node 15 or higher is required). You will also need [Gulp](http://gulpjs.com/), run the following command to install it (administrator privileges required):
-
-    npm install --global gulp-cli
-
-Additional dependencies are installed using the following command in the extension directory:
+In order to build PfP you will need to install [Node.js](https://nodejs.org/) first (Node 15 or higher is required). Additional dependencies are installed using the following command in the extension directory:
 
     npm install
 
 How to build
 ------------
 
-You can pass `--dev` command line flag for all build commands. This will bundle the development Vue version and result in additional debugging output.
+You can append `-- --dev` to all build commands. This will bundle the development Vue version and result in additional debugging output.
 
 ### Firefox
 
 The following command with produce a file with a name like `build-firefox/pfp-n.n.n.xpi`:
 
-    gulp xpi
+    npm run build xpi
 
 ### Chrome and Opera
 
 The following command with produce a file with a name like `build-chrome/pfp-n.n.n.zip`:
 
-    gulp crx
+    npm run build crx
 
 This ZIP file can be uploaded to Chrome Web Store or Opera Add-ons and will be converted into a signed CRX there.
 
@@ -39,7 +35,7 @@ This ZIP file can be uploaded to Chrome Web Store or Opera Add-ons and will be c
 
 The following command with produce a file with a name like `build-web/pfp-web-n.n.n.zip`:
 
-    gulp web
+    npm run build webZip
 
 After unpacking the package, you can open `index.html` in the browser which will give you a slightly feature-reduced version of PfP.
 
@@ -50,23 +46,23 @@ How to test
 
 The following command will create a `build-firefox` directory:
 
-    gulp build-firefox
+    npm run build firefox
 
-You can load this directory as a temporary extension in Firefox via `about:debugging` page. An already loaded extension will reload automatically on rebuild. If you want the directory to be updated automatically whenever you change any source files, you can use `gulp watch-firefox` instead.
+You can load this directory as a temporary extension in Firefox via `about:debugging` page. An already loaded extension will reload automatically on rebuild. If you want the directory to be updated automatically whenever you change any source files, you can use `npm run build watchFirefox` instead.
 
 ### Chrome and Opera
 
 The following command will create a `build-chrome` directory:
 
-    gulp build-chrome
+    npm run build chrome
 
-You can load this directory as an unpacked extension in Chrome and Opera. An already loaded extension will reload automatically on rebuild. If you want the directory to be updated automatically whenever you change any source files, you can use `gulp watch-chrome` instead.
+You can load this directory as an unpacked extension in Chrome and Opera. An already loaded extension will reload automatically on rebuild. If you want the directory to be updated automatically whenever you change any source files, you can use `npm run build watchChrome` instead.
 
 ### Web client
 
 The following command will create a `build-web` directory:
 
-    gulp build-web
+    npm run build web
 
 You can then open `build-web/index.html` in your browser to test then.
 
@@ -75,15 +71,15 @@ Running unit tests
 
 This repository contains an extensive test suite for the core functionality. You can run the unit tests using the following command:
 
-    gulp test
+    npm test
 
 You can also run an individual unit test file, for example:
 
-    gulp test --test=masterPassword
+    npm test -- --test=masterPassword
 
 Cleaning up the repository
 --------------------------
 
 You can run the following command to remove all temporary files that have been generated during build:
 
-    gulp clean
+    npm run build clean
