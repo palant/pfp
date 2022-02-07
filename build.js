@@ -17,7 +17,7 @@ import vue from "rollup-plugin-vue";
 
 import {series, parallel, Files, MemoryFile} from "builder";
 import eslint from "builder/tools/eslint";
-import htmlhint from "builder/tools/htmlhint";
+import htmlValidate from "builder/tools/html-validate";
 import mocha from "builder/tools/mocha";
 import rollup from "builder/tools/rollup";
 import sass from "builder/tools/sass";
@@ -124,10 +124,10 @@ function eslintTask()
              .pipe(eslint);
 }
 
-function htmlhintTask()
+function htmlValidateTask()
 {
   return this.src(["ui/**/*.html", "web/**/*.html"])
-             .pipe(htmlhint, {htmlhintrc: ".htmlhintrc"});
+             .pipe(htmlValidate);
 }
 
 function stylelintTask()
@@ -140,10 +140,10 @@ function stylelintTask()
 
 export {
   eslintTask as eslint,
-  htmlhintTask as htmlhint,
+  htmlValidateTask as htmlValidate,
   stylelintTask as stylelint
 };
-export let validate = parallel(eslintTask, htmlhintTask, stylelintTask);
+export let validate = parallel(eslintTask, htmlValidateTask, stylelintTask);
 
 let common = series(validate, function()
 {
