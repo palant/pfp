@@ -145,7 +145,7 @@ let common = series(validate, function()
           format: "es",
           manualChunks(id)
           {
-            if (id.endsWith("/vue.js") || id.endsWith("/clipboard.js") || id.indexOf("/ui/components/") >= 0)
+            if (/[/\\](vue|clipboard)\.js$|[/\\]ui[/\\]components[/\\]/.test(id))
               return "shared";
             return null;
           },
