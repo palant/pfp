@@ -250,7 +250,7 @@ let webMain = series(validate, function()
           ]
         }))
   )
-    .rename(filepath => filepath.includes(path.sep) ? filepath.split(path.sep).slice(1).join(path.sep) : filepath);
+    .rename(filepath => path.normalize(filepath).includes(path.sep) ? path.normalize(filepath).split(path.sep).slice(1).join(path.sep) : filepath);
 });
 
 export let web = series(webMain, files => files.dest("build-web"));

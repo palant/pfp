@@ -59,7 +59,7 @@ export async function* combineLocales(files)
   {
     file = await file.read();
 
-    let parts = file.path.split(path.sep);
+    let parts = path.normalize(file.path).split(path.sep);
     parts = parts.slice(parts.lastIndexOf("locale") + 1);
     let locale = parts.shift();
     if (!locales.hasOwnProperty(locale))
