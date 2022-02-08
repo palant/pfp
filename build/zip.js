@@ -16,7 +16,7 @@ export default async function* zip(files, name = "zip")
   for await (let file of files)
   {
     file = await file.read();
-    zip.addFile(file.path, file.buffer);
+    zip.addFile(file.path.replace(/\\/g, "/"), file.buffer);
   }
   yield new MemoryFile(name, zip.toBuffer());
 }
