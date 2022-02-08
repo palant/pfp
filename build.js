@@ -232,7 +232,7 @@ let webMain = series(validate, function()
               [path.resolve(process.cwd(), "lib", "browserAPI.js")]: path.resolve(process.cwd(), "web", "backgroundBrowserAPI.js"),
               [path.resolve(process.cwd(), "ui", "browserAPI.js")]: path.resolve(process.cwd(), "web", "contentBrowserAPI.js")
             }),
-            workerLoader(/\/scrypt\.js$/),
+            workerLoader(/[/\\]scrypt\.js$/),
             localeLoader(path.resolve(process.cwd(), "locale", "en_US"))
           ],
           postPlugins: [
