@@ -115,7 +115,7 @@ function eslintTask()
 
 function htmlValidateTask()
 {
-  return this.src(["ui/**/*.html", "web/**/*.html"])
+  return this.src(["ui/**/*.html", "ui/**/*.vue", "web/**/*.html", "ui/**/*.vue"])
              .pipe(htmlValidate);
 }
 
