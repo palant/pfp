@@ -275,7 +275,7 @@ export let test = series(validate, function()
                try
                {
                  yield* await mocha(files, {
-                   timeout: 30000
+                   timeout: 10000
                  });
                }
                finally

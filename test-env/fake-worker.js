@@ -59,7 +59,6 @@ export class FakeWorker extends WorkerEventTarget
     super();
 
     global.self = new WorkerEventTarget(this);
-    // Need to use eval() here, otherwise eslint won't be able to parse it
-    this._waitFor = global.self._waitFor = eval("import(url)");
+    this._waitFor = global.self._waitFor = import(url);
   }
 }

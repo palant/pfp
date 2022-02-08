@@ -7,13 +7,14 @@
 "use strict";
 
 import path from "path";
+import url from "url";
 
 let browser = {};
 
 browser.runtime = {
   getURL: filepath =>
   {
-    return path.resolve(process.cwd(), ...filepath.split("/"));
+    return url.pathToFileURL(path.resolve(process.cwd(), ...filepath.split("/"))).href;
   }
 };
 
