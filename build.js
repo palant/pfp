@@ -79,21 +79,10 @@ function rollupOptions(builder, overrides = {})
   }, overrides)];
 }
 
-function addReloader(files, targetDir)
+function addReloader(files)
 {
   return [
-    files,
-    this.src()
-        .pipe(() => [new MemoryFile("random.json", String(Math.random()))])
-        .dest(targetDir)
-  ];
-}
-
-function createRelease(files, fileName, targetDir)
-{
-  return files
-    .rename(filepath => filepath.split(path.sep).slice(1).join(path.sep))
-    .pipe(async function*(files)
+    files.pipe(async function*(files)
     {
       for await (let file of files)
       {
@@ -102,17 +91,18 @@ function createRelease(files, fileName, targetDir)
           file = await file.read();
 
           let data = JSON.parse(file.contents);
-          let index = data.background.scripts.indexOf("reloader.js");
-          if (index >= 0)
-            data.background.scripts.splice(index, 1);
+          data.background.scripts.push("reloader.js");
           yield new MemoryFile(file.path, utils.stringifyObject(data));
         }
-        else if (file.path != "reloader.js" && file.path != "random.json")
+        else
           yield file;
       }
-    })
-    .pipe(zip, fileName)
-    .dest(targetDir);
+    }),
+    this.src("lib/reloader.js")
+        .rename("reloader.js"),
+    this.src()
+        .pipe(() => [new MemoryFile("random.json", String(Math.random()))])
+  ];
 }
 
 function eslintTask()
@@ -171,8 +161,6 @@ let common = series(validate, function()
     this.src("lib/main.js")
         .pipe(rollup, ...rollupOptions(this))
         .rename("background.js"),
-    this.src("lib/reloader.js")
-        .rename("reloader.js"),
     this.src("worker/scrypt.js")
         .pipe(rollup, ...rollupOptions(this))
   ];
@@ -181,24 +169,20 @@ let common = series(validate, function()
 let chromeMain = series(common, function(common)
 {
   return [
-    common.dest("build-chrome"),
+    common,
     this.src("manifest.json")
         .pipe(utils.jsonModify, data =>
         {
           delete data.applications;
         })
-        .dest("build-chrome")
   ];
 });
 
-export let chrome = series(chromeMain, async function(main)
-{
-  return addReloader.call(this, main, "build-chrome");
-});
+export let chrome = series(chromeMain, addReloader, files => files.dest("build-chrome"));
 
-export let crx = series(chrome, function(files)
+export let crx = series(chromeMain, function(files)
 {
-  return createRelease(files, `pfp-${VERSION}.zip`, "build-chrome");
+  return files.pipe(zip, `pfp-${VERSION}.zip`).dest("build-chrome");
 });
 
 export let watchChrome = series(chrome, function()
@@ -210,7 +194,7 @@ export let watchChrome = series(chrome, function()
 let firefoxMain = series(common, function(common)
 {
   return [
-    common.dest("build-firefox"),
+    common,
     this.src("manifest.json")
         .pipe(utils.jsonModify, data =>
         {
@@ -220,18 +204,14 @@ let firefoxMain = series(common, function(common)
 
           data.browser_action.browser_style = false;
         })
-        .dest("build-firefox")
   ];
 });
 
-export let firefox = series(firefoxMain, function(main)
-{
-  return addReloader.call(this, main, "build-firefox");
-});
+export let firefox = series(firefoxMain, addReloader, files => files.dest("build-firefox"));
 
-export let xpi = series(firefox, function(files)
+export let xpi = series(firefoxMain, function(files)
 {
-  return createRelease(files, `pfp-${VERSION}.xpi`, "build-firefox");
+  return files.pipe(zip, `pfp-${VERSION}.xpi`).dest("build-firefox");
 });
 
 export let watchFirefox = series(firefox, function()
@@ -240,7 +220,7 @@ export let watchFirefox = series(firefox, function()
              .watch(firefox);
 });
 
-export let web = series(validate, function()
+let webMain = series(validate, function()
 {
   return new Files(
     this.src(["LICENSE.txt", "ui/images/**", "ui/third-party/**", "web/**/*.html"]),
@@ -271,13 +251,14 @@ export let web = series(validate, function()
           ]
         }))
   )
-    .rename(path => path.replace(/^(ui|web[/\\])/, ""))
-    .dest("build-web");
+    .rename(filepath => filepath.includes(path.sep) ? filepath.split(path.sep).slice(1).join(path.sep) : filepath);
 });
 
-export let webZip = series(web, function(files)
+export let web = series(webMain, files => files.dest("build-web"));
+
+export let webZip = series(webMain, function(files)
 {
-  return createRelease(files, `pfp-web-${VERSION}.zip`, "build-web");
+  return files.pipe(zip, `pfp-web-${VERSION}.zip`).dest("build-web");
 });
 
 export let test = series(validate, function()
@@ -311,5 +292,5 @@ export function clean()
       .rm();
 }
 
-export let all = parallel(xpi, crx, webZip);
+export let all = parallel(firefox, xpi, chrome, crx, web, webZip);
 export default all;

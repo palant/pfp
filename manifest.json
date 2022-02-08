@@ -26,8 +26,7 @@
   "background": {
     "persistent": true,
     "scripts": [
-      "background.js",
-      "reloader.js"
+      "background.js"
     ]
   },
   "incognito": "spanning",
