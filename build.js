@@ -287,8 +287,8 @@ export let test = series(validate, function()
 
 export function clean()
 {
-  this.src(["build-chrome/**", "build-firefox/**", "build-web/**"])
-      .rm();
+  return this.src(["build-chrome/**", "build-firefox/**", "build-web/**"])
+             .rm();
 }
 
 export let all = parallel(firefox, xpi, chrome, crx, web, webZip);
