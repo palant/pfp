@@ -100,8 +100,7 @@ function addReloader(files)
     }),
     this.src("lib/reloader.js")
         .rename("reloader.js"),
-    this.src()
-        .pipe(() => [new MemoryFile("random.json", String(Math.random()))])
+    new MemoryFile("random.json", String(Math.random()))
   ];
 }
 
