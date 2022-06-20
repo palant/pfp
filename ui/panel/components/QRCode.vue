@@ -12,7 +12,7 @@
       <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
     </div>
     <div class="block-start qrcode-canvas-container">
-      <canvas ref="canvas" :width="matrix.pixelWidth" :height="matrix.pixelWidth" />
+      <canvas ref="canvas" :width="size" :height="size" />
     </div>
   </ModalOverlay>
 </template>
@@ -20,7 +20,10 @@
 <script>
 "use strict";
 
-import JSQR from "jsqr";
+import qrcode from "qrcode/lib/core/qrcode.js";
+import qrcodeRenderer from "qrcode/lib/renderer/canvas.js";
+
+const SCALE = 8;
 
 export default {
   name: "QRCode",
@@ -38,33 +41,15 @@ export default {
   emits: ["cancel"],
   data()
   {
-    let qr = new JSQR();
-
-    let code = new qr.Code();
-    code.encodeMode = code.ENCODE_MODE.BYTE;
-    code.version = code.DEFAULT;
-    code.errorCorrection = code.ERROR_CORRECTION.M;
-
-    let input = new qr.Input();
-    input.dataType = input.DATA_TYPE.TEXT;
-    input.data = this.value;
-
-    let matrix = new qr.Matrix(input, code);
-    matrix.margin = 0;
-    matrix.scale = 8;
-
+    let code = qrcode.create(this.value);
     return {
-      matrix
+      code,
+      size: code.modules.size * SCALE
     };
   },
   mounted()
   {
-    let canvas = this.$refs.canvas;
-    let context = canvas.getContext("2d");
-    context.fillStyle = "white";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = "black";
-    this.matrix.draw(canvas, 0, 0);
+    qrcodeRenderer.render(this.code, this.$refs.canvas, {scale: SCALE, margin: 0});
   }
 };
 </script>

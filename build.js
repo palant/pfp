@@ -25,7 +25,6 @@ import sass from "./build/sass.js";
 import stylelint from "./build/stylelint.js";
 import * as utils from "./build/utils.js";
 import zip from "./build/zip.js";
-import globalLoader from "./build/rollup/globalLoader.js";
 import iife from "./build/rollup/iifeChunks.js";
 import localeLoader from "./build/rollup/localeLoader.js";
 import replace from "./build/rollup/replacePlugin.js";
@@ -44,9 +43,6 @@ function rollupOptions(builder, overrides = {})
   return [{
     plugins: [
       ...prePlugins,
-      globalLoader({
-        jsqr: "JSQR"
-      }),
       alias({
         entries: [
           {
