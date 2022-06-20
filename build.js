@@ -140,7 +140,7 @@ let common = series(validate, function()
           format: "es",
           manualChunks(id)
           {
-            if (/[/\\](vue|clipboard)\.js$|[/\\]@zxcvbn-ts[/\\]|[/\\]ui[/\\]components[/\\]/.test(id))
+            if (/[/\\](vue|clipboard)\.js$|[/\\]ui[/\\]components[/\\]/.test(id))
               return "shared";
             return null;
           },
