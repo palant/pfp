@@ -17,7 +17,17 @@
 <script>
 "use strict";
 
-import zxcvbn from "zxcvbn";
+import {zxcvbn, zxcvbnOptions} from "@zxcvbn-ts/core";
+import zxcvbnCommon from "@zxcvbn-ts/language-common";
+import zxcvbnEn from "@zxcvbn-ts/language-en";
+
+zxcvbnOptions.setOptions({
+  dictionary: {
+    ...zxcvbnCommon.dictionary,
+    ...zxcvbnEn.dictionary
+  },
+  graphs: zxcvbnCommon.adjacencyGraphs
+});
 
 export default {
   name: "PasswordScore",
