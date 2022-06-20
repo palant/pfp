@@ -4,6 +4,8 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
+@use "sass:color";
+
 @import "../_shared.scss";
 
 $body-width: 25em;
@@ -294,7 +296,7 @@ a.iconic-link:hover
 
 .password-menu-link.menuactive
 {
-  background-color: mix($background-color, $text-color, 70%);
+  background-color: color.mix($background-color, $text-color, 70%);
 }
 
 .to-document-link
