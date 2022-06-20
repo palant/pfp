@@ -7,8 +7,9 @@
 <template>
   <div class="password-name-entry">
     <label for="user-name">{{ $t("username_label") }}</label>
-    <ValidatedInput id="user-name" v-model="name" v-model:error="error" v-focus
-                    v-bind="{readonly}" vtype="text" @validate="validateName"
+    <ValidatedInput
+      id="user-name" v-model="name" v-model:error="error" v-focus
+      v-bind="{readonly}" vtype="text" @validate="validateName"
     />
     <div v-if="error" class="error">
       {{ error }}

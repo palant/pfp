@@ -9,10 +9,11 @@
     <ValidatedForm class="modal-form" @validated="submit" @reset="$emit('cancel')">
       <div v-if="options.replacing" class="warning replacing">{{ $t("replace_warning") }}</div>
 
-      <PasswordNameEntry ref="name-entry" v-model="name"
-                         v-model:revision="revision"
-                         :readonly="options.replacing"
-                         :class="{'block-start': options.replacing}"
+      <PasswordNameEntry
+        ref="name-entry" v-model="name"
+        v-model:revision="revision"
+        :readonly="options.replacing"
+        :class="{'block-start': options.replacing}"
       />
 
       <label v-if="password && password.notes" class="block-start">
@@ -35,8 +36,9 @@
       </div>
 
       <!-- Charset checkboxes are aggregated into a single hidden input to simplify validation -->
-      <ValidatedInput v-model="charsets" v-model:error="charsetsError"
-                      :visible="false" @validate="validateCharsets"
+      <ValidatedInput
+        v-model="charsets" v-model:error="charsetsError"
+        :visible="false" @validate="validateCharsets"
       />
       <div v-if="charsetsError" class="error">{{ charsetsError }}</div>
 

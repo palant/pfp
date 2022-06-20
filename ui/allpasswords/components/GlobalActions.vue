@@ -11,10 +11,11 @@
     <IconicLink class="print" :title="$t('print')" @click="printPage" />
     <input ref="importFile" type="file" accept="application/json,text/csv" hidden @change="importFileSelected">
     <iframe ref="frame" class="exportDataFrame" />
-    <EnterMaster v-if="enterMasterCallback" class="modal-form"
-                 :warning="$t('import_with_master')"
-                 :callback="enterMasterCallback"
-                 @done="enterMasterCallback = null"
+    <EnterMaster
+      v-if="enterMasterCallback" class="modal-form"
+      :warning="$t('import_with_master')"
+      :callback="enterMasterCallback"
+      @done="enterMasterCallback = null"
     />
   </div>
 </template>

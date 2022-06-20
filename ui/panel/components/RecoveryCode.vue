@@ -10,16 +10,18 @@
     <div class="recovery-code-accepted">
       <div v-for="(line, index) in accepted" :key="line">
         {{ line }}
-        <IconicLink v-if="index == accepted.length - 1"
-                    class="recovery-code-strip cancel"
-                    :title="$t('remove_line')" @click="accepted.pop()"
+        <IconicLink
+          v-if="index == accepted.length - 1"
+          class="recovery-code-strip cancel"
+          :title="$t('remove_line')" @click="accepted.pop()"
         />
       </div>
     </div>
-    <textarea id="recoveryInput" ref="recoveryInput" v-focus
-              autocomplete="off" autocorrect="off" spellcheck="false"
-              @input="processInput" @change="processInput"
-              @keydown.delete="onDelete" @keydown.backspace="onBackspace"
+    <textarea
+      id="recoveryInput" ref="recoveryInput" v-focus
+      autocomplete="off" autocorrect="off" spellcheck="false"
+      @input="processInput" @change="processInput"
+      @keydown.delete="onDelete" @keydown.backspace="onBackspace"
     />
     <div v-if="currentError" class="error">{{ currentError }}</div>
   </form>

@@ -8,8 +8,9 @@
   <div class="page">
     <template v-if="$root.site == $root.siteDisplayName">
       <label for="site">{{ $t("site") }}</label>
-      <ExternalLink id="site" v-focus="!$root.pwdList.length"
-                    type="url" :param="'https://' + $root.site" data-noaccesskey
+      <ExternalLink
+        id="site" v-focus="!$root.pwdList.length"
+        type="url" :param="'https://' + $root.site" data-noaccesskey
       >
         {{ $root.siteDisplayName }}
       </ExternalLink>
@@ -27,8 +28,9 @@
         {{ $t("remove_alias") }}
       </a>
     </div>
-    <a v-else-if="$root.site && $root.site != 'pfp.invalid' && !$root.pwdList.length"
-       class="alias-container" href="#" @click.prevent="addAlias"
+    <a
+      v-else-if="$root.site && $root.site != 'pfp.invalid' && !$root.pwdList.length"
+      class="alias-container" href="#" @click.prevent="addAlias"
     >
       {{ $t("add_alias") }}
     </a>
@@ -37,24 +39,26 @@
       <SiteSelection :message="$t('select_alias', $root.origSite)" :callback="selectionCallback" />
     </ModalOverlay>
 
-    <PasswordMessage ref="password-message" class="block-start"
-                     :messages="{
-                       password_ready: false,
-                       password_copied: true,
-                       username_copied: true,
-                       no_such_password: false,
-                       unknown_generation_method: false,
-                       wrong_site: false,
-                       no_password_fields: false
-                     }"
+    <PasswordMessage
+      ref="password-message" class="block-start"
+      :messages="{
+        password_ready: false,
+        password_copied: true,
+        username_copied: true,
+        no_such_password: false,
+        unknown_generation_method: false,
+        wrong_site: false,
+        no_password_fields: false
+      }"
     />
 
     <div class="block-start">{{ $t("passwords_label") }}</div>
     <div v-if="!$root.pwdList.length">{{ $t("no_passwords_message") }}</div>
     <div v-else class="password-list-container" role="list" @keydown="keyboardNavigation">
-      <PasswordEntry v-for="(password, index) in $root.pwdList"
-                     :key="password.name + '\0' + password.revision"
-                     role="listitem" :password="password" :focus="index == 0"
+      <PasswordEntry
+        v-for="(password, index) in $root.pwdList"
+        :key="password.name + '\0' + password.revision"
+        role="listitem" :password="password" :focus="index == 0"
       />
     </div>
 

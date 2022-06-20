@@ -11,12 +11,13 @@
     <Confirm ref="confirm" />
     <SizeSelector />
     <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
-    <PasswordMessage ref="global-message"
-                     :messages="{
-                       import_success: true,
-                       unknown_data_format: false,
-                       syntax_error: false
-                     }"
+    <PasswordMessage
+      ref="global-message"
+      :messages="{
+        import_success: true,
+        unknown_data_format: false,
+        syntax_error: false
+      }"
     />
 
     <div class="title-container">

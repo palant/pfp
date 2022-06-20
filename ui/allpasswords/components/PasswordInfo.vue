@@ -6,13 +6,14 @@
 
 <template>
   <div class="password-info-container">
-    <PasswordMessage ref="password-message"
-                     :messages="{
-                       password_ready: false,
-                       password_copied: true,
-                       no_such_password: false,
-                       unknown_generation_method: false
-                     }"
+    <PasswordMessage
+      ref="password-message"
+      :messages="{
+        password_ready: false,
+        password_copied: true,
+        no_such_password: false,
+        unknown_generation_method: false
+      }"
     />
 
     <div class="password-container">
@@ -33,8 +34,9 @@
       <template v-else-if="password.type == 'stored'">
         <div class="password-type">
           <template v-if="true">{{ $t("password_type_stored") }}</template>
-          <span class="help-icon" :title="$t('recovery_code_explanation')"
-                :aria-label="$t('recovery_code_explanation')"
+          <span
+            class="help-icon" :title="$t('recovery_code_explanation')"
+            :aria-label="$t('recovery_code_explanation')"
           />
         </div>
         <pre v-if="recoveryCode">{{ recoveryCode }}</pre>

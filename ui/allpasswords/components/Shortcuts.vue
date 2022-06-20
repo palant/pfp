@@ -6,9 +6,10 @@
 
 <template>
   <div v-keyboard-navigation:shortcut-letter class="shortcuts">
-    <a v-for="(letter, index) in letters" :key="letter.letter"
-       v-focus="index == 0" class="shortcut-letter" href="#"
-       @click.prevent="$emit('clicked', letter.param)"
+    <a
+      v-for="(letter, index) in letters" :key="letter.letter"
+      v-focus="index == 0" class="shortcut-letter" href="#"
+      @click.prevent="$emit('clicked', letter.param)"
     >{{ letter.letter }}</a>
   </div>
 </template>

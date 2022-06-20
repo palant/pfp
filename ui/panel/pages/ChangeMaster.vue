@@ -5,8 +5,9 @@
  -->
 
 <template>
-  <ValidatedForm class="page" @validated="submit"
-                 @reset.prevent="hasPassword && ($root.resettingMaster = false)"
+  <ValidatedForm
+    class="page" @validated="submit"
+    @reset.prevent="hasPassword && ($root.resettingMaster = false)"
   >
     <div>
       <template v-if="!hasPassword">
@@ -22,18 +23,20 @@
       </ExternalLink>
     </div>
     <label class="block-start" for="new-master">{{ $t("new_master") }}</label>
-    <ValidatedInput id="new-master" v-model="newMaster"
-                    v-model:error="newMasterError" v-focus type="password"
-                    @validate="validateMasterPassword"
+    <ValidatedInput
+      id="new-master" v-model="newMaster"
+      v-model:error="newMasterError" v-focus type="password"
+      @validate="validateMasterPassword"
     />
     <div v-if="newMasterError" class="error">
       {{ newMasterError }}
     </div>
     <PasswordScore ref="passwordScore" :password="newMaster" />
     <label class="block-start" for="new-master-repeat">{{ $t("new_master_repeat") }}</label>
-    <ValidatedInput id="new-master-repeat" v-model="newMasterRepeat"
-                    v-model:error="newMasterRepeatError" type="password"
-                    @validate="validateMasterPasswordRepeat"
+    <ValidatedInput
+      id="new-master-repeat" v-model="newMasterRepeat"
+      v-model:error="newMasterRepeatError" type="password"
+      @validate="validateMasterPasswordRepeat"
     />
     <div v-if="newMasterRepeatError" class="error">
       {{ newMasterRepeatError }}

@@ -41,9 +41,10 @@
     <template v-else>
       <div class="sync-section">{{ $t("selection_label") }}</div>
       <div v-keyboard-navigation:sync-provider-link class="sync-provider-selection">
-        <a v-for="(provider, index) in providers" :key="provider.name"
-           v-focus="index == 0" class="sync-provider-link"
-           href="#" @click.prevent="authorize(provider.name)"
+        <a
+          v-for="(provider, index) in providers" :key="provider.name"
+          v-focus="index == 0" class="sync-provider-link"
+          href="#" @click.prevent="authorize(provider.name)"
         >
           <span class="sync-provider-icon" :class="provider.name" />
           <span>{{ provider.label }}</span>
@@ -65,14 +66,16 @@
       <div class="sync-explanation">{{ $t("no_account_text") }}</div>
     </template>
 
-    <ManualAuth v-if="manualAuthCallback"
-                :callback="manualAuthCallback"
-                @cancel="manualAuthCallback = null"
+    <ManualAuth
+      v-if="manualAuthCallback"
+      :callback="manualAuthCallback"
+      @cancel="manualAuthCallback = null"
     />
 
-    <RemoteStorageUsernameInput v-if="remoteStorageUsernameCallback"
-                                :callback="remoteStorageUsernameCallback"
-                                @cancel="remoteStorageUsernameCallback = null"
+    <RemoteStorageUsernameInput
+      v-if="remoteStorageUsernameCallback"
+      :callback="remoteStorageUsernameCallback"
+      @cancel="remoteStorageUsernameCallback = null"
     />
   </div>
 </template>

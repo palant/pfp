@@ -8,10 +8,11 @@
   <ModalOverlay @cancel="$emit('cancel')">
     <ValidatedForm class="modal-form" @validated="done">
       <label for="username">{{ $t("username_label") }}</label>
-      <ValidatedInput id="username" v-model="username"
-                      v-model:error="usernameError" v-focus
-                      placeholder="me@example.com"
-                      @validate="validateUsername"
+      <ValidatedInput
+        id="username" v-model="username"
+        v-model:error="usernameError" v-focus
+        placeholder="me@example.com"
+        @validate="validateUsername"
       />
       <div v-if="usernameError" class="error">
         {{ usernameError }}

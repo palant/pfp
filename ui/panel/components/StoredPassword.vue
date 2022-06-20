@@ -13,9 +13,10 @@
 
       <template v-if="!recoveryActive">
         <label class="block-start" for="password-value">{{ $t("password_label") }}</label>
-        <ValidatedInput id="password-value" ref="password" v-model="password"
-                        v-model:error="passwordError" type="password"
-                        @validate="validatePassword"
+        <ValidatedInput
+          id="password-value" ref="password" v-model="password"
+          v-model:error="passwordError" type="password"
+          @validate="validatePassword"
         />
         <div v-if="passwordError" class="error">
           {{ passwordError }}

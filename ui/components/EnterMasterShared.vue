@@ -8,10 +8,11 @@
   <ValidatedForm @validated="submit" @reset.prevent="$emit('done', false)">
     <div v-if="warning" class="warning">{{ warning }}</div>
     <label for="master-password">{{ $t("master_password") }}</label>
-    <ValidatedInput id="master-password" v-model="masterPassword"
-                    v-model:error="masterPasswordError" v-focus
-                    type="password"
-                    @validate="validateMasterPassword"
+    <ValidatedInput
+      id="master-password" v-model="masterPassword"
+      v-model:error="masterPasswordError" v-focus
+      type="password"
+      @validate="validateMasterPassword"
     />
     <div v-if="masterPasswordError" class="error">
       {{ masterPasswordError }}

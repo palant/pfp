@@ -5,9 +5,10 @@
  -->
 
 <template>
-  <div @keydown.ctrl.e.prevent="testUnknownError"
-       @keydown.ctrl.exact="tabNavigation"
-       @keydown.meta.exact="tabNavigation"
+  <div
+    @keydown.ctrl.e.prevent="testUnknownError"
+    @keydown.ctrl.exact="tabNavigation"
+    @keydown.meta.exact="tabNavigation"
   >
     <Confirm ref="confirm" />
     <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
@@ -19,35 +20,40 @@
       <nav v-keyboard-navigation:tab class="tablist" role="list">
         <div />
 
-        <IconicLink class="tab select-site" role="listitem"
-                    :class="{active: currentPage == 'select-site'}"
-                    :title="$t('select_site')"
-                    @click="currentPage = 'select-site'"
+        <IconicLink
+          class="tab select-site" role="listitem"
+          :class="{active: currentPage == 'select-site'}"
+          :title="$t('select_site')"
+          @click="currentPage = 'select-site'"
         />
 
-        <IconicLink class="tab password-list" role="listitem"
-                    :class="{active: currentPage == 'password-list'}"
-                    :title="$t('password_list')"
-                    @click="currentPage = 'password-list'"
+        <IconicLink
+          class="tab password-list" role="listitem"
+          :class="{active: currentPage == 'password-list'}"
+          :title="$t('password_list')"
+          @click="currentPage = 'password-list'"
         />
 
-        <IconicLink class="tab sync" role="listitem"
-                    :class="{active: currentPage == 'sync', failed: $root.sync.error && $root.sync.error != 'sync_connection_error'}"
-                    :title="$t('sync')"
-                    @click="currentPage = 'sync'"
+        <IconicLink
+          class="tab sync" role="listitem"
+          :class="{active: currentPage == 'sync', failed: $root.sync.error && $root.sync.error != 'sync_connection_error'}"
+          :title="$t('sync')"
+          @click="currentPage = 'sync'"
         />
 
-        <IconicLink class="tab settings" role="listitem"
-                    :class="{active: currentPage == 'settings'}"
-                    :title="$t('settings')"
-                    @click="currentPage = 'settings'"
+        <IconicLink
+          class="tab settings" role="listitem"
+          :class="{active: currentPage == 'settings'}"
+          :title="$t('settings')"
+          @click="currentPage = 'settings'"
         />
 
         <div class="spacer" />
 
-        <IconicLink class="tab lock" role="listitem"
-                    :title="$t('lock_passwords')"
-                    @click="lockPasswords"
+        <IconicLink
+          class="tab lock" role="listitem"
+          :title="$t('lock_passwords')"
+          @click="lockPasswords"
         />
       </nav>
       <SelectSite v-if="currentPage == 'select-site'" @selected="currentPage = 'password-list'" />

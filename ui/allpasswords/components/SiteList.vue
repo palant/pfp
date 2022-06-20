@@ -8,9 +8,10 @@
   <div class="list">
     <Shortcuts :letters="getLetters(sites)" @clicked="scrollToSite" />
 
-    <SiteInfo v-for="site in sites" :key="site.site"
-              :ref="'site.' + site.site" :site="site" :show-notes="showNotes"
-              :show-passwords="showPasswords" @removed="removeSite(site)"
+    <SiteInfo
+      v-for="site in sites" :key="site.site"
+      :ref="'site.' + site.site" :site="site" :show-notes="showNotes"
+      :show-passwords="showPasswords" @removed="removeSite(site)"
     />
   </div>
 </template>
