@@ -1,0 +1,10 @@
+{
+  "title": "PfP: Pain-free Passwords is being discontinued",
+  "par1": "All good things must come to an end. It has been seven years since PfP was first introduced, back then under the name EasyPasswords. It has features that no other password manager can match, and I still like it.",
+  "par2": "Unfortunately, developing a good password manager is lots of effort. I notice that I’ve been neglecting PfP, and this won’t change any more. So I’m now making official what has been somewhat obvious already: PfP is no longer being developed.",
+  "par3": "Does this mean that you can no longer use it? You can. But whatever breaks now stays broken. Sync to Google Drive in particular is already broken and non-trivial to fix unfortunately.",
+  "par4": "What can you use instead? Not LastPass please. Maybe Bitwarden or 1Password. Definitely KeePass or a clone if you don’t mind it being less intuitive. Personally, I’ll be using KeePassXC.",
+  "par5": "How to get your passwords over? On the “All Passwords” page, there is a new button for CSV export. It should be possible to import the resulting file into any password manager. In KeePassXC you’ll need to check “First line has field names,” otherwise the default import settings will do.",
+  "rememberAccept": "Do not show this message again",
+  "accept": "Continue"
+}
