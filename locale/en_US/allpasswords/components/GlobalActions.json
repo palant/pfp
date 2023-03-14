@@ -1,4 +1,5 @@
 {
+  "csv_export": "Export passwords to a generic CSV file",
   "export": "Export password definitions to a file",
   "import": "Import password definitions from a file",
   "print": "Print",

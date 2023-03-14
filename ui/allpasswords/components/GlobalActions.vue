@@ -6,6 +6,7 @@
 
 <template>
   <div class="global-actions">
+    <IconicLink class="csv-export" :title="$t('csv_export')" @click="exportCSVData" />
     <IconicLink class="export" :title="$t('export')" @click="exportData" />
     <IconicLink class="import" :title="$t('import')" @click="selectImportFile" />
     <IconicLink class="print" :title="$t('print')" @click="printPage" />
@@ -39,6 +40,71 @@ export default {
     };
   },
   methods: {
+    async exportCSVData()
+    {
+      this.$root.inProgress = true;
+      try
+      {
+        let sites = await passwords.getAllPasswords();
+        let siteNames = Object.keys(sites);
+        siteNames.sort();
+        {
+          let index = siteNames.indexOf("pfp.invalid");
+          if (index >= 0)
+          {
+            siteNames.splice(index, 1);
+            siteNames.unshift("pfp.invalid");
+          }
+        }
+
+        let result = [];
+        for (let siteName of siteNames)
+        {
+          let site = sites[siteName];
+          for (let password of site.passwords)
+          {
+            let displayName = password.name;
+            if (password.revision)
+              displayName += ` #${password.revision}`;
+
+            let value = await passwords.getPassword(password);
+            result.push(["", displayName, password.name, value, siteName == "pfp.invalid" ? "" : `https://${siteName}/`, password.notes || ""]);
+          }
+        }
+
+        let data = "Group,Title,Username,Password,URL,Notes\n" + result.map(line =>
+        {
+          return line.map(value =>
+          {
+            return `"${value.replace(/"/g, '""')}"`;
+          }).join(",");
+        }).join("\n");
+
+        // See https://bugzil.la/1379960, in Firefox this will only work with a
+        // link inside a frame.
+        let frameDoc = this.$refs.frame.contentDocument;
+        let link = frameDoc.body.lastChild;
+        if (!link || link.localName != "a")
+        {
+          link = frameDoc.createElement("a");
+          frameDoc.body.appendChild(link);
+        }
+
+        let blob = new Blob([data], {type: "text/csv"});
+        link.href = URL.createObjectURL(blob);
+        link.download = "passwords-backup-" + new Date().toISOString().replace(/T.*/, "") + ".csv";
+        link.click();
+      }
+      catch (error)
+      {
+        this.$root.showUnknownError(error);
+      }
+      finally
+      {
+        this.$root.inProgress = false;
+      }
+    },
+
     exportData()
     {
       passwords.exportPasswordData().then(data =>
