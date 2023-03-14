@@ -5,6 +5,8 @@
  */
 
 $font-family: "Helvetica Neue", helvetica, arial, sans-serif;
+$font-size: 24px;
+$font-size-small: 16px;
 
 $text-color: #000;
 $background-color: #fff;
@@ -13,6 +15,17 @@ $success-background: #cfc;
 $error-text: #f44;
 $hover-background: #e2f4ff;
 $greyed-color: #ccc;
+
+$block-spacing: 15px;
+$block-padding: 5px;
+$inline-spacing: 5px;
+$border-radius: $block-padding;
+$dialog-padding: 20px;
+
+$small-icon-size: $font-size-small;
+$text-icon-size: $font-size;
+$icon-size: 32px;
+$large-icon-size: 48px;
 
 @mixin no-appearance
 {
@@ -98,45 +111,6 @@ $greyed-color: #ccc;
   }
 }
 
-:root[data-size="1"]
-{
-  --font-size: 15px;
-  --font-size-small: 10px;
-}
-
-:root[data-size="2"]
-{
-  --font-size: 20px;
-  --font-size-small: 13.333px;
-}
-
-:root
-{
-  --font-size: 24px;
-  --font-size-small: 16px;
-  --block-spacing: calc(var(--font-size) * 0.625);
-  --block-padding: calc(var(--block-spacing) / 3);
-  --inline-spacing: calc(var(--block-spacing) / 3);
-  --border-radius: var(--block-padding);
-  --dialog-padding: calc(var(--block-spacing) * 4 / 3);
-  --small-icon-size: var(--font-size-small);
-  --text-icon-size: var(--font-size);
-  --icon-size: calc(var(--font-size) * 4 / 3);
-  --large-icon-size: calc(var(--font-size) * 2);
-}
-
-:root[data-size="4"]
-{
-  --font-size: 27px;
-  --font-size-small: 18px;
-}
-
-:root[data-size="5"]
-{
-  --font-size: 30px;
-  --font-size-small: 20px;
-}
-
 body
 {
   background-color: $background-color;
@@ -148,7 +122,7 @@ input,
 button
 {
   font-family: $font-family;
-  font-size: var(--font-size);
+  font-size: $font-size;
 }
 
 a
@@ -170,26 +144,26 @@ a:focus
 .warning
 {
   background-color: $warning-background;
-  border-radius: var(--border-radius);
-  padding: var(--block-padding);
+  border-radius: $border-radius;
+  padding: $block-padding;
 
-  @include padding-inline-start(calc(var(--icon-size) + var(--block-padding) + var(--inline-spacing)));
+  @include padding-inline-start($icon-size + $block-padding + $inline-spacing);
   background-image: url("../images/ionicons/md-warning.svg");
-  background-size: var(--icon-size);
-  background-position: var(--block-padding) var(--block-padding);
+  background-size: $icon-size;
+  background-position: $block-padding $block-padding;
   background-repeat: no-repeat;
 }
 
 .success
 {
   background-color: $success-background;
-  border-radius: var(--border-radius);
-  padding: var(--block-padding);
+  border-radius: $border-radius;
+  padding: $block-padding;
 }
 
 .error
 {
-  font-size: var(--font-size-small);
+  font-size: $font-size-small;
   color: $error-text;
 }
 
@@ -200,7 +174,7 @@ a:focus
 
 .unknown-error-details
 {
-  font-size: var(--font-size-small);
+  font-size: $font-size-small;
   white-space: pre-wrap;
 }
 
@@ -208,9 +182,9 @@ a:focus
 {
   display: inline-block;
   cursor: help;
-  width: var(--text-icon-size);
-  height: var(--text-icon-size);
-  background-size: var(--text-icon-size);
+  width: $text-icon-size;
+  height: $text-icon-size;
+  background-size: $text-icon-size;
   background-repeat: no-repeat;
   background-image: url("../images/ionicons/md-help-circle-outline.svg");
 
@@ -220,55 +194,21 @@ a:focus
   }
 }
 
-.size-selector
-{
-  @include float-end;
-  padding: var(--block-padding);
-  border: 1px solid #ccc;
-  border-top-width: 0;
-
-  @media print
-  {
-    display: none;
-  }
-}
-
-.increase-size,
-.decrease-size
-{
-  display: inline-block;
-  min-width: var(--text-icon-size);
-  min-height: var(--text-icon-size);
-  background-size: var(--text-icon-size);
-  background-repeat: no-repeat;
-  margin: 1px;
-}
-
-.increase-size
-{
-  background-image: url("../images/increase-size.svg");
-}
-
-.decrease-size
-{
-  background-image: url("../images/decrease-size.svg");
-}
-
 input[type="checkbox"]
 {
-  width: var(--font-size);
-  height: var(--font-size);
+  width: $font-size;
+  height: $font-size;
   border: 1px solid black;
   border-radius: 2px;
   margin: 0;
-  @include margin-inline-end(var(--inline-spacing));
+  @include margin-inline-end($inline-spacing);
   @include no-appearance;
 }
 
 input[type="checkbox"]:checked
 {
   background-image: url("../images/ionicons/md-checkmark.svg");
-  background-size: calc(var(--font-size) - 4px);
+  background-size: $font-size - 4px;
   background-repeat: no-repeat;
   background-position: center;
 }
@@ -281,7 +221,7 @@ input[type="checkbox"]:checked
   top: 0;
   right: 0;
   bottom: 0;
-  padding: var(--dialog-padding);
+  padding: $dialog-padding;
   z-index: 10000;
   align-items: center;
   justify-content: center;
@@ -293,7 +233,7 @@ input[type="checkbox"]:checked
   margin: auto;
   background-color: $background-color;
   border: 1px solid black;
-  border-radius: var(--border-radius);
+  border-radius: $border-radius;
 
   &.stretch
   {
@@ -304,12 +244,12 @@ input[type="checkbox"]:checked
   {
     display: flex;
     flex-direction: column;
-    padding: var(--dialog-padding);
+    padding: $dialog-padding;
   }
 
   &.cancelable > :last-child
   {
-    padding-top: calc(max(var(--dialog-padding) - var(--small-icon-size) - var(--border-radius), 0));
+    padding-top: max($dialog-padding - $small-icon-size - $border-radius, 0);
   }
 }
 
@@ -323,9 +263,9 @@ input[type="checkbox"]:checked
 .cancel
 {
   display: inline-block;
-  min-width: var(--small-icon-size);
-  min-height: var(--small-icon-size);
-  background-size: var(--small-icon-size);
+  min-width: $small-icon-size;
+  min-height: $small-icon-size;
+  background-size: $small-icon-size;
   background-repeat: no-repeat;
   background-image: url("../images/ionicons/md-close.svg");
 
@@ -337,7 +277,7 @@ input[type="checkbox"]:checked
 
 .modalOverlay-cancel-container > .cancel
 {
-  margin: var(--border-radius);
+  margin: $border-radius;
 }
 
 .modal-form
@@ -352,7 +292,7 @@ input[type="checkbox"]:checked
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  padding: var(--block-spacing) 0;
+  padding: $block-spacing 0;
 }
 
 .setting:not(:last-child)
@@ -366,20 +306,20 @@ input[type="checkbox"]:checked
   flex-direction: column;
   flex-grow: 0;
   width: 70%;
-  margin-right: var(--block-spacing);
+  margin-right: $block-spacing;
 }
 
 .description
 {
   font-size: 80%;
   opacity: 0.5;
-  padding-left: var(--block-spacing);
+  padding-left: $block-spacing;
 }
 
 .setting input:not([type="checkbox"])
 {
   flex-grow: 1;
-  width: var(--font-size);
+  width: $font-size;
 }
 
 .accessKeyMarker
@@ -389,18 +329,18 @@ input[type="checkbox"]:checked
 
 .accessKeyHint
 {
-  --size: calc(var(--icon-size) - 4px);
-  --border-radius: 3px;
-  --padding: 2px;
+  $size: $icon-size - 4px;
+  $border-radius: 3px;
+  $padding: 2px;
   position: absolute;
   display: flex;
-  font-size: calc(var(--size) - var(--border-radius) * 2 - var(--padding) * 2);
+  font-size: $size - $border-radius * 2 - $padding * 2;
   border: 1px solid black !important;
-  border-radius: var(--border-radius);
+  border-radius: $border-radius;
   background-color: #ffffe0;
   text-decoration: underline;
-  min-width: var(--size);
-  min-height: var(--size);
+  min-width: $size;
+  min-height: $size;
   align-items: center;
   justify-content: center;
   opacity: 0.8;

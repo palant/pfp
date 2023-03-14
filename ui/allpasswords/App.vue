@@ -9,7 +9,6 @@
     <InProgress v-if="inProgress" />
     <EnterMaster v-if="masterPromise" @done="enterMasterDone" />
     <Confirm ref="confirm" />
-    <SizeSelector />
     <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
     <PasswordMessage
       ref="global-message"
@@ -49,7 +48,6 @@ import PasswordMessage from "../components/PasswordMessage.vue";
 import UnknownError from "../components/UnknownError.vue";
 import GlobalActions from "./components/GlobalActions.vue";
 import SiteList from "./components/SiteList.vue";
-import SizeSelector from "../components/SizeSelector.vue";
 import EnterMaster from "./modals/EnterMaster.vue";
 import InProgress from "./modals/InProgress.vue";
 
@@ -62,7 +60,6 @@ export default {
     UnknownError,
     GlobalActions,
     SiteList,
-    SizeSelector,
     EnterMaster,
     InProgress
   },

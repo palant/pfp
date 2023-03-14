@@ -1,7 +1,5 @@
 {
   "ok": "OK",
   "cancel": "Cancel",
-  "no_site_placeholder": "(none)",
-  "increase_size": "Increase text size",
-  "decrease_size": "Decrease text size"
+  "no_site_placeholder": "(none)"
 }
