@@ -8,7 +8,7 @@
 
 /* global _parameters */
 
-import {port} from "../ui/messaging.js";
+import {getPort} from "../lib/messaging.js";
 
 function getActiveElement(doc)
 {
@@ -226,9 +226,8 @@ function fillIn(wnd, name, password, noFocus, passwordFieldRequired)
   else if (!fillIn(window, name, password))
     result = "no_password_fields";
 
-  port.emit("done", {
+  getPort("contentScript").emit("done", {
     scriptID,
     result
   });
-  port.disconnect();
 })(_parameters);

@@ -68,7 +68,7 @@
 "use strict";
 
 import {getSiteDisplayName, keyboardNavigationType} from "../common.js";
-import {port} from "../messaging.js";
+import {getPort} from "../../lib/messaging.js";
 import {masterPassword, passwords, ui, sync} from "../proxy.js";
 import EnterMaster from "./pages/EnterMaster.vue";
 import ChangeMaster from "./pages/ChangeMaster.vue";
@@ -86,6 +86,9 @@ const pages = [
   "sync",
   "settings"
 ];
+
+setInterval(() => masterPassword.startAutoLock(), 10000);
+masterPassword.startAutoLock();
 
 let app = null;
 
@@ -148,7 +151,7 @@ export default {
     Object.assign(this, data);
 
     await this.updateSyncState();
-    port.on("syncUpdate", () => this.updateSyncState());
+    getPort("panel").on("syncUpdate", () => this.updateSyncState());
   },
   methods:
   {

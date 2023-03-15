@@ -30,7 +30,6 @@
 "use strict";
 
 import {getSiteDisplayName} from "../../common.js";
-import {port} from "../../messaging.js";
 import {passwords} from "../../proxy.js";
 import PasswordInfo from "./PasswordInfo.vue";
 

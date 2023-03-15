@@ -11,7 +11,7 @@
       <span class="description">{{ $t(name + "_description") }}</span>
     </div>
     <input v-if="typeof defValue == 'boolean'" :id="name" v-model="value" v-focus="focus" type="checkbox">
-    <input v-else-if="typeof defValue == 'number'" :id="name" v-model="value" v-focus="focus" type="number" min="0">
+    <input v-else-if="typeof defValue == 'number'" :id="name" v-model="value" v-focus="focus" type="number" min="1">
   </div>
 </template>
 
