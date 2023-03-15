@@ -56,4 +56,21 @@ browser.storage = {
   }
 };
 
+browser.alarms = {
+  onAlarm: {
+    addListener(callback)
+    {
+    },
+    removeListener(callback)
+    {
+    }
+  },
+  create(name, alarmInfo)
+  {
+  },
+  clear(name)
+  {
+  }
+}
+
 export default browser;
