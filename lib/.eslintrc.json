@@ -1,6 +1,10 @@
 {
   "env": {
     "node": false,
-    "webextensions": true
+    "worker": true
+  },
+  "globals": {
+    "browser": "readonly",
+    "chrome": "readonly"
   }
 }

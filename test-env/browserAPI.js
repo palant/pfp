@@ -19,14 +19,16 @@ browser.runtime = {
 };
 
 export const storageData = Object.create(null);
+export const sessionStorage = Object.create(null);
 
 function clone(value)
 {
   return JSON.parse(JSON.stringify(value));
 }
 
-browser.storage = {
-  local: {
+function setupStorage(storageData)
+{
+  return {
     get: async function(keys)
     {
       let items = {};
@@ -53,7 +55,12 @@ browser.storage = {
       for (let key of keys)
         delete storageData[key];
     }
-  }
+  };
+}
+
+browser.storage = {
+  local: setupStorage(storageData),
+  session: setupStorage(sessionStorage)
 };
 
 browser.alarms = {

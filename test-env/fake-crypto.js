@@ -31,10 +31,11 @@ export function disableFakeRandom()
   randomByte = null;
 }
 
-function Key(keyData, algo, usages)
+function Key(keyData, algo, extractable, usages)
 {
   this._data = keyData;
   this._algo = algo;
+  this._extractable = extractable;
   this._encrypt = false;
   this._decrypt = false;
   this._sign = false;
@@ -82,12 +83,21 @@ export const subtle = {
   {
     if (format != "raw")
       throw new Error("Unexpected data format");
-    if (extractable)
-      throw new Error("Extractable keys not supported");
 
     if (typeof algo == "object")
       algo = algo.name;
-    return new Key(keyData, algo, usages);
+    return new Key(keyData, algo, extractable, usages);
+  },
+
+  exportKey: async function(format, key)
+  {
+    if (format != "raw")
+      throw new Error("Unexpected data format");
+
+    if (!key._extractable)
+      throw new Error("Key isn't extractable");
+
+    return key._data;
   },
 
   encrypt: async function(algo, key, cleartext)

@@ -28,17 +28,33 @@ describe("masterPassword.js", () =>
 
   it("should only give out master password when unlocked", async function()
   {
-    expect(getMasterPassword).to.throw("master_password_required");
+    try
+    {
+      await getMasterPassword();
+      expect.fail("Returned master password when locked");
+    }
+    catch (e)
+    {
+      expect(e).to.equal("master_password_required");
+    }
 
     await changePassword(dummyMaster);
-    expect(getMasterPassword()).to.equal(dummyMaster);
+    expect(await getMasterPassword()).to.equal(dummyMaster);
 
     await forgetPassword();
-    expect(getMasterPassword).to.throw("master_password_required");
+    try
+    {
+      await getMasterPassword();
+      expect.fail("Returned master password when locked");
+    }
+    catch (e)
+    {
+      expect(e).to.equal("master_password_required");
+    }
 
     await forgetPassword();
     await checkPassword(dummyMaster);
-    expect(getMasterPassword()).to.equal(dummyMaster);
+    expect(await getMasterPassword()).to.equal(dummyMaster);
   });
 
   it("should accept only the correct master password", async function()
