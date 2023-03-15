@@ -7,13 +7,6 @@
 "use strict";
 
 import {EventTarget} from "./eventTarget";
-import scryptWorker from "../worker/scrypt.js";
-
-function functionToURL(func)
-{
-  let text = "(" + func.toString() + ")()";
-  return URL.createObjectURL(new Blob([text], {type: "text/javascript"}));
-}
 
 let currentURL = null;
 
@@ -84,10 +77,7 @@ let browser = {
   runtime: {
     getURL: path =>
     {
-      if (path == "worker/scrypt.js")
-        return functionToURL(scryptWorker);
-      else
-        return path;
+      return path;
     },
     onConnect: new EventTarget()
   }

@@ -15,7 +15,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import vue from "rollup-plugin-vue";
 
-import {series, parallel, Files, MemoryFile} from "builder";
+import {series, parallel, Files, MemoryFile, PhysicalFile} from "builder";
 
 import eslint from "./build/eslint.js";
 import htmlValidate from "./build/html-validate.js";
@@ -28,7 +28,6 @@ import zip from "./build/zip.js";
 import iife from "./build/rollup/iifeChunks.js";
 import localeLoader from "./build/rollup/localeLoader.js";
 import replace from "./build/rollup/replacePlugin.js";
-import workerLoader from "./build/rollup/workerLoader.js";
 import testEnv from "./test-env/setup.js";
 
 const VERSION = JSON.parse(fs.readFileSync("./manifest.json")).version;
@@ -81,20 +80,18 @@ function addReloader(files)
     {
       for await (let file of files)
       {
-        if (file.path == "manifest.json")
+        if (file.path == "background.js")
         {
-          file = await file.read();
-
-          let data = JSON.parse(file.contents);
-          data.background.scripts.push("reloader.js");
-          yield new MemoryFile(file.path, utils.stringifyObject(data));
+          let reloader = new PhysicalFile("lib/reloader.js");
+          yield new MemoryFile(file.path, [
+            (await file.read()).contents,
+            (await reloader.read()).contents
+          ].join("\n"));
         }
         else
           yield file;
       }
     }),
-    this.src("lib/reloader.js")
-        .rename("reloader.js"),
     new MemoryFile("random.json", String(Math.random()))
   ];
 }
@@ -103,7 +100,7 @@ function eslintTask()
 {
   return this.src(["*.js", "*.json", "ui/**/*.js", "ui/**/*.vue", "lib/**/*.js",
                    "test/**/*.js", "test-lib/**/*.js", "web/**/*.js",
-                   "contentScript/**/*.js", "worker/**/*.js",
+                   "contentScript/**/*.js",
                    "locale/**/*.json", "!ui/third-party/**"])
              .pipe(eslint);
 }
@@ -154,9 +151,7 @@ let common = series(validate, function()
         .pipe(utils.toChromeLocale),
     this.src("lib/main.js")
         .pipe(rollup, ...rollupOptions(this))
-        .rename("background.js"),
-    this.src("worker/scrypt.js")
-        .pipe(rollup, ...rollupOptions(this))
+        .rename("background.js")
   ];
 });
 
@@ -181,7 +176,7 @@ export let crx = series(chromeMain, function(files)
 
 export let watchChrome = series(chrome, function()
 {
-  return this.src(["*.js", "*.json", "ui/**/*", "lib/**/*", "contentScript/**/*", "worker/**/*", "locale/**/*"])
+  return this.src(["*.js", "*.json", "ui/**/*", "lib/**/*", "contentScript/**/*", "locale/**/*"])
              .watch(chrome);
 });
 
@@ -196,7 +191,7 @@ let firefoxMain = series(common, function(common)
           delete data.minimum_opera_version;
           delete data.background.persistent;
 
-          data.browser_action.browser_style = false;
+          data.action.browser_style = false;
         })
   ];
 });
@@ -210,7 +205,7 @@ export let xpi = series(firefoxMain, function(files)
 
 export let watchFirefox = series(firefox, function()
 {
-  return this.src(["*.js", "*.json", "ui/**/*", "lib/**/*", "contentScript/**/*", "worker/**/*", "locale/**/*"])
+  return this.src(["*.js", "*.json", "ui/**/*", "lib/**/*", "contentScript/**/*", "locale/**/*"])
              .watch(firefox);
 });
 
@@ -227,7 +222,6 @@ let webMain = series(validate, function()
               [path.resolve(process.cwd(), "lib", "browserAPI.js")]: path.resolve(process.cwd(), "web", "backgroundBrowserAPI.js"),
               [path.resolve(process.cwd(), "ui", "browserAPI.js")]: path.resolve(process.cwd(), "web", "contentBrowserAPI.js")
             }),
-            workerLoader(/[/\\]scrypt\.js$/),
             localeLoader(path.resolve(process.cwd(), "locale", "en_US"))
           ],
           postPlugins: [

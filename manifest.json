@@ -1,11 +1,11 @@
 {
-  "manifest_version": 2,
-  "minimum_chrome_version": "55.0",
-  "minimum_opera_version": "42.0",
+  "manifest_version": 3,
+  "minimum_chrome_version": "88.0",
+  "minimum_opera_version": "74.0",
   "applications": {
     "gecko": {
       "id": "easypasswords@palant.de",
-      "strict_min_version": "57.0"
+      "strict_min_version": "109.0"
     }
   },
   "default_locale": "en_US",
@@ -16,18 +16,18 @@
   "homepage_url": "https://pfp.works/",
   "version": "2.2.4",
   "permissions": [
-    "tabs",
-    "http://*/*",
-    "https://*/*",
+    "alarms",
+    "scripting",
     "storage",
     "clipboardWrite",
     "unlimitedStorage"
   ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
   "background": {
-    "persistent": true,
-    "scripts": [
-      "background.js"
-    ]
+    "service_worker": "background.js"
   },
   "incognito": "spanning",
   "options_ui": {
@@ -44,7 +44,7 @@
     "64": "ui/images/icon64.png",
     "128": "ui/images/icon128.png"
   },
-  "browser_action": {
+  "action": {
     "default_icon": {
       "16": "ui/images/icon16.png",
       "20": "ui/images/icon20.png",
@@ -57,9 +57,10 @@
     "default_title": "__MSG_name__"
   },
   "commands": {
-    "_execute_browser_action": {
+    "_execute_action": {
       "suggested_key": {
-        "default": "Ctrl+Shift+F"
+        "default": "Ctrl+Shift+F",
+        "mac": "Command+Shift+F"
       }
     }
   }

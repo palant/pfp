@@ -6,49 +6,19 @@
 
 "use strict";
 
-import browser from "../lib/browserAPI.js";
-import {scryptWorker as worker, deriveBits} from "../lib/crypto.js";
+import {hasher} from "../lib/crypto.js";
 
 function scrypt(password, salt, length)
 {
-  return new Promise((resolve, reject) =>
-  {
-    function messageCallback({data: {result}})
-    {
-      cleanup();
-      resolve(result);
-    }
-
-    function errorCallback()
-    {
-      cleanup();
-      reject("worker-error");
-    }
-
-    function cleanup()
-    {
-      worker.removeEventListener("message", messageCallback);
-      worker.removeEventListener("error", errorCallback);
-    }
-
-    worker.addEventListener("message", messageCallback);
-    worker.addEventListener("error", errorCallback);
-    worker.postMessage({
-      password: Buffer.from(password, "utf-8"),
-      salt: Buffer.from(salt, "utf-8"),
-      length
-    });
-  });
+  return hasher.deriveKey(
+    Buffer.from(password, "utf-8"),
+    Buffer.from(salt, "utf-8"),
+    length
+  );
 }
 
 describe("scrypt.js", () =>
 {
-  before(async function()
-  {
-    // Make sure worker is initialized
-    await deriveBits("foobar", "asdf", 2);
-  });
-
   async function compare(password, salt, length, expected)
   {
     let result = await scrypt(password, salt, length);

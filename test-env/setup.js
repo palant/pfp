@@ -11,7 +11,6 @@ import {TextEncoder, TextDecoder} from "util";
 
 import browser from "./browserAPI.js";
 import {subtle, getRandomValues} from "./fake-crypto.js";
-import {FakeWorker} from "./fake-worker.js";
 
 let origGlobal = null;
 
@@ -24,7 +23,6 @@ export default {
     global.expect = chai.expect;
     global.TextEncoder = TextEncoder;
     global.TextDecoder = TextDecoder;
-    global.Worker = FakeWorker;
     global.atob = str => Buffer.from(str, "base64").toString("binary");
     global.btoa = str => Buffer.from(str, "binary").toString("base64");
     global.navigator = {
