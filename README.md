@@ -1,6 +1,8 @@
 PfP: Pain-free Passwords
 ========================
 
+**IMPORTANT**: PfP: Pain-free Passwords is no longer being developed. While it might still work for you, no issues will be fixed.
+
 PfP: Pain-free Passwords is a Firefox, Chrome and Opera password manager. Most passwords will be generated for a specific site and account from your master password whenever needed, these passwords are never stored on disk and can be recreated easily if data is lost. For passwords that cannot be changed for some reason, storing the password with the extension data is also supported. All extension data is safely encrypted.
 
 You can get an idea of how PfP works by using the [online version](https://pfp.works/webclient/). Please make sure to read the warnings when using this one!
