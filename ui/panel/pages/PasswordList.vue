@@ -57,7 +57,7 @@
     <div v-else class="password-list-container" role="list" @keydown="keyboardNavigation">
       <PasswordEntry
         v-for="(password, index) in $root.pwdList"
-        :key="password.name + '\0' + password.revision"
+        :key="password.title"
         role="listitem" :password="password" :focus="index == 0"
       />
     </div>

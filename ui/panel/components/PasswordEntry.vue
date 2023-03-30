@@ -23,7 +23,7 @@
         :title="$t('.(PasswordMenu)to_clipboard')" @click="copy"
       />
       <span class="user-name-container" :title="tooltip">
-        <span>{{ password.name }}</span>
+        <span>{{ password.title }}</span>
         <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
       </span>
     </div>
@@ -176,7 +176,7 @@ export default {
     copyUsername()
     {
       this.modal = null;
-      clipboardSet(this.password.name);
+      clipboardSet(this.password.username);
       this.$parent.showPasswordMessage("username_copied");
     },
     showQRCode()

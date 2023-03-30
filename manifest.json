@@ -21,7 +21,8 @@
     "https://*/*",
     "storage",
     "clipboardWrite",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "nativeMessaging"
   ],
   "background": {
     "persistent": true,

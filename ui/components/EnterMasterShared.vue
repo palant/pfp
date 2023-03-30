@@ -28,12 +28,13 @@
 <script>
 "use strict";
 
+import {nativeRequest} from "../protocol.js";
 import {masterPassword} from "../proxy.js";
 
 export function validateMasterPassword(value, setError)
 {
-  if (value.length < 6)
-    setError(this.$t("/(components)(EnterMasterShared)password_too_short"));
+  if (!value)
+    setError(this.$t("/(components)(EnterMasterShared)password_required"));
 }
 
 export default {
@@ -62,7 +63,7 @@ export default {
     };
   },
   methods: {
-    submit()
+    async submit()
     {
       if (this.callback)
       {
@@ -71,16 +72,26 @@ export default {
       }
       else
       {
-        masterPassword.checkPassword(this.masterPassword).then(() =>
+        try
         {
+          let keys = await nativeRequest("unlock", {
+            password: this.masterPassword
+          });
+          await masterPassword.rememberKeys(keys);
+          let pwdList = await nativeRequest("get-entries", {
+            keys,
+            hostname: this.$root.site
+          });
+          [this.$root.keys, this.$root.pwdList] = [keys, pwdList];
           this.$emit("done", true);
-        }).catch(error =>
+        }
+        catch (error)
         {
-          if (error == "declined")
+          if (error.code == "InvalidCredentials")
             this.masterPasswordError = this.$t("password_declined");
           else
             this.$root.showUnknownError(error);
-        });
+        }
       }
     },
     validateMasterPassword

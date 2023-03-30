@@ -25,22 +25,6 @@ export default {
   localePath: "panel/pages/EnterMaster",
   components: {
     EnterMasterShared
-  },
-  methods: {
-    done(success)
-    {
-      if (!success)
-        return;
-
-      passwords.getPasswords(this.$root.origSite)
-        .then(([origSite, site, pwdList]) =>
-        {
-          this.$root.origSite = origSite;
-          this.$root.site = site;
-          this.$root.pwdList = pwdList;
-          this.$root.masterPasswordState = "known";
-        }).catch(this.$root.showUnknownError);
-    }
   }
 };
 </script>

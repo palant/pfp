@@ -81,7 +81,8 @@ export const passwords = proxy("passwords", [
 ]);
 
 export const masterPassword = proxy("masterPassword", [
-  "getState", "changePassword", "checkPassword", "forgetPassword"
+  "getState", "changePassword", "checkPassword", "forgetPassword",
+  "getKeys", "rememberKeys", "forgetKeys"
 ]);
 
 export const passwordRetrieval = proxy("passwordRetrieval", [

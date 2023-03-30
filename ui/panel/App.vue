@@ -13,10 +13,10 @@
     <Confirm ref="confirm" />
     <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
 
-    <ChangeMaster v-if="masterPasswordState == 'unset' || (masterPasswordState == 'set' && resettingMaster)" />
-    <EnterMaster v-else-if="masterPasswordState == 'set'" />
-    <DeprecationNote v-if="masterPasswordState == 'known' && !deprecationAccepted" />
-    <div v-else-if="masterPasswordState == 'known' && deprecationAccepted" class="tabs">
+    <ChangeMaster v-if="false" />
+    <EnterMaster v-else-if="!keys" />
+    <DeprecationNote v-if="false" />
+    <div v-else-if="keys" class="tabs">
       <nav v-keyboard-navigation:tab class="tablist" role="list">
         <div />
 
@@ -69,6 +69,7 @@
 
 import {getSiteDisplayName, keyboardNavigationType} from "../common.js";
 import {port} from "../messaging.js";
+import {nativeRequest} from "../protocol.js";
 import {masterPassword, passwords, ui, sync} from "../proxy.js";
 import EnterMaster from "./pages/EnterMaster.vue";
 import ChangeMaster from "./pages/ChangeMaster.vue";
@@ -113,7 +114,7 @@ export default {
       site: null,
       origSite: null,
       pwdList: null,
-      masterPasswordState: null,
+      keys: null,
       sync: {}
     };
   },
@@ -133,15 +134,22 @@ export default {
   created: async function()
   {
     let data = {};
-    [data.origSite, data.deprecationAccepted, data.masterPasswordState] = await Promise.all([
+    [data.site, data.deprecationAccepted, data.keys] = await Promise.all([
       ui.getCurrentHost(),
       ui.isDeprecationAccepted(),
-      masterPassword.getState()
+      masterPassword.getKeys()
     ]);
 
-    if (data.masterPasswordState == "known")
+    const PREFIX = "www.";
+    if (data.site.startsWith(PREFIX))
+      data.site = data.site.slice(PREFIX.length);
+
+    if (data.keys)
     {
-      [data.origSite, data.site, data.pwdList] = await passwords.getPasswords(data.origSite);
+      data.pwdList = await nativeRequest("get-entries", {
+        keys: data.keys,
+        hostname: data.site
+      });
     }
 
     // Update all data at once to prevent inconsistent intermediate states
