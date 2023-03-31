@@ -52,7 +52,7 @@
 
 import browser from "../../../lib/browserAPI.js";
 import {set as clipboardSet} from "../../clipboard.js";
-import {normalizeHostname} from "../../common.js";
+import {normalizeHostname, handleErrors} from "../../common.js";
 import {getPort} from "../../../lib/messaging.js";
 import {nativeRequest} from "../../protocol.js";
 import {passwords, ui} from "../../proxy.js";
@@ -106,27 +106,23 @@ export default {
     }
   },
   methods: {
-    ensureValue()
+    ensureValue: handleErrors(async function()
     {
       if (this.value)
-        return Promise.resolve();
+        return;
 
-      return passwords.getPassword(this.password)
-        .then(value =>
-        {
-          this.value = value;
-        });
-    },
+      this.value = await nativeRequest("get-password", {
+        keys: this.$root.keys,
+        uuid: this.password.uuid
+      });
+    }),
     async fillIn()
     {
       try
       {
         this.modal = null;
 
-        let password = await nativeRequest("get-password", {
-          keys: this.$root.keys,
-          uuid: this.password.uuid
-        });
+        await this.ensureValue();
 
         let currentHost = await ui.getCurrentHost();
         if (normalizeHostname(currentHost) !== this.$root.site)
@@ -154,7 +150,7 @@ export default {
               scriptID,
               hostname: currentHost,
               username: this.password.username,
-              password
+              password: this.value
             })
           }).catch(reject);
 
