@@ -67,7 +67,7 @@
 <script>
 "use strict";
 
-import {getSiteDisplayName, keyboardNavigationType} from "../common.js";
+import {getSiteDisplayName, keyboardNavigationType, handleErrors} from "../common.js";
 import {port} from "../messaging.js";
 import {nativeRequest} from "../protocol.js";
 import {masterPassword, passwords, ui, sync} from "../proxy.js";
@@ -225,18 +225,11 @@ export default {
     {
       this.unknownError = error;
     },
-    async lockPasswords()
+    lockPasswords: handleErrors(async function()
     {
-      try
-      {
-        await masterPassword.forgetKeys();
-        this.keys = null;
-      }
-      catch (error)
-      {
-        this.showUnknownError(error);
-      }
-    }
+      await masterPassword.forgetKeys();
+      this.keys = null;
+    })
   }
 };
 </script>

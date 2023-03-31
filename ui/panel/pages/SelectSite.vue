@@ -13,6 +13,7 @@
 <script>
 "use strict";
 
+import {handleErrors} from "../../common.js";
 import {passwords} from "../../proxy.js";
 import SiteSelection from "../components/SiteSelection.vue";
 
@@ -24,20 +25,13 @@ export default {
   },
   emits: ["selected"],
   methods: {
-    async selected(site)
+    selected: handleErrors(async function(site)
     {
-      try
-      {
-        let entries = await this.$root.getEntries(site);
-        this.$root.site = site;
-        this.$root.pwdList = entries;
-        this.$emit("selected");
-      }
-      catch (error)
-      {
-        this.$root.showUnknownError(error);
-      }
-    }
+      let entries = await this.$root.getEntries(site);
+      this.$root.site = site;
+      this.$root.pwdList = entries;
+      this.$emit("selected");
+    })
   }
 };
 </script>

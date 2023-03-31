@@ -42,3 +42,18 @@ export function keyboardNavigationType(event)
   }
   return null;
 }
+
+export function handleErrors(func)
+{
+  return async function(...args)
+  {
+    try
+    {
+      await func.apply(this, args);
+    }
+    catch (error)
+    {
+      this.$root.showUnknownError(error);
+    }
+  };
+}

@@ -39,7 +39,7 @@
 <script>
 "use strict";
 
-import {getSiteDisplayName} from "../../common.js";
+import {getSiteDisplayName, handleErrors} from "../../common.js";
 import {passwords} from "../../proxy.js";
 import {nativeRequest} from "../../protocol.js";
 
@@ -72,34 +72,27 @@ export default {
       this.updateSites();
     }
   },
-  async mounted()
+  mounted: handleErrors(async function()
   {
-    try
-    {
-      let sites = await nativeRequest("get-sites", {
-        keys: this.$root.keys
-      });
-      sites.sort();
+    let sites = await nativeRequest("get-sites", {
+      keys: this.$root.keys
+    });
+    sites.sort();
 
-      let index = sites.indexOf("");
-      if (index >= 0)
-        sites.splice(index, 1);
-      sites.unshift("");
+    let index = sites.indexOf("");
+    if (index >= 0)
+      sites.splice(index, 1);
+    sites.unshift("");
 
-      this.allSites = sites.map(site =>
-      {
-        return {
-          name: site,
-          displayName: getSiteDisplayName(site)
-        };
-      });
-      this.updateSites();
-    }
-    catch (error)
+    this.allSites = sites.map(site =>
     {
-      this.$root.showUnknownError(error);
-    }
-  },
+      return {
+        name: site,
+        displayName: getSiteDisplayName(site)
+      };
+    });
+    this.updateSites();
+  }),
   methods: {
     updateSites()
     {
