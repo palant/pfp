@@ -225,11 +225,17 @@ export default {
     {
       this.unknownError = error;
     },
-    lockPasswords()
+    async lockPasswords()
     {
-      masterPassword.forgetPassword()
-        .then(() => this.masterPasswordState = "set")
-        .catch(this.showUnknownError);
+      try
+      {
+        await masterPassword.forgetKeys();
+        this.keys = null;
+      }
+      catch (error)
+      {
+        this.showUnknownError(error);
+      }
     }
   }
 };
