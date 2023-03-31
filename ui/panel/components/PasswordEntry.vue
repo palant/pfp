@@ -50,9 +50,12 @@
 <script>
 "use strict";
 
+import browser from "../../../lib/browserAPI.js";
 import {set as clipboardSet} from "../../clipboard.js";
+import {normalizeHostname} from "../../common.js";
+import {getPort} from "../../../lib/messaging.js";
 import {nativeRequest} from "../../protocol.js";
-import {passwords, passwordRetrieval} from "../../proxy.js";
+import {passwords, ui} from "../../proxy.js";
 import GeneratedPassword from "./GeneratedPassword.vue";
 import NotesEditor from "./NotesEditor.vue";
 import QRCode from "./QRCode.vue";
@@ -144,7 +147,39 @@ export default {
           keys: this.$root.keys,
           uuid: this.password.uuid
         });
-        await passwordRetrieval.fillIn(this.$root.site, this.password.username, password);
+
+        let currentHost = await ui.getCurrentHost();
+        if (normalizeHostname(currentHost) !== this.$root.site)
+          throw "wrong_site";
+
+        await new Promise((resolve, reject) =>
+        {
+          let scriptID = Math.random();
+          let port = getPort("contentScript");
+
+          port.on("done", function doneHandler({scriptID: source, result})
+          {
+            if (source != scriptID)
+              return;
+
+            port.off("done", doneHandler);
+            if (result)
+              reject(result);
+            else
+              resolve();
+          });
+
+          browser.tabs.executeScript({
+            code: "var _parameters = " + JSON.stringify({
+              scriptID,
+              hostname: currentHost,
+              username: this.password.username,
+              password
+            })
+          }).catch(reject);
+
+          browser.tabs.executeScript({file: "contentScript/fillIn.js"}).catch(reject);
+        });
 
         window.close();
       }

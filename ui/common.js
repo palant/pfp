@@ -8,6 +8,14 @@
 
 import {$t} from "./i18n.js";
 
+export function normalizeHostname(hostname)
+{
+  const PREFIX = "www.";
+  if (hostname && hostname.startsWith(PREFIX))
+    return hostname.slice(PREFIX.length);
+  return hostname;
+}
+
 export function getSiteDisplayName(site)
 {
   if (site == null)

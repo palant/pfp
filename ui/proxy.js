@@ -85,10 +85,6 @@ export const masterPassword = proxy("masterPassword", [
   "getKeys", "rememberKeys", "forgetKeys"
 ]);
 
-export const passwordRetrieval = proxy("passwordRetrieval", [
-  "fillIn"
-]);
-
 export const prefs = proxy("prefs", ["getPref", "setPref"]);
 
 export const recoveryCodes = proxy("recoveryCodes", [

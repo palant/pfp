@@ -67,7 +67,7 @@
 <script>
 "use strict";
 
-import {getSiteDisplayName, keyboardNavigationType, handleErrors} from "../common.js";
+import {normalizeHostname, getSiteDisplayName, keyboardNavigationType, handleErrors} from "../common.js";
 import {port} from "../messaging.js";
 import {nativeRequest} from "../protocol.js";
 import {masterPassword, passwords, ui, sync} from "../proxy.js";
@@ -139,9 +139,7 @@ export default {
       masterPassword.getKeys()
     ]);
 
-    const PREFIX = "www.";
-    if (data.site && data.site.startsWith(PREFIX))
-      data.site = data.site.slice(PREFIX.length);
+    data.site = normalizeHostname(data.site);
 
     if (data.keys)
     {
