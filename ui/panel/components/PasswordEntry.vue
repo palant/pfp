@@ -91,28 +91,8 @@ export default {
   computed: {
     tooltip()
     {
-      let tooltip = "";
       let password = this.password;
-      if (password.type == "generated2")
-      {
-        tooltip = this.$t("password_type_generated2");
-
-        tooltip += "\n" + this.$t("password_length");
-        tooltip += " " + password.length;
-
-        tooltip += "\n" + this.$t("allowed_characters");
-        if (password.lower)
-          tooltip += " " + "abc";
-        if (password.upper)
-          tooltip += " " + "XYZ";
-        if (password.number)
-          tooltip += " " + "789";
-        if (password.symbol)
-          tooltip += " " + "+^;";
-      }
-      else if (password.type == "stored")
-        tooltip = this.$t("password_type_stored");
-
+      let tooltip = this.$t("password_username") + " " + password.username;
       if (password.notes)
         tooltip += "\n" + this.$t("notes") + " " + password.notes;
 
