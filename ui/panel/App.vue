@@ -111,8 +111,7 @@ export default {
       resettingMaster: false,
       deprecationAccepted: false,
       currentPage: "password-list",
-      site: null,
-      origSite: null,
+      site: undefined,
       pwdList: null,
       keys: null,
       sync: {}
@@ -127,7 +126,7 @@ export default {
   watch: {
     site()
     {
-      if (this.currentPage == "password-list" && this.site === "")
+      if (this.currentPage == "password-list" && this.site === null)
         this.currentPage = "select-site";
     }
   },
@@ -141,15 +140,12 @@ export default {
     ]);
 
     const PREFIX = "www.";
-    if (data.site.startsWith(PREFIX))
+    if (data.site && data.site.startsWith(PREFIX))
       data.site = data.site.slice(PREFIX.length);
 
     if (data.keys)
     {
-      data.pwdList = await nativeRequest("get-entries", {
-        keys: data.keys,
-        hostname: data.site
-      });
+      data.pwdList = await this.getEntries(data.site, data.keys);
     }
 
     // Update all data at once to prevent inconsistent intermediate states
@@ -160,6 +156,26 @@ export default {
   },
   methods:
   {
+    async getEntries(hostname, keys = this.keys)
+    {
+      if (hostname === null)
+        return [];
+
+      let entries = await nativeRequest("get-entries", {
+        keys,
+        hostname
+      });
+      entries.sort(function(a, b)
+      {
+        if (a.title < b.title)
+          return -1;
+        if (b.title > a.title)
+          return 1;
+        return 0;
+      });
+      return entries;
+    },
+
     updateSyncState: async function()
     {
       let [syncData, isSyncing] = await Promise.all([

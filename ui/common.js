@@ -10,12 +10,12 @@ import {$t} from "./i18n.js";
 
 export function getSiteDisplayName(site)
 {
-  if (site == "pfp.invalid")
-    return $t("/no_site_placeholder");
+  if (site == null)
+    return "???";
   else if (site)
     return site;
   else
-    return "???";
+    return $t("/no_site_placeholder");
 }
 
 export function keyboardNavigationType(event)

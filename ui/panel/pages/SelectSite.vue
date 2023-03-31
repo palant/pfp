@@ -24,17 +24,19 @@ export default {
   },
   emits: ["selected"],
   methods: {
-    selected(site)
+    async selected(site)
     {
-      passwords.getPasswords(site)
-        .then(([origSite, site, pwdList]) =>
-        {
-          this.$root.origSite = origSite;
-          this.$root.site = site;
-          this.$root.pwdList = pwdList;
-          this.$emit("selected");
-        })
-        .catch(this.$root.showUnknownError);
+      try
+      {
+        let entries = await this.$root.getEntries(site);
+        this.$root.site = site;
+        this.$root.pwdList = entries;
+        this.$emit("selected");
+      }
+      catch (error)
+      {
+        this.$root.showUnknownError(error);
+      }
     }
   }
 };

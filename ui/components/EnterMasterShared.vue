@@ -78,11 +78,9 @@ export default {
             password: this.masterPassword
           });
           await masterPassword.rememberKeys(keys);
-          let pwdList = await nativeRequest("get-entries", {
-            keys,
-            hostname: this.$root.site
-          });
-          [this.$root.keys, this.$root.pwdList] = [keys, pwdList];
+
+          this.$root.pwdList = await this.$root.getEntries(this.$root.site, keys);
+          this.$root.keys = keys;
           this.$emit("done", true);
         }
         catch (error)

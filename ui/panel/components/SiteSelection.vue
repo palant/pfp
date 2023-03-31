@@ -41,6 +41,7 @@
 
 import {getSiteDisplayName} from "../../common.js";
 import {passwords} from "../../proxy.js";
+import {nativeRequest} from "../../protocol.js";
 
 export default {
   name: "SiteSelection",
@@ -58,7 +59,7 @@ export default {
   data()
   {
     return {
-      value: this.$root.site && this.$root.siteDisplayName,
+      value: this.$root.site === null ? "" : this.$root.siteDisplayName,
       allSites: null,
       sites: [],
       activeIndex: -1,
@@ -71,26 +72,33 @@ export default {
       this.updateSites();
     }
   },
-  mounted()
+  async mounted()
   {
-    passwords.getAllSites()
-      .then(sites =>
-      {
-        let index = sites.indexOf("pfp.invalid");
-        if (index >= 0)
-          sites.splice(index, 1);
-        sites.unshift("pfp.invalid");
+    try
+    {
+      let sites = await nativeRequest("get-sites", {
+        keys: this.$root.keys
+      });
+      sites.sort();
 
-        this.allSites = sites.map(site =>
-        {
-          return {
-            name: site,
-            displayName: getSiteDisplayName(site)
-          };
-        });
-        this.updateSites();
-      })
-      .catch(this.$root.showUnknownError);
+      let index = sites.indexOf("");
+      if (index >= 0)
+        sites.splice(index, 1);
+      sites.unshift("");
+
+      this.allSites = sites.map(site =>
+      {
+        return {
+          name: site,
+          displayName: getSiteDisplayName(site)
+        };
+      });
+      this.updateSites();
+    }
+    catch (error)
+    {
+      this.$root.showUnknownError(error);
+    }
   },
   methods: {
     updateSites()
@@ -118,7 +126,7 @@ export default {
     },
     done(site)
     {
-      if (site)
+      if (site !== null)
         this.callback(site);
     }
   }
