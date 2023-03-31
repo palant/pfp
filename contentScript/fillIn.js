@@ -218,12 +218,12 @@ function fillIn(wnd, name, password, noFocus, passwordFieldRequired)
   return result;
 }
 
-(function({scriptID, host, name, password})
+(function({scriptID, hostname, username, password})
 {
   let result = null;
-  if (window.location.hostname != host)
+  if (window.location.hostname != hostname)
     result = "wrong_site";
-  else if (!fillIn(window, name, password))
+  else if (!fillIn(window, username, password))
     result = "no_password_fields";
 
   port.emit("done", {

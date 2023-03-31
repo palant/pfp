@@ -51,6 +51,7 @@
 "use strict";
 
 import {set as clipboardSet} from "../../clipboard.js";
+import {nativeRequest} from "../../protocol.js";
 import {passwords, passwordRetrieval} from "../../proxy.js";
 import GeneratedPassword from "./GeneratedPassword.vue";
 import NotesEditor from "./NotesEditor.vue";
@@ -133,12 +134,24 @@ export default {
           this.value = value;
         });
     },
-    fillIn()
+    async fillIn()
     {
-      this.modal = null;
-      passwordRetrieval.fillIn(this.password)
-        .then(() => window.close())
-        .catch(error => this.$parent.showPasswordMessage(error));
+      try
+      {
+        this.modal = null;
+
+        let password = await nativeRequest("get-password", {
+          keys: this.$root.keys,
+          uuid: this.password.uuid
+        });
+        await passwordRetrieval.fillIn(this.$root.site, this.password.username, password);
+
+        window.close();
+      }
+      catch (error)
+      {
+        this.$parent.showPasswordMessage(error);
+      }
     },
     copy()
     {
