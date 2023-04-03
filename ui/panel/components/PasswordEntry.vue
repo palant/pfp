@@ -225,22 +225,28 @@ export default {
       this.passwordOptions = {incRevision: true};
       this.modal = "generated";
     },
-    removePassword()
+    removePassword: handleErrors(async function()
     {
       this.modal = null;
-      let message = this.$t("remove_confirmation", this.password.name, this.$root.siteDisplayName);
+      let message = this.$t("remove_confirmation", this.password.title, this.$root.siteDisplayName);
       if (this.password.notes)
         message += " " + this.$t("remove_confirmation_notes", this.password.notes);
-      this.$root.confirm(message).then(response =>
+      if (await this.$root.confirm(message))
       {
-        if (response)
+        try
         {
-          passwords.removePassword(this.password)
-            .then(pwdList => this.$root.pwdList = pwdList)
-            .catch(this.$parent.showPasswordMessage);
+          await nativeRequest("remove-entry", {
+            keys: this.$root.keys,
+            uuid: this.password.uuid
+          });
+          this.$root.pwdList = await this.$root.getEntries(this.$root.site);
         }
-      });
-    }
+        catch (error)
+        {
+          this.$parent.showPasswordMessage(error);
+        }
+      }
+    })
   }
 };
 </script>
