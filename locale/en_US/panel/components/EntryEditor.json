@@ -3,6 +3,8 @@
   "username_label": "User name:",
   "edit_title": "Set a title that is different from the user name.",
   "password_label": "Password:",
+  "show_password": "Show password",
+  "hide_password": "Hide password",
   "use_recovery": "Use recovery code",
   "cancel_recovery": "Enter password directly",
   "submit": "Save password",

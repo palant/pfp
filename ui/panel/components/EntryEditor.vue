@@ -27,11 +27,18 @@
 
       <template v-if="!recoveryActive">
         <label class="block-start" for="password-value">{{ $t("password_label") }}</label>
-        <ValidatedInput
-          id="password-value" ref="password" v-model="password"
-          v-model:error="passwordError" type="password"
-          @validate="validatePassword"
-        />
+        <div id="password-value-container">
+          <ValidatedInput
+            id="password-value" ref="password" v-model="password"
+            v-model:error="passwordError" :type="passwordVisible ? 'text' : 'password'"
+            @validate="validatePassword"
+          />
+          <IconicLink
+            id="show-password" href="#" :class="'iconic-link' + (passwordVisible ? ' active' : '')"
+            :title="$t(passwordVisible ? 'hide_password' : 'show_password')"
+            @click="passwordVisible = !passwordVisible"
+          />
+        </div>
         <div v-if="passwordError" class="error">
           {{ passwordError }}
         </div>
@@ -75,6 +82,7 @@ export default {
       nameError: null,
       password: "",
       passwordError: null,
+      passwordVisible: false,
       recoveryActive: false
     };
   },

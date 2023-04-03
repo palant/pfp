@@ -431,6 +431,27 @@ a.iconic-link:hover
   min-width: 3ch;
 }
 
+#password-value-container
+{
+  display: flex;
+  flex-direction: row;
+}
+
+#password-value
+{
+  flex-grow: 1;
+}
+
+#show-password
+{
+  background-image: url("../images/ionicons/eye.svg");
+}
+
+#show-password.active
+{
+  background-image: url("../images/ionicons/eye-off.svg");
+}
+
 .site-autocomplete
 {
   border: $menu-border-width solid $text-color;
