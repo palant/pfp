@@ -1,0 +1,13 @@
+{
+  "title_label": "Title:",
+  "username_label": "User name:",
+  "edit_title": "Set a title that is different from the user name.",
+  "password_label": "Password:",
+  "use_recovery": "Use recovery code",
+  "cancel_recovery": "Enter password directly",
+  "submit": "Save password",
+
+  "title_required": "Please enter some username or title for this password.",
+  "title_exists": "This user name and revision combination already exists. Maybe increase the revision number?",
+  "password_value_required": "Please enter the password you used on this website."
+}

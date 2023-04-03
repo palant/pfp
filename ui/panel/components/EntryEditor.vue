@@ -7,9 +7,23 @@
 <template>
   <ModalOverlay :stretch="true" @cancel="$emit('cancel')">
     <ValidatedForm class="modal-form" @validated="submit" @reset="$emit('cancel')">
-      <div class="warning">{{ $t("warning") }}</div>
+      <template v-if="titleVisible">
+        <label class="block-start" for="title">{{ $t("title_label") }}</label>
+        <ValidatedInput
+          id="title" v-model="title" v-model:error="titleError"
+          v-bind="{readonly}" type="text" @validate="validateTitle"
+        />
+      </template>
 
-      <PasswordNameEntry ref="name-entry" v-model="name" v-model:revision="revision" class="block-start" />
+      <label class="block-start" for="user-name">{{ $t("username_label") }}</label>
+      <input id="user-name" v-model="name" v-focus v-bind="{readonly}" type="text">
+      <div v-if="error" class="error">
+        {{ error }}
+      </div>
+
+      <a v-if="!titleVisible" href="#" class="edit-title" @click.prevent="titleVisible = true">
+        {{ $t("edit_title") }}
+      </a>
 
       <template v-if="!recoveryActive">
         <label class="block-start" for="password-value">{{ $t("password_label") }}</label>
@@ -39,23 +53,26 @@
 <script>
 "use strict";
 
+import {handleErrors} from "../../common.js";
+import {nativeRequest} from "../../protocol.js";
 import {passwords} from "../../proxy.js";
-import PasswordNameEntry from "./PasswordNameEntry.vue";
 import RecoveryCode from "./RecoveryCode.vue";
 
 export default {
-  name: "StoredPassword",
-  localePath: "panel/components/StoredPassword",
+  name: "EntryEditor",
+  localePath: "panel/components/EntryEditor",
   components: {
-    PasswordNameEntry,
     RecoveryCode
   },
   emits: ["cancel"],
   data()
   {
     return {
+      titleVisible: false,
+      title: "",
+      titleError: null,
       name: "",
-      revision: "1",
+      nameError: null,
       password: "",
       passwordError: null,
       recoveryActive: false
@@ -81,27 +98,36 @@ export default {
       this.recoveryActive = false;
       this.password = password;
     },
-    submit()
+    submit: handleErrors(async function()
     {
-      let revision = this.revision != "1" ? this.revision : "";
+      try
+      {
+        if (!this.title)
+          this.title = this.name;
 
-      passwords.addStored({
-        site: this.$root.site,
-        name: this.name,
-        revision,
-        password: this.password
-      }).then(pwdList =>
-      {
-        this.$root.pwdList = pwdList;
+        await nativeRequest("add-entry", {
+          keys: this.$root.keys,
+          hostname: this.$root.site,
+          title: this.title,
+          username: this.name,
+          password: this.password
+          // notes: ???
+        });
+
+        this.$root.pwdList = await this.$root.getEntries(this.$root.site);
         this.$emit("cancel");
-      }).catch(error =>
+      }
+      catch (error)
       {
-        if (error == "alreadyExists")
-          this.$refs["name-entry"].nameConflict();
+        if (error.code == "EntryExists")
+        {
+          this.titleError = this.$t("title_exists");
+          this.titleVisible = true;
+        }
         else
-          this.$root.showUnknownError(error);
-      });
-    }
+          throw error;
+      }
+    })
   }
 };
 </script>

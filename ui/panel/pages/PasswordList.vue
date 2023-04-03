@@ -62,15 +62,10 @@
       />
     </div>
 
-    <a v-if="$root.site" class="add-password-link" href="#" @click.prevent="modal = 'generated'">
-      {{ $t("generate_password_link") }}
+    <a v-if="$root.site !== null" class="add-password-link" href="#" @click.prevent="modal = 'new-entry'">
+      {{ $t("new_password_link") }}
     </a>
-    <GeneratedPassword v-if="modal == 'generated'" @cancel="modal = null" />
-
-    <a v-if="$root.site" class="add-password-link" href="#" @click.prevent="modal = 'stored'">
-      {{ $t("stored_password_link") }}
-    </a>
-    <StoredPassword v-if="modal == 'stored'" @cancel="modal = null" />
+    <EntryEditor v-if="modal == 'new-entry'" @cancel="modal = null" />
 
     <div class="link-container">
       <a href="#" @click.prevent="showAll">
@@ -86,20 +81,18 @@
 import {keyboardNavigationType} from "../../common.js";
 import {passwords, ui} from "../../proxy.js";
 import PasswordMessage from "../../components/PasswordMessage.vue";
-import GeneratedPassword from "../components/GeneratedPassword.vue";
 import PasswordEntry from "../components/PasswordEntry.vue";
 import SiteSelection from "../components/SiteSelection.vue";
-import StoredPassword from "../components/StoredPassword.vue";
+import EntryEditor from "../components/EntryEditor.vue";
 
 export default {
   name: "PasswordList",
   localePath: "panel/pages/PasswordList",
   components: {
     PasswordMessage,
-    GeneratedPassword,
     PasswordEntry,
     SiteSelection,
-    StoredPassword
+    EntryEditor
   },
   data: () =>
   {
