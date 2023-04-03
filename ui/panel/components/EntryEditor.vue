@@ -67,7 +67,6 @@
 
 import {handleErrors} from "../../common.js";
 import {nativeRequest} from "../../protocol.js";
-import {passwords} from "../../proxy.js";
 import RecoveryCode from "./RecoveryCode.vue";
 
 export default {
