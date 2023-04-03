@@ -19,7 +19,9 @@
       </div>
 
       <label class="block-start" for="user-name">{{ $t("username_label") }}</label>
-      <input id="user-name" v-model="name" v-focus v-bind="{readonly}" type="text">
+      <ValidatedInput
+        id="user-name" v-model="name" v-focus v-bind="{readonly}" type="text"
+      />
       <div v-if="!titleVisible && titleError" class="error">
         {{ titleError }}
       </div>
