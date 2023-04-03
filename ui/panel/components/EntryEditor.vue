@@ -7,18 +7,21 @@
 <template>
   <ModalOverlay :stretch="true" @cancel="$emit('cancel')">
     <ValidatedForm class="modal-form" @validated="submit" @reset="$emit('cancel')">
-      <template v-if="titleVisible">
+      <div class="title-container" v-bind="titleVisible ? {} : {hidden: 'hidden'}">
         <label class="block-start" for="title">{{ $t("title_label") }}</label>
         <ValidatedInput
-          id="title" v-model="title" v-model:error="titleError"
+          id="title" ref="title" v-model="title" v-model:error="titleError"
           v-bind="{readonly}" type="text" @validate="validateTitle"
         />
-      </template>
+        <div v-if="titleVisible && titleError" class="error">
+          {{ titleError }}
+        </div>
+      </div>
 
       <label class="block-start" for="user-name">{{ $t("username_label") }}</label>
       <input id="user-name" v-model="name" v-focus v-bind="{readonly}" type="text">
-      <div v-if="error" class="error">
-        {{ error }}
+      <div v-if="!titleVisible && titleError" class="error">
+        {{ titleError }}
       </div>
 
       <a v-if="!titleVisible" href="#" class="edit-title" @click.prevent="titleVisible = true">
@@ -79,7 +82,6 @@ export default {
       title: "",
       titleError: null,
       name: "",
-      nameError: null,
       password: "",
       passwordError: null,
       passwordVisible: false,
@@ -88,6 +90,16 @@ export default {
   },
   watch:
   {
+    name()
+    {
+      if (!this.titleVisible)
+        this.title = this.name;
+    },
+    titleVisible()
+    {
+      if (this.titleVisible)
+        this.$nextTick(() => this.$refs.title.$el.focus());
+    },
     recoveryActive()
     {
       if (!this.recoveryActive)
@@ -96,6 +108,11 @@ export default {
   },
   methods:
   {
+    validateTitle(value, setError)
+    {
+      if (!value)
+        setError(this.$t("title_required"));
+    },
     validatePassword(value, setError)
     {
       if (!value)
@@ -110,9 +127,6 @@ export default {
     {
       try
       {
-        if (!this.title)
-          this.title = this.name;
-
         await nativeRequest("add-entry", {
           keys: this.$root.keys,
           hostname: this.$root.site,

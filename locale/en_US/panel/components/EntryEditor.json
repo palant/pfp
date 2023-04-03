@@ -10,6 +10,6 @@
   "submit": "Save password",
 
   "title_required": "Please enter some username or title for this password.",
-  "title_exists": "This user name and revision combination already exists. Maybe increase the revision number?",
+  "title_exists": "This password title already exists.",
   "password_value_required": "Please enter the password you used on this website."
 }

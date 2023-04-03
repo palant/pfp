@@ -414,6 +414,12 @@ a.iconic-link:hover
   font-size: $font-size-small;
 }
 
+.title-container:not([hidden])
+{
+  display: flex;
+  flex-direction: column;
+}
+
 .edit-title,
 .use-recovery,
 .cancel-recovery
