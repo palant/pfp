@@ -38,9 +38,6 @@
   },
   "dependencies": {
     "@stablelib/scrypt": "^1.0.0",
-    "@zxcvbn-ts/core": "^2.0.1",
-    "@zxcvbn-ts/language-common": "^2.0.1",
-    "@zxcvbn-ts/language-en": "^2.0.1",
     "qrcode": "^1.5.0",
     "vue": "^3.0.4"
   }

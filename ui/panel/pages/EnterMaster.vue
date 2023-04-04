@@ -5,13 +5,7 @@
  -->
 
 <template>
-  <EnterMasterShared class="page" :cancelable="false" @done="done">
-    <div class="link-container">
-      <a href="#" @click.prevent="$root.resettingMaster = true">
-        {{ $t("reset") }}
-      </a>
-    </div>
-  </EnterMasterShared>
+  <EnterMasterShared class="page" :cancelable="false" @done="done" />
 </template>
 
 <script>

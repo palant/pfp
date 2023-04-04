@@ -13,7 +13,6 @@
     <Confirm ref="confirm" />
     <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
 
-    <ChangeMaster v-if="false" />
     <EnterMaster v-else-if="!keys" />
     <DeprecationNote v-if="false" />
     <div v-else-if="keys" class="tabs">
@@ -72,7 +71,6 @@ import {port} from "../messaging.js";
 import {nativeRequest} from "../protocol.js";
 import {masterPassword, passwords, ui, sync} from "../proxy.js";
 import EnterMaster from "./pages/EnterMaster.vue";
-import ChangeMaster from "./pages/ChangeMaster.vue";
 import DeprecationNote from "./pages/DeprecationNote.vue";
 import PasswordList from "./pages/PasswordList.vue";
 import SelectSite from "./pages/SelectSite.vue";
@@ -94,7 +92,6 @@ export default {
   name: "App",
   localePath: "panel/App",
   components: {
-    ChangeMaster,
     EnterMaster,
     DeprecationNote,
     PasswordList,
@@ -108,7 +105,6 @@ export default {
   {
     return {
       unknownError: null,
-      resettingMaster: false,
       deprecationAccepted: false,
       currentPage: "password-list",
       site: undefined,
