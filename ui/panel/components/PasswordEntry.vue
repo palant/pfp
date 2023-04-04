@@ -52,10 +52,9 @@
 
 import browser from "../../../lib/browserAPI.js";
 import {set as clipboardSet} from "../../clipboard.js";
-import {normalizeHostname, handleErrors} from "../../common.js";
+import {normalizeHostname, handleErrors, getCurrentHost} from "../../common.js";
 import {getPort} from "../../../lib/messaging.js";
 import {nativeRequest} from "../../protocol.js";
-import {ui} from "../../proxy.js";
 import GeneratedPassword from "./GeneratedPassword.vue";
 import NotesEditor from "./NotesEditor.vue";
 import QRCode from "./QRCode.vue";
@@ -124,7 +123,7 @@ export default {
 
         await this.ensureValue();
 
-        let currentHost = await ui.getCurrentHost();
+        let currentHost = await getCurrentHost();
         if (normalizeHostname(currentHost) !== this.$root.site)
           throw "wrong_site";
 

@@ -6,6 +6,7 @@
 
 "use strict";
 
+import browser from "../lib/browserAPI.js";
 import {$t} from "./i18n.js";
 
 export function normalizeHostname(hostname)
@@ -64,4 +65,20 @@ export function handleErrors(func)
       this.$root.showUnknownError(error);
     }
   };
+}
+
+export async function getCurrentHost()
+{
+  let tabs = await browser.tabs.query({
+    lastFocusedWindow: true,
+    active: true
+  });
+  if (!tabs.length)
+    return null;
+
+  let url = new URL(tabs[0].url);
+  if (url.protocol != "http:" && url.protocol != "https:")
+    return null;
+
+  return url.hostname || null;
 }

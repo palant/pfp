@@ -57,10 +57,12 @@
 <script>
 "use strict";
 
-import {normalizeHostname, getSiteDisplayName, keyboardNavigationType, handleErrors} from "../common.js";
+import {
+  normalizeHostname, getSiteDisplayName, keyboardNavigationType, handleErrors, getCurrentHost
+} from "../common.js";
 import {port} from "../messaging.js";
 import {nativeRequest} from "../protocol.js";
-import {masterPassword, passwords, ui} from "../proxy.js";
+import {masterPassword, passwords} from "../proxy.js";
 import EnterMaster from "./pages/EnterMaster.vue";
 import PasswordList from "./pages/PasswordList.vue";
 import SelectSite from "./pages/SelectSite.vue";
@@ -114,7 +116,7 @@ export default {
   {
     let data = {};
     [data.site, data.keys] = await Promise.all([
-      ui.getCurrentHost(),
+      getCurrentHost(),
       masterPassword.getKeys()
     ]);
 

@@ -90,7 +90,3 @@ export const prefs = proxy("prefs", ["getPref", "setPref"]);
 export const recoveryCodes = proxy("recoveryCodes", [
   "getValidChars", "getCode", "formatCode", "isValid", "decodeCode"
 ]);
-
-export const ui = proxy("ui", [
-  "getCurrentHost"
-]);

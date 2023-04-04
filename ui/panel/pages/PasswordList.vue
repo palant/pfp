@@ -80,7 +80,7 @@
 
 import browser from "../../../lib/browserAPI.js";
 import {keyboardNavigationType, handleErrors} from "../../common.js";
-import {passwords, ui} from "../../proxy.js";
+import {passwords} from "../../proxy.js";
 import PasswordMessage from "../../components/PasswordMessage.vue";
 import PasswordEntry from "../components/PasswordEntry.vue";
 import SiteSelection from "../components/SiteSelection.vue";
