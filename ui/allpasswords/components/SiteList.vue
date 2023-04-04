@@ -19,8 +19,9 @@
 <script>
 "use strict";
 
-import {getSiteDisplayName} from "../../common.js";
-import {passwords} from "../../proxy.js";
+import {getSiteDisplayName, handleErrors} from "../../common.js";
+import {nativeRequest} from "../../protocol.js";
+import {masterPassword, passwords} from "../../proxy.js";
 import Shortcuts from "./Shortcuts.vue";
 import SiteInfo from "./SiteInfo.vue";
 
@@ -51,27 +52,31 @@ export default {
     this.updateData();
   },
   methods: {
-    updateData()
+    updateData: handleErrors(async function()
     {
-      passwords.getAllPasswords().then(sites =>
-      {
-        let siteNames = Object.keys(sites);
-        siteNames.sort();
-        {
-          let index = siteNames.indexOf("pfp.invalid");
-          if (index >= 0)
-          {
-            siteNames.splice(index, 1);
-            siteNames.unshift("pfp.invalid");
-          }
-        }
+      let keys = await masterPassword.getKeys();
+      let entries = await nativeRequest("get-all-entries", {
+        keys
+      });
 
-        let siteList = [];
-        for (let name of siteNames)
-          siteList.push(sites[name]);
-        this.sites = siteList;
-      }).catch(this.$root.showUnknownError);
-    },
+      let siteNames = new Set();
+      let sites = new Map();
+      for (let entry of entries)
+      {
+        siteNames.add(entry.hostname);
+
+        if (!sites.has(entry.hostname))
+          sites.set(entry.hostname, {site: entry.hostname, aliases: [], passwords: []});
+        sites.get(entry.hostname).passwords.push(entry);
+      }
+      siteNames = [...siteNames];
+      siteNames.sort();
+
+      let siteList = [];
+      for (let name of siteNames)
+        siteList.push(sites.get(name));
+      this.sites = siteList;
+    }),
     getLetters(sites)
     {
       let letters = [];

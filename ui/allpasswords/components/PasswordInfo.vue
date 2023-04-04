@@ -18,29 +18,17 @@
 
     <div class="password-container">
       <IconicLink ref="to-clipboard" class="to-clipboard-link" :title="$t('/(panel)(components)(PasswordMenu)to_clipboard')" @click="copy" />
-      <span class="user-name-container">
-        <span class="user-name">{{ password.name }}</span>
-        <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
-      </span>
+      <span class="password-title">{{ password.title }}</span>
       <span v-if="showPasswords && value" class="password-value">{{ value }}</span>
       <IconicLink class="password-remove-link" :title="$t('/(panel)(components)(PasswordMenu)remove_password')" @click="removePassword" />
     </div>
     <div class="password-info">
-      <template v-if="password.type == 'generated2'">
-        <div class="password-type">{{ $t("/(panel)(components)(PasswordEntry)password_type_generated2") }}</div>
-        <div>{{ $t("/(panel)(components)(PasswordEntry)password_length") }} {{ password.length }}</div>
-        <div>{{ $t("/(panel)(components)(PasswordEntry)allowed_characters") }}  {{ allowedChars }}</div>
-      </template>
-      <template v-else-if="password.type == 'stored'">
-        <div class="password-type">
-          <template v-if="true">{{ $t("password_type_stored") }}</template>
-          <span
-            class="help-icon" :title="$t('recovery_code_explanation')"
-            :aria-label="$t('recovery_code_explanation')"
-          />
-        </div>
-        <pre v-if="recoveryCode">{{ recoveryCode }}</pre>
-      </template>
+      <span
+        class="help-icon" :title="$t('recovery_code_explanation')"
+        :aria-label="$t('recovery_code_explanation')"
+      />
+      <pre v-if="recoveryCode">{{ recoveryCode }}</pre>
+      <div>{{ $t("/(panel)(components)(PasswordEntry)password_username") }} {{ password.username }}</div>
       <div v-if="showNotes && password.notes">{{ $t("/(panel)(components)(PasswordEntry)notes") }} {{ password.notes }}</div>
     </div>
   </div>
