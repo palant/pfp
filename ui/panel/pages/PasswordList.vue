@@ -78,7 +78,8 @@
 <script>
 "use strict";
 
-import {keyboardNavigationType} from "../../common.js";
+import browser from "../../../lib/browserAPI.js";
+import {keyboardNavigationType, handleErrors} from "../../common.js";
 import {passwords, ui} from "../../proxy.js";
 import PasswordMessage from "../../components/PasswordMessage.vue";
 import PasswordEntry from "../components/PasswordEntry.vue";
@@ -190,12 +191,28 @@ export default {
         }
       });
     },
-    showAll()
+    showAll: handleErrors(async function()
     {
-      ui.showAllPasswords()
-        .then(() => window.close())
-        .catch(this.$root.showUnknownError);
-    }
+      let url = browser.runtime.getURL("ui/allpasswords/allpasswords.html");
+
+      // Only look for existing tab in the active window, don't activate
+      // background windows to avoid unexpected effects.
+      let tabs = await browser.tabs.query({
+        url,
+        lastFocusedWindow: true
+      });
+
+      if (tabs.length)
+        await browser.tabs.update(tabs[0].id, {active: true});
+      else
+      {
+        await browser.tabs.create({
+          url,
+          active: true
+        });
+      }
+      window.close();
+    })
   }
 };
 </script>
