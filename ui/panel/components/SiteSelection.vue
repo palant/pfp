@@ -40,7 +40,6 @@
 "use strict";
 
 import {getSiteDisplayName, handleErrors} from "../../common.js";
-import {passwords} from "../../proxy.js";
 import {nativeRequest} from "../../protocol.js";
 
 export default {

@@ -55,7 +55,7 @@ import {set as clipboardSet} from "../../clipboard.js";
 import {normalizeHostname, handleErrors} from "../../common.js";
 import {getPort} from "../../../lib/messaging.js";
 import {nativeRequest} from "../../protocol.js";
-import {passwords, ui} from "../../proxy.js";
+import {ui} from "../../proxy.js";
 import GeneratedPassword from "./GeneratedPassword.vue";
 import NotesEditor from "./NotesEditor.vue";
 import QRCode from "./QRCode.vue";

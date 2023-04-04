@@ -14,7 +14,6 @@
 "use strict";
 
 import {handleErrors} from "../../common.js";
-import {passwords} from "../../proxy.js";
 import SiteSelection from "../components/SiteSelection.vue";
 
 export default {

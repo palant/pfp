@@ -17,7 +17,6 @@
 <script>
 "use strict";
 
-import {passwords} from "../../proxy.js";
 import EnterMasterShared from "../../components/EnterMasterShared.vue";
 
 export default {
