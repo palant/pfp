@@ -21,7 +21,6 @@
 
 import {getSiteDisplayName, handleErrors} from "../../common.js";
 import {nativeRequest} from "../../protocol.js";
-import {masterPassword, passwords} from "../../proxy.js";
 import Shortcuts from "./Shortcuts.vue";
 import SiteInfo from "./SiteInfo.vue";
 
