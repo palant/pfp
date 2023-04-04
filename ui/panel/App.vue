@@ -14,7 +14,6 @@
     <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
 
     <EnterMaster v-else-if="!keys" />
-    <DeprecationNote v-if="false" />
     <div v-else-if="keys" class="tabs">
       <nav v-keyboard-navigation:tab class="tablist" role="list">
         <div />
@@ -63,7 +62,6 @@ import {port} from "../messaging.js";
 import {nativeRequest} from "../protocol.js";
 import {masterPassword, passwords, ui} from "../proxy.js";
 import EnterMaster from "./pages/EnterMaster.vue";
-import DeprecationNote from "./pages/DeprecationNote.vue";
 import PasswordList from "./pages/PasswordList.vue";
 import SelectSite from "./pages/SelectSite.vue";
 import Settings from "./pages/Settings.vue";
@@ -83,7 +81,6 @@ export default {
   localePath: "panel/App",
   components: {
     EnterMaster,
-    DeprecationNote,
     PasswordList,
     SelectSite,
     Settings,
@@ -94,7 +91,6 @@ export default {
   {
     return {
       unknownError: null,
-      deprecationAccepted: false,
       currentPage: "password-list",
       site: undefined,
       pwdList: null,
@@ -117,9 +113,8 @@ export default {
   created: async function()
   {
     let data = {};
-    [data.site, data.deprecationAccepted, data.keys] = await Promise.all([
+    [data.site, data.keys] = await Promise.all([
       ui.getCurrentHost(),
-      ui.isDeprecationAccepted(),
       masterPassword.getKeys()
     ]);
 
