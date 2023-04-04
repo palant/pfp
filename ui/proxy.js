@@ -92,5 +92,5 @@ export const recoveryCodes = proxy("recoveryCodes", [
 ]);
 
 export const ui = proxy("ui", [
-  "getCurrentHost", "isDeprecationAccepted", "acceptDeprecation", "getLink", "openLink"
+  "getCurrentHost"
 ]);

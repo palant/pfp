@@ -8,7 +8,7 @@
   <a v-if="$isWebClient" :href="url" target="_blank" rel="noopener">
     <slot />
   </a>
-  <a v-else href="#" @click.prevent="click">
+  <a v-else :href="url" @click.prevent="openLink">
     <slot />
   </a>
 </template>
@@ -16,7 +16,8 @@
 <script>
 "use strict";
 
-import {ui} from "../proxy.js";
+import browser from "../../lib/browserAPI.js";
+import {handleErrors} from "../common.js";
 
 export default {
   name: "ExternalLink",
@@ -36,22 +37,30 @@ export default {
       url: "#"
     };
   },
-  mounted()
+  mounted: handleErrors(function()
   {
-    ui.getLink({
-      type: this.type,
-      param: this.param
-    }).then(url => this.url = url).catch(this.$root.showUnknownError);
-  },
+    this.url = this.getLink();
+  }),
   methods:
   {
-    click()
+    getLink()
     {
-      ui.openLink({
-        type: this.type,
-        param: this.param
-      }).catch(this.$root.showUnknownError);
-    }
+      if (this.type == "url")
+        return this.param;
+      else if (this.type == "relnotes")
+        return `https://pfp.works/release-notes/${this.param}`;
+      else if (this.type == "documentation")
+        return `https://pfp.works/documentation/${this.param}/`;
+
+      throw new Error("Unexpected link type");
+    },
+    openLink: handleErrors(async function()
+    {
+      await browser.tabs.create({
+        url: this.getLink(),
+        active: true
+      });
+    })
   }
 };
 </script>
