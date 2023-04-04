@@ -54,9 +54,8 @@ export default {
   methods: {
     updateData: handleErrors(async function()
     {
-      let keys = await masterPassword.getKeys();
       let entries = await nativeRequest("get-all-entries", {
-        keys
+        keys: this.$root.keys
       });
 
       let siteNames = new Set();

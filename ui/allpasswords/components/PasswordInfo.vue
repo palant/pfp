@@ -38,7 +38,9 @@
 "use strict";
 
 import {set as clipboardSet} from "../../clipboard.js";
-import {passwords, recoveryCodes} from "../../proxy.js";
+import {handleErrors} from "../../common.js";
+import {nativeRequest} from "../../protocol.js";
+import {recoveryCodes} from "../../proxy.js";
 import PasswordMessage from "../../components/PasswordMessage.vue";
 
 export default {
@@ -106,17 +108,16 @@ export default {
     }
   },
   methods: {
-    ensureValue()
+    ensureValue: handleErrors(async function()
     {
       if (this.value)
-        return Promise.resolve();
+        return;
 
-      return passwords.getPassword(this.password)
-        .then(value =>
-        {
-          this.value = value;
-        });
-    },
+      this.value = await nativeRequest("get-password", {
+        keys: this.$root.keys,
+        uuid: this.password.uuid
+      });
+    }),
     showPasswordMessage(message)
     {
       this.$refs["password-message"].message = message;
@@ -152,22 +153,27 @@ export default {
         }).catch(this.showPasswordMessage);
       }
     },
-    removePassword()
+    removePassword: handleErrors(async function()
     {
-      let message = this.$t("/(panel)(components)(PasswordEntry)remove_confirmation", this.password.name, this.siteDisplayName);
+      let message = this.$t("/(panel)(components)(PasswordEntry)remove_confirmation", this.password.title, this.siteDisplayName);
       if (this.password.notes)
         message += " " + this.$t("/(panel)(components)(PasswordEntry)remove_confirmation_notes", this.password.notes);
-      this.$root.confirm(message).then(accepted =>
+      if (await this.$root.confirm(message))
       {
-        if (!accepted)
-          return;
-
-        passwords.removePassword(this.password).then(() =>
+        try
         {
+          await nativeRequest("remove-entry", {
+            keys: this.$root.keys,
+            uuid: this.password.uuid
+          });
           this.$emit("removed");
-        }).catch(this.showPasswordMessage);
-      });
-    },
+        }
+        catch (error)
+        {
+          this.showPasswordMessage(error);
+        }
+      }
+    }),
     activate()
     {
       this.$refs["to-clipboard"].$el.focus();

@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <div @keydown.ctrl.e.prevent="testUnknownError">
+  <div v-if="keys" @keydown.ctrl.e.prevent="testUnknownError">
     <InProgress v-if="inProgress" />
     <EnterMaster v-if="masterPromise" @done="enterMasterDone" />
     <Confirm ref="confirm" />
@@ -42,7 +42,8 @@
 <script>
 "use strict";
 
-import {setErrorHandler} from "../proxy.js";
+import {handleErrors} from "../common.js";
+import {setErrorHandler, masterPassword} from "../proxy.js";
 import Confirm from "../components/Confirm.vue";
 import PasswordMessage from "../components/PasswordMessage.vue";
 import UnknownError from "../components/UnknownError.vue";
@@ -66,6 +67,7 @@ export default {
   data()
   {
     return {
+      keys: null,
       inProgress: false,
       masterPromise: null,
       unknownError: null,
@@ -97,7 +99,7 @@ export default {
       }
     }
   },
-  mounted()
+  mounted: handleErrors(async function()
   {
     document.title = this.$t("title");
     setErrorHandler("master_password_required", () =>
@@ -107,7 +109,8 @@ export default {
         this.masterPromise = {resolve, reject};
       });
     });
-  },
+    this.keys = await masterPassword.getKeys();
+  }),
   methods: {
     testUnknownError()
     {
