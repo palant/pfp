@@ -34,13 +34,6 @@
         />
 
         <IconicLink
-          class="tab sync" role="listitem"
-          :class="{active: currentPage == 'sync', failed: $root.sync.error && $root.sync.error != 'sync_connection_error'}"
-          :title="$t('sync')"
-          @click="currentPage = 'sync'"
-        />
-
-        <IconicLink
           class="tab settings" role="listitem"
           :class="{active: currentPage == 'settings'}"
           :title="$t('settings')"
@@ -57,7 +50,6 @@
       </nav>
       <SelectSite v-if="currentPage == 'select-site'" @selected="currentPage = 'password-list'" />
       <PasswordList v-if="currentPage == 'password-list'" />
-      <Sync v-else-if="currentPage == 'sync'" />
       <Settings v-else-if="currentPage == 'settings'" />
     </div>
   </div>
@@ -69,20 +61,18 @@
 import {normalizeHostname, getSiteDisplayName, keyboardNavigationType, handleErrors} from "../common.js";
 import {port} from "../messaging.js";
 import {nativeRequest} from "../protocol.js";
-import {masterPassword, passwords, ui, sync} from "../proxy.js";
+import {masterPassword, passwords, ui} from "../proxy.js";
 import EnterMaster from "./pages/EnterMaster.vue";
 import DeprecationNote from "./pages/DeprecationNote.vue";
 import PasswordList from "./pages/PasswordList.vue";
 import SelectSite from "./pages/SelectSite.vue";
 import Settings from "./pages/Settings.vue";
-import Sync from "./pages/Sync.vue";
 import Confirm from "../components/Confirm.vue";
 import UnknownError from "../components/UnknownError.vue";
 
 const pages = [
   "select-site",
   "password-list",
-  "sync",
   "settings"
 ];
 
@@ -97,7 +87,6 @@ export default {
     PasswordList,
     SelectSite,
     Settings,
-    Sync,
     Confirm,
     UnknownError
   },
@@ -109,8 +98,7 @@ export default {
       currentPage: "password-list",
       site: undefined,
       pwdList: null,
-      keys: null,
-      sync: {}
+      keys: null
     };
   },
   computed: {
@@ -144,9 +132,6 @@ export default {
 
     // Update all data at once to prevent inconsistent intermediate states
     Object.assign(this, data);
-
-    await this.updateSyncState();
-    port.on("syncUpdate", () => this.updateSyncState());
   },
   methods:
   {
@@ -168,22 +153,6 @@ export default {
         return 0;
       });
       return entries;
-    },
-
-    updateSyncState: async function()
-    {
-      let [syncData, isSyncing] = await Promise.all([
-        sync.getSyncData(),
-        sync.isSyncing()
-      ]);
-
-      this.sync = {
-        provider: syncData.provider || null,
-        username: syncData.username || null,
-        lastSync: syncData.lastSync || null,
-        error: syncData.error || null,
-        isSyncing
-      };
     },
     testUnknownError()
     {

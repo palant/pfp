@@ -220,16 +220,6 @@ h1
   background-image: url("../images/ionicons/md-list.svg");
 }
 
-.sync
-{
-  background-image: url("../images/ionicons/md-sync.svg");
-
-  &.failed:not(.active)
-  {
-    background-color: #fcc;
-  }
-}
-
 .settings
 {
   background-image: url("../images/ionicons/md-settings.svg");
@@ -503,69 +493,6 @@ a.iconic-link:hover
 #notes-textarea
 {
   min-height: 300px;
-}
-
-.sync-section
-{
-  font-weight: bold;
-}
-
-.sync-explanation,
-.remoteStorage-hosting-link
-{
-  font-size: $font-size-small;
-}
-
-.sync-provider-selection
-{
-  display: flex;
-  flex-direction: column;
-  align-self: center;
-}
-
-.sync-provider-link
-{
-  font-size: 120%;
-  font-weight: bold;
-  color: $text-color;
-}
-
-.sync-provider-icon
-{
-  $height: 24px;
-  display: inline-block;
-  margin: 0 $inline-spacing;
-  height: $height;
-  background-size: auto $height;
-  background-repeat: no-repeat;
-}
-
-.sync-provider-icon.dropbox
-{
-  width: 28.183px;
-  background-image: url("../images/logos/dropbox.svg");
-}
-
-.sync-provider-icon.gdrive
-{
-  width: 27.676px;
-  background-image: url("../images/logos/gdrive.svg");
-}
-
-.sync-provider-icon.remotestorage
-{
-  width: 20.792px;
-  background-image: url("../images/remotestorage.svg");
-}
-
-.sync-failed
-{
-  color: $error-text;
-}
-
-.sync-error
-{
-  margin-top: $block-spacing;
 }
 
 .modalOverlay-inner
