@@ -62,7 +62,7 @@ import {
 } from "../common.js";
 import {port} from "../messaging.js";
 import {nativeRequest} from "../protocol.js";
-import {masterPassword, passwords} from "../proxy.js";
+import {masterPassword} from "../proxy.js";
 import EnterMaster from "./pages/EnterMaster.vue";
 import PasswordList from "./pages/PasswordList.vue";
 import SelectSite from "./pages/SelectSite.vue";
