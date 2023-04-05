@@ -15,7 +15,7 @@
         <span class="to-clipboard-link iconic-link" />
         {{ $t("to_clipboard") }}
       </a>
-      <a href="#" class="password-menu-entry" @click.prevent="$parent.copyUsername">
+      <a v-if="password.username" href="#" class="password-menu-entry" @click.prevent="$parent.copyUsername">
         {{ $t("to_clipboard_username") }}
       </a>
     </div>

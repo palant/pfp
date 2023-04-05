@@ -22,9 +22,8 @@
         class="to-clipboard-link iconic-link"
         :title="$t('.(PasswordMenu)to_clipboard')" @click="copy"
       />
-      <span class="user-name-container" :title="tooltip">
-        <span>{{ password.title }}</span>
-        <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
+      <span class="password-title" :title="tooltip">
+        {{ password.title }}
       </span>
     </div>
 

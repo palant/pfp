@@ -249,7 +249,7 @@ h1
   }
 }
 
-.user-name-container
+.password-title
 {
   flex-grow: 1;
 }
@@ -354,11 +354,11 @@ a.iconic-link:hover
     &:first-child
     {
       @include padding-inline-end($inline-spacing);
-      @include border-end(1px solid #ccc);
     }
 
-    &:last-child
+    &:not(:first-child)
     {
+      @include border-start(1px solid #ccc);
       justify-content: flex-end;
       @include padding-inline-start($inline-spacing);
     }

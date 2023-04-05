@@ -85,6 +85,19 @@ $large-icon-size: 48px;
   }
 }
 
+@mixin border-start($spec)
+{
+  :root:not([dir="rtl"]) &
+  {
+    border-left: $spec;
+  }
+
+  :root[dir="rtl"] &
+  {
+    border-right: $spec;
+  }
+}
+
 @mixin border-end($spec)
 {
   :root:not([dir="rtl"]) &
