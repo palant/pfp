@@ -214,15 +214,21 @@ export default {
     {
       this.modal = "notes";
     },
-    makeGenerated()
+    async duplicate()
     {
-      this.passwordOptions = {replacing: true};
-      this.modal = "generated";
-    },
-    bumpRevision()
-    {
-      this.passwordOptions = {incRevision: true};
-      this.modal = "generated";
+      this.modal = null;
+      try
+      {
+        await nativeRequest("duplicate-entry", {
+          keys: this.$root.keys,
+          uuid: this.password.uuid
+        });
+        this.$root.pwdList = await this.$root.getEntries(this.$root.site);
+      }
+      catch (error)
+      {
+        this.$parent.showPasswordMessage(error);
+      }
     },
     removePassword: handleErrors(async function()
     {

@@ -27,13 +27,9 @@
       <span class="notes-link iconic-link" />
       {{ $t(password.notes ? "edit_notes" : "add_notes") }}
     </a>
-    <a v-if="password.type == 'stored'" href="#" class="password-menu-entry" @click.prevent="$parent.makeGenerated">
-      <span class="make-generated-link iconic-link" />
-      {{ $t("make_generated") }}
-    </a>
-    <a href="#" class="password-menu-entry" @click.prevent="$parent.bumpRevision">
-      <span class="bump-revision-link iconic-link" />
-      {{ $t("bump_revision") }}
+    <a href="#" class="password-menu-entry" @click.prevent="$parent.duplicate">
+      <span class="duplicate-link iconic-link" />
+      {{ $t("duplicate") }}
     </a>
     <a href="#" class="password-menu-entry" @click.prevent="$parent.removePassword">
       <span class="password-remove-link iconic-link" />
