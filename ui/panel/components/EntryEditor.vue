@@ -239,7 +239,6 @@ export default {
           title: this.title,
           username: this.name,
           password: this.password
-          // notes: ???
         });
 
         this.$root.pwdList = await this.$root.getEntries(this.$root.site);

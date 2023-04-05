@@ -25,7 +25,7 @@ function connect()
 
 async function onMessage(message)
 {
-  let queued = responseQueue.get(message.requestId);
+  let queued = responseQueue.get(message.request_id);
   if (!queued)
   {
     console.error("Received response not matching any request", message);
@@ -33,13 +33,13 @@ async function onMessage(message)
   }
 
   let [resolve, reject] = queued;
-  responseQueue.delete(message.requestId);
+  responseQueue.delete(message.request_id);
   if (message.success)
     resolve(message.response);
   else
   {
-    let error = new Error(message.error);
-    error.code = message.errorCode;
+    let error = new Error(message.response.error);
+    error.code = message.response.error_code;
     reject(error);
   }
 }
@@ -51,9 +51,9 @@ export async function nativeRequest(action, request)
 
   let requestId = Math.random().toString().slice(2);
   let message = {
-    requestId,
+    request_id: requestId,
     action,
-    request
+    ...request
   };
 
   port.postMessage(message);
