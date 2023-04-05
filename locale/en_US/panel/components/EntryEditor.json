@@ -2,6 +2,8 @@
   "title_label": "Title:",
   "username_label": "User name:",
   "edit_title": "Set a title that is different from the user name.",
+  "length_label": "Length:",
+  "allowed_characters_label": "Allowed characters:",
   "password_label": "Password:",
   "show_password": "Show password",
   "hide_password": "Hide password",

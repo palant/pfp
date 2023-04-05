@@ -31,6 +31,22 @@
       </a>
 
       <template v-if="!recoveryActive">
+        <template v-if="newEntry">
+          <label class="block-start" for="password-length">{{ $t("length_label") }}</label>
+          <div class="length-container">
+            <input id="password-length" v-model.number="length" type="range" min="4" max="24" step="1">
+            <span class="password-length-value">{{ length }}</span>
+          </div>
+
+          <label class="block-start" for="charset-lower">{{ $t("allowed_characters_label") }}</label>
+          <div class="charsets-container">
+            <label><input id="charset-lower" v-model="lower" type="checkbox">abc</label>
+            <label><input v-model="upper" type="checkbox">XYZ</label>
+            <label><input v-model="number" type="checkbox">789</label>
+            <label><input v-model="symbol" type="checkbox">+^;</label>
+          </div>
+        </template>
+
         <label class="block-start" for="password-value">{{ $t("password_label") }}</label>
         <div id="password-value-container">
           <ValidatedInput
@@ -69,6 +85,13 @@ import {handleErrors} from "../../common.js";
 import {nativeRequest} from "../../protocol.js";
 import RecoveryCode from "./RecoveryCode.vue";
 
+// I, l, O, 0, 1 excluded because of potential confusion. ", ', \ excluded
+// because of common bugs in web interfaces (magic quotes).
+const LOWERCASE = "abcdefghjkmnpqrstuvwxyz";
+const UPPERCASE = "ABCDEFGHJKMNPQRSTUVWXYZ";
+const NUMBER = "23456789";
+const SYMBOL = "!#$%&()*+,-./:;<=>?@[]^_{|}~";
+
 export default {
   name: "EntryEditor",
   localePath: "panel/components/EntryEditor",
@@ -79,10 +102,16 @@ export default {
   data()
   {
     return {
+      newEntry: true,
       titleVisible: false,
       title: "",
       titleError: null,
       name: "",
+      length: 16,
+      lower: true,
+      upper: true,
+      number: true,
+      symbol: true,
       password: "",
       passwordError: null,
       passwordVisible: false,
@@ -101,11 +130,36 @@ export default {
       if (this.titleVisible)
         this.$nextTick(() => this.$refs.title.$el.focus());
     },
+    length()
+    {
+      this.generatePassword();
+    },
+    lower()
+    {
+      this.generatePassword();
+    },
+    upper()
+    {
+      this.generatePassword();
+    },
+    number()
+    {
+      this.generatePassword();
+    },
+    symbol()
+    {
+      this.generatePassword();
+    },
     recoveryActive()
     {
       if (!this.recoveryActive)
         this.$nextTick(() => this.$refs.password.$el.focus());
     }
+  },
+  mounted()
+  {
+    if (this.newEntry)
+      this.generatePassword();
   },
   methods:
   {
@@ -118,6 +172,57 @@ export default {
     {
       if (!value)
         setError(this.$t("password_value_required"));
+    },
+    generatePassword()
+    {
+      let array = new Uint8Array(this.length);
+      crypto.getRandomValues(array);
+
+      let charsets = [];
+      if (this.lower)
+        charsets.push(LOWERCASE);
+      if (this.upper)
+        charsets.push(UPPERCASE);
+      if (this.number)
+        charsets.push(NUMBER);
+      if (this.symbol)
+        charsets.push(SYMBOL);
+
+      if (!charsets.length)
+        return;
+
+      let lengthSum = (previous, current) => previous + current.length;
+      let numChars = charsets.reduce(lengthSum, 0);
+      let seen = new Set();
+
+      let result = [];
+      for (let i = 0; i < array.length; i++)
+      {
+        if (charsets.length - seen.size >= array.length - i)
+        {
+          for (let value of seen.values())
+          {
+            let index = charsets.indexOf(value);
+            if (index >= 0)
+              charsets.splice(index, 1);
+          }
+          seen.clear();
+          numChars = charsets.reduce(lengthSum, 0);
+        }
+
+        let index = array[i] % numChars;
+        for (let charset of charsets)
+        {
+          if (index < charset.length)
+          {
+            result.push(charset[index]);
+            seen.add(charset);
+            break;
+          }
+          index -= charset.length;
+        }
+      }
+      this.password = result.join("");
     },
     setPassword(password)
     {

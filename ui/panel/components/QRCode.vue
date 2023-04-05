@@ -6,7 +6,7 @@
 
 <template>
   <ModalOverlay :focus-cancel="true" @cancel="$emit('cancel')">
-    <div>{{ $t(".(PasswordNameEntry)username_label") }}</div>
+    <div>{{ $t(".(EntryEditor)username_label") }}</div>
     <div>
       <span>{{ password.username }}</span>
     </div>

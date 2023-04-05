@@ -27,10 +27,6 @@
       </span>
     </div>
 
-    <GeneratedPassword
-      v-if="modal == 'generated'" :password="password"
-      :options="passwordOptions" @cancel="modal = null"
-    />
     <PasswordMenu
       v-if="modal == 'menu'" :password="password"
       @cancel="modal = null"
@@ -54,7 +50,6 @@ import {set as clipboardSet} from "../../clipboard.js";
 import {normalizeHostname, handleErrors, getCurrentHost} from "../../common.js";
 import {getPort} from "../../../lib/messaging.js";
 import {nativeRequest} from "../../protocol.js";
-import GeneratedPassword from "./GeneratedPassword.vue";
 import NotesEditor from "./NotesEditor.vue";
 import QRCode from "./QRCode.vue";
 import PasswordMenu from "./PasswordMenu.vue";
@@ -63,7 +58,6 @@ export default {
   name: "PasswordEntry",
   localePath: "panel/components/PasswordEntry",
   components: {
-    GeneratedPassword,
     NotesEditor,
     QRCode,
     PasswordMenu
