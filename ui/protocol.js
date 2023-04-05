@@ -52,8 +52,7 @@ export async function nativeRequest(action, request)
   let requestId = Math.random().toString().slice(2);
   let message = {
     request_id: requestId,
-    action,
-    ...request
+    [action]: request
   };
 
   port.postMessage(message);
