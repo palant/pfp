@@ -23,13 +23,12 @@
       <IconicLink class="password-remove-link" :title="$t('/(panel)(components)(PasswordMenu)remove_password')" @click="removePassword" />
     </div>
     <div class="password-info">
-      <span
-        class="help-icon" :title="$t('recovery_code_explanation')"
-        :aria-label="$t('recovery_code_explanation')"
-      />
-      <pre v-if="recoveryCode">{{ recoveryCode }}</pre>
       <div>{{ $t("/(panel)(components)(PasswordEntry)password_username") }} {{ password.username }}</div>
       <div v-if="showNotes && password.notes">{{ $t("/(panel)(components)(PasswordEntry)notes") }} {{ password.notes }}</div>
+      <div v-if="recoveryCode && recoveryCodeParams">
+        {{ $t("recovery_code") }}
+        <pre>{{ recoveryCode }}</pre>
+      </div>
     </div>
   </div>
 </template>
@@ -40,7 +39,7 @@
 import {set as clipboardSet} from "../../clipboard.js";
 import {handleErrors} from "../../common.js";
 import {nativeRequest} from "../../protocol.js";
-import {recoveryCodes} from "../../proxy.js";
+import {getCode} from "../../recoveryCodes.js";
 import PasswordMessage from "../../components/PasswordMessage.vue";
 
 export default {
@@ -64,6 +63,10 @@ export default {
     },
     showPasswords: {
       type: Boolean,
+      required: true
+    },
+    recoveryCodeParams: {
+      type: Object,
       required: true
     }
   },
@@ -95,16 +98,24 @@ export default {
     {
       if (this.showPasswords)
         this.ensureValue().catch(this.showPasswordMessage);
-    }
-  },
-  mounted()
-  {
-    if (this.password.type == "stored" && !this.recoveryCode)
+    },
+    async recoveryCodeParams()
     {
-      recoveryCodes.getCode(this.password).then(code =>
+      if (this.recoveryCodeParams)
       {
-        this.recoveryCode = code;
-      }).catch(this.showPasswordMessage);
+        try
+        {
+          await this.ensureValue();
+          let [kdfParams, key] = this.recoveryCodeParams;
+          this.recoveryCode = await getCode(this.password, kdfParams, key);
+        }
+        catch (error)
+        {
+          this.showPasswordMessage(error);
+        }
+      }
+      else
+        this.recoveryCode = null;
     }
   },
   methods: {

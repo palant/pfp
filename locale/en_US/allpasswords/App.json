@@ -1,6 +1,8 @@
 {
   "title": "All passwords known to PfP",
   "show_notes": "Show notes",
+  "show_recovery_codes": "Show recovery codes",
+  "recovery_code_explanation": "Recovery codes securely encode a password and can be entered when adding a password. They are safe to print, decryption is only possible with the main password they have been protected with.",
   "show_passwords": "Show passwords",
   "intro": "Here you can create an encrypted backup of your data. This page is also safe to print as long as the passwords aren't shown, the information shown is sufficient to recreate the passwords (same master password has to be used).",
   "show_passwords_confirm": "This will display all your passwords on screen, please only proceed if nobody can watch over your shoulder. This action might take some time to complete."

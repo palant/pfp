@@ -20,7 +20,7 @@
       v-for="password in site.passwords" :key="password.name"
       ref="password" :password="password"
       :site-display-name="displayName" :show-notes="showNotes"
-      :show-passwords="showPasswords"
+      :show-passwords="showPasswords" :recovery-code-params="recoveryCodeParams"
       @removed="removePassword(password)"
     />
   </div>
@@ -49,6 +49,10 @@ export default {
     },
     showPasswords: {
       type: Boolean,
+      required: true
+    },
+    recoveryCodeParams: {
+      type: Object,
       required: true
     }
   },

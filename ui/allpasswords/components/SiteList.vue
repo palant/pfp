@@ -11,7 +11,8 @@
     <SiteInfo
       v-for="site in sites" :key="site.site"
       :ref="'site.' + site.site" :site="site" :show-notes="showNotes"
-      :show-passwords="showPasswords" @removed="removeSite(site)"
+      :show-passwords="showPasswords" :recovery-code-params="recoveryCodeParams"
+      @removed="removeSite(site)"
     />
   </div>
 </template>
@@ -37,6 +38,10 @@ export default {
     },
     showPasswords: {
       type: Boolean,
+      required: true
+    },
+    recoveryCodeParams: {
+      type: Object,
       required: true
     }
   },

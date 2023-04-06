@@ -8,6 +8,7 @@
   <div v-if="keys" @keydown.ctrl.e.prevent="testUnknownError">
     <InProgress v-if="inProgress" />
     <EnterMaster v-if="masterPromise" @done="enterMasterDone" />
+    <EnterRecoveryPassword v-if="recoveryPasswordPromise" @done="queryRecoveryPasswordDone" />
     <Confirm ref="confirm" />
     <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
     <PasswordMessage
@@ -29,13 +30,23 @@
         <label><input v-model="showNotes" type="checkbox">{{ $t("show_notes") }}</label>
       </div>
       <div>
+        <label><input v-model="showRecoveryCodes" type="checkbox">{{ $t("show_recovery_codes") }}</label>
+        <span
+          class="help-icon" :title="$t('recovery_code_explanation')"
+          :aria-label="$t('recovery_code_explanation')"
+        />
+      </div>
+      <div>
         <label><input v-model="showPasswords" type="checkbox">{{ $t("show_passwords") }}</label>
       </div>
     </div>
 
     <div class="intro">{{ $t("intro") }}</div>
 
-    <SiteList ref="siteList" :show-notes="showNotes" :show-passwords="confirmedPasswords && showPasswords" />
+    <SiteList
+      ref="siteList" :show-notes="showNotes" :show-passwords="confirmedPasswords && showPasswords"
+      :recovery-code-params="showRecoveryCodes ? recoveryCodeParams : null"
+    />
   </div>
 </template>
 
@@ -43,6 +54,7 @@
 "use strict";
 
 import {handleErrors} from "../common.js";
+import {nativeRequest} from "../protocol.js";
 import {setErrorHandler, masterPassword} from "../proxy.js";
 import Confirm from "../components/Confirm.vue";
 import PasswordMessage from "../components/PasswordMessage.vue";
@@ -50,6 +62,7 @@ import UnknownError from "../components/UnknownError.vue";
 import GlobalActions from "./components/GlobalActions.vue";
 import SiteList from "./components/SiteList.vue";
 import EnterMaster from "./modals/EnterMaster.vue";
+import EnterRecoveryPassword from "./modals/EnterRecoveryPassword.vue";
 import InProgress from "./modals/InProgress.vue";
 
 export default {
@@ -62,6 +75,7 @@ export default {
     GlobalActions,
     SiteList,
     EnterMaster,
+    EnterRecoveryPassword,
     InProgress
   },
   data()
@@ -70,8 +84,11 @@ export default {
       keys: null,
       inProgress: false,
       masterPromise: null,
+      recoveryPasswordPromise: null,
+      recoveryCodeParams: null,
       unknownError: null,
       showNotes: !("hideNotes" in window.localStorage),
+      showRecoveryCodes: false,
       showPasswords: false,
       confirmedPasswords: false
     };
@@ -85,6 +102,37 @@ export default {
       else
         window.localStorage.hideNotes = true;
     },
+    showRecoveryCodes: handleErrors(async function()
+    {
+      if (this.showRecoveryCodes && !this.recoveryCodeParams)
+      {
+        try
+        {
+          let password = await this.queryRecoveryPassword();
+
+          this.inProgress = true;
+          let kdfParams = await nativeRequest("duplicate-kdf-parameters", null);
+          let {key, _} = await nativeRequest("derive-key", {
+            password,
+            kdf_parameters: kdfParams
+          });
+          this.recoveryCodeParams = [kdfParams, key];
+        }
+        catch (error)
+        {
+          if (error == "canceled")
+          {
+            this.showRecoveryCodes = false;
+            return;
+          }
+          throw error;
+        }
+        finally
+        {
+          this.inProgress = false;
+        }
+      }
+    }),
     showPasswords()
     {
       if (this.showPasswords && !this.confirmedPasswords)
@@ -131,6 +179,28 @@ export default {
       this.masterPromise = null;
       if (success)
         resolve();
+      else
+        reject("canceled");
+    },
+    queryRecoveryPassword()
+    {
+      if (!this.recoveryPasswordPromise)
+      {
+        this.recoveryPasswordPromise = {};
+        this.recoveryPasswordPromise.promise = new Promise((resolve, reject) =>
+        {
+          this.recoveryPasswordPromise.resolve = resolve;
+          this.recoveryPasswordPromise.reject = reject;
+        });
+      }
+      return this.recoveryPasswordPromise.promise;
+    },
+    queryRecoveryPasswordDone(result)
+    {
+      let {resolve, reject} = this.recoveryPasswordPromise;
+      this.recoveryPasswordPromise = null;
+      if (result)
+        resolve(result);
       else
         reject("canceled");
     },
