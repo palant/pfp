@@ -8,7 +8,7 @@
   <ModalOverlay @cancel="done(null)">
     <ValidatedForm class="modal-form" @validated="done(password)" @reset.prevent="done(null)">
       <div>{{ $t("description") }}</div>
-      <label for="recovery-password">{{ $t("/(panel)(components)(RecoveryCode)password_label") }}</label>
+      <label class="block-start" for="recovery-password">{{ $t("/(panel)(components)(RecoveryCode)password_label") }}</label>
       <ValidatedInput
         id="recovery-password" v-model="password"
         v-model:error="passwordError" v-focus
@@ -18,7 +18,7 @@
       <div v-if="passwordError" class="error">
         {{ passwordError }}
       </div>
-      <label for="recovery-password-repeat">{{ $t("password_repeat") }}</label>
+      <label class="block-start" for="recovery-password-repeat">{{ $t("password_repeat") }}</label>
       <ValidatedInput
         id="recovery-password-repeat" v-model="passwordRepeat"
         v-model:error="passwordRepeatError"

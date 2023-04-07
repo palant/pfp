@@ -359,3 +359,8 @@ input[type="checkbox"]:checked
   opacity: 0.8;
   z-index: 10001;
 }
+
+.block-start
+{
+  margin-top: $block-spacing;
+}
