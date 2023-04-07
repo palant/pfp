@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <ModalOverlay :stretch="true" @cancel="$emit('cancel')">
+  <ModalOverlay :stretch="true" @cancel="recoveryActive ? setPassword(null) : $emit('cancel')">
     <ValidatedForm v-if="!recoveryActive" class="modal-form" @validated="submit" @reset="$emit('cancel')">
       <div class="title-container" v-bind="titleVisible ? {} : {hidden: 'hidden'}">
         <label class="block-start" for="title">{{ $t("title_label") }}</label>
