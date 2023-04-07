@@ -171,7 +171,7 @@ export default {
       }
       catch (error)
       {
-        if (error == "wrong_version")
+        if (error == "wrong_version" || error == "invalid_password")
           this.currentError = this.$t(error);
         else
           this.currentError = error;

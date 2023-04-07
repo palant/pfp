@@ -125,15 +125,23 @@ async function decryptPassword(ciphertext, initializationVector, keyArray)
     "raw", keyArray, "AES-GCM", false, ["decrypt"]
   );
 
-  let plaintext = await crypto.subtle.decrypt(
-    {
-      name: "AES-GCM",
-      iv: initializationVector,
-      tagLength: tagSize * 8
-    },
-    key,
-    ciphertext
-  );
+  let plaintext;
+  try
+  {
+    plaintext = await crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv: initializationVector,
+        tagLength: tagSize * 8
+      },
+      key,
+      ciphertext
+    );
+  }
+  catch (error)
+  {
+    throw "invalid_password";
+  }
 
   return decoder.decode(plaintext);
 }
