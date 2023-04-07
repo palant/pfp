@@ -16,7 +16,7 @@ if (typeof runtime.getBackgroundPage == "function")
   // If we can access the background page we are not in a content script.
   portName = document.documentElement.dataset.portname;
   messageQueue = [];
-  document.addEventListener("DOMContentLoaded", event =>
+  document.addEventListener("DOMContentLoaded", () =>
   {
     let queue = messageQueue;
     messageQueue = null;

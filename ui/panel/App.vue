@@ -60,7 +60,6 @@
 import {
   normalizeHostname, getSiteDisplayName, keyboardNavigationType, handleErrors, getCurrentHost
 } from "../common.js";
-import {port} from "../messaging.js";
 import {nativeRequest} from "../protocol.js";
 import {masterPassword} from "../proxy.js";
 import EnterMaster from "./pages/EnterMaster.vue";
@@ -75,8 +74,6 @@ const pages = [
   "password-list",
   "settings"
 ];
-
-let app = null;
 
 export default {
   name: "App",
@@ -174,7 +171,7 @@ export default {
     },
     confirm(message)
     {
-      return new Promise((resolve, reject) =>
+      return new Promise(resolve =>
       {
         let confirm = this.$refs.confirm;
         confirm.message = message;

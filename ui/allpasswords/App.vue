@@ -161,7 +161,7 @@ export default {
     },
     confirm(message)
     {
-      return new Promise((resolve, reject) =>
+      return new Promise(resolve =>
       {
         let confirm = this.$refs.confirm;
         confirm.message = message;
