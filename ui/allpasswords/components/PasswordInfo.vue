@@ -107,7 +107,7 @@ export default {
         {
           await this.ensureValue();
           let [kdfParams, key] = this.recoveryCodeParams;
-          this.recoveryCode = await getCode(this.password, kdfParams, key);
+          this.recoveryCode = await getCode(this.value, kdfParams, key);
         }
         catch (error)
         {

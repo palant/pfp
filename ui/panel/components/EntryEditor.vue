@@ -6,7 +6,7 @@
 
 <template>
   <ModalOverlay :stretch="true" @cancel="$emit('cancel')">
-    <ValidatedForm class="modal-form" @validated="submit" @reset="$emit('cancel')">
+    <ValidatedForm v-if="!recoveryActive" class="modal-form" @validated="submit" @reset="$emit('cancel')">
       <div class="title-container" v-bind="titleVisible ? {} : {hidden: 'hidden'}">
         <label class="block-start" for="title">{{ $t("title_label") }}</label>
         <ValidatedInput
@@ -30,51 +30,46 @@
         {{ $t("edit_title") }}
       </a>
 
-      <template v-if="!recoveryActive">
-        <template v-if="newEntry">
-          <label class="block-start" for="password-length">{{ $t("length_label") }}</label>
-          <div class="length-container">
-            <input id="password-length" v-model.number="length" type="range" min="4" max="24" step="1">
-            <span class="password-length-value">{{ length }}</span>
-          </div>
-
-          <label class="block-start" for="charset-lower">{{ $t("allowed_characters_label") }}</label>
-          <div class="charsets-container">
-            <label><input id="charset-lower" v-model="lower" type="checkbox">abc</label>
-            <label><input v-model="upper" type="checkbox">XYZ</label>
-            <label><input v-model="number" type="checkbox">789</label>
-            <label><input v-model="symbol" type="checkbox">+^;</label>
-          </div>
-        </template>
-
-        <label class="block-start" for="password-value">{{ $t("password_label") }}</label>
-        <div id="password-value-container">
-          <ValidatedInput
-            id="password-value" ref="password" v-model="password"
-            v-model:error="passwordError" :type="passwordVisible ? 'text' : 'password'"
-            @validate="validatePassword"
-          />
-          <IconicLink
-            id="show-password" href="#" :class="'iconic-link' + (passwordVisible ? ' active' : '')"
-            :title="$t(passwordVisible ? 'hide_password' : 'show_password')"
-            @click="passwordVisible = !passwordVisible"
-          />
+      <template v-if="newEntry">
+        <label class="block-start" for="password-length">{{ $t("length_label") }}</label>
+        <div class="length-container">
+          <input id="password-length" v-model.number="length" type="range" min="4" max="24" step="1">
+          <span class="password-length-value">{{ length }}</span>
         </div>
-        <div v-if="passwordError" class="error">
-          {{ passwordError }}
+
+        <label class="block-start" for="charset-lower">{{ $t("allowed_characters_label") }}</label>
+        <div class="charsets-container">
+          <label><input id="charset-lower" v-model="lower" type="checkbox">abc</label>
+          <label><input v-model="upper" type="checkbox">XYZ</label>
+          <label><input v-model="number" type="checkbox">789</label>
+          <label><input v-model="symbol" type="checkbox">+^;</label>
         </div>
-        <a class="use-recovery" href="#" @click.prevent="recoveryActive = true">{{ $t("use_recovery") }}</a>
       </template>
-      <template v-else>
-        <RecoveryCode @done="setPassword" />
-        <a class="cancel-recovery" href="#" @click.prevent="recoveryActive = false">{{ $t("cancel_recovery") }}</a>
-      </template>
+
+      <label class="block-start" for="password-value">{{ $t("password_label") }}</label>
+      <div id="password-value-container">
+        <ValidatedInput
+          id="password-value" ref="password" v-model="password"
+          v-model:error="passwordError" :type="passwordVisible ? 'text' : 'password'"
+          @validate="validatePassword"
+        />
+        <IconicLink
+          id="show-password" href="#" :class="'iconic-link' + (passwordVisible ? ' active' : '')"
+          :title="$t(passwordVisible ? 'hide_password' : 'show_password')"
+          @click="passwordVisible = !passwordVisible"
+        />
+      </div>
+      <div v-if="passwordError" class="error">
+        {{ passwordError }}
+      </div>
+      <a class="use-recovery" href="#" @click.prevent="recoveryActive = true">{{ $t("use_recovery") }}</a>
 
       <div class="button-container">
         <button type="submit">{{ $t("submit") }}</button>
         <button type="reset">{{ $t("/cancel") }}</button>
       </div>
     </ValidatedForm>
+    <RecoveryCode v-if="recoveryActive" @done="setPassword" />
   </ModalOverlay>
 </template>
 
@@ -227,7 +222,11 @@ export default {
     setPassword(password)
     {
       this.recoveryActive = false;
-      this.password = password;
+      if (password !== null)
+      {
+        this.newEntry = false;
+        this.password = password;
+      }
     },
     submit: handleErrors(async function()
     {

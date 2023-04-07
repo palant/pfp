@@ -6,6 +6,8 @@
 
 "use strict";
 
+import {nativeRequest} from "./protocol.js";
+
 const blockSize = 14;
 const version = 2;
 const versionSize = 1;
@@ -13,6 +15,17 @@ const ivSize = 12;
 const tagSize = 16;
 
 let encoder = new TextEncoder();
+let decoder = new TextDecoder();
+
+export function toBase64(buffer)
+{
+  let array = new Uint8Array(buffer);
+  let result = [];
+  for (let i = 0; i < array.length; i++)
+    result.push(String.fromCharCode(array[i]));
+
+  return btoa(result.join(""));
+}
 
 export function fromBase64(string)
 {
@@ -106,6 +119,25 @@ async function encryptPassword(password, keyArray)
   return [initializationVector, new Uint8Array(ciphertext)];
 }
 
+async function decryptPassword(ciphertext, initializationVector, keyArray)
+{
+  let key = await crypto.subtle.importKey(
+    "raw", keyArray, "AES-GCM", false, ["decrypt"]
+  );
+
+  let plaintext = await crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv: initializationVector,
+      tagLength: tagSize * 8
+    },
+    key,
+    ciphertext
+  );
+
+  return decoder.decode(plaintext);
+}
+
 export async function getCode(password, kdfParams, key)
 {
   kdfParams = fromBase64(kdfParams);
@@ -169,7 +201,7 @@ export function isValid(recoveryCode)
 {
   let buffer = fromBase32(recoveryCode);
   if (buffer.length % (blockSize + 1))
-    return "invalid-length";
+    return "invalid_length";
 
   let blocks = buffer.length / (blockSize + 1);
   for (let i = 0; i < blocks; i++)
@@ -184,8 +216,7 @@ export function isValid(recoveryCode)
   return "unterminated";
 }
 
-/*
-export async function decodeCode(recoveryCode)
+export async function decodeCode(recoveryCode, password)
 {
   let validationResult = isValid(recoveryCode);
   if (validationResult != "ok")
@@ -204,19 +235,21 @@ export async function decodeCode(recoveryCode)
     throw "wrong_version";
   pos += versionSize;
 
-  if (buffer.length < versionSize + saltSize + ivSize + tagSize)
+  let {key, bytes_consumed} = await nativeRequest("derive-key", {
+    password,
+    kdf_parameters: toBase64(buffer.slice(pos))
+  });
+  pos += bytes_consumed;
+
+  if (buffer.length < pos + ivSize + tagSize)
     throw new Error("Unexpected: too little data");
 
-  let salt = toBase64(buffer.slice(pos, pos += saltSize));
-  let iv = toBase64(buffer.slice(pos, pos += ivSize));
-  let ciphertext = toBase64(buffer.slice(pos));
+  let iv = buffer.slice(pos, pos += ivSize);
+  let ciphertext = buffer.slice(pos);
 
-  let encrypted = `${iv}_${ciphertext}`;
-  let key = await deriveKeyWithPassword(salt);
-  let decoded = await decrypt(encrypted, key, false);
+  let decoded = await decryptPassword(ciphertext, iv, fromBase64(key));
   return decoded.replace(/\0+$/, "");
 }
-*/
 
 let pearsonHashPermutations = null;
 

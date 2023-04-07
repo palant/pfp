@@ -8,7 +8,6 @@
   "show_password": "Show password",
   "hide_password": "Hide password",
   "use_recovery": "Use recovery code",
-  "cancel_recovery": "Enter password directly",
   "submit": "Save password",
 
   "title_required": "Please enter some username or title for this password.",

@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <form class="modal-form">
+  <ValidatedForm class="modal-form" @validated="submit" @reset="$emit('done', null)">
     <label class="block-start" for="recoveryInput">{{ $t("label") }}</label>
     <div class="recovery-code-accepted">
       <div v-for="(line, index) in accepted" :key="line">
@@ -13,24 +13,36 @@
         <IconicLink
           v-if="index == accepted.length - 1"
           class="recovery-code-strip cancel"
-          :title="$t('remove_line')" @click="accepted.pop()"
+          :title="$t('remove_line')" @click="removeLine"
         />
       </div>
     </div>
     <textarea
+      v-if="!complete"
       id="recoveryInput" ref="recoveryInput" v-focus
       autocomplete="off" autocorrect="off" spellcheck="false"
       @input="processInput" @change="processInput"
       @keydown.delete="onDelete" @keydown.backspace="onBackspace"
     />
     <div v-if="currentError" class="error">{{ currentError }}</div>
-  </form>
+    <label class="block-start" for="recoveryPassword">{{ $t("password_label") }}</label>
+    <ValidatedInput
+      id="recovery-password" v-model="password" v-model:error="passwordError"
+      type="password" @validate="validatePassword"
+    />
+    <div v-if="passwordError" class="error">{{ passwordError }}</div>
+    <div class="button-container">
+      <button type="submit">{{ $t("submit") }}</button>
+      <button type="reset">{{ $t("/cancel") }}</button>
+    </div>
+  </ValidatedForm>
 </template>
 
 <script>
 "use strict";
 
-import {recoveryCodes} from "../../proxy.js";
+import {handleErrors} from "../../common.js";
+import {base32Alphabet, isValid, decodeCode} from "../../recoveryCodes.js";
 
 export default {
   name: "RecoveryCode",
@@ -39,17 +51,12 @@ export default {
   data()
   {
     return {
-      validChars: "",
       currentError: null,
-      accepted: []
+      accepted: [],
+      complete: false,
+      password: "",
+      passwordError: null
     };
-  },
-  mounted()
-  {
-    recoveryCodes.getValidChars().then(validChars =>
-    {
-      this.validChars = validChars;
-    }).catch(this.$root.showUnknownError);
   },
   methods: {
     insert(str, substr, pos)
@@ -74,13 +81,13 @@ export default {
     formatValue(value)
     {
       value = value.toUpperCase();
-      value = value.replace(new RegExp(`[^${this.validChars}\0]`, "gi"), "");
+      value = value.replace(new RegExp(`[^${base32Alphabet}\0]`, "gi"), "");
       value = value.replace(/(?:\w\0*){23}\w/g, "$&\n");
       value = value.replace(/(?:\w\0*){11}\w(?=\0*\w)/g, "$&:");
       value = value.replace(/(?:\w\0*){3}\w(?=\0*\w)/g, "$&-");
       return value;
     },
-    processInput()
+    processInput: handleErrors(async function()
     {
       let [value, selectionDirection] = this.getValue();
       value = this.formatValue(value);
@@ -93,54 +100,38 @@ export default {
       }
 
       let error = null;
-      let checkSubstr = fromIndex =>
+      let fromIndex = undefined;
+      for (;;)
       {
         let index = value.lastIndexOf("\n", fromIndex);
         if (fromIndex < 0 || index < 0)
-          return error ? Promise.reject(error) : Promise.resolve();
+          break;
 
         let code = this.accepted.join("") + value.substr(0, index);
-        return recoveryCodes.isValid(code).then(result =>
+        let validity = isValid(code);
+        if (validity == "ok" || validity == "unterminated")
         {
-          if (result == "ok" || result == "unterminated")
-          {
-            this.accepted = this.formatValue(code).trim().replace(/\0/g, "").split("\n");
-            this.setValue([value.substr(index + 1), selectionDirection]);
-            if (result == "ok")
-            {
-              return recoveryCodes.decodeCode(code).then(password =>
-              {
-                this.$emit("done", password);
-                if (error)
-                  throw error;
-              }).catch(error =>
-              {
-                if (error == "wrong_version")
-                  throw this.$t(error);
-
-                this.$root.showUnknownError(error);
-              });
-            }
-            return error ? Promise.reject(error) : Promise.resolve();
-          }
+          this.accepted = this.formatValue(code).trim().replace(/\0/g, "").split("\n");
+          this.setValue([value.substr(index + 1), selectionDirection]);
+          this.complete = (validity == "ok");
+          break;
+        }
+        else
+        {
+          if (validity == "checksum_mismatch")
+            error = this.$t(validity);
           else
-          {
-            if (result == "checksum_mismatch")
-              error = this.$t(result);
-            else
-              error = result;
-            return checkSubstr(index - 1);
-          }
-        });
-      };
+            error = validity;
+          fromIndex = index - 1;
+        }
+      }
 
-      checkSubstr().then(() =>
-      {
-        this.currentError = null;
-      }).catch(error =>
-      {
-        this.currentError = error;
-      });
+      this.currentError = error;
+    }),
+    removeLine()
+    {
+      this.accepted.pop();
+      this.complete = false;
     },
     onDelete()
     {
@@ -159,7 +150,33 @@ export default {
 
       while (input.selectionEnd > 0 && !/\w/.test(input.value[input.selectionEnd - 1]))
         input.selectionEnd--;
-    }
+    },
+    validatePassword(value, setError)
+    {
+      if (!value)
+        setError(this.$t("password_required"));
+    },
+    submit: handleErrors(async function()
+    {
+      if (!this.complete)
+      {
+        this.currentError = this.$t("code_incomplete");
+        return;
+      }
+
+      try
+      {
+        let password = await decodeCode(this.accepted.join(""), this.password);
+        this.$emit("done", password);
+      }
+      catch (error)
+      {
+        if (error == "wrong_version")
+          this.currentError = this.$t(error);
+        else
+          this.currentError = error;
+      }
+    })
   }
 };
 </script>
