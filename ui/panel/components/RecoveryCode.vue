@@ -27,8 +27,8 @@
     <div v-if="currentError" class="error">{{ currentError }}</div>
     <label class="block-start" for="recoveryPassword">{{ $t("password_label") }}</label>
     <ValidatedInput
-      id="recovery-password" v-model="password" v-model:error="passwordError"
-      type="password" @validate="validatePassword"
+      id="recovery-password" ref="password" v-model="password"
+      v-model:error="passwordError" type="password" @validate="validatePassword"
     />
     <div v-if="passwordError" class="error">{{ passwordError }}</div>
     <div class="button-container">
@@ -57,6 +57,13 @@ export default {
       password: "",
       passwordError: null
     };
+  },
+  watch: {
+    complete()
+    {
+      if (this.complete)
+        this.$nextTick(() => this.$refs.password.$el.focus());
+    }
   },
   methods: {
     insert(str, substr, pos)
