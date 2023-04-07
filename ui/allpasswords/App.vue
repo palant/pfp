@@ -54,8 +54,8 @@
 "use strict";
 
 import {handleErrors} from "../common.js";
-import {nativeRequest} from "../protocol.js";
 import {setErrorHandler, masterPassword} from "../proxy.js";
+import {getRecoveryCodeParameters} from "../recoveryCodes.js";
 import Confirm from "../components/Confirm.vue";
 import PasswordMessage from "../components/PasswordMessage.vue";
 import UnknownError from "../components/UnknownError.vue";
@@ -111,12 +111,7 @@ export default {
           let password = await this.queryRecoveryPassword();
 
           this.inProgress = true;
-          let kdfParams = await nativeRequest("duplicate-kdf-parameters", null);
-          let {key, _} = await nativeRequest("derive-key", {
-            password,
-            kdf_parameters: kdfParams
-          });
-          this.recoveryCodeParams = [kdfParams, key];
+          this.recoveryCodeParams = await getRecoveryCodeParameters(password);
         }
         catch (error)
         {

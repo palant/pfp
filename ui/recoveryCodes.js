@@ -146,7 +146,17 @@ async function decryptPassword(ciphertext, initializationVector, keyArray)
   return decoder.decode(plaintext);
 }
 
-export async function getCode(password, kdfParams, key)
+export async function getRecoveryCodeParameters(password)
+{
+  let kdfParams = await nativeRequest("duplicate-kdf-parameters", null);
+  let {key, _} = await nativeRequest("derive-key", {
+    password,
+    kdf_parameters: kdfParams
+  });
+  return [kdfParams, key];
+}
+
+export async function getCode(password, [kdfParams, key])
 {
   kdfParams = fromBase64(kdfParams);
 
