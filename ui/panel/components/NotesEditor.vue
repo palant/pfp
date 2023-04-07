@@ -25,7 +25,8 @@
 <script>
 "use strict";
 
-import {passwords} from "../../proxy.js";
+import {handleErrors} from "../../common.js";
+import {nativeRequest} from "../../protocol.js";
 
 export default {
   name: "NotesEditor",
@@ -45,14 +46,16 @@ export default {
   },
   methods:
   {
-    saveNotes()
+    saveNotes: handleErrors(async function()
     {
-      passwords.setNotes(this.password, this.value).then(pwdList =>
-      {
-        this.$root.pwdList = pwdList;
-        this.$emit("cancel");
-      }).catch(this.$root.showUnknownError);
-    }
+      await nativeRequest("update-entry", {
+        keys: this.$root.keys,
+        uuid: this.password.uuid,
+        notes: this.value
+      });
+      this.$root.pwdList = await this.$root.getEntries(this.$root.site);
+      this.$emit("cancel");
+    })
   }
 };
 </script>
