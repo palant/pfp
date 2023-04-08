@@ -32,7 +32,7 @@
         {{ $t("edit_title") }}
       </a>
 
-      <template v-if="newEntry">
+      <template v-if="generatorVisible">
         <label class="block-start" for="password-length">{{ $t("length_label") }}</label>
         <div class="length-container">
           <input id="password-length" v-model.number="length" type="range" min="4" max="24" step="1">
@@ -64,6 +64,9 @@
       <div v-if="passwordError" class="error">
         {{ passwordError }}
       </div>
+      <a v-if="!generatorVisible" class="generate-password" href="#" @click.prevent="generatorVisible = true">
+        {{ $t("generate_password") }}
+      </a>
       <a class="use-recovery" href="#" @click.prevent="recoveryActive = true">{{ $t("use_recovery") }}</a>
 
       <div class="button-container">
@@ -109,11 +112,11 @@ export default {
   data()
   {
     return {
-      newEntry: !this.password,
       titleVisible: this.password && this.password.title != this.password.username,
       title: this.password ? this.password.title : "",
       titleError: null,
       name: this.password ? this.password.username : "",
+      generatorVisible: !this.password,
       length: 16,
       lower: true,
       upper: true,
@@ -136,6 +139,11 @@ export default {
     {
       if (this.titleVisible)
         this.$nextTick(() => this.$refs.title.$el.focus());
+    },
+    generatorVisible()
+    {
+      if (this.generatorVisible)
+        this.generatePassword();
     },
     length()
     {
@@ -165,7 +173,7 @@ export default {
   },
   mounted()
   {
-    if (this.newEntry)
+    if (this.generatorVisible)
       this.generatePassword();
   },
   methods:
@@ -236,7 +244,7 @@ export default {
       this.recoveryActive = false;
       if (password !== null)
       {
-        this.newEntry = false;
+        this.generatorVisible = false;
         this.passwordValue = password;
       }
     },

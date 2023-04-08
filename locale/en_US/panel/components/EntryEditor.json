@@ -7,6 +7,7 @@
   "password_label": "Password:",
   "show_password": "Show password",
   "hide_password": "Hide password",
+  "generate_password": "Generate a new password automatically",
   "use_recovery": "Use recovery code",
   "submit": "Save password",
 
