@@ -102,10 +102,6 @@ export default {
     password: {
       type: Object,
       default: null
-    },
-    value: {
-      type: String,
-      default: ""
     }
   },
   emits: ["cancel"],
@@ -122,7 +118,7 @@ export default {
       upper: true,
       number: true,
       symbol: true,
-      passwordValue: this.value || "",
+      passwordValue: this.password ? this.password.password : "",
       passwordError: null,
       passwordVisible: false,
       recoveryActive: false

@@ -31,16 +31,12 @@ export default {
     password: {
       type: Object,
       required: true
-    },
-    value: {
-      type: String,
-      required: true
     }
   },
   emits: ["cancel"],
   data()
   {
-    let code = qrcode.create(this.value);
+    let code = qrcode.create(this.password.password);
     return {
       code,
       size: code.modules.size * SCALE

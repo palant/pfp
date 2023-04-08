@@ -32,11 +32,11 @@
       @cancel="modal = null"
     />
     <QRCode
-      v-if="modal == 'qrcode'" :password="password" :value="value"
+      v-if="modal == 'qrcode'" :password="password"
       @cancel="modal = null"
     />
     <EntryEditor
-      v-if="modal == 'editor'" :password="password" :value="value"
+      v-if="modal == 'editor'" :password="password"
       @cancel="modal = null"
     />
     <NotesEditor
@@ -81,7 +81,6 @@ export default {
   data()
   {
     return {
-      value: null,
       passwordOptions: null,
       modal: null
     };
@@ -97,30 +96,12 @@ export default {
       return tooltip;
     }
   },
-  watch: {
-    password()
-    {
-      this.value = null;
-    }
-  },
   methods: {
-    ensureValue: handleErrors(async function()
-    {
-      if (this.value)
-        return;
-
-      this.value = await nativeRequest("get-password", {
-        keys: this.$root.keys,
-        uuid: this.password.uuid
-      });
-    }),
     async fillIn()
     {
       try
       {
         this.modal = null;
-
-        await this.ensureValue();
 
         let currentHost = await getCurrentHost();
         if (normalizeHostname(currentHost) !== this.$root.site)
@@ -148,7 +129,7 @@ export default {
               scriptID,
               hostname: currentHost,
               username: this.password.username,
-              password: this.value
+              password: this.password.password
             })
           }).catch(reject);
 
@@ -166,34 +147,8 @@ export default {
     {
       this.modal = null;
 
-      let doCopy = () =>
-      {
-        clipboardSet(this.value);
-        this.$parent.showPasswordMessage("password_copied");
-      };
-
-      if (this.value)
-        doCopy();
-      else
-      {
-        this.ensureValue().then(() =>
-        {
-          if (!this.$isWebClient)
-            doCopy();
-          else
-          {
-            this.$parent.showPasswordMessage("password_ready");
-            let handler = event =>
-            {
-              window.removeEventListener("click", handler, true);
-              event.stopPropagation();
-              event.preventDefault();
-              doCopy();
-            };
-            window.addEventListener("click", handler, true);
-          }
-        }).catch(error => this.$parent.showPasswordMessage(error));
-      }
+      clipboardSet(this.password.password);
+      this.$parent.showPasswordMessage("password_copied");
     },
     copyUsername()
     {
@@ -201,26 +156,13 @@ export default {
       clipboardSet(this.password.username);
       this.$parent.showPasswordMessage("username_copied");
     },
-    async editEntry()
+    editEntry()
     {
-      try
-      {
-        this.modal = null;
-        await this.ensureValue();
-        this.modal = "editor";
-      }
-      catch (error)
-      {
-        this.$parent.showPasswordMessage(error);
-      }
+      this.modal = "editor";
     },
     showQRCode()
     {
-      this.modal = null;
-      this.ensureValue().then(() =>
-      {
-        this.modal = "qrcode";
-      }).catch(error => this.$parent.showPasswordMessage(error));
+      this.modal = "qrcode";
     },
     showNotes()
     {

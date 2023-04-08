@@ -19,7 +19,7 @@
     <div class="password-container">
       <IconicLink ref="to-clipboard" class="to-clipboard-link" :title="$t('/(panel)(components)(PasswordMenu)to_clipboard')" @click="copy" />
       <span class="password-title">{{ password.title }}</span>
-      <span v-if="showPasswords && value" class="password-value">{{ value }}</span>
+      <span v-if="showPasswords" class="password-value">{{ password.password }}</span>
       <IconicLink class="password-remove-link" :title="$t('/(panel)(components)(PasswordMenu)remove_password')" @click="removePassword" />
     </div>
     <div class="password-info">
@@ -74,7 +74,6 @@ export default {
   data()
   {
     return {
-      value: null,
       recoveryCode: null
     };
   },
@@ -94,19 +93,13 @@ export default {
     }
   },
   watch: {
-    showPasswords()
-    {
-      if (this.showPasswords)
-        this.ensureValue().catch(this.showPasswordMessage);
-    },
     async recoveryCodeParams()
     {
       if (this.recoveryCodeParams)
       {
         try
         {
-          await this.ensureValue();
-          this.recoveryCode = await getCode(this.value, this.recoveryCodeParams);
+          this.recoveryCode = await getCode(this.password.password, this.recoveryCodeParams);
         }
         catch (error)
         {
@@ -118,50 +111,14 @@ export default {
     }
   },
   methods: {
-    ensureValue: handleErrors(async function()
-    {
-      if (this.value)
-        return;
-
-      this.value = await nativeRequest("get-password", {
-        keys: this.$root.keys,
-        uuid: this.password.uuid
-      });
-    }),
     showPasswordMessage(message)
     {
       this.$refs["password-message"].message = message;
     },
     copy()
     {
-      let doCopy = () =>
-      {
-        clipboardSet(this.value);
-        this.showPasswordMessage("password_copied");
-      };
-
-      if (this.value)
-        doCopy();
-      else
-      {
-        this.ensureValue().then(() =>
-        {
-          if (!this.$isWebClient)
-            doCopy();
-          else
-          {
-            this.showPasswordMessage("password_ready");
-            let handler = event =>
-            {
-              window.removeEventListener("click", handler, true);
-              event.stopPropagation();
-              event.preventDefault();
-              doCopy();
-            };
-            window.addEventListener("click", handler, true);
-          }
-        }).catch(this.showPasswordMessage);
-      }
+      clipboardSet(this.password.password);
+      this.showPasswordMessage("password_copied");
     },
     removePassword: handleErrors(async function()
     {
