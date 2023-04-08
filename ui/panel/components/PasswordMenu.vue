@@ -23,6 +23,10 @@
       <span class="show-qrcode-link iconic-link" />
       {{ $t("show_qrcode") }}
     </a>
+    <a href="#" class="password-menu-entry" @click.prevent="$parent.editEntry">
+      <span class="edit-entry-link iconic-link" />
+      {{ $t("edit_entry") }}
+    </a>
     <a href="#" class="password-menu-entry" @click.prevent="$parent.showNotes">
       <span class="notes-link iconic-link" />
       {{ $t(password.notes ? "edit_notes" : "add_notes") }}

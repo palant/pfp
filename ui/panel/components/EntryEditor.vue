@@ -11,7 +11,8 @@
         <label class="block-start" for="title">{{ $t("title_label") }}</label>
         <ValidatedInput
           id="title" ref="title" v-model="title" v-model:error="titleError"
-          v-bind="{readonly}" type="text" @validate="validateTitle"
+          v-focus="password && password.title != password.username"
+          type="text" @validate="validateTitle"
         />
         <div v-if="titleVisible && titleError" class="error">
           {{ titleError }}
@@ -19,9 +20,10 @@
       </div>
 
       <label class="block-start" for="user-name">{{ $t("username_label") }}</label>
-      <ValidatedInput
-        id="user-name" v-model="name" v-focus v-bind="{readonly}" type="text"
-      />
+      <input
+        id="user-name" v-model.trim="name"
+        v-focus="!password || password.title == password.username" type="text"
+      >
       <div v-if="!titleVisible && titleError" class="error">
         {{ titleError }}
       </div>
@@ -49,7 +51,7 @@
       <label class="block-start" for="password-value">{{ $t("password_label") }}</label>
       <div id="password-value-container">
         <ValidatedInput
-          id="password-value" ref="password" v-model="password"
+          id="password-value" ref="password" v-model="passwordValue"
           v-model:error="passwordError" :type="passwordVisible ? 'text' : 'password'"
           @validate="validatePassword"
         />
@@ -93,21 +95,31 @@ export default {
   components: {
     RecoveryCode
   },
+  props: {
+    password: {
+      type: Object,
+      default: null
+    },
+    value: {
+      type: String,
+      default: ""
+    }
+  },
   emits: ["cancel"],
   data()
   {
     return {
-      newEntry: true,
-      titleVisible: false,
-      title: "",
+      newEntry: !this.password,
+      titleVisible: this.password && this.password.title != this.password.username,
+      title: this.password ? this.password.title : "",
       titleError: null,
-      name: "",
+      name: this.password ? this.password.username : "",
       length: 16,
       lower: true,
       upper: true,
       number: true,
       symbol: true,
-      password: "",
+      passwordValue: this.value || "",
       passwordError: null,
       passwordVisible: false,
       recoveryActive: false
@@ -217,7 +229,7 @@ export default {
           index -= charset.length;
         }
       }
-      this.password = result.join("");
+      this.passwordValue = result.join("");
     },
     setPassword(password)
     {
@@ -225,20 +237,34 @@ export default {
       if (password !== null)
       {
         this.newEntry = false;
-        this.password = password;
+        this.passwordValue = password;
       }
     },
     submit: handleErrors(async function()
     {
       try
       {
-        await nativeRequest("add-entry", {
-          keys: this.$root.keys,
-          hostname: this.$root.site,
-          title: this.title,
-          username: this.name,
-          password: this.password
-        });
+        if (this.password)
+        {
+          await nativeRequest("update-entry", {
+            keys: this.$root.keys,
+            uuid: this.password.uuid,
+            hostname: this.$root.site,
+            title: this.title,
+            username: this.name,
+            password: this.passwordValue
+          });
+        }
+        else
+        {
+          await nativeRequest("add-entry", {
+            keys: this.$root.keys,
+            hostname: this.$root.site,
+            title: this.title,
+            username: this.name,
+            password: this.passwordValue
+          });
+        }
 
         this.$root.pwdList = await this.$root.getEntries(this.$root.site);
         this.$emit("cancel");

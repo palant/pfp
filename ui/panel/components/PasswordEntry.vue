@@ -35,6 +35,10 @@
       v-if="modal == 'qrcode'" :password="password" :value="value"
       @cancel="modal = null"
     />
+    <EntryEditor
+      v-if="modal == 'editor'" :password="password" :value="value"
+      @cancel="modal = null"
+    />
     <NotesEditor
       v-if="modal == 'notes'" :password="password"
       @cancel="modal = null"
@@ -50,6 +54,7 @@ import {set as clipboardSet} from "../../clipboard.js";
 import {normalizeHostname, handleErrors, getCurrentHost} from "../../common.js";
 import {getPort} from "../../../lib/messaging.js";
 import {nativeRequest} from "../../protocol.js";
+import EntryEditor from "./EntryEditor.vue";
 import NotesEditor from "./NotesEditor.vue";
 import QRCode from "./QRCode.vue";
 import PasswordMenu from "./PasswordMenu.vue";
@@ -58,6 +63,7 @@ export default {
   name: "PasswordEntry",
   localePath: "panel/components/PasswordEntry",
   components: {
+    EntryEditor,
     NotesEditor,
     QRCode,
     PasswordMenu
@@ -194,6 +200,19 @@ export default {
       this.modal = null;
       clipboardSet(this.password.username);
       this.$parent.showPasswordMessage("username_copied");
+    },
+    async editEntry()
+    {
+      try
+      {
+        this.modal = null;
+        await this.ensureValue();
+        this.modal = "editor";
+      }
+      catch (error)
+      {
+        this.$parent.showPasswordMessage(error);
+      }
     },
     showQRCode()
     {
