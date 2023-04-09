@@ -253,17 +253,6 @@ h1
   flex-grow: 1;
 }
 
-.password-revision::before
-{
-  content: "#";
-}
-
-.password-revision
-{
-  font-size: $font-size-small;
-  vertical-align: text-top;
-}
-
 .iconic-link
 {
   min-width: $icon-size;

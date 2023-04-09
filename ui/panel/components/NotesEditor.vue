@@ -8,10 +8,7 @@
   <ModalOverlay :stretch="true" @cancel="$emit('cancel')">
     <form class="modal-form" @submit.prevent="saveNotes" @reset.prevent="$emit('cancel')">
       <div>{{ $t(".(EntryEditor)username_label") }}</div>
-      <div>
-        {{ password.name }}
-        <span v-if="password.revision" class="password-revision">{{ password.revision }}</span>
-      </div>
+      <div>{{ password.username }}</div>
       <label class="block-start" for="notes-textarea">{{ $t("notes_label") }}</label>
       <textarea id="notes-textarea" v-model.trim="value" v-focus />
       <div class="button-container">
