@@ -18,7 +18,7 @@
 <script>
 "use strict";
 
-import {prefs} from "../proxy.js";
+import {getPref, setPref} from "../prefs.js";
 
 export default {
   name: "Setting",
@@ -44,14 +44,14 @@ export default {
     };
   },
   watch: {
-    value()
+    async value()
     {
-      prefs.setPref(this.name, this.value);
+      await setPref(this.name, this.value);
     }
   },
-  created()
+  async created()
   {
-    prefs.getPref(this.name, this.defValue).then(value => this.value = value);
+    this.value = await getPref(this.name, this.defValue);
   }
 };
 </script>

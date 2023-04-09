@@ -84,5 +84,3 @@ export const masterPassword = proxy("masterPassword", [
   "getState", "changePassword", "checkPassword", "forgetPassword",
   "getKeys", "rememberKeys", "forgetKeys"
 ]);
-
-export const prefs = proxy("prefs", ["getPref", "setPref"]);
