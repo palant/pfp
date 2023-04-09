@@ -104,7 +104,7 @@ export default {
         this.modal = null;
 
         let currentHost = await getCurrentHost();
-        if (normalizeHostname(currentHost) !== this.$root.site)
+        if (normalizeHostname(currentHost) !== this.$root.origHostname)
           throw "wrong_site";
 
         await new Promise((resolve, reject) =>
@@ -177,7 +177,7 @@ export default {
           keys: this.$root.keys,
           uuid: this.password.uuid
         });
-        this.$root.pwdList = await this.$root.getEntries(this.$root.site);
+        await this.$root.updateEntries();
       }
       catch (error)
       {
@@ -198,7 +198,7 @@ export default {
             keys: this.$root.keys,
             uuid: this.password.uuid
           });
-          this.$root.pwdList = await this.$root.getEntries(this.$root.site);
+          await this.$root.updateEntries();
         }
         catch (error)
         {

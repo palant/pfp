@@ -253,7 +253,7 @@ export default {
           await nativeRequest("update-entry", {
             keys: this.$root.keys,
             uuid: this.password.uuid,
-            hostname: this.$root.site,
+            hostname: this.$root.hostname,
             title: this.title,
             username: this.name,
             password: this.passwordValue
@@ -263,14 +263,14 @@ export default {
         {
           await nativeRequest("add-entry", {
             keys: this.$root.keys,
-            hostname: this.$root.site,
+            hostname: this.$root.hostname,
             title: this.title,
             username: this.name,
             password: this.passwordValue
           });
         }
 
-        this.$root.pwdList = await this.$root.getEntries(this.$root.site);
+        await this.$root.updateEntries();
         this.$emit("cancel");
       }
       catch (error)

@@ -91,52 +91,51 @@ export default {
     return {
       unknownError: null,
       currentPage: "password-list",
-      site: undefined,
-      pwdList: null,
+      hostname: undefined,
+      origHostname: undefined,
+      pwdList: [],
       keys: null
     };
   },
   computed: {
     siteDisplayName()
     {
-      return getSiteDisplayName(this.site);
+      return getSiteDisplayName(this.hostname);
     }
   },
   watch: {
-    site()
+    hostname()
     {
-      if (this.currentPage == "password-list" && this.site === null)
+      if (this.currentPage == "password-list" && this.hostname === null)
         this.currentPage = "select-site";
     }
   },
   created: async function()
   {
-    let data = {};
-    [data.site, data.keys] = await Promise.all([
+    let [hostname, keys] = await Promise.all([
       getCurrentHost(),
       masterPassword.getKeys()
     ]);
+    this.origHostname = this.hostname = normalizeHostname(hostname);
 
-    data.site = normalizeHostname(data.site);
-
-    if (data.keys)
-    {
-      data.pwdList = await this.getEntries(data.site, data.keys);
-    }
-
-    // Update all data at once to prevent inconsistent intermediate states
-    Object.assign(this, data);
+    this.keys = keys;
+    if (this.keys)
+      await this.updateEntries();
   },
   methods:
   {
-    async getEntries(hostname, keys = this.keys)
+    async updateEntries()
     {
-      if (hostname === null)
-        return [];
+      if (this.origHostname === null)
+      {
+        this.hostname = this.origHostname;
+        this.pwdList = [];
+        return;
+      }
 
-      let entries = await nativeRequest("get-entries", {
-        keys,
-        hostname
+      let {hostname, entries} = await nativeRequest("get-entries", {
+        keys: this.keys,
+        hostname: this.origHostname
       });
       entries.sort(function(a, b)
       {
@@ -146,7 +145,9 @@ export default {
           return 1;
         return 0;
       });
-      return entries;
+
+      this.hostname = hostname;
+      this.pwdList = entries;
     },
     testUnknownError()
     {

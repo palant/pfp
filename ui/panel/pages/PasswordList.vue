@@ -6,11 +6,11 @@
 
 <template>
   <div class="page">
-    <template v-if="$root.site == $root.siteDisplayName">
+    <template v-if="$root.hostname == $root.siteDisplayName">
       <label for="site">{{ $t("site") }}</label>
       <ExternalLink
         id="site" v-focus="!$root.pwdList.length"
-        type="url" :param="'https://' + $root.site" data-noaccesskey
+        type="url" :param="'https://' + $root.hostname" data-noaccesskey
       >
         {{ $root.siteDisplayName }}
       </ExternalLink>
@@ -22,14 +22,14 @@
       </div>
     </template>
 
-    <div v-if="$root.origSite != $root.site" class="alias-container">
-      {{ $t("alias_description", $root.origSite) }}
+    <div v-if="$root.origHostname != $root.hostname" class="alias-container">
+      {{ $t("alias_description", $root.origHostname) }}
       <a href="#" @click.prevent="removeAlias">
         {{ $t("remove_alias") }}
       </a>
     </div>
     <a
-      v-else-if="$root.site && $root.site != 'pfp.invalid' && !$root.pwdList.length"
+      v-else-if="$root.hostname && !$root.pwdList.length"
       class="alias-container" href="#" @click.prevent="addAlias"
     >
       {{ $t("add_alias") }}
@@ -62,7 +62,7 @@
       />
     </div>
 
-    <a v-if="$root.site !== null" class="add-password-link" href="#" @click.prevent="modal = 'new-entry'">
+    <a v-if="$root.hostname !== null" class="add-password-link" href="#" @click.prevent="modal = 'new-entry'">
       {{ $t("new_password_link") }}
     </a>
     <EntryEditor v-if="modal == 'new-entry'" @cancel="modal = null" />
@@ -80,7 +80,7 @@
 
 import browser from "../../../lib/browserAPI.js";
 import {keyboardNavigationType, handleErrors} from "../../common.js";
-import {passwords} from "../../proxy.js";
+import {nativeRequest} from "../../protocol.js";
 import PasswordMessage from "../../components/PasswordMessage.vue";
 import PasswordEntry from "../components/PasswordEntry.vue";
 import SiteSelection from "../components/SiteSelection.vue";
@@ -154,43 +154,33 @@ export default {
     },
     addAlias()
     {
-      this.selectionCallback = site =>
+      this.selectionCallback = handleErrors(async hostname =>
       {
         this.modal = null;
-        if (site == this.$root.origSite)
+        if (hostname == this.$root.origHostname)
           return;
 
-        passwords.addAlias(this.$root.origSite, site)
-          .then(() => passwords.getPasswords(this.$root.origSite))
-          .then(([origSite, site, pwdList]) =>
-          {
-            this.$root.origSite = origSite;
-            this.$root.site = site;
-            this.$root.pwdList = pwdList;
-          })
-          .catch(this.$root.showUnknownError);
-      };
+        await nativeRequest("add-alias", {
+          keys: this.$root.keys,
+          alias: this.$root.origHostname,
+          hostname
+        });
+        await this.$root.updateEntries();
+      });
       this.modal = "site-selection";
     },
-    removeAlias()
+    removeAlias: handleErrors(async function()
     {
-      let message = this.$t("remove_alias_confirmation", this.$root.origSite, this.$root.siteDisplayName);
-      this.$root.confirm(message).then(response =>
+      let message = this.$t("remove_alias_confirmation", this.$root.origHostname, this.$root.siteDisplayName);
+      if (await this.$root.confirm(message))
       {
-        if (response)
-        {
-          passwords.removeAlias(this.$root.origSite)
-            .then(() => passwords.getPasswords(this.$root.origSite))
-            .then(([origSite, site, pwdList]) =>
-            {
-              this.$root.origSite = origSite;
-              this.$root.site = site;
-              this.$root.pwdList = pwdList;
-            })
-            .catch(this.$root.showUnknownError);
-        }
-      });
-    },
+        await nativeRequest("remove-alias", {
+          keys: this.$root.keys,
+          alias: this.$root.origHostname
+        });
+        await this.$root.updateEntries();
+      }
+    }),
     showAll: handleErrors(async function()
     {
       let url = browser.runtime.getURL("ui/allpasswords/allpasswords.html");

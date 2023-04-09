@@ -79,8 +79,8 @@ export default {
           });
           await masterPassword.rememberKeys(keys);
 
-          this.$root.pwdList = await this.$root.getEntries(this.$root.site, keys);
           this.$root.keys = keys;
+          await this.$root.updateEntries();
           this.$emit("done", true);
         }
         catch (error)

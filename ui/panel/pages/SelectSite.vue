@@ -26,9 +26,8 @@ export default {
   methods: {
     selected: handleErrors(async function(site)
     {
-      let entries = await this.$root.getEntries(site);
-      this.$root.site = site;
-      this.$root.pwdList = entries;
+      this.$root.origHostname = site;
+      await this.$root.updateEntries();
       this.$emit("selected");
     })
   }

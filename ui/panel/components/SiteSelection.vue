@@ -58,7 +58,7 @@ export default {
   data()
   {
     return {
-      value: this.$root.site === null ? "" : this.$root.siteDisplayName,
+      value: this.$root.hostname === null ? "" : this.$root.siteDisplayName,
       allSites: null,
       sites: [],
       activeIndex: -1,

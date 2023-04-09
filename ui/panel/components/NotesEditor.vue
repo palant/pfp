@@ -53,7 +53,7 @@ export default {
         uuid: this.password.uuid,
         notes: this.value
       });
-      this.$root.pwdList = await this.$root.getEntries(this.$root.site);
+      await this.$root.updateEntries();
       this.$emit("cancel");
     })
   }
