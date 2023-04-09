@@ -54,6 +54,7 @@
 "use strict";
 
 import {handleErrors} from "../common.js";
+import {getPref, setPref} from "../prefs.js";
 import {setErrorHandler, masterPassword} from "../proxy.js";
 import {getRecoveryCodeParameters} from "../recoveryCodes.js";
 import Confirm from "../components/Confirm.vue";
@@ -87,7 +88,7 @@ export default {
       recoveryPasswordPromise: null,
       recoveryCodeParams: null,
       unknownError: null,
-      showNotes: !("hideNotes" in window.localStorage),
+      showNotes: false,
       showRecoveryCodes: false,
       showPasswords: false,
       confirmedPasswords: false
@@ -95,12 +96,9 @@ export default {
   },
   watch:
   {
-    showNotes()
+    async showNotes()
     {
-      if (this.showNotes)
-        delete window.localStorage.hideNotes;
-      else
-        window.localStorage.hideNotes = true;
+      await setPref("showNotes", this.showNotes);
     },
     showRecoveryCodes: handleErrors(async function()
     {
@@ -152,6 +150,7 @@ export default {
         this.masterPromise = {resolve, reject};
       });
     });
+    this.showNotes = await getPref("showNotes", true);
     this.keys = await masterPassword.getKeys();
   }),
   methods: {
