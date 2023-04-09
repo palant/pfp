@@ -358,6 +358,11 @@ input[type="checkbox"]:checked
   justify-content: center;
   opacity: 0.8;
   z-index: 10001;
+
+  @media print
+  {
+    display: none;
+  }
 }
 
 .block-start
