@@ -79,7 +79,7 @@
 "use strict";
 
 import browser from "../../../lib/browserAPI.js";
-import {keyboardNavigationType, handleErrors} from "../../common.js";
+import {keyboardNavigationType, handleErrors, normalizeHostname} from "../../common.js";
 import {nativeRequest} from "../../protocol.js";
 import PasswordMessage from "../../components/PasswordMessage.vue";
 import PasswordEntry from "../components/PasswordEntry.vue";
@@ -157,6 +157,7 @@ export default {
       this.selectionCallback = handleErrors(async hostname =>
       {
         this.modal = null;
+        hostname = normalizeHostname(hostname);
         if (hostname == this.$root.origHostname)
           return;
 
