@@ -75,11 +75,25 @@ export default {
       siteNames = [...siteNames];
       siteNames.sort();
 
+      let modifiedAliases = false;
       for (let alias of Object.keys(aliases))
       {
         let site = sites.get(aliases[alias]);
-        if (site)
+        if (!site || sites.has(alias))
+        {
+          delete aliases[alias];
+          modifiedAliases = true;
+        }
+        else if (site)
           site.aliases.push(alias);
+      }
+
+      if (modifiedAliases)
+      {
+        await nativeRequest("set-aliases", {
+          keys: this.$root.keys,
+          aliases
+        });
       }
 
       let siteList = [];
