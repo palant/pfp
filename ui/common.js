@@ -14,7 +14,7 @@ export function normalizeHostname(hostname)
   const PREFIX = "www.";
   if (hostname && hostname.startsWith(PREFIX))
     return hostname.slice(PREFIX.length);
-  return hostname;
+  return hostname.toLowerCase();
 }
 
 export function getSiteDisplayName(site)
