@@ -58,7 +58,7 @@ export default {
   methods: {
     updateData: handleErrors(async function()
     {
-      let entries = await nativeRequest("get-all-entries", {
+      let {aliases, entries} = await nativeRequest("get-all-entries", {
         keys: this.$root.keys
       });
 
@@ -74,6 +74,13 @@ export default {
       }
       siteNames = [...siteNames];
       siteNames.sort();
+
+      for (let alias of Object.keys(aliases))
+      {
+        let site = sites.get(aliases[alias]);
+        if (site)
+          site.aliases.push(alias);
+      }
 
       let siteList = [];
       for (let name of siteNames)

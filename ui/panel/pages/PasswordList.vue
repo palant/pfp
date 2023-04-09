@@ -36,7 +36,7 @@
     </a>
 
     <ModalOverlay v-if="modal == 'site-selection'" :stretch="true" @cancel="modal = null">
-      <SiteSelection :message="$t('select_alias', $root.origSite)" :callback="selectionCallback" />
+      <SiteSelection :message="$t('select_alias', $root.origHostname)" :callback="selectionCallback" />
     </ModalOverlay>
 
     <PasswordMessage
