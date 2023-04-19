@@ -13,7 +13,7 @@ let responseQueue = null;
 
 function connect()
 {
-  port = browser.runtime.connectNative("de.palant.kdbx_native_host");
+  port = browser.runtime.connectNative("works.pfp.kdbx_native_host");
   responseQueue = new Map();
   port.onDisconnect.addListener(() =>
   {
@@ -25,7 +25,7 @@ function connect()
 
 async function onMessage(message)
 {
-  let queued = responseQueue.get(message.request_id);
+  let queued = responseQueue.get(message.requestId);
   if (!queued)
   {
     console.error("Received response not matching any request", message);
@@ -33,13 +33,13 @@ async function onMessage(message)
   }
 
   let [resolve, reject] = queued;
-  responseQueue.delete(message.request_id);
+  responseQueue.delete(message.requestId);
   if (message.success)
     resolve(message.response);
   else
   {
     let error = new Error(message.response.error);
-    error.code = message.response.error_code;
+    error.code = message.response.errorCode;
     reject(error);
   }
 }
@@ -51,7 +51,7 @@ export async function nativeRequest(action, request)
 
   let requestId = Math.random().toString().slice(2);
   let message = {
-    request_id: requestId,
+    requestId,
     action,
     request
   };

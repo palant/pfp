@@ -151,7 +151,7 @@ export async function getRecoveryCodeParameters(password)
   let kdfParams = await nativeRequest("duplicate-kdf-parameters", null);
   let {key} = await nativeRequest("derive-key", {
     password,
-    kdf_parameters: kdfParams
+    kdfParameters: kdfParams
   });
   return [kdfParams, key];
 }
@@ -253,11 +253,11 @@ export async function decodeCode(recoveryCode, password)
     throw "wrong_version";
   pos += versionSize;
 
-  let {key, bytes_consumed} = await nativeRequest("derive-key", {
+  let {key, bytesConsumed} = await nativeRequest("derive-key", {
     password,
-    kdf_parameters: toBase64(buffer.slice(pos))
+    kdfParameters: toBase64(buffer.slice(pos))
   });
-  pos += bytes_consumed;
+  pos += bytesConsumed;
 
   if (buffer.length < pos + ivSize + tagSize)
     throw new Error("Unexpected: too little data");
