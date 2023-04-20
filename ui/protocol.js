@@ -13,7 +13,7 @@ let responseQueue = null;
 
 function connect()
 {
-  port = browser.runtime.connectNative("works.pfp.kdbx_native_host");
+  port = browser.runtime.connectNative("works.pfp.pfp_native_host");
   responseQueue = new Map();
   port.onDisconnect.addListener(() =>
   {
