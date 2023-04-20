@@ -215,7 +215,10 @@ export default {
     },
     showUnknownError(error)
     {
-      this.unknownError = error;
+      if (error.name == "Unconfigured")
+        this.nativeHost = "unconfigured";
+      else
+        this.unknownError = error;
     },
     lockPasswords: handleErrors(async function()
     {
