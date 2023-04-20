@@ -5,9 +5,9 @@
  -->
 
 <template>
-  <div v-if="keys" @keydown.ctrl.e.prevent="testUnknownError">
+  <EnterMaster v-if="keys === null" />
+  <div v-else @keydown.ctrl.e.prevent="testUnknownError">
     <InProgress v-if="inProgress" />
-    <EnterMaster v-if="masterPromise" @done="enterMasterDone" />
     <EnterRecoveryPassword v-if="recoveryPasswordPromise" @done="queryRecoveryPasswordDone" />
     <Confirm ref="confirm" />
     <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
@@ -55,7 +55,7 @@
 
 import {handleErrors} from "../common.js";
 import {getPref, setPref} from "../prefs.js";
-import {setErrorHandler, masterPassword} from "../proxy.js";
+import {masterPassword} from "../proxy.js";
 import {getRecoveryCodeParameters} from "../recoveryCodes.js";
 import Confirm from "../components/Confirm.vue";
 import PasswordMessage from "../components/PasswordMessage.vue";
@@ -84,7 +84,6 @@ export default {
     return {
       keys: null,
       inProgress: false,
-      masterPromise: null,
       recoveryPasswordPromise: null,
       recoveryCodeParams: null,
       unknownError: null,
@@ -143,13 +142,7 @@ export default {
   mounted: handleErrors(async function()
   {
     document.title = this.$t("title");
-    setErrorHandler("master_password_required", () =>
-    {
-      return new Promise((resolve, reject) =>
-      {
-        this.masterPromise = {resolve, reject};
-      });
-    });
+
     this.showNotes = await getPref("showNotes", true);
     this.keys = await masterPassword.getKeys();
   }),
@@ -166,15 +159,6 @@ export default {
         confirm.message = message;
         confirm.callback = resolve;
       });
-    },
-    enterMasterDone(success)
-    {
-      let {resolve, reject} = this.masterPromise;
-      this.masterPromise = null;
-      if (success)
-        resolve();
-      else
-        reject("canceled");
     },
     queryRecoveryPassword()
     {
@@ -204,10 +188,10 @@ export default {
     },
     showUnknownError(error)
     {
-      if (error == "canceled")
-        return;
-
-      this.unknownError = error;
+      if (error.name == "InvalidCredentials")
+        this.keys = null;
+      else
+        this.unknownError = error;
     },
     updateData()
     {

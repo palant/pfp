@@ -114,7 +114,11 @@ export default {
     {
       if (this.currentPage == "password-list" && this.hostname === null)
         this.currentPage = "select-site";
-    }
+    },
+    keys: handleErrors(async function()
+    {
+      await this.updateEntries();
+    })
   },
   created: async function()
   {
@@ -128,10 +132,7 @@ export default {
 
       this.nativeHost = this.checkNativeHostProtocol(protocolVersion);
       this.origHostname = this.hostname = normalizeHostname(hostname);
-
       this.keys = keys;
-      if (this.keys && this.nativeHost == "supported")
-        await this.updateEntries();
     }
     catch (error)
     {
@@ -160,6 +161,9 @@ export default {
     },
     async updateEntries()
     {
+      if (!this.keys || this.nativeHost != "supported")
+        return;
+
       if (this.origHostname === null)
       {
         this.hostname = this.origHostname;

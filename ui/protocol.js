@@ -12,7 +12,6 @@ export const PROTOCOL_VERSION = "1.0";
 
 let port = null;
 let responseQueue = null;
-let errorHandlers = new Map();
 
 function connect()
 {
@@ -70,26 +69,6 @@ export async function nativeRequest(action, request)
 
   return await new Promise((resolve, reject) =>
   {
-    let rejectWrapper = async function(error)
-    {
-      if (!error || !errorHandlers.has(error.name))
-        reject(error);
-
-      try
-      {
-        resolve(await errorHandlers.get(error.name)(error));
-      }
-      catch (error)
-      {
-        reject(error);
-      }
-    };
-
-    responseQueue.set(requestId, [resolve, rejectWrapper]);
+    responseQueue.set(requestId, [resolve, reject]);
   });
-}
-
-export function setErrorHandler(error, handler)
-{
-  errorHandlers.set(error, handler);
 }

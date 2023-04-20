@@ -5,8 +5,8 @@
  -->
 
 <template>
-  <ModalOverlay @cancel="done(false)">
-    <EnterMasterShared class="modal-form" :warning="warning" :callback="callback" @done="done" />
+  <ModalOverlay :cancelable="!!callback" @cancel="done(false)">
+    <EnterMasterShared class="modal-form" :cancelable="!!callback" :warning="warning" :callback="callback" @done="done" />
   </ModalOverlay>
 </template>
 
