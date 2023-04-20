@@ -17,6 +17,13 @@ function connect()
   responseQueue = new Map();
   port.onDisconnect.addListener(() =>
   {
+    let error = new Error(chrome.runtime.lastError.message);
+    error.code = "NativeHostDisconnect";
+    console.error(error);
+
+    for (let [, reject] of responseQueue.values())
+      reject(error);
+
     port = null;
     responseQueue = null;
   });
