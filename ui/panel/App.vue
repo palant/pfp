@@ -13,44 +13,47 @@
     <Confirm ref="confirm" />
     <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
 
-    <EnterMaster v-else-if="!keys" />
-    <div v-else-if="keys" class="tabs">
-      <nav v-keyboard-navigation:tab class="tablist" role="list">
-        <div />
+    <template v-if="nativeHost == 'supported'">
+      <EnterMaster v-if="!keys" />
+      <div v-else class="tabs">
+        <nav v-keyboard-navigation:tab class="tablist" role="list">
+          <div />
 
-        <IconicLink
-          class="tab select-site" role="listitem"
-          :class="{active: currentPage == 'select-site'}"
-          :title="$t('select_site')"
-          @click="currentPage = 'select-site'"
-        />
+          <IconicLink
+            class="tab select-site" role="listitem"
+            :class="{active: currentPage == 'select-site'}"
+            :title="$t('select_site')"
+            @click="currentPage = 'select-site'"
+          />
 
-        <IconicLink
-          class="tab password-list" role="listitem"
-          :class="{active: currentPage == 'password-list'}"
-          :title="$t('password_list')"
-          @click="currentPage = 'password-list'"
-        />
+          <IconicLink
+            class="tab password-list" role="listitem"
+            :class="{active: currentPage == 'password-list'}"
+            :title="$t('password_list')"
+            @click="currentPage = 'password-list'"
+          />
 
-        <IconicLink
-          class="tab settings" role="listitem"
-          :class="{active: currentPage == 'settings'}"
-          :title="$t('settings')"
-          @click="currentPage = 'settings'"
-        />
+          <IconicLink
+            class="tab settings" role="listitem"
+            :class="{active: currentPage == 'settings'}"
+            :title="$t('settings')"
+            @click="currentPage = 'settings'"
+          />
 
-        <div class="spacer" />
+          <div class="spacer" />
 
-        <IconicLink
-          class="tab lock" role="listitem"
-          :title="$t('lock_passwords')"
-          @click="lockPasswords"
-        />
-      </nav>
-      <SelectSite v-if="currentPage == 'select-site'" @selected="currentPage = 'password-list'" />
-      <PasswordList v-if="currentPage == 'password-list'" />
-      <Settings v-else-if="currentPage == 'settings'" />
-    </div>
+          <IconicLink
+            class="tab lock" role="listitem"
+            :title="$t('lock_passwords')"
+            @click="lockPasswords"
+          />
+        </nav>
+        <SelectSite v-if="currentPage == 'select-site'" @selected="currentPage = 'password-list'" />
+        <PasswordList v-if="currentPage == 'password-list'" />
+        <Settings v-else-if="currentPage == 'settings'" />
+      </div>
+    </template>
+    <NativeHostError v-else :error="nativeHost" />
   </div>
 </template>
 
@@ -60,9 +63,10 @@
 import {
   normalizeHostname, getSiteDisplayName, keyboardNavigationType, handleErrors, getCurrentHost
 } from "../common.js";
-import {nativeRequest} from "../protocol.js";
+import {nativeRequest, PROTOCOL_VERSION} from "../protocol.js";
 import {masterPassword} from "../proxy.js";
 import EnterMaster from "./pages/EnterMaster.vue";
+import NativeHostError from "./pages/NativeHostError.vue";
 import PasswordList from "./pages/PasswordList.vue";
 import SelectSite from "./pages/SelectSite.vue";
 import Settings from "./pages/Settings.vue";
@@ -80,6 +84,7 @@ export default {
   localePath: "panel/App",
   components: {
     EnterMaster,
+    NativeHostError,
     PasswordList,
     SelectSite,
     Settings,
@@ -89,6 +94,7 @@ export default {
   data()
   {
     return {
+      nativeHost: null,
       unknownError: null,
       currentPage: "password-list",
       hostname: undefined,
@@ -112,18 +118,46 @@ export default {
   },
   created: async function()
   {
-    let [hostname, keys] = await Promise.all([
-      getCurrentHost(),
-      masterPassword.getKeys()
-    ]);
-    this.origHostname = this.hostname = normalizeHostname(hostname);
+    try
+    {
+      let [protocolVersion, hostname, keys] = await Promise.all([
+        nativeRequest("get-protocol", null),
+        getCurrentHost(),
+        masterPassword.getKeys()
+      ]);
 
-    this.keys = keys;
-    if (this.keys)
-      await this.updateEntries();
+      this.nativeHost = this.checkNativeHostProtocol(protocolVersion);
+      this.origHostname = this.hostname = normalizeHostname(hostname);
+
+      this.keys = keys;
+      if (this.keys && this.nativeHost == "supported")
+        await this.updateEntries();
+    }
+    catch (error)
+    {
+      if (error.name == "NativeHostDisconnect")
+        this.nativeHost = "inaccessible";
+      else
+        this.showUnknownError(error);
+    }
   },
   methods:
   {
+    checkNativeHostProtocol(remoteVersion)
+    {
+      let our = PROTOCOL_VERSION.split(".").map(part => parseInt(part, 10));
+      let remote = remoteVersion.split(".").map(part => parseInt(part, 10));
+      for (let i = 0, len = Math.max(our.length, remote.length); i < len; i++)
+      {
+        let ourPart = our[i] || 0;
+        let remotePart = remote[i] || 0;
+        if (ourPart < remotePart)
+          return "extension_outdated";
+        else if (ourPart > remotePart)
+          return "native_host_outdated";
+      }
+      return "supported";
+    },
     async updateEntries()
     {
       if (this.origHostname === null)

@@ -8,6 +8,8 @@
 
 import browser from "../lib/browserAPI.js";
 
+export const PROTOCOL_VERSION = "1.0";
+
 let port = null;
 let responseQueue = null;
 

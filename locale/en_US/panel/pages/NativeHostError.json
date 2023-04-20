@@ -1,0 +1,9 @@
+{
+  "title": "Connection to pfp-native-host application failed",
+
+  "inaccessible": "It appears that the pfp-native-host application is either missing or not configured. If you did not install the application yet, please use the link below to download it. After downloading, run the application to configure it. Make sure to configure the browser you are currently using.",
+  "extension_outdated": "The extension is too old for the pfp-native-host application used. Please update to the latest version.",
+  "native_host_outdated": "The pfp-native-host application is outdated. Please use the link below to replace it with the latest version.",
+
+  "download_title": "Download pfp-native-host application"
+}
