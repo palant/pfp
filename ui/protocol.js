@@ -18,7 +18,7 @@ function connect()
   port.onDisconnect.addListener(() =>
   {
     let error = new Error(chrome.runtime.lastError.message);
-    error.code = "NativeHostDisconnect";
+    error.name = "NativeHostDisconnect";
     console.error(error);
 
     for (let [, reject] of responseQueue.values())
@@ -46,7 +46,7 @@ async function onMessage(message)
   else
   {
     let error = new Error(message.response.error);
-    error.code = message.response.errorCode;
+    error.name = message.response.errorCode;
     reject(error);
   }
 }

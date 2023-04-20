@@ -275,7 +275,7 @@ export default {
       }
       catch (error)
       {
-        if (error.code == "EntryExists")
+        if (error.name == "EntryExists")
         {
           this.titleError = this.$t("title_exists");
           this.titleVisible = true;

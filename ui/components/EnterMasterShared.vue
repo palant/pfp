@@ -85,7 +85,7 @@ export default {
         }
         catch (error)
         {
-          if (error.code == "InvalidCredentials")
+          if (error.name == "InvalidCredentials")
             this.masterPasswordError = this.$t("password_declined");
           else
             this.$root.showUnknownError(error);
