@@ -53,7 +53,7 @@
         <Settings v-else-if="currentPage == 'settings'" />
       </div>
     </template>
-    <NativeHostError v-else :error="nativeHost" />
+    <NativeHostError v-else-if="nativeHost !== null" :error="nativeHost" />
   </div>
 </template>
 
