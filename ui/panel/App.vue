@@ -217,6 +217,8 @@ export default {
     {
       if (error.name == "Unconfigured")
         this.nativeHost = "unconfigured";
+      else if (error.name == "InvalidCredentials")
+        this.lockPasswords();
       else
         this.unknownError = error;
     },
