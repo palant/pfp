@@ -1,9 +1,3 @@
 {
-  "csv_export": "Export passwords to a generic CSV file",
-  "csv_export_confirmation": "Exporting to a generic CSV file might take a while because all passwords need to be generated. Also, the resulting file will contain plain-text passwords and isn’t suitable as a secure password storage. Continue?",
-  "export": "Export password definitions to a file",
-  "import": "Import password definitions from a file",
-  "print": "Print",
-  "import_with_master": "It seems that this backup was created with a different master password. It can still be imported, all generated passwords will be converted to stored passwords however.",
-  "import_confirm": "Your existing passwords might get overwritten. Are you sure you want to proceed?"
+  "print": "Print"
 }

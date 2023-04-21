@@ -5,8 +5,7 @@
  -->
 
 <template>
-  <ValidatedForm @validated="submit" @reset.prevent="$emit('done', false)">
-    <div v-if="warning" class="warning">{{ warning }}</div>
+  <ValidatedForm @validated="submit">
     <label for="master-password">{{ $t("master_password") }}</label>
     <ValidatedInput
       id="master-password" v-model="masterPassword"
@@ -19,7 +18,6 @@
     </div>
     <div class="button-container">
       <button type="submit">{{ $t("submit") }}</button>
-      <button v-if="cancelable" type="reset">{{ $t("/cancel") }}</button>
     </div>
     <slot />
   </ValidatedForm>
@@ -40,20 +38,6 @@ export function validateMasterPassword(value, setError)
 export default {
   name: "EnterMasterShared",
   localePath: "components/EnterMasterShared",
-  props: {
-    callback: {
-      type: Function,
-      default: null
-    },
-    warning: {
-      type: String,
-      default: null
-    },
-    cancelable: {
-      type: Boolean,
-      default: true
-    }
-  },
   emits: ["done"],
   data()
   {
@@ -65,30 +49,22 @@ export default {
   methods: {
     async submit()
     {
-      if (this.callback)
+      try
       {
-        this.callback(this.masterPassword);
-        this.$emit("done", true);
-      }
-      else
-      {
-        try
-        {
-          let keys = await nativeRequest("unlock", {
-            password: this.masterPassword
-          });
-          await masterPassword.rememberKeys(keys);
+        let keys = await nativeRequest("unlock", {
+          password: this.masterPassword
+        });
+        await masterPassword.rememberKeys(keys);
 
-          this.$root.keys = keys;
-          this.$emit("done", true);
-        }
-        catch (error)
-        {
-          if (error.name == "InvalidCredentials")
-            this.masterPasswordError = this.$t("password_declined");
-          else
-            this.$root.showUnknownError(error);
-        }
+        this.$root.keys = keys;
+        this.$emit("done");
+      }
+      catch (error)
+      {
+        if (error.name == "InvalidCredentials")
+          this.masterPasswordError = this.$t("password_declined");
+        else
+          this.$root.showUnknownError(error);
       }
     },
     validateMasterPassword

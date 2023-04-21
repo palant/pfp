@@ -5,7 +5,7 @@
  -->
 
 <template>
-  <EnterMasterShared class="page" :cancelable="false" @done="done" />
+  <EnterMasterShared class="page" />
 </template>
 
 <script>

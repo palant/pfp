@@ -16,7 +16,8 @@
       :messages="{
         import_success: true,
         unknown_data_format: false,
-        syntax_error: false
+        syntax_error: false,
+        import_no_data: false
       }"
     />
 

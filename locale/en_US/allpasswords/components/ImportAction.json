@@ -1,0 +1,4 @@
+{
+  "import": "Import password definitions from a file",
+  "load_error": "Failed reading the file"
+}

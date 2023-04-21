@@ -6,7 +6,11 @@
 
 <template>
   <div class="modalOverlay" @click.self="$emit('cancel')" @keydown.stop>
-    <div ref="inner" class="modalOverlay-inner" :class="{stretch: stretch, cancelable: cancelable}">
+    <div
+      ref="inner" class="modalOverlay-inner"
+      v-bind="position ? {style: positionStyles(position)} : null"
+      :class="{stretch: stretch, cancelable: cancelable}"
+    >
       <div v-if="cancelable" class="modalOverlay-cancel-container">
         <IconicLink ref="cancel" v-cancel class="cancel" :title="$t('/cancel')" @click="$emit('cancel')" />
       </div>
@@ -35,6 +39,10 @@ export default {
     stretch: {
       type: Boolean,
       default: false
+    },
+    position: {
+      type: Object,
+      default: null
     }
   },
   emits: ["cancel"],
@@ -80,6 +88,23 @@ export default {
     }
   },
   methods: {
+    positionStyles(position)
+    {
+      let styles = [
+        "position: absolute",
+        "width: auto",
+        "min-width: auto"
+      ];
+      if (typeof position.left == "number")
+        styles.push(`left: ${position.left}px`);
+      if (typeof position.right == "number")
+        styles.push(`right: ${position.right}px`);
+      if (typeof position.top == "number")
+        styles.push(`top: ${position.top}px`);
+      if (typeof position.bottom == "number")
+        styles.push(`bottom: ${position.bottom}px`);
+      return styles.join(";");
+    },
     ensureDocHeight()
     {
       // TODO: This is quite hacky, is there a more straightforward way?

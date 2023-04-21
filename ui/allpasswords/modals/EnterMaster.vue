@@ -5,8 +5,8 @@
  -->
 
 <template>
-  <ModalOverlay :cancelable="!!callback" @cancel="done(false)">
-    <EnterMasterShared class="modal-form" :cancelable="!!callback" :warning="warning" :callback="callback" @done="done" />
+  <ModalOverlay :cancelable="false">
+    <EnterMasterShared class="modal-form" @done="$emit('done')" />
   </ModalOverlay>
 </template>
 
@@ -20,22 +20,6 @@ export default {
   components: {
     EnterMasterShared
   },
-  props: {
-    callback: {
-      type: Function,
-      default: null
-    },
-    warning: {
-      type: String,
-      default: null
-    }
-  },
-  emits: ["done"],
-  methods: {
-    done(success)
-    {
-      this.$emit("done", success);
-    }
-  }
+  emits: ["done"]
 };
 </script>
