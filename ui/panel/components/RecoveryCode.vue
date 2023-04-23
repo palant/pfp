@@ -26,9 +26,9 @@
     />
     <div v-if="currentError" class="error">{{ currentError }}</div>
     <label class="block-start" for="recoveryPassword">{{ $t("password_label") }}</label>
-    <ValidatedInput
+    <PasswordInput
       id="recovery-password" ref="password" v-model="password"
-      v-model:error="passwordError" type="password" @validate="validatePassword"
+      v-model:error="passwordError" @validate="validatePassword"
     />
     <div v-if="passwordError" class="error">{{ passwordError }}</div>
     <div class="button-container">
@@ -62,7 +62,7 @@ export default {
     complete()
     {
       if (this.complete)
-        this.$nextTick(() => this.$refs.password.$el.focus());
+        this.$nextTick(() => this.$refs.password.focus());
     }
   },
   methods: {

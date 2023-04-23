@@ -369,3 +369,38 @@ input[type="checkbox"]:checked
 {
   margin-top: $block-spacing;
 }
+
+.iconic-link
+{
+  min-width: $icon-size;
+  min-height: $icon-size;
+  background-size: $icon-size;
+  background-repeat: no-repeat;
+  margin: 1px;
+}
+
+a.iconic-link:hover
+{
+  outline: 1px solid #888;
+}
+
+.password-value-container
+{
+  display: flex;
+  flex-direction: row;
+}
+
+.password-value
+{
+  flex-grow: 1;
+}
+
+.show-password
+{
+  background-image: url("../images/ionicons/eye.svg");
+}
+
+.show-password.active
+{
+  background-image: url("../images/ionicons/eye-off.svg");
+}

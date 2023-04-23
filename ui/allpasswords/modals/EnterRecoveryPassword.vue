@@ -9,20 +9,18 @@
     <ValidatedForm class="modal-form" @validated="done(password)" @reset.prevent="done(null)">
       <div>{{ $t("description") }}</div>
       <label class="block-start" for="recovery-password">{{ $t("/(panel)(components)(RecoveryCode)password_label") }}</label>
-      <ValidatedInput
+      <PasswordInput
         id="recovery-password" v-model="password"
-        v-model:error="passwordError" v-focus
-        type="password"
+        v-model:error="passwordError" :default-focus="true"
         @validate="validatePassword"
       />
       <div v-if="passwordError" class="error">
         {{ passwordError }}
       </div>
       <label class="block-start" for="recovery-password-repeat">{{ $t("password_repeat") }}</label>
-      <ValidatedInput
+      <PasswordInput
         id="recovery-password-repeat" v-model="passwordRepeat"
         v-model:error="passwordRepeatError"
-        type="password"
         @validate="validatePasswordRepeat"
       />
       <div v-if="passwordRepeatError" class="error">

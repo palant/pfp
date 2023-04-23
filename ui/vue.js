@@ -14,6 +14,7 @@ import AccessKeys from "./accessKeys.js";
 import ExternalLink from "./components/ExternalLink.vue";
 import IconicLink from "./components/IconicLink.vue";
 import ModalOverlay from "./components/ModalOverlay.vue";
+import PasswordInput from "./components/PasswordInput.vue";
 import ValidatedForm from "./components/ValidatedForm.vue";
 import ValidatedInput from "./components/ValidatedInput.vue";
 
@@ -40,6 +41,7 @@ export function runApp(App, isWebClient = false)
   app.component("ExternalLink", ExternalLink);
   app.component("IconicLink", IconicLink);
   app.component("ModalOverlay", ModalOverlay);
+  app.component("PasswordInput", PasswordInput);
   app.component("ValidatedForm", ValidatedForm);
   app.component("ValidatedInput", ValidatedInput);
 

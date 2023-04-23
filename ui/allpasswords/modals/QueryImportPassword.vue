@@ -9,10 +9,7 @@
     <form class="modal-form" @submit.prevent="done(true)" @reset.prevent="done(false)">
       <div v-if="showWarning" class="warning">{{ $t("warning") }}</div>
       <label for="backup-password">{{ $t("prompt") }}</label>
-      <input
-        id="backup-password" v-model.trim="password"
-        v-focus type="password"
-      >
+      <PasswordInput id="backup-password" v-model="password" :default-focus="true" />
       <div class="button-container">
         <button type="submit">{{ $t("submit") }}</button>
         <button type="reset">{{ $t("/cancel") }}</button>

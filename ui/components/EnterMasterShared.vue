@@ -7,10 +7,9 @@
 <template>
   <ValidatedForm @validated="submit">
     <label for="master-password">{{ $t("master_password") }}</label>
-    <ValidatedInput
+    <PasswordInput
       id="master-password" v-model="masterPassword"
-      v-model:error="masterPasswordError" v-focus
-      type="password"
+      v-model:error="masterPasswordError" :default-focus="true"
       @validate="validateMasterPassword"
     />
     <div v-if="masterPasswordError" class="error">
