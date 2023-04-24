@@ -128,39 +128,21 @@ export default {
               resolve();
           });
 
-          if (browser.scripting)
-          {
-            browser.scripting.executeScript({
-              target: {tabId: tab.id},
-              func: args => window._parameters = args,
-              args: [{
-                scriptID,
-                hostname: currentHost,
-                username: this.password.username,
-                password: this.password.password
-              }]
-            }).catch(reject);
+          browser.scripting.executeScript({
+            target: {tabId: tab.id},
+            func: args => window._parameters = args,
+            args: [{
+              scriptID,
+              hostname: currentHost,
+              username: this.password.username,
+              password: this.password.password
+            }]
+          }).catch(reject);
 
-            browser.scripting.executeScript({
-              target: {tabId: tab.id},
-              files: ["contentScript/fillIn.js"]
-            }).catch(reject);
-          }
-          else
-          {
-            browser.tabs.executeScript(tab.id, {
-              code: "var _parameters = " + JSON.stringify({
-                scriptID,
-                hostname: currentHost,
-                username: this.password.username,
-                password: this.password.password
-              })
-            }).catch(reject);
-
-            browser.tabs.executeScript(tab.id, {
-              file: browser.runtime.getURL("contentScript/fillIn.js")
-            }).catch(reject);
-          }
+          browser.scripting.executeScript({
+            target: {tabId: tab.id},
+            files: ["contentScript/fillIn.js"]
+          }).catch(reject);
         });
 
         window.close();

@@ -6,4 +6,35 @@
 
 "use strict";
 
-export default (typeof browser != "undefined" ? browser : chrome);
+let api = (typeof browser != "undefined" ? browser : chrome);
+
+if (!api.scripting)
+{
+  api.scripting = {
+    executeScript(details)
+    {
+      function convertDetails(details)
+      {
+        if (details.func)
+        {
+          return {
+            code: `(${details.func})(...${JSON.stringify(details.args)})`
+          };
+        }
+        else
+        {
+          if (!details.files || details.files.length != 1)
+            throw new Error("Exactly one file has to be specified");
+
+          return {
+            file: chrome.runtime.getURL(details.files[0])
+          };
+        }
+      }
+
+      return api.tabs.executeScript(details.target.tabId, convertDetails(details));
+    }
+  };
+}
+
+export default api;
