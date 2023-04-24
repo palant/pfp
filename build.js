@@ -13,7 +13,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import vue from "rollup-plugin-vue";
 
-import {series, parallel, MemoryFile} from "builder";
+import {series, parallel, MemoryFile, PhysicalFile} from "builder";
 
 import eslint from "./build/eslint.js";
 import htmlValidate from "./build/html-validate.js";
@@ -74,20 +74,18 @@ function addReloader(files)
     {
       for await (let file of files)
       {
-        if (file.path == "manifest.json")
+        if (file.path == "background.js")
         {
-          file = await file.read();
-
-          let data = JSON.parse(file.contents);
-          data.background.scripts.push("reloader.js");
-          yield new MemoryFile(file.path, utils.stringifyObject(data));
+          let reloader = new PhysicalFile("lib/reloader.js");
+          yield new MemoryFile(file.path, [
+            (await file.read()).contents,
+            (await reloader.read()).contents
+          ].join("\n"));
         }
         else
           yield file;
       }
     }),
-    this.src("lib/reloader.js")
-        .rename("reloader.js"),
     new MemoryFile("random.json", String(Math.random()))
   ];
 }
