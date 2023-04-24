@@ -30,19 +30,19 @@ export function deriveBits(password, salt, length)
   );
 }
 
-export function derivePassword({masterPassword, domain, name, revision, length, lower, upper, number, symbol})
+export function derivePassword({mainPassword, domain, name, revision, length, lower, upper, number, symbol})
 {
   let salt = domain + "\0" + name;
   if (revision)
     salt += "\0" + revision;
 
-  let array = deriveBits(masterPassword, salt, length);
+  let array = deriveBits(mainPassword, salt, length);
   return toPassword(array, lower, upper, number, symbol);
 }
 
-export async function deriveKey({masterPassword, salt})
+export async function deriveKey({mainPassword, salt})
 {
-  let array = deriveBits(masterPassword, atob(salt), AES_KEY_SIZE / 8);
+  let array = deriveBits(mainPassword, atob(salt), AES_KEY_SIZE / 8);
   let key = await crypto.subtle.importKey(
     "raw", array, "AES-GCM", false, ["decrypt"]
   );

@@ -6,14 +6,14 @@
 
 <template>
   <ValidatedForm @validated="submit">
-    <label for="master-password">{{ $t("master_password") }}</label>
+    <label for="main-password">{{ $t("password_label") }}</label>
     <PasswordInput
-      id="master-password" v-model="masterPassword"
-      v-model:error="masterPasswordError" :default-focus="true"
-      @validate="validateMasterPassword"
+      id="main-password" v-model="password"
+      v-model:error="passwordError" :default-focus="true"
+      @validate="validatePassword"
     />
-    <div v-if="masterPasswordError" class="error">
-      {{ masterPasswordError }}
+    <div v-if="passwordError" class="error">
+      {{ passwordError }}
     </div>
     <div class="button-container">
       <button type="submit">{{ $t("submit") }}</button>
@@ -28,21 +28,15 @@
 import {rememberKeys} from "../keys.js";
 import {nativeRequest} from "../protocol.js";
 
-export function validateMasterPassword(value, setError)
-{
-  if (!value)
-    setError(this.$t("/(components)(EnterMasterShared)password_required"));
-}
-
 export default {
-  name: "EnterMasterShared",
-  localePath: "components/EnterMasterShared",
+  name: "EnterMainPassword",
+  localePath: "components/EnterMainPassword",
   emits: ["done"],
   data()
   {
     return {
-      masterPassword: "",
-      masterPasswordError: null
+      password: "",
+      passwordError: null
     };
   },
   methods: {
@@ -51,7 +45,7 @@ export default {
       try
       {
         let keys = await nativeRequest("unlock", {
-          password: this.masterPassword
+          password: this.password
         });
         await rememberKeys(keys);
 
@@ -61,12 +55,16 @@ export default {
       catch (error)
       {
         if (error.name == "InvalidCredentials")
-          this.masterPasswordError = this.$t("password_declined");
+          this.passwordError = this.$t("password_declined");
         else
           this.$root.showUnknownError(error);
       }
     },
-    validateMasterPassword
+    validatePassword(value, setError)
+    {
+      if (!value)
+        setError(this.$t("password_required"));
+    }
   }
 };
 </script>

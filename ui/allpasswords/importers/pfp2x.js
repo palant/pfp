@@ -36,7 +36,7 @@ export default async function(data, password)
     throw "password_required";
 
   let decryptionKey = await deriveKey({
-    masterPassword: password,
+    mainPassword: password,
     salt: data.data[SALT_KEY]
   });
 
@@ -66,7 +66,7 @@ export default async function(data, password)
     else if (entry.type == "generated2")
     {
       let params = {
-        masterPassword: password,
+        mainPassword: password,
         domain: entry.site,
         name: entry.name,
         revision: entry.revision,

@@ -1,6 +1,0 @@
-{
-  "master_password": "Enter master password:",
-  "submit": "Access passwords",
-  "password_required": "Please enter a master password.",
-  "password_declined": "This doesn't seem to be the master password you have used before."
-}

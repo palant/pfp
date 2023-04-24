@@ -5,7 +5,9 @@
  -->
 
 <template>
-  <EnterMaster v-if="keys === null" />
+  <ModalOverlay v-if="keys === null" :cancelable="false">
+    <EnterMainPassword class="modal-form" />
+  </ModalOverlay>
   <div v-else @keydown.ctrl.e.prevent="testUnknownError">
     <InProgress v-if="inProgress" />
     <EnterRecoveryPassword v-if="recoveryPasswordPromise" @done="queryRecoveryPasswordDone" />
@@ -63,7 +65,7 @@ import PasswordMessage from "../components/PasswordMessage.vue";
 import UnknownError from "../components/UnknownError.vue";
 import GlobalActions from "./components/GlobalActions.vue";
 import SiteList from "./components/SiteList.vue";
-import EnterMaster from "./modals/EnterMaster.vue";
+import EnterMainPassword from "../components/EnterMainPassword.vue";
 import EnterRecoveryPassword from "./modals/EnterRecoveryPassword.vue";
 import InProgress from "./modals/InProgress.vue";
 
@@ -76,7 +78,7 @@ export default {
     UnknownError,
     GlobalActions,
     SiteList,
-    EnterMaster,
+    EnterMainPassword,
     EnterRecoveryPassword,
     InProgress
   },

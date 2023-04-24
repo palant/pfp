@@ -14,7 +14,7 @@
     <UnknownError v-if="unknownError" :error="unknownError" @close="unknownError = null" />
 
     <template v-if="nativeHost == 'supported'">
-      <EnterMaster v-if="!keys" />
+      <EnterMainPassword v-if="!keys" class="page" />
       <div v-else class="tabs">
         <nav v-keyboard-navigation:tab class="tablist" role="list">
           <div />
@@ -65,7 +65,7 @@ import {
 } from "../common.js";
 import {nativeRequest, PROTOCOL_VERSION} from "../protocol.js";
 import {getKeys, forgetKeys} from "../keys.js";
-import EnterMaster from "./pages/EnterMaster.vue";
+import EnterMainPassword from "../components/EnterMainPassword.vue";
 import NativeHostError from "./pages/NativeHostError.vue";
 import PasswordList from "./pages/PasswordList.vue";
 import SelectSite from "./pages/SelectSite.vue";
@@ -83,7 +83,7 @@ export default {
   name: "App",
   localePath: "panel/App",
   components: {
-    EnterMaster,
+    EnterMainPassword,
     NativeHostError,
     PasswordList,
     SelectSite,
