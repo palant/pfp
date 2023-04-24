@@ -17,6 +17,22 @@ export function normalizeHostname(hostname)
   return hostname && hostname.toLowerCase();
 }
 
+export function getHostname(url)
+{
+  try
+  {
+    url = new URL(url);
+    if (url.protocol != "http:" && url.protocol != "https:")
+      return null;
+
+    return url.hostname || null;
+  }
+  catch (error)
+  {
+    return null;
+  }
+}
+
 export function getSiteDisplayName(site)
 {
   if (site == null)
@@ -73,12 +89,5 @@ export async function getCurrentHost()
     lastFocusedWindow: true,
     active: true
   });
-  if (!tabs.length)
-    return null;
-
-  let url = new URL(tabs[0].url);
-  if (url.protocol != "http:" && url.protocol != "https:")
-    return null;
-
-  return url.hostname || null;
+  return getHostname((tabs[0] || {}).url);
 }

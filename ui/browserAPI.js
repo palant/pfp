@@ -43,7 +43,7 @@ function promisifyAPI(api)
       create: promisify.bind(api.tabs, "create", 1),
       remove: promisify.bind(api.tabs, "remove", 1),
       update: promisify.bind(api.tabs, "update", 2),
-      executeScript: promisify.bind(api.tabs, "executeScript", 1),
+      executeScript: promisify.bind(api.tabs, "executeScript", 2),
       sendMessage: promisify.bind(api.tabs, "sendMessage", 2),
       onUpdated: api.tabs.onUpdated,
       onRemoved: api.tabs.onRemoved

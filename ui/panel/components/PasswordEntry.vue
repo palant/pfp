@@ -51,7 +51,7 @@
 
 import browser from "../../browserAPI.js";
 import {set as clipboardSet} from "../../clipboard.js";
-import {normalizeHostname, handleErrors, getCurrentHost} from "../../common.js";
+import {normalizeHostname, getHostname, handleErrors} from "../../common.js";
 import {port} from "../../../lib/messaging.js";
 import {nativeRequest} from "../../protocol.js";
 import EntryEditor from "./EntryEditor.vue";
@@ -103,7 +103,12 @@ export default {
       {
         this.modal = null;
 
-        let currentHost = await getCurrentHost();
+        let tabs = await browser.tabs.query({
+          lastFocusedWindow: true,
+          active: true
+        });
+        let tab = tabs[0] || {};
+        let currentHost = getHostname(tab.url);
         if (normalizeHostname(currentHost) !== this.$root.origHostname)
           throw "wrong_site";
 
@@ -123,7 +128,7 @@ export default {
               resolve();
           });
 
-          browser.tabs.executeScript({
+          browser.tabs.executeScript(tab.id, {
             code: "var _parameters = " + JSON.stringify({
               scriptID,
               hostname: currentHost,
@@ -132,7 +137,7 @@ export default {
             })
           }).catch(reject);
 
-          browser.tabs.executeScript({file: "contentScript/fillIn.js"}).catch(reject);
+          browser.tabs.executeScript(tab.id, {file: "contentScript/fillIn.js"}).catch(reject);
         });
 
         window.close();
