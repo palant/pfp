@@ -16,16 +16,13 @@
   "homepage_url": "https://pfp.works/",
   "version": "2.2.5",
   "permissions": [
+    "activeTab",
     "alarms",
     "scripting",
     "storage",
     "clipboardWrite",
     "unlimitedStorage",
     "nativeMessaging"
-  ],
-  "host_permissions": [
-    "http://*/*",
-    "https://*/*"
   ],
   "background": {
     "service_worker": "background.js"

@@ -186,8 +186,6 @@ let firefoxMain = series(common, function(common)
           delete data.minimum_opera_version;
 
           data.permissions = data.permissions.filter(p => p != "scripting");
-          data.permissions.push(...data.host_permissions);
-          delete data.host_permissions;
 
           data.background.scripts = [data.background.service_worker];
           delete data.background.service_worker;
