@@ -6,7 +6,7 @@
 
 "use strict";
 
-import browser from "../lib/browserAPI.js";
+import browser from "./browserAPI.js";
 
 const prefsPrefix = "pref:";
 

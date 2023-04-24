@@ -56,7 +56,7 @@
 
 import {handleErrors} from "../common.js";
 import {getPref, setPref} from "../prefs.js";
-import {masterPassword} from "../proxy.js";
+import {getKeys} from "../keys.js";
 import {getRecoveryCodeParameters} from "../recoveryCodes.js";
 import Confirm from "../components/Confirm.vue";
 import PasswordMessage from "../components/PasswordMessage.vue";
@@ -145,7 +145,7 @@ export default {
     document.title = this.$t("title");
 
     this.showNotes = await getPref("showNotes", true);
-    this.keys = await masterPassword.getKeys();
+    this.keys = await getKeys();
   }),
   methods: {
     testUnknownError()

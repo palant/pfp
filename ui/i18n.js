@@ -6,7 +6,7 @@
 
 "use strict";
 
-import {i18n} from "./browserAPI.js";
+import browser from "./browserAPI.js";
 
 export function $t(id, ...params)
 {
@@ -46,7 +46,7 @@ export function $t(id, ...params)
   if (path)
     id = path.replace(/\//g, "@") + "@" + id;
 
-  let message = i18n.getMessage(id);
+  let message = browser.i18n.getMessage(id);
   for (let i = 0; i < params.length; i++)
     message = message.replace(new RegExp(`\\{${i + 1}\\}`, "g"), params[i]);
   return message;

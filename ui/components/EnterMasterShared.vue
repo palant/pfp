@@ -25,8 +25,8 @@
 <script>
 "use strict";
 
+import {rememberKeys} from "../keys.js";
 import {nativeRequest} from "../protocol.js";
-import {masterPassword} from "../proxy.js";
 
 export function validateMasterPassword(value, setError)
 {
@@ -53,7 +53,7 @@ export default {
         let keys = await nativeRequest("unlock", {
           password: this.masterPassword
         });
-        await masterPassword.rememberKeys(keys);
+        await rememberKeys(keys);
 
         this.$root.keys = keys;
         this.$emit("done");

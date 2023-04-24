@@ -64,7 +64,7 @@ import {
   normalizeHostname, getSiteDisplayName, keyboardNavigationType, handleErrors, getCurrentHost
 } from "../common.js";
 import {nativeRequest, PROTOCOL_VERSION} from "../protocol.js";
-import {masterPassword} from "../proxy.js";
+import {getKeys, forgetKeys} from "../keys.js";
 import EnterMaster from "./pages/EnterMaster.vue";
 import NativeHostError from "./pages/NativeHostError.vue";
 import PasswordList from "./pages/PasswordList.vue";
@@ -127,7 +127,7 @@ export default {
       let [protocolVersion, hostname, keys] = await Promise.all([
         nativeRequest("get-protocol", null),
         getCurrentHost(),
-        masterPassword.getKeys()
+        getKeys()
       ]);
 
       this.nativeHost = this.checkNativeHostProtocol(protocolVersion);
@@ -228,7 +228,7 @@ export default {
     },
     lockPasswords: handleErrors(async function()
     {
-      await masterPassword.forgetKeys();
+      await forgetKeys();
       this.keys = null;
     })
   }

@@ -6,7 +6,7 @@
 
 "use strict";
 
-import browser from "../lib/browserAPI.js";
+import browser from "./browserAPI.js";
 import {$t} from "./i18n.js";
 
 export function normalizeHostname(hostname)

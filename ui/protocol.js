@@ -6,7 +6,7 @@
 
 "use strict";
 
-import browser from "../lib/browserAPI.js";
+import browser from "./browserAPI.js";
 
 export const PROTOCOL_VERSION = "1.0";
 

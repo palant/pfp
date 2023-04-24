@@ -16,7 +16,7 @@
 <script>
 "use strict";
 
-import browser from "../../lib/browserAPI.js";
+import browser from "../browserAPI.js";
 import {handleErrors} from "../common.js";
 
 export default {

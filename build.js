@@ -10,7 +10,6 @@ import fs from "fs";
 import path from "path";
 
 import alias from "@rollup/plugin-alias";
-import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import vue from "rollup-plugin-vue";
@@ -19,17 +18,12 @@ import {series, parallel, Files, MemoryFile} from "builder";
 
 import eslint from "./build/eslint.js";
 import htmlValidate from "./build/html-validate.js";
-import mocha from "./build/mocha.js";
 import rollup from "./build/rollup.js";
 import sass from "./build/sass.js";
 import stylelint from "./build/stylelint.js";
 import * as utils from "./build/utils.js";
 import zip from "./build/zip.js";
 import iife from "./build/rollup/iifeChunks.js";
-import localeLoader from "./build/rollup/localeLoader.js";
-import replace from "./build/rollup/replacePlugin.js";
-import workerLoader from "./build/rollup/workerLoader.js";
-import testEnv from "./test-env/setup.js";
 
 const VERSION = JSON.parse(fs.readFileSync("./manifest.json")).version;
 
@@ -102,15 +96,14 @@ function addReloader(files)
 function eslintTask()
 {
   return this.src(["*.js", "*.json", "ui/**/*.js", "ui/**/*.vue", "lib/**/*.js",
-                   "test/**/*.js", "test-lib/**/*.js", "web/**/*.js",
-                   "contentScript/**/*.js", "worker/**/*.js",
+                   "contentScript/**/*.js",
                    "locale/**/*.json", "!ui/third-party/**"])
              .pipe(eslint);
 }
 
 function htmlValidateTask()
 {
-  return this.src(["ui/**/*.html", "ui/**/*.vue", "web/**/*.html", "ui/**/*.vue"])
+  return this.src(["ui/**/*.html", "ui/**/*.vue", "ui/**/*.vue"])
              .pipe(htmlValidate);
 }
 
@@ -152,11 +145,9 @@ let common = series(validate, function()
     this.src("locale/**/*.json")
         .pipe(utils.combineLocales)
         .pipe(utils.toChromeLocale),
-    this.src("lib/main.js")
+    this.src("lib/background.js")
         .pipe(rollup, ...rollupOptions(this))
-        .rename("background.js"),
-    this.src("worker/scrypt.js")
-        .pipe(rollup, ...rollupOptions(this))
+        .rename("background.js")
   ];
 });
 
@@ -181,7 +172,7 @@ export let crx = series(chromeMain, function(files)
 
 export let watchChrome = series(chrome, function()
 {
-  return this.src(["*.js", "*.json", "ui/**/*", "lib/**/*", "contentScript/**/*", "worker/**/*", "locale/**/*"])
+  return this.src(["*.js", "*.json", "ui/**/*", "lib/**/*", "contentScript/**/*", "locale/**/*"])
              .watch(chrome);
 });
 
@@ -210,81 +201,15 @@ export let xpi = series(firefoxMain, function(files)
 
 export let watchFirefox = series(firefox, function()
 {
-  return this.src(["*.js", "*.json", "ui/**/*", "lib/**/*", "contentScript/**/*", "worker/**/*", "locale/**/*"])
+  return this.src(["*.js", "*.json", "ui/**/*", "lib/**/*", "contentScript/**/*", "locale/**/*"])
              .watch(firefox);
-});
-
-let webMain = series(validate, function()
-{
-  return new Files(
-    this.src(["LICENSE.txt", "ui/images/**", "ui/third-party/**", "web/**/*.html"]),
-    this.src(["ui/**/*.scss", "!ui/options/options.scss", "web/**/*.scss"])
-        .pipe(sass),
-    this.src("web/index.js")
-        .pipe(rollup, ...rollupOptions(this, {
-          plugins: [
-            replace({
-              [path.resolve(process.cwd(), "lib", "browserAPI.js")]: path.resolve(process.cwd(), "web", "backgroundBrowserAPI.js"),
-              [path.resolve(process.cwd(), "ui", "browserAPI.js")]: path.resolve(process.cwd(), "web", "contentBrowserAPI.js")
-            }),
-            workerLoader(/[/\\]scrypt\.js$/),
-            localeLoader(path.resolve(process.cwd(), "locale", "en_US"))
-          ],
-          postPlugins: [
-            babel.default({
-              retainLines: true,
-              compact: false,
-              babelrc: false,
-              babelHelpers: "runtime",
-              extensions: [".js", ".vue"],
-              presets: ["@babel/preset-env"],
-              plugins: [
-                ["@babel/transform-runtime"]
-              ]
-            })
-          ]
-        }))
-  )
-    .rename(filepath => path.normalize(filepath).includes(path.sep) ? path.normalize(filepath).split(path.sep).slice(1).join(path.sep) : filepath);
-});
-
-export let web = series(webMain, files => files.dest("build-web"));
-
-export let webZip = series(webMain, function(files)
-{
-  return files.pipe(zip, `pfp-web-${VERSION}.zip`).dest("build-web");
-});
-
-export let test = series(validate, function()
-{
-  let testFile = this.getFlag("test");
-  if (!testFile)
-    testFile = "**/*.js";
-  else if (!testFile.endsWith(".js"))
-    testFile += ".js";
-
-  return this.src("test/" + testFile)
-             .pipe(async function*(files)
-             {
-               testEnv.setup();
-               try
-               {
-                 yield* await mocha(files, {
-                   timeout: 10000
-                 });
-               }
-               finally
-               {
-                 testEnv.teardown();
-               }
-             });
 });
 
 export function clean()
 {
-  return this.src(["build-chrome/**", "build-firefox/**", "build-web/**"])
+  return this.src(["build-chrome/**", "build-firefox/**"])
              .rm();
 }
 
-export let all = parallel(firefox, xpi, chrome, crx, web, webZip);
+export let all = parallel(firefox, xpi, chrome, crx);
 export default all;

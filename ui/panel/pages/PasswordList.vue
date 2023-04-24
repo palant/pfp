@@ -78,7 +78,7 @@
 <script>
 "use strict";
 
-import browser from "../../../lib/browserAPI.js";
+import browser from "../../browserAPI.js";
 import {keyboardNavigationType, handleErrors, normalizeHostname} from "../../common.js";
 import {nativeRequest} from "../../protocol.js";
 import PasswordMessage from "../../components/PasswordMessage.vue";
