@@ -16,7 +16,6 @@
   "homepage_url": "https://pfp.works/",
   "version": "2.2.5",
   "permissions": [
-    "tabs",
     "http://*/*",
     "https://*/*",
     "alarms",
