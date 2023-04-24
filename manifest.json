@@ -14,7 +14,7 @@
   "description": "__MSG_description__",
   "author": "Wladimir Palant",
   "homepage_url": "https://pfp.works/",
-  "version": "2.2.5",
+  "version": "3.0.0",
   "permissions": [
     "activeTab",
     "alarms",
