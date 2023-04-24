@@ -194,7 +194,10 @@ export default {
       if (error.name == "InvalidCredentials")
         this.keys = null;
       else
+      {
         this.unknownError = error;
+        console.error(error);
+      }
     },
     updateData()
     {

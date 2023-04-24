@@ -180,11 +180,24 @@ let firefoxMain = series(common, function(common)
     this.src("manifest.json")
         .pipe(utils.jsonModify, data =>
         {
+          data.manifest_version = 2;
+
           delete data.minimum_chrome_version;
           delete data.minimum_opera_version;
-          delete data.background.persistent;
 
+          data.permissions = data.permissions.filter(p => p != "scripting");
+          data.permissions.push(...data.host_permissions);
+          delete data.host_permissions;
+
+          data.background.scripts = [data.background.service_worker];
+          delete data.background.service_worker;
+
+          data.browser_action = data.action;
           data.browser_action.browser_style = false;
+          delete data.action;
+
+          data.commands._execute_browser_action = data.commands._execute_action;
+          delete data.commands._execute_action;
         })
   ];
 });

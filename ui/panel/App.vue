@@ -224,7 +224,10 @@ export default {
       else if (error.name == "InvalidCredentials")
         this.lockPasswords();
       else
+      {
         this.unknownError = error;
+        console.error(error);
+      }
     },
     lockPasswords: handleErrors(async function()
     {
