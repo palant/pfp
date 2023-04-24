@@ -2,8 +2,5 @@
   "env": {
     "node": false,
     "webextensions": true
-  },
-  "rules": {
-    "no-unused-vars": "error"
   }
 }

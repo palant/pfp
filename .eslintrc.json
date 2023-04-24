@@ -14,7 +14,6 @@
   },
   "rules": {
     "no-console": "off",
-    "no-unused-vars": "off",
     "array-bracket-spacing": "error",
     "arrow-spacing": "error",
     "brace-style": [

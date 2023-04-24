@@ -66,7 +66,7 @@ download("https://unicode.org/Public/UNIDATA/UnicodeData.txt").then(data =>
   do
   {
     changed = false;
-    for (let [code, name, category, , , decomposition] of data)
+    for (let [code, , category, , , decomposition] of data)
     {
       if (!category.startsWith("L") || code.length > 4 || vowels.has(parseInt(code, 16)) || !decomposition)
         continue;

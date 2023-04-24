@@ -7,14 +7,13 @@
 "use strict";
 
 import fs from "fs";
-import path from "path";
 
 import alias from "@rollup/plugin-alias";
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import vue from "rollup-plugin-vue";
 
-import {series, parallel, Files, MemoryFile} from "builder";
+import {series, parallel, MemoryFile} from "builder";
 
 import eslint from "./build/eslint.js";
 import htmlValidate from "./build/html-validate.js";
