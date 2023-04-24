@@ -16,7 +16,10 @@
       {{ passwordError }}
     </div>
     <div class="button-container">
-      <button type="submit">{{ $t("submit") }}</button>
+      <div class="progress-container">
+        <button type="submit" v-bind="inProgress ? {disabled: 'disabled'} : {}">{{ $t("submit") }}</button>
+        <span v-if="inProgress" class="progress-indicator" />
+      </div>
     </div>
     <slot />
   </ValidatedForm>
@@ -36,12 +39,14 @@ export default {
   {
     return {
       password: "",
-      passwordError: null
+      passwordError: null,
+      inProgress: false
     };
   },
   methods: {
     async submit()
     {
+      this.inProgress = true;
       try
       {
         let keys = await nativeRequest("unlock", {
@@ -58,6 +63,10 @@ export default {
           this.passwordError = this.$t("password_declined");
         else
           this.$root.showUnknownError(error);
+      }
+      finally
+      {
+        this.inProgress = false;
       }
     },
     validatePassword(value, setError)

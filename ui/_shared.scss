@@ -404,3 +404,22 @@ a.iconic-link:hover
 {
   background-image: url("../images/ionicons/eye-off.svg");
 }
+
+.progress-container
+{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.progress-indicator
+{
+  $image-size: $font-size;
+  min-width: $image-size;
+  min-height: $image-size;
+  background-size: $image-size;
+  background-repeat: no-repeat;
+  opacity: 0.6;
+  margin: 0 1em;
+  background-image: url("../images/circles.svg");
+}
