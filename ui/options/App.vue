@@ -5,19 +5,18 @@
  -->
 
 <template>
-  <Setting name="autolock" :def-value="true" :focus="true" />
-  <Setting name="autolock_delay" :def-value="10" />
+  <SettingPage />
 </template>
 
 <script>
 "use strict";
 
-import Setting from "../components/Setting.vue";
+import SettingPage from "../components/SettingsPage.vue";
 
 export default {
   name: "App",
   components: {
-    Setting
+    SettingPage
   }
 };
 </script>

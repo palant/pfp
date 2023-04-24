@@ -50,7 +50,7 @@
         </nav>
         <SelectSite v-if="currentPage == 'select-site'" @selected="currentPage = 'password-list'" />
         <PasswordList v-if="currentPage == 'password-list'" />
-        <Settings v-else-if="currentPage == 'settings'" />
+        <SettingsPage v-else-if="currentPage == 'settings'" class="page" />
       </div>
     </template>
     <NativeHostError v-else-if="nativeHost !== null" :error="nativeHost" />
@@ -69,7 +69,7 @@ import EnterMainPassword from "../components/EnterMainPassword.vue";
 import NativeHostError from "./pages/NativeHostError.vue";
 import PasswordList from "./pages/PasswordList.vue";
 import SelectSite from "./pages/SelectSite.vue";
-import Settings from "./pages/Settings.vue";
+import SettingsPage from "../components/SettingsPage.vue";
 import Confirm from "../components/Confirm.vue";
 import UnknownError from "../components/UnknownError.vue";
 
@@ -87,7 +87,7 @@ export default {
     NativeHostError,
     PasswordList,
     SelectSite,
-    Settings,
+    SettingsPage,
     Confirm,
     UnknownError
   },

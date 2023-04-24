@@ -50,7 +50,8 @@ function promisifyAPI(api)
     },
     i18n: api.i18n,
     runtime: api.runtime,
-    browserAction: api.browserAction
+    browserAction: api.browserAction,
+    alarms: api.alarms
   };
 }
 

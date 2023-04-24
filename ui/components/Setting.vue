@@ -10,8 +10,8 @@
       <label :for="name">{{ $t(name + "_title") }}</label>
       <span class="description">{{ $t(name + "_description") }}</span>
     </div>
-    <input v-if="typeof defValue == 'boolean'" :id="name" v-model="value" v-focus="focus" type="checkbox">
-    <input v-else-if="typeof defValue == 'number'" :id="name" v-model="value" v-focus="focus" type="number" min="0">
+    <input v-if="typeof defValue == 'boolean'" :id="name" ref="input" v-model="value" v-focus="focus" type="checkbox">
+    <input v-else-if="typeof defValue == 'number'" :id="name" ref="input" v-model="value" v-focus="focus" type="number" :min="minValue">
   </div>
 </template>
 
@@ -32,11 +32,16 @@ export default {
       type: [Boolean, Number],
       required: true
     },
+    minValue: {
+      type: Number,
+      default: 0
+    },
     focus: {
       type: Boolean,
       default: false
     }
   },
+  emits: ["modified"],
   data()
   {
     return {
@@ -46,7 +51,17 @@ export default {
   watch: {
     async value()
     {
+      if (this.$refs.input.validationMessage)
+        return;
+
+      if (typeof this.defValue == "number" && typeof this.value != "number")
+      {
+        this.value = parseInt(this.value, 10);
+        return;
+      }
+
       await setPref(this.name, this.value);
+      this.$emit("modified");
     }
   },
   async created()
