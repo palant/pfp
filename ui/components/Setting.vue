@@ -10,8 +10,8 @@
       <label :for="name">{{ $t(name + "_title") }}</label>
       <span class="description">{{ $t(name + "_description") }}</span>
     </div>
-    <input v-if="typeof defValue == 'boolean'" :id="name" ref="input" v-model="value" v-focus="focus" type="checkbox">
-    <input v-else-if="typeof defValue == 'number'" :id="name" ref="input" v-model="value" v-focus="focus" type="number" :min="minValue">
+    <input v-if="typeof defValue == 'boolean'" :id="name" ref="input" v-model="value" v-focus="defaultFocus" type="checkbox">
+    <input v-else-if="typeof defValue == 'number'" :id="name" ref="input" v-model="value" v-focus="defaultFocus" type="number" :min="minValue">
   </div>
 </template>
 
@@ -36,7 +36,7 @@ export default {
       type: Number,
       default: 0
     },
-    focus: {
+    defaultFocus: {
       type: Boolean,
       default: false
     }

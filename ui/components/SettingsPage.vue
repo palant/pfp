@@ -6,7 +6,7 @@
 
 <template>
   <div>
-    <Setting name="autolock" :def-value="true" :focus="true" @modified="resetAutolock" />
+    <Setting name="autolock" :def-value="true" :default-focus="true" @modified="resetAutolock" />
     <Setting name="autolock_delay" :def-value="10" :min-value="1" @modified="resetAutolock" />
   </div>
 </template>
