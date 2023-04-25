@@ -28,8 +28,8 @@
     "rollup": "^2.75.7",
     "rollup-plugin-vue": "^6.0.0",
     "sass": "^1.52.3",
-    "stylelint": "^14.9.1",
-    "stylelint-config-standard": "^26.0.0"
+    "stylelint": "^15.6.0",
+    "stylelint-config-standard-scss": "^9.0.0"
   },
   "dependencies": {
     "@stablelib/scrypt": "^1.0.0",

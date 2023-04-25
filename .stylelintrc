@@ -1,12 +1,8 @@
 {
-  "extends": "stylelint-config-standard",
+  "extends": "stylelint-config-standard-scss",
   "rules": {
     "at-rule-no-unknown": [true, {"ignoreAtRules": ["mixin", "include", "use"]}],
     "at-rule-empty-line-before": ["always", {"ignore": ["inside-block"]}],
-    "block-opening-brace-newline-before": "always",
-    "block-opening-brace-newline-after": "always",
-    "block-opening-brace-space-before": null,
-    "block-opening-brace-space-after": null,
     "color-function-notation": "legacy",
     "declaration-empty-line-before": null,
     "function-no-unknown": [true, {"ignoreFunctions": ["color.mix"]}],
@@ -14,6 +10,9 @@
     "no-invalid-position-at-import-rule": [true, {"ignoreAtRules": "use"}],
     "property-no-vendor-prefix": null,
     "selector-class-pattern": null,
-    "selector-id-pattern": null
+    "selector-id-pattern": null,
+    "scss/at-import-no-partial-leading-underscore": null,
+    "scss/at-import-partial-extension": "always",
+    "scss/dollar-variable-empty-line-before": null
   }
 }
