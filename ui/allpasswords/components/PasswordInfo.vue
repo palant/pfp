@@ -9,10 +9,8 @@
     <PasswordMessage
       ref="password-message"
       :messages="{
-        password_ready: false,
         password_copied: true,
-        no_such_password: false,
-        unknown_generation_method: false
+        no_such_password: false
       }"
     />
 

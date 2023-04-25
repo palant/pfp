@@ -1,7 +1,6 @@
 {
   "select_site": "Select site",
   "password_list": "Password list",
-  "sync": "Data sync",
   "settings": "Settings",
   "lock_passwords": "Lock passwords"
 }

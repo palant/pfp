@@ -41,6 +41,9 @@ export default {
       if (!this.message)
         return;
 
+      if (this.message.name == "NoSuchEntry")
+        this.message = "no_such_password";
+
       if (this.messages.hasOwnProperty(this.message))
       {
         if (this.resetTimeout)
