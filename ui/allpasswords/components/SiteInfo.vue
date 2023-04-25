@@ -13,7 +13,7 @@
 
     <div v-if="site.aliases.length">
       {{ $t("aliases_label") }}
-      {{ site.aliases.slice().sort().join(", ") }}
+      {{ site.aliases.join(", ") }}
     </div>
 
     <PasswordInfo

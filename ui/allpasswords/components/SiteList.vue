@@ -98,7 +98,20 @@ export default {
 
       let siteList = [];
       for (let name of siteNames)
-        siteList.push(sites.get(name));
+      {
+        let siteInfo = sites.get(name);
+        siteInfo.aliases.sort();
+        siteInfo.passwords.sort((a, b) =>
+        {
+          if (a.title < b.title)
+            return -1;
+          else if (a.title > b.title)
+            return 1;
+          else
+            return 0;
+        });
+        siteList.push(siteInfo);
+      }
       this.sites = siteList;
     }),
     getLetters(sites)
