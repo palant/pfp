@@ -17,7 +17,7 @@
     "@rollup/plugin-alias": "^5.0.0",
     "@rollup/plugin-commonjs": "^24.1.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
-    "adm-zip": "^0.5.9",
+    "adm-zip": "^0.5.10",
     "builder": "github:palant/builder#v0.1.4",
     "eslint": "^8.39.0",
     "eslint-plugin-json": "^3.1.0",
