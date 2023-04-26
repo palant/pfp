@@ -1,7 +1,7 @@
 {
   "title": "PfP: Pain-free Passwords",
   "name": "pfp",
-  "description": "A simple and secure browser extension to be used with KeePass databases.",
+  "description": "A simple and secure password manager to be used with KeePass databases.",
   "author": "Wladimir Palant",
   "license": "MPL-2.0",
   "type": "module",
