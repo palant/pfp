@@ -1,10 +1,10 @@
 {
-  "title": "Connection to pfp-native-host application failed",
+  "title": "Connection to PfP Native Host application failed",
 
-  "inaccessible": "It appears that the pfp-native-host application is either missing or not configured. If you did not install the application yet, please use the link below to download it. After downloading, run the application to configure it. Make sure to configure the browser you are currently using.",
-  "extension_outdated": "The extension is too old for the pfp-native-host application used. Please update to the latest version.",
-  "native_host_outdated": "The pfp-native-host application is outdated. Please use the link below to replace it with the latest version.",
-  "unconfigured": "The pfp-native-host application has not been configured. Please run it and choose a passwords database to use or create a new one.",
+  "inaccessible": "It appears that PfP Native Host application is either missing or not configured. If you did not install the application yet, please see the link below for instructions on downloading it. After downloading, run the application to configure it. Make sure to configure the browser you are currently using.",
+  "extension_outdated": "The extension is too old for the PfP Native Host application used. Please update to the latest version.",
+  "native_host_outdated": "The PfP Native Host application is outdated. Please use the link below for instructions on replacing it with the latest version.",
+  "unconfigured": "The PfP Native Host application has not been configured. Please run it and choose a passwords database to use or create a new one.",
 
-  "download_title": "Download pfp-native-host application"
+  "download_title": "Install PfP Native Host application"
 }

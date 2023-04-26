@@ -9,7 +9,7 @@
     <h1>{{ $t("title") }}</h1>
     <p>{{ $t(error) }}</p>
     <p v-if="error == 'inaccessible' || error == 'native_host_outdated'">
-      <ExternalLink type="url" param="https://github.com/palant/pfp-native-host/releases/latest">
+      <ExternalLink v-focus type="documentation" param="installing-native-host">
         {{ $t("download_title") }}
       </ExternalLink>
     </p>
