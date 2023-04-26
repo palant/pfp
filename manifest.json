@@ -21,7 +21,6 @@
     "scripting",
     "storage",
     "clipboardWrite",
-    "unlimitedStorage",
     "nativeMessaging"
   ],
   "background": {
