@@ -16,13 +16,15 @@
       {{ site.aliases.join(", ") }}
     </div>
 
-    <PasswordInfo
-      v-for="password in site.passwords" :key="password.username"
-      ref="password" :password="password"
-      :site-display-name="displayName" :show-notes="showNotes"
-      :show-passwords="showPasswords" :recovery-code-params="recoveryCodeParams"
-      @removed="removePassword(password)"
-    />
+    <template v-for="password in site.passwords" :key="password.username">
+      <PasswordInfo
+        v-if="$parent.shouldShow(password)"
+        ref="password" :password="password"
+        :site-display-name="displayName" :show-notes="showNotes"
+        :show-passwords="showPasswords" :recovery-code-params="recoveryCodeParams"
+        @removed="removePassword(password)"
+      />
+    </template>
   </div>
 </template>
 

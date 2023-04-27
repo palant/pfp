@@ -6,14 +6,26 @@
 
 <template>
   <div class="list">
-    <Shortcuts :letters="getLetters(sites)" @clicked="scrollToSite" />
+    <Shortcuts :letters="letters" @clicked="scrollToSite" />
 
-    <SiteInfo
-      v-for="site in sites" :key="site.site"
-      :ref="'site.' + site.site" :site="site" :show-notes="showNotes"
-      :show-passwords="showPasswords" :recovery-code-params="recoveryCodeParams"
-      @removed="removeSite(site)"
-    />
+    <div class="filter-row">
+      <div v-if="tags.length" class="filter">
+        <label for="tag-filter">{{ $t("tag_filter") + " " }}</label>
+        <select id="tag-filter" v-model="tagFilter">
+          <option :value="null">Any</option>
+          <option v-for="tag in tags" :key="tag">{{ tag }}</option>
+        </select>
+      </div>
+    </div>
+
+    <template v-for="site in sites" :key="site.site">
+      <SiteInfo
+        v-if="site.passwords.some(shouldShow)"
+        :ref="'site.' + site.site" :site="site" :show-notes="showNotes"
+        :show-passwords="showPasswords" :recovery-code-params="recoveryCodeParams"
+        @removed="removeSite(site)"
+      />
+    </template>
   </div>
 </template>
 
@@ -27,6 +39,7 @@ import SiteInfo from "./SiteInfo.vue";
 
 export default {
   name: "SiteList",
+  localePath: "allpasswords/components/SiteList",
   components: {
     Shortcuts,
     SiteInfo
@@ -49,7 +62,24 @@ export default {
   {
     return {
       sites: [],
+      letters: [],
+      tags: [],
+      tagFilter: null
     };
+  },
+  watch: {
+    sites: {
+      handler()
+      {
+        this.updateLetters();
+        this.updateTags();
+      },
+      deep: true
+    },
+    tagFilter()
+    {
+      this.updateLetters();
+    }
   },
   mounted()
   {
@@ -114,12 +144,25 @@ export default {
       }
       this.sites = siteList;
     }),
-    getLetters(sites)
+
+    shouldShow(entry)
+    {
+      if (!this.tagFilter)
+        return true;
+
+      return entry.tags && entry.tags.includes(this.tagFilter);
+    },
+
+    updateLetters()
     {
       let letters = [];
       let currentLetter = null;
-      for (let site of sites)
+      let filter = entry => this.shouldShow(entry);
+      for (let site of this.sites)
       {
+        if (!site.passwords.some(filter))
+          continue;
+
         let letter = getSiteDisplayName(site.site).toUpperCase()[0];
         if (letter != currentLetter && letter != "(")
         {
@@ -127,12 +170,27 @@ export default {
           letters.push({letter, param: site.site});
         }
       }
-      return letters;
+      this.letters = letters;
     },
+
+    updateTags()
+    {
+      let tags = new Set();
+      for (let site of this.sites)
+        for (let password of site.passwords)
+          for (let tag of password.tags || [])
+            tags.add(tag);
+
+      this.tags = [...tags.keys()].sort();
+      if (!this.tags.includes(this.tagFilter))
+        this.tagFilter = null;
+    },
+
     scrollToSite(site)
     {
       this.$refs["site." + site].activate();
     },
+
     removeSite(site)
     {
       let index = this.sites.indexOf(site);
