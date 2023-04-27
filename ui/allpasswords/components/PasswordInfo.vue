@@ -22,6 +22,12 @@
     </div>
     <div class="password-info">
       <div>{{ $t("/(panel)(components)(PasswordEntry)password_username") }} {{ password.username }}</div>
+      <div v-if="password.tags && password.tags.length">
+        {{ $t("/(panel)(components)(PasswordEntry)tags") }}
+        <ul class="tag-list">
+          <li v-for="tag in password.tags" :key="tag">{{ tag }}</li>
+        </ul>
+      </div>
       <div v-if="showNotes && password.notes" class="notes">{{ $t("/(panel)(components)(PasswordEntry)notes") }} {{ password.notes }}</div>
       <div v-if="recoveryCode && recoveryCodeParams">
         {{ $t("recovery_code") }}

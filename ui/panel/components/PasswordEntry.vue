@@ -90,6 +90,8 @@ export default {
     {
       let password = this.password;
       let tooltip = this.$t("password_username") + " " + password.username;
+      if (password.tags && password.tags.length)
+        tooltip += "\n" + this.$t("tags") + " " + password.tags.join(", ");
       if (password.notes)
         tooltip += "\n" + this.$t("notes") + " " + password.notes;
 
