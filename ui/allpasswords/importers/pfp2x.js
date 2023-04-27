@@ -12,6 +12,14 @@ const SALT_KEY = "salt";
 const HMAC_SECRET_KEY = "hmac-secret";
 const STORAGE_PREFIX = "site:";
 
+function convertSite(site)
+{
+  if (site == "pfp.invalid")
+    return "";
+  else
+    return site;
+}
+
 export default async function(data, password)
 {
   try
@@ -82,7 +90,7 @@ export default async function(data, password)
         title: entry.name + (entry.revision ? " #" + entry.revision : ""),
         username: entry.name,
         password: generated,
-        hostname: entry.site,
+        hostname: convertSite(entry.site),
         notes: entry.notes || null
       });
     }
@@ -92,7 +100,7 @@ export default async function(data, password)
         title: entry.name + (entry.revision ? " #" + entry.revision : ""),
         username: entry.name,
         password: entry.password,
-        hostname: entry.site,
+        hostname: convertSite(entry.site),
         notes: entry.notes || null
       });
     }
