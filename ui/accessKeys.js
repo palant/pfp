@@ -50,6 +50,8 @@ function onKeyDown(event)
     showHints();
   else if (accessKeys && event.altKey && !event.ctrlKey && !event.metaKey)
     triggerHint(event);
+  else if (accessKeys && !event.altKey)
+    hideHints();
 }
 
 function onKeyUp(event)
