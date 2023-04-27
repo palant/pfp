@@ -125,7 +125,7 @@ export default {
     try
     {
       let [protocolVersion, hostname, keys] = await Promise.all([
-        nativeRequest("get-protocol", null),
+        nativeRequest("get-protocol", PROTOCOL_VERSION),
         getCurrentHost(),
         getKeys()
       ]);
