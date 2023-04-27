@@ -22,7 +22,7 @@ export default async function* htmlValidate(files, options = {})
   let report = Reporter.merge(reports);
   if (!report.valid)
   {
-    console.log(formatterFactory("stylish")(report.results));
+    console.log(formatterFactory("text")(report.results));
     throw null;
   }
 }

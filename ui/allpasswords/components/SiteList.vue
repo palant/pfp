@@ -9,13 +9,12 @@
     <Shortcuts :letters="letters" @clicked="scrollToSite" />
 
     <div class="filter-row">
-      <div v-if="tags.length" class="filter">
-        <label for="tag-filter">{{ $t("tag_filter") + " " }}</label>
-        <select id="tag-filter" v-model="tagFilter">
-          <option :value="null">Any</option>
-          <option v-for="tag in tags" :key="tag">{{ tag }}</option>
-        </select>
-      </div>
+      <label for="site-filter">{{ $t("filters") }}</label>
+      <input id="site-filter" v-model.trim="siteFilter" :placeholder="$t('site_filter_placeholder')">
+      <select v-if="tags.length" v-model="tagFilter">
+        <option :value="null">{{ $t("tag_filter_placeholder") }}</option>
+        <option v-for="tag in tags" :key="tag">{{ tag }}</option>
+      </select>
     </div>
 
     <template v-for="site in sites" :key="site.site">
@@ -64,6 +63,7 @@ export default {
       sites: [],
       letters: [],
       tags: [],
+      siteFilter: null,
       tagFilter: null
     };
   },
@@ -75,6 +75,10 @@ export default {
         this.updateTags();
       },
       deep: true
+    },
+    siteFilter()
+    {
+      this.updateLetters();
     },
     tagFilter()
     {
@@ -147,10 +151,13 @@ export default {
 
     shouldShow(entry)
     {
-      if (!this.tagFilter)
-        return true;
+      if (this.siteFilter && !entry.hostname.includes(this.siteFilter))
+        return false;
 
-      return entry.tags && entry.tags.includes(this.tagFilter);
+      if (this.tagFilter && (!entry.tags || !entry.tags.includes(this.tagFilter)))
+        return false;
+
+      return true;
     },
 
     updateLetters()
