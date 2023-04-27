@@ -138,6 +138,23 @@ button
   font-size: $font-size;
 }
 
+input:not([type="checkbox"], [type="radio"], [type="range"], [type="submit"], [type="file"], .tag-input),
+.tag-editor
+{
+  appearance: none;
+  border: 1px inset ButtonBorder;
+  border-radius: 2px;
+  outline: none;
+  background-color: Field;
+  color: FieldText;
+
+  &:focus,
+  &.focus
+  {
+    outline: 1px inset ButtonBorder;
+  }
+}
+
 a
 {
   text-decoration: none;
@@ -334,7 +351,11 @@ input[type="checkbox"]:checked
 
 .accessKeyMarker
 {
-  text-decoration: underline;
+  /* text-decoration isn’t drawn below descenders like g */
+  background-size: 1px 1em;
+  box-shadow:
+    inset 0 -0.125em $background-color,
+    inset 0 -0.175em $text-color;
 }
 
 .accessKeyHint
@@ -419,4 +440,30 @@ a.iconic-link:hover
   opacity: 0.6;
   margin: 0 1em;
   background-image: url("../images/circles.svg");
+}
+
+.tag-list
+{
+  display: inline;
+  margin: 0;
+  padding: 0;
+
+  li
+  {
+    display: inline-block;
+    margin: 2px;
+    padding: 0 2px;
+    border: 1px solid $text-color;
+    border-radius: 3px;
+    background-color: $hover-background;
+    white-space: nowrap;
+  }
+
+  .tag-remove
+  {
+    display: inline-block;
+    cursor: pointer;
+    border-inline-start: 1px solid $text-color;
+    margin-inline-start: 2px;
+  }
 }

@@ -5,7 +5,7 @@
   "applications": {
     "gecko": {
       "id": "pfp@pfp.works",
-      "strict_min_version": "66.0"
+      "strict_min_version": "80.0"
     }
   },
   "default_locale": "en_US",

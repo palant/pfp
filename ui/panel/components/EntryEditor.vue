@@ -61,6 +61,9 @@
       </a>
       <a class="use-recovery" href="#" @click.prevent="recoveryActive = true">{{ $t("use_recovery") }}</a>
 
+      <label class="block-start" for="tags">{{ $t("tags_label") }}</label>
+      <TagEditor id="tags" v-model="tags" />
+
       <div class="button-container">
         <button type="submit">{{ $t("submit") }}</button>
         <button type="reset">{{ $t("/cancel") }}</button>
@@ -76,6 +79,7 @@
 import {handleErrors} from "../../common.js";
 import {nativeRequest} from "../../protocol.js";
 import RecoveryCode from "./RecoveryCode.vue";
+import TagEditor from "./TagEditor.vue";
 
 // I, l, O, 0, 1 excluded because of potential confusion. ", ', \ excluded
 // because of common bugs in web interfaces (magic quotes).
@@ -88,7 +92,8 @@ export default {
   name: "EntryEditor",
   localePath: "panel/components/EntryEditor",
   components: {
-    RecoveryCode
+    RecoveryCode,
+    TagEditor
   },
   props: {
     password: {
@@ -112,7 +117,8 @@ export default {
       symbol: true,
       passwordValue: this.password ? this.password.password : "",
       passwordError: null,
-      recoveryActive: false
+      recoveryActive: false,
+      tags: this.password ? this.password.tags : []
     };
   },
   watch:
@@ -247,7 +253,8 @@ export default {
             hostname: this.$root.hostname,
             title: this.title,
             username: this.name,
-            password: this.passwordValue
+            password: this.passwordValue,
+            tags: this.tags
           });
         }
         else
@@ -257,7 +264,8 @@ export default {
             hostname: this.$root.hostname,
             title: this.title,
             username: this.name,
-            password: this.passwordValue
+            password: this.passwordValue,
+            tags: this.tags
           });
         }
 

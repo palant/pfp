@@ -395,6 +395,28 @@ h1
   min-width: 3ch;
 }
 
+.tag-editor
+{
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  overflow-y: auto;
+}
+
+.tag-list
+{
+  white-space: nowrap;
+}
+
+.tag-input
+{
+  @include no-appearance;
+  border: none;
+  outline: none;
+  flex-grow: 1;
+  min-width: 200px;
+}
+
 .site-autocomplete
 {
   border: $menu-border-width solid $text-color;
