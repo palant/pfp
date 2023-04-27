@@ -68,7 +68,7 @@ function showHints()
 {
   let elements = [];
   let root = document.querySelector(".modalOverlay") || document;
-  for (let element of root.querySelectorAll("button,label,a"))
+  for (let element of root.querySelectorAll("button,select,label,a"))
   {
     if (element.hasAttribute("data-noaccesskey"))
       continue;
@@ -77,6 +77,12 @@ function showHints()
       elements.push([0, element.title.trim(), element]);
     else if (element.localName == "button")
       elements.push([1, element.textContent.trim(), element]);
+    else if (element.localName == "select")
+    {
+      if ((element.labels && element.labels.length) || !element.options.length)
+        continue;
+      elements.push([2, element.options[0].textContent.trim(), element]);
+    }
     else if (element.localName != "a")
       elements.push([2, element.textContent.trim(), element]);
     else if (!element.classList.contains("iconic-link"))
@@ -237,7 +243,10 @@ function triggerHint(event)
       target.click();
     }
     else
+    {
+      element.focus();
       element.click();
+    }
   }
 }
 
