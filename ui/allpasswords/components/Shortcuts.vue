@@ -8,7 +8,7 @@
   <div v-keyboard-navigation:shortcut-letter class="shortcuts">
     <a
       v-for="(letter, index) in letters" :key="letter.letter"
-      v-focus="index == 0" class="shortcut-letter" href="#"
+      v-focus="focusUnassigned() && index == 0" class="shortcut-letter" href="#"
       @click.prevent="$emit('clicked', letter.param)"
     >{{ letter.letter }}</a>
   </div>
@@ -25,6 +25,12 @@ export default {
       required: true
     }
   },
-  emits: ["clicked"]
+  emits: ["clicked"],
+  methods: {
+    focusUnassigned()
+    {
+      return !document.activeElement || document.activeElement == document.body;
+    }
+  }
 };
 </script>
