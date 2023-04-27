@@ -9,7 +9,7 @@
     <label for="site-selection-site">{{ message }}</label>
     <input
       id="site-selection-site" v-model.trim="value" v-focus v-select
-      type="text" placeholder="example.com" autocomplete="off"
+      type="search" placeholder="example.com" autocomplete="off"
       @keydown.arrow-down.prevent="activeIndex = Math.min(activeIndex + 1, sites.length - 1)"
       @keydown.arrow-up.prevent="activeIndex = Math.max(activeIndex - 1, -1)"
       @keydown.enter="enter"

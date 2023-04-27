@@ -10,7 +10,7 @@
 
     <div class="filter-row">
       <label for="site-filter">{{ $t("filters") }}</label>
-      <input id="site-filter" v-model.trim="siteFilter" :placeholder="$t('site_filter_placeholder')">
+      <input id="site-filter" v-model.trim="siteFilter" type="search" :placeholder="$t('site_filter_placeholder')">
       <select v-if="tags.length" v-model="tagFilter">
         <option :value="null">{{ $t("tag_filter_placeholder") }}</option>
         <option v-for="tag in tags" :key="tag">{{ tag }}</option>
