@@ -28,23 +28,25 @@
       <GlobalActions />
     </div>
 
-    <div class="options">
-      <div>
-        <label><input v-model="showNotes" type="checkbox">{{ $t("show_notes") }}</label>
-      </div>
-      <div>
-        <label><input v-model="showRecoveryCodes" type="checkbox">{{ $t("show_recovery_codes") }}</label>
-        <span
-          class="help-icon" :title="$t('recovery_code_explanation')"
-          :aria-label="$t('recovery_code_explanation')"
-        />
-      </div>
-      <div>
-        <label><input v-model="showPasswords" type="checkbox">{{ $t("show_passwords") }}</label>
+    <div class="overview">
+      <div class="intro">{{ $t("intro") }}</div>
+
+      <div class="options">
+        <div>
+          <label><input v-model="showNotes" type="checkbox">{{ $t("show_notes") }}</label>
+        </div>
+        <div>
+          <label><input v-model="showRecoveryCodes" type="checkbox">{{ $t("show_recovery_codes") }}</label>
+          <span
+            class="help-icon" :title="$t('recovery_code_explanation')"
+            :aria-label="$t('recovery_code_explanation')"
+          />
+        </div>
+        <div>
+          <label><input v-model="showPasswords" type="checkbox">{{ $t("show_passwords") }}</label>
+        </div>
       </div>
     </div>
-
-    <div class="intro">{{ $t("intro") }}</div>
 
     <SiteList
       ref="siteList" :show-notes="showNotes" :show-passwords="confirmedPasswords && showPasswords"
