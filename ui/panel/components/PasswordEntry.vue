@@ -27,6 +27,9 @@
       </span>
     </div>
 
+    <UnencryptedFillInConfirmation
+      v-if="fillInConfirmPromise" @done="fillInConfirmDone"
+    />
     <PasswordMenu
       v-if="modal == 'menu'" :password="password"
       @cancel="modal = null"
@@ -62,6 +65,19 @@ import NotesEditor from "./NotesEditor.vue";
 import QRCode from "./QRCode.vue";
 import PasswordMenu from "./PasswordMenu.vue";
 import SiteSelection from "./SiteSelection.vue";
+import UnencryptedFillInConfirmation from "./UnencryptedFillInConfirmation.vue";
+
+function isUnencrypted(url)
+{
+  try
+  {
+    return new URL(url).protocol == "http:";
+  }
+  catch (error)
+  {
+    return false;
+  }
+}
 
 export default {
   name: "PasswordEntry",
@@ -71,7 +87,8 @@ export default {
     NotesEditor,
     QRCode,
     PasswordMenu,
-    SiteSelection
+    SiteSelection,
+    UnencryptedFillInConfirmation
   },
   props: {
     password: {
@@ -87,7 +104,8 @@ export default {
   {
     return {
       passwordOptions: null,
-      modal: null
+      modal: null,
+      fillInConfirmPromise: null
     };
   },
   computed: {
@@ -118,6 +136,33 @@ export default {
         let currentHost = getHostname(tab.url);
         if (normalizeHostname(currentHost) !== this.$root.origHostname)
           throw "wrong_site";
+
+        if (!this.password.insecureFillIn && isUnencrypted(tab.url))
+        {
+          let response = await this.fillInConfirm();
+          console.log(response);
+          if (response == "upgrade")
+          {
+            // Not using tabs.update() here, it would disable Back button.
+            await browser.scripting.executeScript({
+              target: {tabId: tab.id},
+              files: ["contentScript/upgradeConnection.js"]
+            });
+            window.close();
+            return;
+          }
+          else if (response == "fillIn+remember")
+          {
+            await nativeRequest("update-entry", {
+              keys: this.$root.keys,
+              uuid: this.password.uuid,
+              insecureFillIn: true
+            });
+            await this.$root.updateEntries();
+          }
+          else if (response != "fillIn")
+            return;
+        }
 
         await new Promise((resolve, reject) =>
         {
@@ -159,6 +204,22 @@ export default {
         this.$parent.showPasswordMessage(error);
       }
     },
+
+    fillInConfirm()
+    {
+      return new Promise(resolve =>
+      {
+        this.fillInConfirmPromise = resolve;
+      });
+    },
+
+    fillInConfirmDone(result)
+    {
+      let resolve = this.fillInConfirmPromise;
+      this.fillInConfirmPromise = null;
+      resolve(result);
+    },
+
     copy()
     {
       this.modal = null;

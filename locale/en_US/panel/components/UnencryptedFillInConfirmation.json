@@ -1,0 +1,6 @@
+{
+  "prompt": "The website connection is not secure, passwords entered here might be compromised. PfP could attempt navigating to this page via a secure connection if possible, or it could fill in the password regardless. How do you want to proceed?",
+  "remember_label": "Fill in this password without asking in future",
+  "upgrade_label": "Upgrade connection",
+  "accept_label": "Fill in"
+}

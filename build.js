@@ -125,6 +125,7 @@ let common = series(validate, function()
     this.src(["LICENSE.txt", "ui/**/*.html", "ui/images/**", "ui/third-party/**"]),
     this.src("contentScript/fillIn.js")
         .pipe(rollup, ...rollupOptions(this)),
+    this.src("contentScript/upgradeConnection.js"),
     this.src("ui/*/main.js")
         .pipe(rollup, ...rollupOptions(this, {
           format: "es",
