@@ -2,5 +2,12 @@
   "autolock_title": "Enable auto-lock",
   "autolock_description": "Lock passwords automatically when the panel is closed",
   "autolock_delay_title": "Auto-lock delay",
-  "autolock_delay_description": "Interval in minutes after which the passwords should be locked"
+  "autolock_delay_description": "Interval in minutes after which the passwords should be locked",
+  "font_size_title": "Text size",
+  "font_size_description": "",
+  "font_size_small": "Small",
+  "font_size_smaller": "Smaller",
+  "font_size_normal": "Normal",
+  "font_size_larger": "Larger",
+  "font_size_large": "Large"
 }

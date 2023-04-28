@@ -8,8 +8,8 @@
 
 @import "../_shared.scss";
 
-$body-width: 600px;
-$page-padding: 10px;
+$body-width: 25em;
+$page-padding: 0.5em;
 $menu-border-width: 1px;
 
 :root
@@ -28,7 +28,7 @@ h1
   font-size: 100%;
   font-weight: bold;
   margin-top: 0;
-  margin-bottom: $block-spacing;
+  margin-bottom: var(--block-spacing);
 }
 
 .page
@@ -40,7 +40,7 @@ h1
 
 .unknown-error
 {
-  margin: $inline-spacing;
+  margin: var(--inline-spacing);
 }
 
 .special-site
@@ -51,7 +51,7 @@ h1
 .button-container,
 .link-container
 {
-  margin-top: $block-spacing;
+  margin-top: var(--block-spacing);
 }
 
 .button-container:not([hidden]),
@@ -64,12 +64,12 @@ h1
 
 .link-container
 {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .unknown-error-details
 {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
   white-space: pre-wrap;
 }
 
@@ -154,11 +154,11 @@ h1
   display: flex;
   flex-direction: column;
   background-color: #eee;
-  padding-inline-start: $inline-spacing;
+  padding-inline-start: var(--inline-spacing);
 
   & > :first-child
   {
-    height: $inline-spacing;
+    height: var(--inline-spacing);
   }
 
   & > :not(.active)
@@ -169,9 +169,9 @@ h1
 
 .tab
 {
-  min-width: $icon-size + 2 * $inline-spacing;
-  min-height: $icon-size + 2 * $inline-spacing;
-  background-size: $icon-size;
+  min-width: calc(var(--icon-size) + 2 * var(--inline-spacing));
+  min-height: calc(var(--icon-size) + 2 * var(--inline-spacing));
+  background-size: var(--icon-size);
   background-repeat: no-repeat;
   background-position: 50%;
   border: 1px solid #eee;
@@ -181,12 +181,12 @@ h1
     background-color: $background-color;
     border-color: #ccc;
 
-    border-radius: $border-radius 0 0 $border-radius;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
     border-right-color: $background-color;
 
     :root[dir="rtl"] &
     {
-      border-radius: 0 $border-radius $border-radius 0;
+      border-radius: 0 var(--border-radius) var(--border-radius) 0;
       border-left-color: $background-color;
     }
   }
@@ -224,7 +224,7 @@ h1
 
 .alias-container
 {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .password-list-container
@@ -310,7 +310,7 @@ h1
     display: flex;
     flex-direction: row;
     align-items: center;
-    font-size: $font-size-small;
+    font-size: var(--font-size-small);
     color: $text-color;
     text-decoration: none;
   }
@@ -322,7 +322,7 @@ h1
 
   & > .iconic-link
   {
-    margin-inline-end: $inline-spacing;
+    margin-inline-end: var(--inline-spacing);
   }
 }
 
@@ -337,24 +337,24 @@ h1
 
     &:first-child
     {
-      padding-inline-end: $inline-spacing;
+      padding-inline-end: var(--inline-spacing);
     }
 
     &:not(:first-child)
     {
       border-inline-start: 1px solid #ccc;
       justify-content: flex-end;
-      padding-inline-start: $inline-spacing;
+      padding-inline-start: var(--inline-spacing);
     }
   }
 }
 
 .add-password-link
 {
-  min-height: $icon-size;
-  padding-inline-start: $icon-size + $inline-spacing;
+  min-height: var(--icon-size);
+  padding-inline-start: calc(var(--icon-size) + var(--inline-spacing));
   background-image: url("../images/ionicons/md-add-circle-outline.svg");
-  background-size: $icon-size;
+  background-size: var(--icon-size);
   background-repeat: no-repeat;
 }
 
@@ -373,7 +373,7 @@ h1
 
 .warning.replacing
 {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .title-container:not([hidden])
@@ -387,7 +387,7 @@ h1
 .use-recovery,
 .cancel-recovery
 {
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
 }
 
 #password-length
@@ -425,8 +425,8 @@ h1
 .site-autocomplete
 {
   border: $menu-border-width solid $text-color;
-  padding: $block-padding;
-  max-height: 8 * $font-size;
+  padding: var(--block-padding);
+  max-height: calc(8 * var(--font-size));
   overflow: auto;
 
   & > .site-entry
@@ -444,13 +444,13 @@ h1
 .recovery-code-accepted
 {
   margin: 0;
-  font-size: $font-size-small;
+  font-size: var(--font-size-small);
   font-family: monospace;
 }
 
 .recovery-code-strip
 {
-  margin: -2px $inline-spacing;
+  margin: -2px var(--inline-spacing);
 }
 
 #recoveryInput

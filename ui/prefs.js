@@ -25,3 +25,20 @@ export async function setPref(name, value)
   let key = prefsPrefix + name;
   await browser.storage.local.set({[key]: value});
 }
+
+async function updateFontSize()
+{
+  document.documentElement.setAttribute("data-size", await getPref("font_size", "normal"));
+}
+
+export async function initFontSize()
+{
+  await updateFontSize();
+
+  browser.storage.local.onChanged.addListener(changes =>
+  {
+    let key = prefsPrefix + "font_size";
+    if (key in changes)
+      updateFontSize();
+  });
+}

@@ -8,6 +8,7 @@
   <div>
     <Setting name="autolock" :def-value="true" :default-focus="true" @modified="resetAutolock" />
     <Setting name="autolock_delay" :def-value="10" :min-value="1" @modified="resetAutolock" />
+    <Setting name="font_size" :choices="['small', 'smaller', 'normal', 'larger', 'large']" def-value="normal" />
   </div>
 </template>
 

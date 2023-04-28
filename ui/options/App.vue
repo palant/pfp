@@ -12,11 +12,16 @@
 "use strict";
 
 import SettingPage from "../components/SettingsPage.vue";
+import {initFontSize} from "../prefs.js";
 
 export default {
   name: "App",
   components: {
     SettingPage
+  },
+  mounted()
+  {
+    initFontSize();
   }
 };
 </script>

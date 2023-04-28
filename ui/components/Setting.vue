@@ -10,6 +10,9 @@
       <label :for="name">{{ $t(name + "_title") }}</label>
       <span class="description">{{ $t(name + "_description") }}</span>
     </div>
+    <select v-if="choices !== null" :id="name" ref="input" v-model="value" v-focus="defaultFocus">
+      <option v-for="choice in choices" :key="choice" :value="choice">{{ $t(name + "_" + choice) }}</option>
+    </select>
     <input v-if="typeof defValue == 'boolean'" :id="name" ref="input" v-model="value" v-focus="defaultFocus" type="checkbox">
     <input v-else-if="typeof defValue == 'number'" :id="name" ref="input" v-model="value" v-focus="defaultFocus" type="number" :min="minValue">
   </div>
@@ -29,8 +32,12 @@ export default {
       required: true
     },
     defValue: {
-      type: [Boolean, Number],
+      type: [Boolean, Number, String],
       required: true
+    },
+    choices: {
+      type: Array,
+      default: null
     },
     minValue: {
       type: Number,

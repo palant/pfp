@@ -59,7 +59,7 @@
 "use strict";
 
 import {handleErrors} from "../common.js";
-import {getPref, setPref} from "../prefs.js";
+import {getPref, setPref, initFontSize} from "../prefs.js";
 import {getKeys} from "../keys.js";
 import {getRecoveryCodeParameters} from "../recoveryCodes.js";
 import Confirm from "../components/Confirm.vue";
@@ -148,8 +148,11 @@ export default {
   {
     document.title = this.$t("title");
 
-    this.showNotes = await getPref("showNotes", true);
-    this.keys = await getKeys();
+    [this.showNotes, this.keys] = await Promise.all([
+      getPref("showNotes", true),
+      getKeys(),
+      initFontSize()
+    ]);
   }),
   methods: {
     testUnknownError()

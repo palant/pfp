@@ -65,6 +65,7 @@ import {
 } from "../common.js";
 import {nativeRequest, PROTOCOL_VERSION} from "../protocol.js";
 import {getKeys, forgetKeys} from "../keys.js";
+import {initFontSize} from "../prefs.js";
 import EnterMainPassword from "../components/EnterMainPassword.vue";
 import NativeHostError from "./pages/NativeHostError.vue";
 import PasswordList from "./pages/PasswordList.vue";
@@ -127,7 +128,8 @@ export default {
       let [protocolVersion, hostname, keys] = await Promise.all([
         nativeRequest("get-protocol", PROTOCOL_VERSION),
         getCurrentHost(),
-        getKeys()
+        getKeys(),
+        initFontSize()
       ]);
 
       this.nativeHost = this.checkNativeHostProtocol(protocolVersion);
