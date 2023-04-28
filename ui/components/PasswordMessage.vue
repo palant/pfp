@@ -43,6 +43,8 @@ export default {
 
       if (this.message.name == "NoSuchEntry")
         this.message = "no_such_password";
+      else if (this.message.name == "EntryExists")
+        this.message = "password_exists";
 
       if (this.messages.hasOwnProperty(this.message))
       {

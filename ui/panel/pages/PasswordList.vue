@@ -45,6 +45,7 @@
         password_copied: true,
         username_copied: true,
         no_such_password: false,
+        password_exists: false,
         wrong_site: false,
         no_password_fields: false
       }"
