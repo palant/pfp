@@ -22,7 +22,7 @@
         class="to-clipboard-link iconic-link"
         :title="$t('.(PasswordMenu)to_clipboard')" @click="copy"
       />
-      <span class="password-title" :title="tooltip">
+      <span class="password-title" :title="tooltip" @dblclick="editEntry">
         {{ password.title }}
       </span>
     </div>
