@@ -25,6 +25,11 @@
       <span class="password-title" :title="tooltip" @dblclick="editEntry">
         {{ password.title }}
       </span>
+      <IconicLink
+        v-if="password.notes"
+        class="notes-link iconic-link"
+        :title="$t('.(PasswordMenu)edit_notes')" @click="showNotes"
+      />
     </div>
 
     <UnencryptedFillInConfirmation
