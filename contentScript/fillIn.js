@@ -21,7 +21,9 @@ function getActiveElement(doc)
 
 function isVisible(element)
 {
-  return element.offsetHeight && element.offsetWidth;
+  let styles = window.getComputedStyle(element, "");
+  return element.offsetHeight && element.offsetWidth && styles.opacity != 0 &&
+    styles.visibility != "hidden"  && styles.visibility != "collapse";
 }
 
 function fakeInput(field, value)
