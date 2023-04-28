@@ -154,7 +154,7 @@ h1
   display: flex;
   flex-direction: column;
   background-color: #eee;
-  @include padding-inline-start($inline-spacing);
+  padding-inline-start: $inline-spacing;
 
   & > :first-child
   {
@@ -163,7 +163,7 @@ h1
 
   & > :not(.active)
   {
-    @include border-end(1px solid #ccc);
+    border-inline-end: 1px solid #ccc;
   }
 }
 
@@ -322,7 +322,7 @@ h1
 
   & > .iconic-link
   {
-    @include margin-inline-end($inline-spacing);
+    margin-inline-end: $inline-spacing;
   }
 }
 
@@ -337,14 +337,14 @@ h1
 
     &:first-child
     {
-      @include padding-inline-end($inline-spacing);
+      padding-inline-end: $inline-spacing;
     }
 
     &:not(:first-child)
     {
-      @include border-start(1px solid #ccc);
+      border-inline-start: 1px solid #ccc;
       justify-content: flex-end;
-      @include padding-inline-start($inline-spacing);
+      padding-inline-start: $inline-spacing;
     }
   }
 }
@@ -352,7 +352,7 @@ h1
 .add-password-link
 {
   min-height: $icon-size;
-  @include padding-inline-start($icon-size + $inline-spacing);
+  padding-inline-start: $icon-size + $inline-spacing;
   background-image: url("../images/ionicons/md-add-circle-outline.svg");
   background-size: $icon-size;
   background-repeat: no-repeat;
@@ -415,7 +415,7 @@ h1
 
 .tag-input
 {
-  @include no-appearance;
+  appearance: none;
   border: none;
   outline: none;
   flex-grow: 1;
