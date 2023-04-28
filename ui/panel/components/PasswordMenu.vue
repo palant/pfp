@@ -27,6 +27,10 @@
       <span class="edit-entry-link iconic-link" />
       {{ $t("edit_entry") }}
     </a>
+    <a href="#" class="password-menu-entry" @click.prevent="$parent.moveEntry">
+      <span class="move-entry-link iconic-link" />
+      {{ $t("move_entry") }}
+    </a>
     <a href="#" class="password-menu-entry" @click.prevent="$parent.showNotes">
       <span class="notes-link iconic-link" />
       {{ $t(password.notes ? "edit_notes" : "add_notes") }}

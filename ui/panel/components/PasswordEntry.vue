@@ -39,6 +39,9 @@
       v-if="modal == 'editor'" :password="password"
       @cancel="modal = null"
     />
+    <ModalOverlay v-if="modal == 'move'" :stretch="true" @cancel="modal = null">
+      <SiteSelection :message="$t('move_prompt')" :callback="doMove" />
+    </ModalOverlay>
     <NotesEditor
       v-if="modal == 'notes'" :password="password"
       @cancel="modal = null"
@@ -58,6 +61,7 @@ import EntryEditor from "./EntryEditor.vue";
 import NotesEditor from "./NotesEditor.vue";
 import QRCode from "./QRCode.vue";
 import PasswordMenu from "./PasswordMenu.vue";
+import SiteSelection from "./SiteSelection.vue";
 
 export default {
   name: "PasswordEntry",
@@ -66,7 +70,8 @@ export default {
     EntryEditor,
     NotesEditor,
     QRCode,
-    PasswordMenu
+    PasswordMenu,
+    SiteSelection
   },
   props: {
     password: {
@@ -170,6 +175,30 @@ export default {
     editEntry()
     {
       this.modal = "editor";
+    },
+    moveEntry()
+    {
+      this.modal = "move";
+    },
+    async doMove(hostname)
+    {
+      this.modal = null;
+      if (hostname == this.password.hostname)
+        return;
+
+      try
+      {
+        await nativeRequest("update-entry", {
+          keys: this.$root.keys,
+          uuid: this.password.uuid,
+          hostname
+        });
+        await this.$root.updateEntries();
+      }
+      catch (error)
+      {
+        this.$parent.showPasswordMessage(error);
+      }
     },
     showQRCode()
     {
