@@ -7,6 +7,7 @@
 "use strict";
 
 import browser from "./browserAPI.js";
+import {getPref, setPref} from "./prefs.js";
 
 export const PROTOCOL_VERSION = "1.1";
 
@@ -58,9 +59,12 @@ export async function nativeRequest(action, request)
   if (!port)
     connect();
 
+  let database = await getDatabase();
+
   let requestId = Math.random().toString().slice(2);
   let message = {
     requestId,
+    database,
     action,
     request
   };
@@ -71,4 +75,14 @@ export async function nativeRequest(action, request)
   {
     responseQueue.set(requestId, [resolve, reject]);
   });
+}
+
+export async function getDatabase()
+{
+  return await getPref("database", null);
+}
+
+export async function setDatabase(database)
+{
+  await setPref("database", database);
 }
