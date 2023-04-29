@@ -161,7 +161,12 @@ function showHints()
           accessKeyElements.push(span);
 
           if (index + 1 < text.length)
-            replacements.push(document.createTextNode(text.substr(index + 1)));
+          {
+            let textEnd = text.substr(index + 1);
+            // Make sure whitespace after the marker isn’t collapsed
+            textEnd = textEnd.replace(/^ /, "\xA0");
+            replacements.push(document.createTextNode(textEnd));
+          }
 
           element.replaceChild(replacements[0], child);
           let insertionPoint = replacements[0].nextSibling;
@@ -216,7 +221,7 @@ function hideHints()
         text += element.textContent;
         if (element.nextSibling && element.nextSibling.nodeType == Node.TEXT_NODE)
         {
-          text += element.nextSibling.nodeValue;
+          text += element.nextSibling.nodeValue.replace(/^\xA0/, " ");
           element.parentNode.removeChild(element.nextSibling);
         }
         element.parentNode.replaceChild(document.createTextNode(text), element);
