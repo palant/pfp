@@ -295,10 +295,10 @@ input[type="checkbox"]:checked
 .accessKeyMarker
 {
   /* text-decoration isn’t drawn below descenders like g */
-  background-size: 1px 1em;
-  box-shadow:
-    inset 0 -0.125em $background-color,
-    inset 0 -0.175em $text-color;
+  background-size: 100% 1px;
+  background-repeat: repeat-x;
+  background-image: linear-gradient(to right, $text-color 0%, $text-color 100%);
+  background-position: 0 90%;
 }
 
 .accessKeyHint
