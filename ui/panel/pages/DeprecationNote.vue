@@ -11,7 +11,9 @@
     <p class="deprecationNote">{{ $t("par2") }}</p>
     <p class="deprecationNote">{{ $t("par3") }}</p>
     <p class="deprecationNote">{{ $t("par4") }}</p>
-    <p class="deprecationNote">{{ $t("par5") }}</p>
+    <ExternalLink type="url" param="https://palant.info/2023/05/02/a-way-forward-for-pfp-pain-free-passwords/">
+      {{ $t("more_info") }}
+    </ExternalLink>
     <label class="block-start">
       <input v-model="rememberAccept" type="checkbox">
       {{ $t("rememberAccept") }}
