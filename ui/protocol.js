@@ -35,6 +35,11 @@ function connect()
 
 async function onMessage(message)
 {
+  // Error message without requestId is probably a parsing error, assign it to
+  // the currently outstanding request.
+  if (!message.requestId && !message.success && responseQueue.size == 1)
+    message.requestId = responseQueue.keys().next().value;
+
   let queued = responseQueue.get(message.requestId);
   if (!queued)
   {
