@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "builder",
-    "test": "builder test"
+    "test": "builder validate"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^5.0.0",
