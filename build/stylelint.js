@@ -24,13 +24,13 @@ export default async function* stylelint_(files, options = {})
     });
 
     let result = await stylelint.lint(options);
-    if (options.fix && result.output)
-      yield new MemoryFile(file.path, result.output);
+    if (options.fix && result.code)
+      yield new MemoryFile(file.path, result.code);
     else
     {
       yield file;
-      if (result.output)
-        console.log(result.output);
+      if (result.report)
+        console.log(result.report);
     }
     if (result.errored)
       seenErrors = true;

@@ -13,6 +13,7 @@
     "selector-id-pattern": null,
     "scss/at-import-no-partial-leading-underscore": null,
     "scss/at-import-partial-extension": "always",
-    "scss/dollar-variable-empty-line-before": null
+    "scss/dollar-variable-empty-line-before": null,
+    "scss/load-no-partial-leading-underscore": null
   }
 }
