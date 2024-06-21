@@ -15,7 +15,7 @@ export default async function* htmlValidate(files, options = {})
   for await (let file of files)
   {
     file = await file.read();
-    reports.push(validator.validateString(file.contents, file.path));
+    reports.push(await validator.validateString(file.contents, file.path));
     yield file;
   }
 

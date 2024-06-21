@@ -8,11 +8,11 @@
 
 import path from "path";
 
-import sass from "sass";
+import {compile} from "sass";
 
 import {PhysicalFile, MemoryFile} from "builder";
 
-export default async function* sass_(files)
+export default async function* sass(files)
 {
   for await (let file of files)
   {
@@ -25,6 +25,6 @@ export default async function* sass_(files)
     // Replace file extension by .css
     let newPath = path.join(path.dirname(file.path), path.basename(file.path, path.extname(file.path))) + ".css";
 
-    yield new MemoryFile(newPath, sass.compile(file.path).css);
+    yield new MemoryFile(newPath, compile(file.path).css);
   }
 }
