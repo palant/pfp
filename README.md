@@ -6,7 +6,7 @@ PfP: Pain-free Passwords is a Firefox, Chrome and Opera password manager. It com
 Installing build prerequisites
 ------------------------------
 
-In order to build PfP you will need to install [Node.js](https://nodejs.org/) first (Node 16 or higher is required). Additional dependencies are installed using the following command in the extension directory:
+In order to build PfP you will need to install [Node.js](https://nodejs.org/) first (Node 17 or higher is required). Additional dependencies are installed using the following command in the extension directory:
 
     npm install
 

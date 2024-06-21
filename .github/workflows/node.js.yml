@@ -17,10 +17,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [19.x, 20.x]
+        node-version: [21.x, 22.x]
         include:
           - os: ubuntu-latest
-            node-version: 16.x
+            node-version: 17.x
 
     steps:
     - uses: actions/checkout@v3
